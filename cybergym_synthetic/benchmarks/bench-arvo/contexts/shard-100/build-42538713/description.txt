@@ -1,0 +1,44 @@
+ARVO id: 42538713
+Project: ots
+Fuzz target: ots-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/khaledhosny/ots.git
+
+=== Crash report ===
+INFO: Seed: 1826742349
+INFO: Loaded 1 modules   (13596 inline 8-bit counters): 13596 [0xaa6c50, 0xaaa16c), 
+INFO: Loaded 1 PC tables (13596 PCs): 13596 [0x7ec0b0,0x821270), 
+/out/ots-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x627000385430 (pc 0x0000005b92d7 bp 0x7fffffffd950 sp 0x7fffffffd910 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x5b92d6 in ots::Buffer::ReadU16(unsigned short*) /src/ots/src/ots.h:114:5
+    #1 0x619621 in (anonymous namespace)::ParseVariationDataSubtable(ots::Font const*, unsigned char const*, unsigned long, unsigned short) /src/ots/src/variations.cc:68:17
+    #2 0x61871d in ots::ParseItemVariationStore(ots::Font const*, unsigned char const*, unsigned long) /src/ots/src/variations.cc:128:10
+    #3 0x610a13 in ots::OpenTypeHVAR::Parse(unsigned char const*, unsigned long) /src/ots/src/hvar.cc:47:8
+    #4 0x5aabc7 in ots::Font::ParseTable(ots::TableEntry const&, unsigned char const*, ots::Arena&) /src/ots/src/ots.cc:946:20
+    #5 0x5b2fdd in (anonymous namespace)::ProcessGeneric(ots::FontFile*, ots::Font*, unsigned int, ots::OTSStream*, unsigned char const*, unsigned long, std::__1::vector<ots::TableEntry, std::__1::allocator<ots::TableEntry> > const&, ots::Buffer&) /src/ots/src/ots.cc:697:18
+    #6 0x5b21cd in (anonymous namespace)::ProcessTTF(ots::FontFile*, ots::Font*, ots::OTSStream*, unsigned char const*, unsigned long, unsigned int) /src/ots/src/ots.cc:259:10
+    #7 0x5ad9ba in ots::OTSContext::Process(ots::OTSStream*, unsigned char const*, unsigned long, unsigned int) /src/ots/src/ots.cc:1109:14
+    #8 0x5a925c in LLVMFuzzerTestOneInput /src/ots/util/ots-fuzzer.cc:21:21
+    #9 0x54e481 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:517:13
+    #10 0x52565a in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #11 0x530f0b in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #12 0x524cfc in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #13 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #14 0x41cb88 in _start (/out/ots-fuzzer+0x41cb88)
+
+DEDUP_TOKEN: ots::Buffer::ReadU16(unsigned short*)--(anonymous namespace)::ParseVariationDataSubtable(ots::Font const*, unsigned char const*, unsigned long, unsigned short)--ots::ParseItemVariationStore(ots::Font const*, unsigned char const*, unsigned long)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/ots/src/ots.h:114:5 in ots::Buffer::ReadU16(unsigned short*)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42538713

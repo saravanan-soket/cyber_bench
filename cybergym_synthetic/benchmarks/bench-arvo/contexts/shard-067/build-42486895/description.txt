@@ -1,0 +1,50 @@
+ARVO id: 42486895
+Project: poppler
+Fuzz target: pdf_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Negative-size-param
+Language: c++
+Repo: https://gitlab.freedesktop.org/poppler/poppler.git
+
+=== Crash report ===
+INFO: Seed: 3678630673
+INFO: Loaded 1 modules   (78321 inline 8-bit counters): 78321 [0x14a1f78, 0x14b5169), 
+INFO: Loaded 1 PC tables (78321 PCs): 78321 [0xf39748,0x106b658), 
+/out/pdf_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: negative-size-param: (size=-287)
+[1m[0mSCARINESS: 10 (negative-size-param)
+    #0 0x51e784 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #1 0x55c315 in BaseMemStream<char const>::getChars(int, unsigned char*) /src/poppler/poppler/Stream.h:725:5
+    #2 0x59d3d3 in Stream::doGetChars(int, unsigned char*) /src/poppler/poppler/Stream.h:122:14
+    #3 0x59d24c in Stream::fillString(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&) /src/poppler/poppler/Stream.h:138:25
+    #4 0x5915f3 in Stream::fillGooString(GooString*) /src/poppler/poppler/Stream.h:145:5
+    #5 0x591065 in Catalog::readMetadata() /src/poppler/poppler/Catalog.cc:175:25
+    #6 0x559423 in poppler::document::metadata() const /src/poppler/cpp/poppler-document.cpp:824:57
+    #7 0x551923 in LLVMFuzzerTestOneInput /src/fuzz/pdf_fuzzer.cc:37:8
+    #8 0x45a431 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #9 0x445762 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #10 0x44b8be in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #11 0x473782 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #12 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #13 0x41fe58 in _start (/out/pdf_fuzzer+0x41fe58)
+
+DEDUP_TOKEN: __asan_memcpy--BaseMemStream<char const>::getChars(int, unsigned char*)--Stream::doGetChars(int, unsigned char*)
+[1m[32m0x7ffff7e789cf is located 160207 bytes inside of 163136-byte region [0x7ffff7e51800,0x7ffff7e79540)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x51f37d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x433f17 in operator new(unsigned long) (/out/pdf_fuzzer+0x433f17)
+    #2 0x445762 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #3 0x44b8be in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #4 0x473782 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #5 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: malloc--operator new(unsigned long)--fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long)
+SUMMARY: AddressSanitizer: negative-size-param /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3 in __asan_memcpy
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42486895

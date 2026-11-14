@@ -1,0 +1,49 @@
+ARVO id: 42485462
+Project: skia
+Fuzz target: api_svg_canvas
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Seed: 3479817477
+INFO: Loaded 1 modules   (236114 inline 8-bit counters): 236114 [0x48435f8, 0x487d04a), 
+INFO: Loaded 1 PC tables (236114 PCs): 236114 [0x487d050,0x4c17570), 
+/out/api_svg_canvas: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x206739b in SkColorShader::asAGradient(SkShader::GradientInfo*) const /src/skia/out/Fuzz/../../src/shaders/SkColorShader.cpp:34:27
+    #1 0xb115fa in SkSVGDevice::AutoElement::addGradientShaderResources(SkShader const*, SkPaint const&, (anonymous namespace)::Resources*) /src/skia/out/Fuzz/../../src/svg/SkSVGDevice.cpp:405:51
+    #2 0xb10da0 in SkSVGDevice::AutoElement::addShaderResources(SkPaint const&, (anonymous namespace)::Resources*) /src/skia/out/Fuzz/../../src/svg/SkSVGDevice.cpp:564:15
+    #3 0xb0fead in SkSVGDevice::AutoElement::addResources(SkSVGDevice::MxCp const&, SkPaint const&) /src/skia/out/Fuzz/../../src/svg/SkSVGDevice.cpp:386:15
+    #4 0xb080ea in SkSVGDevice::AutoElement::AutoElement(char const*, SkSVGDevice*, SkSVGDevice::ResourceBucket*, SkSVGDevice::MxCp const&, SkPaint const&) /src/skia/out/Fuzz/../../src/svg/SkSVGDevice.cpp:262:31
+    #5 0xb098f2 in SkSVGDevice::drawPath(SkPath const&, SkPaint const&, bool) /src/skia/out/Fuzz/../../src/svg/SkSVGDevice.cpp:908:17
+    #6 0xba7813 in SkCanvas::onDrawPath(SkPath const&, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2433:23
+    #7 0xb9d6e1 in SkCanvas::drawPath(SkPath const&, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1992:11
+    #8 0x980c29 in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1262:25
+    #9 0x9903ad in fuzz_SVGCanvas(Fuzz*) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1779:5
+    #10 0x9baa39 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAPISVGCanvas.cpp:14:5
+    #11 0x8d41d1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #12 0x8bfc62 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #13 0x8c5c8e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #14 0x8ec8d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #15 0x7ffff3d2982f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #16 0x89a528 in _start (/out/api_svg_canvas+0x89a528)
+
+DEDUP_TOKEN: SkColorShader::asAGradient(SkShader::GradientInfo*) const--SkSVGDevice::AutoElement::addGradientShaderResources(SkShader const*, SkPaint const&, (anonymous namespace)::Resources*)--SkSVGDevice::AutoElement::addShaderResources(SkPaint const&, (anonymous namespace)::Resources*)
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mgrInfo[1m[35m' in the stack frame of function '[1m[32m_ZN11SkSVGDevice11AutoElement26addGradientShaderResourcesEPK8SkShaderRK7SkPaintPN12_GLOBAL__N_19ResourcesE[1m[35m'[1m[0m
+    #0 0xb114a0 in SkSVGDevice::AutoElement::addGradientShaderResources(SkShader const*, SkPaint const&, (anonymous namespace)::Resources*) /src/skia/out/Fuzz/../../src/svg/SkSVGDevice.cpp:402
+
+DEDUP_TOKEN: SkSVGDevice::AutoElement::addGradientShaderResources(SkShader const*, SkPaint const&, (anonymous namespace)::Resources*)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/skia/out/Fuzz/../../src/shaders/SkColorShader.cpp:34:27 in SkColorShader::asAGradient(SkShader::GradientInfo*) const
+Unique heap origins: 92
+Stack depot allocated bytes: 8000
+Unique origin histories: 7
+History depot allocated bytes: 168
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42485462

@@ -1,0 +1,42 @@
+ARVO id: 42540437
+Project: imagemagick
+Fuzz target: encoder_mvg_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 4231049038
+INFO: Loaded 1 modules   (157505 inline 8-bit counters): 157505 [0x29fdba8, 0x2a242e9), 
+INFO: Loaded 1 PC tables (157505 PCs): 157505 [0x2a242f0,0x2c8b700), 
+/out/encoder_mvg_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address 0x7fed56177000 (pc 0x7fed551b2d76 bp 0x7ffd6f603e70 sp 0x7ffd6f603608 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7fed551b2d75  (/lib/x86_64-linux-gnu/libc.so.6+0x14dd75)
+    #1 0x461db0 in __msan_memcpy.part.51 /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:1493
+    #2 0x8563af in CheckPrimitiveExtent /src/imagemagick/MagickCore/draw.c:2228:10
+    #3 0x8470bd in DrawImage /src/imagemagick/MagickCore/draw.c:3964:17
+    #4 0xe82ff1 in ReadMVGImage /src/imagemagick/coders/mvg.c:222:10
+    #5 0x7d4509 in ReadImage /src/imagemagick/MagickCore/constitute.c:500:13
+    #6 0x6fddfa in BlobToImage /src/imagemagick/MagickCore/blob.c:473:13
+    #7 0x593b61 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4029:12
+    #8 0x4a4bdc in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #9 0x4ebddc in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:526:13
+    #10 0x4a60a6 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #11 0x4b6a0d in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:707:9
+    #12 0x4a51e1 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #13 0x7fed5508583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #14 0x4220f8 in _start (/out/encoder_mvg_fuzzer+0x4220f8)
+
+DEDUP_TOKEN: __msan_memcpy.part.51--CheckPrimitiveExtent
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x14dd75) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42540437

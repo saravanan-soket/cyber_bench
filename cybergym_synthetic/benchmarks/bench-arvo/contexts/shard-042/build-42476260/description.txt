@@ -1,0 +1,42 @@
+ARVO id: 42476260
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_VORBIS_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Seed: 949386800
+INFO: Loaded 1 modules   (62024 inline 8-bit counters): 62024 [0xc274c0, 0xc36708), 
+INFO: Loaded 1 PC tables (62024 PCs): 62024 [0x84ba58,0x93ded8), 
+/out/ffmpeg_AV_CODEC_ID_VORBIS_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x00042eeb1834 (pc 0x0000004ed90c bp 0x7ffc6bbc60d0 sp 0x7ffc6bbc6010 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x4ed90b in vorbis_floor0_decode /src/ffmpeg/libavcodec/vorbisdec.c:1135:36
+    #1 0x4eeb07 in vorbis_parse_audio_packet /src/ffmpeg/libavcodec/vorbisdec.c:1633:15
+    #2 0x4e8451 in vorbis_decode_frame /src/ffmpeg/libavcodec/vorbisdec.c:1812:16
+    #3 0x4d4fbd in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:433:15
+    #4 0x4d4e1b in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:629:15
+    #5 0x4d0178 in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:647:15
+    #6 0x4d008b in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:705:15
+    #7 0x4d0afd in compat_decode /src/ffmpeg/libavcodec/decode.c:841:15
+    #8 0x4cbeed in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:257:23
+    #9 0x45d991 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:553:15
+    #10 0x448b91 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:286:6
+    #11 0x44e59a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:767:9
+    #12 0x476a42 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #13 0x7ff71428082f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #14 0x407e88 in _start (/out/ffmpeg_AV_CODEC_ID_VORBIS_fuzzer+0x407e88)
+
+DEDUP_TOKEN: vorbis_floor0_decode--vorbis_parse_audio_packet--vorbis_decode_frame
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/ffmpeg/libavcodec/vorbisdec.c:1135:36 in vorbis_floor0_decode
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42476260

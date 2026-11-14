@@ -1,0 +1,55 @@
+ARVO id: 42503337
+Project: serenity
+Fuzz target: FuzzMarkdown
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/SerenityOS/serenity
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 506509734
+INFO: Loaded 1 modules   (128415 inline 8-bit counters): 128415 [0x15a22e0, 0x15c187f), 
+INFO: Loaded 1 PC tables (128415 PCs): 128415 [0x15c1880,0x17b7270), 
+/out/FuzzMarkdown: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x7ffff4a00028 (pc 0x0000010e2799 bp 0x7fffffffd150 sp 0x7fffffffd0d0 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x10e2799 in AK::Vector<unsigned long, 0ul>::clear_with_capacity() /src/serenity/Meta/Lagom/../../AK/Vector.h:347:16
+    #1 0x10e2799 in AK::Vector<unsigned long, 0ul>::clear() /src/serenity/Meta/Lagom/../../AK/Vector.h:335:9
+    #2 0x10e2799 in AK::Vector<unsigned long, 0ul>::~Vector() /src/serenity/Meta/Lagom/../../AK/Vector.h:100:9
+    #3 0x10e2799 in regex::MatchState::~MatchState() /src/serenity/Userland/Libraries/LibRegex/RegexMatch.h:521:8
+    #4 0x10e2799 in regex::BumpAllocatedLinkedList<regex::MatchState>::Node::~Node() /src/serenity/Userland/Libraries/LibRegex/RegexMatcher.cpp:379:12
+    #5 0x10e2799 in auto AK::UniformBumpAllocator<regex::BumpAllocatedLinkedList<regex::MatchState>::Node, true, 2097152ul>::destroy_all()::'lambda'(auto)::operator()<unsigned long>(auto) const /src/serenity/Meta/Lagom/../../AK/BumpAllocator.h:181:50
+    #6 0x10e2799 in void AK::BumpAllocator<true, 2097152ul>::for_each_chunk<AK::UniformBumpAllocator<regex::BumpAllocatedLinkedList<regex::MatchState>::Node, true, 2097152ul>::destroy_all()::'lambda'(auto)>(auto&&) /src/serenity/Meta/Lagom/../../AK/BumpAllocator.h:91:13
+    #7 0x10e2799 in AK::UniformBumpAllocator<regex::BumpAllocatedLinkedList<regex::MatchState>::Node, true, 2097152ul>::destroy_all() /src/serenity/Meta/Lagom/../../AK/BumpAllocator.h:175:15
+    #8 0x10e2799 in AK::UniformBumpAllocator<regex::BumpAllocatedLinkedList<regex::MatchState>::Node, true, 2097152ul>::~UniformBumpAllocator() /src/serenity/Meta/Lagom/../../AK/BumpAllocator.h:159:9
+    #9 0x10d171b in regex::BumpAllocatedLinkedList<regex::MatchState>::~BumpAllocatedLinkedList() /src/serenity/Userland/Libraries/LibRegex/RegexMatcher.cpp:330:7
+    #10 0x10d171b in regex::Matcher<regex::ECMA262Parser>::execute(regex::MatchInput const&, regex::MatchState&, unsigned long&) const /src/serenity/Userland/Libraries/LibRegex/RegexMatcher.cpp:508:1
+    #11 0x10cbfb9 in regex::Matcher<regex::ECMA262Parser>::match(AK::Vector<regex::RegexStringView, 0ul> const&, AK::Optional<regex::RegexOptions<regex::ECMAScriptFlags> >) const /src/serenity/Userland/Libraries/LibRegex/RegexMatcher.cpp:246:28
+    #12 0x10ca359 in regex::Matcher<regex::ECMA262Parser>::match(regex::RegexStringView const&, AK::Optional<regex::RegexOptions<regex::ECMAScriptFlags> >) const /src/serenity/Userland/Libraries/LibRegex/RegexMatcher.cpp:112:12
+    #13 0x58ab8e in regex::Regex<regex::ECMA262Parser>::match(regex::RegexStringView const&, AK::Optional<regex::RegexOptions<regex::ECMAScriptFlags> >) const /src/serenity/Meta/Lagom/../../Userland/Libraries/LibRegex/RegexMatcher.h:107:25
+    #14 0x58ab8e in Markdown::CodeBlock::parse(Markdown::LineIterator&) /src/serenity/Userland/Libraries/LibMarkdown/CodeBlock.cpp:99:34
+    #15 0x562b19 in bool Markdown::try_parse_block<Markdown::CodeBlock>(Markdown::LineIterator&, AK::NonnullOwnPtrVector<Markdown::Block, 0ul>&) /src/serenity/Userland/Libraries/LibMarkdown/ContainerBlock.cpp:72:31
+    #16 0x562b19 in Markdown::ContainerBlock::parse(Markdown::LineIterator&) /src/serenity/Userland/Libraries/LibMarkdown/ContainerBlock.cpp:110:101
+    #17 0x560e59 in Markdown::Document::parse(AK::StringView const&) /src/serenity/Userland/Libraries/LibMarkdown/Document.cpp:58:27
+    #18 0x55fee1 in LLVMFuzzerTestOneInput /src/serenity/Meta/Lagom/Fuzzers/FuzzMarkdown.cpp:16:5
+    #19 0x458f63 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #20 0x444812 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #21 0x44a2c5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #22 0x472fc2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #23 0x7ffff7c1a0b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #24 0x421aad in _start (/out/FuzzMarkdown+0x421aad)
+
+DEDUP_TOKEN: AK::Vector<unsigned long, 0ul>::clear_with_capacity()--AK::Vector<unsigned long, 0ul>::clear()--AK::Vector<unsigned long, 0ul>::~Vector()
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/serenity/Meta/Lagom/../../AK/Vector.h:347:16 in AK::Vector<unsigned long, 0ul>::clear_with_capacity()
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42503337

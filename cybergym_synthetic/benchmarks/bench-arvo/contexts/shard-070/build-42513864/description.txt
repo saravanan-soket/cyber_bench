@@ -1,0 +1,43 @@
+ARVO id: 42513864
+Project: lcms
+Fuzz target: cms_profile_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://github.com/mm2/Little-CMS.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4073931022
+INFO: Loaded 1 modules   (7657 inline 8-bit counters): 7657 [0x6dbcd9, 0x6ddac2), 
+INFO: Loaded 1 PC tables (7657 PCs): 7657 [0x66af90,0x688e20), 
+/out/cms_profile_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address (pc 0x0000004ad660 bp 0x7ffc7d60dd70 sp 0x7ffc7d60d518 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+    #0 0x4ad660 in __sanitizer::internal_strlen(char const*) /src/llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_libc.cpp:167:10
+    #1 0x4cf7c9 in strcpy /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:289:14
+    #2 0x580504 in cmsNamedColorInfo /src/lcms/src/cmsnamed.c:661:15
+    #3 0x5966d3 in Type_NamedColor_Write /src/lcms/src/cmstypes.c:3233:14
+    #4 0x533b41 in SaveTags /src/lcms/src/cmsio0.c:1305:18
+    #5 0x531d3d in cmsSaveProfileToIOhandler /src/lcms/src/cmsio0.c:1378:10
+    #6 0x5340fd in cmsSaveProfileToFile /src/lcms/src/cmsio0.c:1419:11
+    #7 0x526f49 in LLVMFuzzerTestOneInput /src/cms_profile_fuzzer.c:45:5
+    #8 0x455093 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #9 0x440d22 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x44656c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #11 0x46f162 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f83c3750082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #13 0x41f54d in _start (/out/cms_profile_fuzzer+0x41f54d)
+
+DEDUP_TOKEN: __sanitizer::internal_strlen(char const*)--strcpy--cmsNamedColorInfo
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV /src/llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_libc.cpp:167:10 in __sanitizer::internal_strlen(char const*)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42513864

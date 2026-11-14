@@ -1,0 +1,79 @@
+ARVO id: 42470801
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_LIBFDK_AAC_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Global-buffer-overflow READ 4
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Seed: 3950785085
+INFO: Loaded 1 modules   (51581 inline 8-bit counters): 51581 [0x11b14c8, 0x11bde45), 
+INFO: Loaded 1 PC tables (51581 PCs): 51581 [0xdab8e0,0xe750b0), 
+/out/ffmpeg_AV_CODEC_ID_LIBFDK_AAC_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: global-buffer-overflow on address 0x000000d6e1b4 at pc 0x000000aa8990 bp 0x7fffb9e15490 sp 0x7fffb9e15488
+[1m[0m[1m[34mREAD of size 4 at 0x000000d6e1b4 thread T0[1m[0m
+SCARINESS: 27 (4-byte-read-global-buffer-overflow-far-from-bounds)
+    #0 0xaa898f in initSlotBasedRotation(PS_DEC*, int, int) /src/fdk-aac/libSBRdec/src/psdec.cpp:361:14
+    #1 0xaad76c in sbr_dec(SBR_DEC*, short*, short*, SBR_DEC*, short*, int, SBR_HEADER_DATA*, SBR_FRAME_DATA*, SBR_PREV_FRAME_DATA*, int, PS_DEC*, unsigned int, int) /src/fdk-aac/libSBRdec/src/sbr_dec.cpp:800:13
+    #2 0x9d573b in sbrDecoder_DecodeElement(SBR_DECODER_INSTANCE*, short*, short*, int, FDK_channelMapDescr const*, int, int, int, int, int*, int) /src/fdk-aac/libSBRdec/src/sbrdecoder.cpp:1749:5
+    #3 0x9d44a6 in sbrDecoder_Apply /src/fdk-aac/libSBRdec/src/sbrdecoder.cpp:1895:19
+    #4 0x97e5a2 in aacDecoder_DecodeFrame /src/fdk-aac/libAACdec/src/aacdecoder_lib.cpp:1455:20
+    #5 0x548d7f in fdk_aac_decode_frame /src/ffmpeg/libavcodec/libfdk-aacdec.c:348:11
+    #6 0x544dd4 in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:437:15
+    #7 0x544a22 in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:633:15
+    #8 0x53a7c1 in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:651:15
+    #9 0x53a5d2 in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:709:15
+    #10 0x53b1f5 in compat_decode /src/ffmpeg/libavcodec/decode.c:800:15
+    #11 0x531942 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:245:23
+    #12 0xb5ba58 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:570:15
+    #13 0xb31f2a in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #14 0xb3d7a3 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #15 0xb315ac in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #16 0x7f3a94ad782f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #17 0x41da18 in _start (/out/ffmpeg_AV_CODEC_ID_LIBFDK_AAC_fuzzer+0x41da18)
+
+DEDUP_TOKEN: initSlotBasedRotation(PS_DEC*, int, int)--sbr_dec(SBR_DEC*, short*, short*, SBR_DEC*, short*, int, SBR_HEADER_DATA*, SBR_FRAME_DATA*, SBR_PREV_FRAME_DATA*, int, PS_DEC*, unsigned int, int)--sbrDecoder_DecodeElement(SBR_DECODER_INSTANCE*, short*, short*, int, FDK_channelMapDescr const*, int, int, int, int, int*, int)
+[1m[32m0x000000d6e1b4 is located 12 bytes to the left of global variable 'ScaleFactorsFine' defined in 'libSBRdec/src/sbr_rom.cpp:1622:16' (0xd6e1c0) of size 124
+[1m[0m[1m[32m0x000000d6e1b4 is located 24 bytes to the right of global variable 'ScaleFactors' defined in 'libSBRdec/src/sbr_rom.cpp:1616:16' (0xd6e160) of size 60
+[1m[0mSUMMARY: AddressSanitizer: global-buffer-overflow /src/fdk-aac/libSBRdec/src/psdec.cpp:361:14 in initSlotBasedRotation(PS_DEC*, int, int)
+Shadow bytes around the buggy address:
+  0x0000801a5be0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m
+  0x0000801a5bf0: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m
+  0x0000801a5c00: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0000801a5c10: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0000801a5c20: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0000801a5c30: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m[[1m[31mf9[1m[0m][1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0000801a5c40: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0000801a5c50: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m06[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m03[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x0000801a5c60: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m03[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0000801a5c70: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0000801a5c80: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42470801

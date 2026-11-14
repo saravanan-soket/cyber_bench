@@ -1,0 +1,95 @@
+ARVO id: 42511063
+Project: imagemagick
+Fuzz target: encoder_mng_fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-use-after-free READ 8
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/encoder_mng_fuzzer[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-use-after-free on address 0x627000022d50 at pc 0x00000086aff9 bp 0x7ffe5d277090 sp 0x7ffe5d277088
+[1m[0m[1m[34mREAD of size 8 at 0x627000022d50 thread T0[1m[0m
+SCARINESS: 51 (8-byte-read-heap-use-after-free)
+    #0 0x86aff8 in CloseBlob /src/imagemagick/MagickCore/blob.c:611:3
+    #1 0xf06900 in ReadOneMNGImage /src/imagemagick/coders/png.c:6852:13
+    #2 0xef2c14 in ReadMNGImage /src/imagemagick/coders/png.c:7821:9
+    #3 0x8ed2e5 in ReadImage /src/imagemagick/MagickCore/constitute.c:728:15
+    #4 0x86889e in BlobToImage /src/imagemagick/MagickCore/blob.c:475:13
+    #5 0x7787b1 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4044:12
+    #6 0x75f965 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:66:11
+    #7 0x76048b in main (/out/encoder_mng_fuzzer+0x76048b)
+    #8 0x7fcaa9f1c082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #9 0x6a620d in _start (/out/encoder_mng_fuzzer+0x6a620d)
+
+DEDUP_TOKEN: CloseBlob--ReadOneMNGImage--ReadMNGImage
+[1m[32m0x627000022d50 is located 13392 bytes inside of 13504-byte region [0x62700001f900,0x627000022dc0)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x726652 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:111:3
+    #1 0xa36696 in RelinquishMagickMemory /src/imagemagick/MagickCore/memory.c:1167:3
+    #2 0x9f28b8 in DestroyImage /src/imagemagick/MagickCore/image.c:1223:19
+    #3 0xa154d1 in DeleteImageFromList /src/imagemagick/MagickCore/list.c:333:12
+    #4 0xa154d1 in DestroyImageList /src/imagemagick/MagickCore/list.c:485:5
+    #5 0xf1b604 in ReadOnePNGImage /src/imagemagick/coders/png.c:2437:15
+    #6 0xf0666f in ReadOneMNGImage /src/imagemagick/coders/png.c:6838:13
+    #7 0xef2c14 in ReadMNGImage /src/imagemagick/coders/png.c:7821:9
+    #8 0x8ed2e5 in ReadImage /src/imagemagick/MagickCore/constitute.c:728:15
+    #9 0x86889e in BlobToImage /src/imagemagick/MagickCore/blob.c:475:13
+    #10 0x7787b1 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4044:12
+    #11 0x75f965 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:66:11
+    #12 0x76048b in main (/out/encoder_mng_fuzzer+0x76048b)
+
+DEDUP_TOKEN: free--RelinquishMagickMemory--DestroyImage
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x7268bd in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:129:3
+    #1 0xa34d31 in AcquireMagickMemory /src/imagemagick/MagickCore/memory.c:558:10
+    #2 0xa34d31 in AcquireCriticalMemory /src/imagemagick/MagickCore/memory.c:634:10
+    #3 0x9eb528 in AcquireImage /src/imagemagick/MagickCore/image.c:150:19
+    #4 0xef2b9d in ReadMNGImage /src/imagemagick/coders/png.c:7803:9
+    #5 0x8ed2e5 in ReadImage /src/imagemagick/MagickCore/constitute.c:728:15
+    #6 0x86889e in BlobToImage /src/imagemagick/MagickCore/blob.c:475:13
+    #7 0x7787b1 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4044:12
+    #8 0x75f965 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:66:11
+    #9 0x76048b in main (/out/encoder_mng_fuzzer+0x76048b)
+
+DEDUP_TOKEN: malloc--AcquireMagickMemory--AcquireCriticalMemory
+SUMMARY: AddressSanitizer: heap-use-after-free /src/imagemagick/MagickCore/blob.c:611:3 in CloseBlob
+Shadow bytes around the buggy address:
+  0x0c4e7fffc550: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c4e7fffc560: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c4e7fffc570: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c4e7fffc580: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c4e7fffc590: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+=>0x0c4e7fffc5a0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m[[1m[35mfd[1m[0m][1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c4e7fffc5b0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4e7fffc5c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4e7fffc5d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4e7fffc5e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4e7fffc5f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42511063

@@ -1,0 +1,87 @@
+ARVO id: 395921924
+Project: tinysparql
+Fuzz target: fuzz_rdf_turtle
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c
+Repo: https://gitlab.gnome.org/GNOME/tinysparql.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/fuzz_rdf_turtle[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x521000331500 at pc 0x55e1c3750ee5 bp 0x7ffcc174ff20 sp 0x7ffcc174ff18
+[1m[0m[1m[34mREAD of size 1 at 0x521000331500 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x55e1c3750ee4 in terminal_STRING_LITERAL1 /work/meson/../../src/tinysparql/src/libtinysparql/core/tracker-sparql-grammar.h:2053:2
+    #1 0x55e1c374e128 in parse_terminal /work/meson/../../src/tinysparql/src/libtinysparql/tracker-deserializer-turtle.c:246:7
+    #2 0x55e1c374c0e7 in tracker_deserializer_turtle_iterate_next /work/meson/../../src/tinysparql/src/libtinysparql/tracker-deserializer-turtle.c:767:15
+    #3 0x55e1c374c0e7 in tracker_deserializer_turtle_next /work/meson/../../src/tinysparql/src/libtinysparql/tracker-deserializer-turtle.c:930:9
+    #4 0x55e1c3614b27 in tracker_sparql_cursor_next /work/meson/../../src/tinysparql/src/libtinysparql/tracker-cursor.c:548:12
+    #5 0x55e1c36555c9 in tracker_data_load_from_deserializer /work/meson/../../src/tinysparql/src/libtinysparql/core/tracker-data-update.c:3407:9
+    #6 0x55e1c373dfae in tracker_direct_batch_update /work/meson/../../src/tinysparql/src/libtinysparql/direct/tracker-direct-batch.c:382:4
+    #7 0x55e1c3737278 in tracker_direct_connection_update_batch /work/meson/../../src/tinysparql/src/libtinysparql/direct/tracker-direct.c:1665:2
+    #8 0x55e1c3146854 in LLVMFuzzerTestOneInput /work/meson/../../src/tinysparql/fuzzing/fuzz_rdf_turtle.c:57:2
+    #9 0x55e1c3f7fb2f in main (/out/fuzz_rdf_turtle+0x111cb2f)
+    #10 0x7f22e256c082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+    #11 0x55e1c306e07d in _start (/out/fuzz_rdf_turtle+0x20b07d)
+
+DEDUP_TOKEN: terminal_STRING_LITERAL1--parse_terminal--tracker_deserializer_turtle_iterate_next
+[1m[32m0x521000331500 is located 0 bytes after 4096-byte region [0x521000330500,0x521000331500)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x55e1c310708f in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:68:3
+    #1 0x55e1c3483fdc in g_malloc /work/meson/../../src/tinysparql/subprojects/glib-2.80.3/glib/gmem.c:100:13
+    #2 0x55e1c33d186b in g_buffered_input_stream_set_buffer_size /work/meson/../../src/tinysparql/subprojects/glib-2.80.3/gio/gbufferedinputstream.c:237:22
+    #3 0x55e1c359d71c in object_set_property /work/meson/../../src/tinysparql/subprojects/glib-2.80.3/gobject/gobject.c:2172:7
+    #4 0x55e1c359bf06 in g_object_new_internal /work/meson/../../src/tinysparql/subprojects/glib-2.80.3/gobject/gobject.c:2651:11
+    #5 0x55e1c359b506 in g_object_new_valist /work/meson/../../src/tinysparql/subprojects/glib-2.80.3/gobject/gobject.c:2945:16
+    #6 0x55e1c3599ab2 in g_object_new /work/meson/../../src/tinysparql/subprojects/glib-2.80.3/gobject/gobject.c:2418:12
+    #7 0x55e1c3749365 in tracker_deserializer_turtle_constructed /work/meson/../../src/tinysparql/src/libtinysparql/tracker-deserializer-turtle.c:110:3
+    #8 0x55e1c359bf9b in g_object_new_internal /work/meson/../../src/tinysparql/subprojects/glib-2.80.3/gobject/gobject.c:2657:5
+    #9 0x55e1c359b506 in g_object_new_valist /work/meson/../../src/tinysparql/subprojects/glib-2.80.3/gobject/gobject.c:2945:16
+    #10 0x55e1c3599ab2 in g_object_new /work/meson/../../src/tinysparql/subprojects/glib-2.80.3/gobject/gobject.c:2418:12
+    #11 0x55e1c3748ca9 in tracker_deserializer_turtle_new /work/meson/../../src/tinysparql/src/libtinysparql/tracker-deserializer-turtle.c:985:9
+    #12 0x55e1c373df70 in tracker_direct_batch_update /work/meson/../../src/tinysparql/src/libtinysparql/direct/tracker-direct-batch.c:378:19
+    #13 0x55e1c3737278 in tracker_direct_connection_update_batch /work/meson/../../src/tinysparql/src/libtinysparql/direct/tracker-direct.c:1665:2
+    #14 0x55e1c3146854 in LLVMFuzzerTestOneInput /work/meson/../../src/tinysparql/fuzzing/fuzz_rdf_turtle.c:57:2
+    #15 0x55e1c3f7fb2f in main (/out/fuzz_rdf_turtle+0x111cb2f)
+
+DEDUP_TOKEN: __interceptor_malloc--g_malloc--g_buffered_input_stream_set_buffer_size
+SUMMARY: AddressSanitizer: heap-buffer-overflow /work/meson/../../src/tinysparql/src/libtinysparql/core/tracker-sparql-grammar.h:2053:2 in terminal_STRING_LITERAL1
+Shadow bytes around the buggy address:
+  0x521000331280: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x521000331300: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x521000331380: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x521000331400: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x521000331480: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x521000331500:[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x521000331580: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x521000331600: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x521000331680: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x521000331700: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x521000331780: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/395921924

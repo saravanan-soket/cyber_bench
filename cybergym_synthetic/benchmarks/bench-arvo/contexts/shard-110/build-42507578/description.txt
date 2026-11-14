@@ -1,0 +1,87 @@
+ARVO id: 42507578
+Project: leptonica
+Fuzz target: pix3_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Stack-buffer-overflow READ 4
+Language: c++
+Repo: https://github.com/DanBloomberg/leptonica.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1395702312
+INFO: Loaded 1 modules   (116496 inline 8-bit counters): 116496 [0x162eeb0, 0x164b5c0), 
+INFO: Loaded 1 PC tables (116496 PCs): 116496 [0x164b5c0,0x18126c0), 
+/out/pix3_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffff7f4e914 at pc 0x0000005ca568 bp 0x7fffffffd950 sp 0x7fffffffd948
+[1m[0m[1m[34mREAD of size 4 at 0x7ffff7f4e914 thread T0[1m[0m
+SCARINESS: 32 (4-byte-read-stack-buffer-overflow)
+    #0 0x5ca567 in pixCountPixels /src/leptonica/src/pix3.c:1970:24
+    #1 0x5cad2e in pixCountPixelsInRect /src/leptonica/src/pix3.c:2021:9
+    #2 0x555e92 in LLVMFuzzerTestOneInput /src/leptonica/prog/fuzzing/pix3_fuzzer.cc:89:2
+    #3 0x45a261 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #4 0x443ff2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #5 0x44a335 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #6 0x4741e2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #7 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #8 0x41ef08 in _start (/out/pix3_fuzzer+0x41ef08)
+
+DEDUP_TOKEN: pixCountPixels--pixCountPixelsInRect--LLVMFuzzerTestOneInput
+[1m[32mAddress 0x7ffff7f4e914 is located in stack of thread T0 at offset 276 in frame[1m[0m
+[1m[0m    #0 0x55558f in LLVMFuzzerTestOneInput /src/leptonica/prog/fuzzing/pix3_fuzzer.cc:4
+
+DEDUP_TOKEN: LLVMFuzzerTestOneInput
+  This frame has 11 object(s):
+    [32, 40) 'pixs_payload' (line 9)
+    [64, 72) 'box1' (line 12)
+    [96, 104) 'pix_pointer_payload' (line 13)
+    [128, 136) 'return_pix' (line 13)
+    [160, 168) 'pix2' (line 13)
+    [192, 200) 'return_numa' (line 14)
+    [224, 228) 'l_f' (line 15)
+    [240, 244) 'l_i' (line 16)
+    [256, 260) 'l_i2' (line 16)
+    [272, 276) 'l_ui' (line 17)[1m[32m <== Memory access at offset 276 overflows this variable[1m[0m
+    [288, 296) 'boxa1' (line 18)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/leptonica/src/pix3.c:1970:24 in pixCountPixels
+Shadow bytes around the buggy address:
+  0x10007efe1cd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe1ce0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe1cf0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe1d00: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x10007efe1d10: [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m
+=>0x10007efe1d20: [1m[0m04[1m[0m [1m[31mf2[1m[0m[[1m[0m04[1m[0m][1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe1d30: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe1d40: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe1d50: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe1d60: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe1d70: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42507578

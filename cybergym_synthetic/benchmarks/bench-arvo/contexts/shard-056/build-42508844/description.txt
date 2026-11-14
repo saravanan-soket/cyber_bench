@@ -1,0 +1,109 @@
+ARVO id: 42508844
+Project: ghostpdl
+Fuzz target: gstoraster_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Stack-buffer-overflow READ {*}
+Language: c++
+Repo: https://cgit.ghostscript.com/ghostpdl.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2928024536
+INFO: Loaded 3 modules   (182523 inline 8-bit counters): 13708 [0x7f08663519e0, 0x7f0866354f6c), 959 [0x7f08663b2a40, 0x7f08663b2dff), 167856 [0x2d97c90, 0x2dc0c40), 
+INFO: Loaded 3 PC tables (182523 PCs): 13708 [0x7f0866354f70,0x7f086638a830), 959 [0x7f08663b2e00,0x7f08663b69f0), 167856 [0x24c5430,0x2754f30), 
+/out/gstoraster_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7f0865913040 at pc 0x0000004bf0a4 bp 0x7ffd6b5ab6f0 sp 0x7ffd6b5aaeb0
+[1m[0m[1m[34mREAD of size 72 at 0x7f0865913040 thread T0[1m[0m
+SCARINESS: 41 (multi-byte-read-stack-buffer-overflow)
+    #0 0x4bf0a3 in __interceptor_memcpy /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:827:5
+    #1 0xff4cad in pdf_compute_encryption_key_preR5 /src/ghostpdl/./pdf/pdf_sec.c:129:13
+    #2 0xff4cad in check_user_password_preR5 /src/ghostpdl/./pdf/pdf_sec.c:442:12
+    #3 0xff1d02 in check_password_preR5 /src/ghostpdl/./pdf/pdf_sec.c:1227:12
+    #4 0xff1d02 in pdfi_initialise_Decryption /src/ghostpdl/./pdf/pdf_sec.c:1374:20
+    #5 0xeac1b9 in pdfi_init_file /src/ghostpdl/./pdf/ghostpdf.c:1071:20
+    #6 0xeac1b9 in pdfi_set_input_stream /src/ghostpdl/./pdf/ghostpdf.c:1314:12
+    #7 0xe98974 in zPDFstream /src/ghostpdl/./psi/zpdfops.c:521:12
+    #8 0xcffd1b in interp /src/ghostpdl/./psi/interp.c:1725:40
+    #9 0xcffd1b in gs_call_interp /src/ghostpdl/./psi/interp.c:522:12
+    #10 0xcffd1b in gs_interpret /src/ghostpdl/./psi/interp.c:479:12
+    #11 0x56912a in gs_main_interpret /src/ghostpdl/./psi/imain.c:257:12
+    #12 0x56912a in gs_main_run_string_end /src/ghostpdl/./psi/imain.c:945:12
+    #13 0x56912a in gs_main_run_string_with_length /src/ghostpdl/./psi/imain.c:889:12
+    #14 0x5645d2 in gs_main_run_string /src/ghostpdl/./psi/imain.c:870:12
+    #15 0x101dad1 in run_string /src/ghostpdl/./psi/imainarg.c:1166:12
+    #16 0x1019b09 in swproc /src/ghostpdl/./psi/imainarg.c:367:20
+    #17 0x10169ee in gs_main_init_with_args01 /src/ghostpdl/./psi/imainarg.c:224:24
+    #18 0x101d859 in gs_main_init_with_args /src/ghostpdl/./psi/imainarg.c:289:16
+    #19 0xce8394 in psapi_init_with_args /src/ghostpdl/./psi/psapi.c:281:12
+    #20 0x560ae0 in gsapi_init_with_args /src/ghostpdl/./psi/iapi.c:247:12
+    #21 0x55fcb0 in gs_to_raster_fuzz /src/gstoraster_fuzzer.cc:97:8
+    #22 0x55fcb0 in LLVMFuzzerTestOneInput /src/gstoraster_fuzzer.cc:114:2
+    #23 0x457fb3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #24 0x443802 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #25 0x44937c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #26 0x4723b2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #27 0x7f0865d4d0b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #28 0x4209fd in _start (/out/gstoraster_fuzzer+0x4209fd)
+
+DEDUP_TOKEN: __interceptor_memcpy--pdf_compute_encryption_key_preR5--check_user_password_preR5
+[1m[32mAddress 0x7f0865913040 is located in stack of thread T0 at offset 64 in frame[1m[0m
+[1m[0m    #0 0xff44cf in check_user_password_preR5 /src/ghostpdl/./pdf/pdf_sec.c:424
+
+DEDUP_TOKEN: check_user_password_preR5
+  This frame has 14 object(s):
+    [32, 64) 'Key.i' (line 54)
+    [96, 100) 'P.i' (line 56)[1m[32m <== Memory access at offset 64 partially underflows this variable[1m[0m
+    [112, 200) 'md5.i' (line 57)[1m[32m <== Memory access at offset 64 partially underflows this variable[1m[0m
+    [240, 248) 'a.i' (line 58)
+    [272, 280) 's.i' (line 59)
+    [304, 312) 'Key' (line 425)
+    [336, 344) 'XORKey' (line 425)
+    [368, 376) 'stream' (line 427)
+    [400, 408) 'arc4_stream' (line 427)
+    [432, 464) 'Buffer' (line 428)
+    [496, 512) 'Hash' (line 429)
+    [528, 616) 'md5' (line 430)
+    [656, 664) 's' (line 431)
+    [688, 696) 'a' (line 432)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:827:5 in __interceptor_memcpy
+Shadow bytes around the buggy address:
+  0x0fe18cb1a5b0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe18cb1a5c0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe18cb1a5d0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe18cb1a5e0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe18cb1a5f0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+=>0x0fe18cb1a600: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mf2[1m[0m][1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe18cb1a610: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m
+  0x0fe18cb1a620: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m
+  0x0fe18cb1a630: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe18cb1a640: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x0fe18cb1a650: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42508844

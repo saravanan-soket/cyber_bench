@@ -1,0 +1,79 @@
+ARVO id: 42518509
+Project: serenity
+Fuzz target: FuzzFlacLoader
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ {*}
+Language: c++
+Repo: https://github.com/SerenityOS/serenity
+
+=== Crash report ===
+Reading 320 bytes from /tmp/poc
+=================================================================
+[1m[31m==8==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x610000000200 at pc 0x0000004a2941 bp 0x7fffd6f10da0 sp 0x7fffd6f10570
+[1m[0m[1m[34mREAD of size 164 at 0x610000000200 thread T0[1m[0m
+SCARINESS: 26 (multi-byte-read-heap-buffer-overflow)
+    #0 0x4a2940 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #1 0x5158a7 in AK::TypedTransfer<unsigned int>::copy(unsigned int*, unsigned int const*, unsigned long) /src/serenity/Meta/Lagom/../../AK/TypedTransfer.h:43:17
+    #2 0x5158a7 in AK::Vector<unsigned int, 0ul>::Vector(AK::Span<unsigned int const>) /src/serenity/Meta/Lagom/../../AK/Vector.h:97:9
+    #3 0x4efcaf in Audio::FlacLoaderPlugin::load_picture(Audio::FlacRawMetadataBlock&) /src/serenity/Userland/Libraries/LibAudio/FlacLoader.cpp:155:34
+    #4 0x4e9daf in Audio::FlacLoaderPlugin::parse_header() /src/serenity/Userland/Libraries/LibAudio/FlacLoader.cpp:116:13
+    #5 0x4e4380 in Audio::FlacLoaderPlugin::initialize() /src/serenity/Userland/Libraries/LibAudio/FlacLoader.cpp:42:5
+    #6 0x4e14bc in LLVMFuzzerTestOneInput /src/serenity/Meta/Lagom/Fuzzers/FuzzFlacLoader.cpp:16:15
+    #7 0x4e0ffa in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+    #8 0x4e0dcc in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:318:12
+    #9 0x7f21e2a8e082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #10 0x42217d in _start (/out/FuzzFlacLoader+0x42217d)
+
+DEDUP_TOKEN: __asan_memcpy--AK::TypedTransfer<unsigned int>::copy(unsigned int*, unsigned int const*, unsigned long)--AK::Vector<unsigned int, 0ul>::Vector(AK::Span<unsigned int const>)
+[1m[32m0x610000000200 is located 0 bytes to the right of 192-byte region [0x610000000140,0x610000000200)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4a35b6 in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0x4e3812 in AK::Detail::ByteBuffer<32ul>::try_ensure_capacity_slowpath(unsigned long) /src/serenity/Meta/Lagom/../../AK/ByteBuffer.h:293:33
+    #2 0x4e331f in AK::Detail::ByteBuffer<32ul>::try_ensure_capacity(unsigned long) /src/serenity/Meta/Lagom/../../AK/ByteBuffer.h:177:16
+    #3 0x4e331f in AK::Detail::ByteBuffer<32ul>::try_resize(unsigned long) /src/serenity/Meta/Lagom/../../AK/ByteBuffer.h:168:9
+    #4 0x51658c in AK::Detail::ByteBuffer<32ul>::ByteBuffer(AK::Detail::ByteBuffer<32ul> const&) /src/serenity/Meta/Lagom/../../AK/ByteBuffer.h:31:9
+    #5 0x4ec974 in Audio::FlacLoaderPlugin::next_meta_block(Core::Stream::BigEndianInputBitStream&) /src/serenity/Userland/Libraries/LibAudio/FlacLoader.cpp:227:9
+    #6 0x4e9af4 in Audio::FlacLoaderPlugin::parse_header() /src/serenity/Userland/Libraries/LibAudio/FlacLoader.cpp:110:17
+    #7 0x4e4380 in Audio::FlacLoaderPlugin::initialize() /src/serenity/Userland/Libraries/LibAudio/FlacLoader.cpp:42:5
+    #8 0x4e14bc in LLVMFuzzerTestOneInput /src/serenity/Meta/Lagom/Fuzzers/FuzzFlacLoader.cpp:16:15
+    #9 0x4e0ffa in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+
+DEDUP_TOKEN: __interceptor_malloc--AK::Detail::ByteBuffer<32ul>::try_ensure_capacity_slowpath(unsigned long)--AK::Detail::ByteBuffer<32ul>::try_ensure_capacity(unsigned long)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x0c207fff7ff0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c207fff8000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c207fff8010: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c207fff8020: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c207fff8030: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c207fff8040:[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c207fff8050: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c207fff8060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c207fff8070: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c207fff8080: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c207fff8090: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42518509

@@ -1,0 +1,137 @@
+ARVO id: 42502594
+Project: uWebSockets
+Fuzz target: EpollEchoServerPubSub
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Container-overflow READ 1
+Language: c++
+Repo: https://github.com/uNetworking/uWebSockets.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 189030345
+INFO: Loaded 1 modules   (3346 inline 8-bit counters): 3346 [0x6ba3c8, 0x6bb0da), 
+INFO: Loaded 1 PC tables (3346 PCs): 3346 [0x643778,0x650898), 
+/out/EpollEchoServerPubSub: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: container-overflow on address 0x61d000000240 at pc 0x000000575bd5 bp 0x7ffd874f25c0 sp 0x7ffd874f25b8
+[1m[0m[1m[34mREAD of size 1 at 0x61d000000240 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-container-overflow)
+    #0 0x575bd4 in __is_long /usr/local/bin/../include/c++/v1/string:1456:39
+    #1 0x575bd4 in __get_pointer /usr/local/bin/../include/c++/v1/string:1550:17
+    #2 0x575bd4 in data /usr/local/bin/../include/c++/v1/string:1262:75
+    #3 0x575bd4 in operator basic_string_view /usr/local/bin/../include/c++/v1/string:900:65
+    #4 0x575bd4 in operator() /src/uWebSockets/fuzzing/../src/App.h:244:80
+    #5 0x575bd4 in __invoke<(lambda at ../src/App.h:228:57) &, uWS::Subscriber *, uWS::TopicTreeMessage &, uWS::TopicTree<uWS::TopicTreeMessage>::IteratorFlags> /usr/local/bin/../include/c++/v1/type_traits:3738:23
+    #6 0x575bd4 in __call<(lambda at ../src/App.h:228:57) &, uWS::Subscriber *, uWS::TopicTreeMessage &, uWS::TopicTree<uWS::TopicTreeMessage>::IteratorFlags> /usr/local/bin/../include/c++/v1/__functional/invoke.h:30:16
+    #7 0x575bd4 in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:172:16
+    #8 0x575bd4 in std::__1::__function::__func<uWS::TemplatedApp<true>&& uWS::TemplatedApp<true>::ws<test()::PerSocketData>(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, uWS::TemplatedApp<true>::WebSocketBehavior<test()::PerSocketData>&&)::'lambda'(uWS::Subscriber*, uWS::TopicTreeMessage&, uWS::TopicTree<uWS::TopicTreeMessage>::IteratorFlags), std::__1::allocator<uWS::TemplatedApp<true>&& uWS::TemplatedApp<true>::ws<test()::PerSocketData>(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, uWS::TemplatedApp<true>::WebSocketBehavior<test()::PerSocketData>&&)::'lambda'(uWS::Subscriber*, uWS::TopicTreeMessage&, uWS::TopicTree<uWS::TopicTreeMessage>::IteratorFlags)>, bool (uWS::Subscriber*, uWS::TopicTreeMessage&, uWS::TopicTree<uWS::TopicTreeMessage>::IteratorFlags)>::operator()(uWS::Subscriber*&&, uWS::TopicTreeMessage&, uWS::TopicTree<uWS::TopicTreeMessage>::IteratorFlags&&) /usr/local/bin/../include/c++/v1/__functional/function.h:346:12
+    #9 0x5a7335 in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:499:16
+    #10 0x5a7335 in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:1176:12
+    #11 0x5a7335 in drainImpl /src/uWebSockets/fuzzing/../src/TopicTree.h:124:17
+    #12 0x5a7335 in drain /src/uWebSockets/fuzzing/../src/TopicTree.h:259:13
+    #13 0x5a7335 in uWS::TopicTree<uWS::TopicTreeMessage>::publish(uWS::Subscriber*, std::__1::basic_string_view<char, std::__1::char_traits<char> >, uWS::TopicTreeMessage&&) /src/uWebSockets/fuzzing/../src/TopicTree.h:302:21
+    #14 0x5a6b02 in uWS::TemplatedApp<true>::publish(std::__1::basic_string_view<char, std::__1::char_traits<char> >, std::__1::basic_string_view<char, std::__1::char_traits<char> >, uWS::OpCode, bool) /src/uWebSockets/fuzzing/../src/App.h:117:20
+    #15 0x5a6845 in operator()<uWS::WebSocket<true, true, PerSocketData> > /src/uWebSockets/fuzzing/EpollEchoServerPubSub.cpp:54:18
+    #16 0x5a6845 in __invoke<(lambda at EpollEchoServerPubSub.cpp:51:20) &, uWS::WebSocket<true, true, PerSocketData> *, std::__1::string_view, uWS::OpCode> /usr/local/bin/../include/c++/v1/type_traits:3738:23
+    #17 0x5a6845 in invoke<(lambda at EpollEchoServerPubSub.cpp:51:20) &, uWS::WebSocket<true, true, PerSocketData> *, std::__1::string_view, uWS::OpCode> /usr/local/bin/../include/c++/v1/__functional/invoke.h:93:12
+    #18 0x5a6845 in ofats::any_detail::handler_traits<void, uWS::WebSocket<true, true, test()::PerSocketData>*, std::__1::basic_string_view<char, std::__1::char_traits<char> >, uWS::OpCode>::small_handler<test()::$_1>::call(ofats::any_detail::storage&, uWS::WebSocket<true, true, test()::PerSocketData>*, std::__1::basic_string_view<char, std::__1::char_traits<char> >, uWS::OpCode) /src/uWebSockets/fuzzing/../src/MoveOnlyFunction.h:133:14
+    #19 0x581685 in call /src/uWebSockets/fuzzing/../src/MoveOnlyFunction.h:247:12
+    #20 0x581685 in operator() /src/uWebSockets/fuzzing/../src/MoveOnlyFunction.h:354:1
+    #21 0x581685 in uWS::WebSocketContext<true, true, test()::PerSocketData>::handleFragment(char*, unsigned long, unsigned int, int, bool, uWS::WebSocketState<true>*, void*) /src/uWebSockets/fuzzing/../src/WebSocketContext.h:93:21
+    #22 0x57cb64 in consumeMessage<6U, unsigned char> /src/uWebSockets/fuzzing/../src/WebSocketProtocol.h:330:21
+    #23 0x57cb64 in consume /src/uWebSockets/fuzzing/../src/WebSocketProtocol.h:426:25
+    #24 0x57cb64 in operator()<us_socket_t> /src/uWebSockets/fuzzing/../src/WebSocketContext.h:285:13
+    #25 0x57cb64 in auto uWS::WebSocketContext<true, true, test()::PerSocketData>::init()::'lambda'(auto*, char*, int)::__invoke<us_socket_t>(auto*, char*, int) /src/uWebSockets/fuzzing/../src/WebSocketContext.h:263:60
+    #26 0x5b287f in us_internal_dispatch_ready_poll /src/uWebSockets/fuzzing/../uSockets/src/loop.c:324:25
+    #27 0x5ae803 in us_loop_run /src/uWebSockets/fuzzing/../uSockets/src/eventing/epoll_kqueue.c:147:21
+    #28 0x5641f1 in run /src/uWebSockets/fuzzing/../src/Loop.h:166:9
+    #29 0x5641f1 in run /src/uWebSockets/fuzzing/../src/Loop.h:183:18
+    #30 0x5641f1 in run /src/uWebSockets/fuzzing/../src/App.h:460:9
+    #31 0x5641f1 in test() /src/uWebSockets/fuzzing/EpollEchoServerPubSub.cpp:76:10
+    #32 0x561b5f in LLVMFuzzerTestOneInput /src/uWebSockets/fuzzing/./libEpollFuzzer/epoll_fuzzer.h:740:2
+    #33 0x457a23 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #34 0x443382 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #35 0x448dfd in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #36 0x471d72 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #37 0x7f86aafbf0b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #38 0x42058d in _start (/out/EpollEchoServerPubSub+0x42058d)
+
+DEDUP_TOKEN: __is_long--__get_pointer--data
+[1m[32m0x61d000000240 is located 448 bytes inside of 2048-byte region [0x61d000000080,0x61d000000880)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x55c58d in operator new(unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:95:3
+    #1 0x5a7b2b in __libcpp_operator_new<unsigned long> /usr/local/bin/../include/c++/v1/new:235:10
+    #2 0x5a7b2b in __libcpp_allocate /usr/local/bin/../include/c++/v1/new:261:10
+    #3 0x5a7b2b in allocate /usr/local/bin/../include/c++/v1/__memory/allocator.h:105:38
+    #4 0x5a7b2b in allocate /usr/local/bin/../include/c++/v1/__memory/allocator_traits.h:262:20
+    #5 0x5a7b2b in __split_buffer /usr/local/bin/../include/c++/v1/__split_buffer:306:29
+    #6 0x5a7b2b in void std::__1::vector<uWS::TopicTreeMessage, std::__1::allocator<uWS::TopicTreeMessage> >::__emplace_back_slow_path<uWS::TopicTreeMessage&>(uWS::TopicTreeMessage&) /usr/local/bin/../include/c++/v1/vector:1687:49
+    #7 0x5a7635 in emplace_back<uWS::TopicTreeMessage &> /usr/local/bin/../include/c++/v1/vector:1709:9
+    #8 0x5a7635 in uWS::TopicTree<uWS::TopicTreeMessage>::publish(uWS::Subscriber*, std::__1::basic_string_view<char, std::__1::char_traits<char> >, uWS::TopicTreeMessage&&) /src/uWebSockets/fuzzing/../src/TopicTree.h:321:26
+    #9 0x5a6b02 in uWS::TemplatedApp<true>::publish(std::__1::basic_string_view<char, std::__1::char_traits<char> >, std::__1::basic_string_view<char, std::__1::char_traits<char> >, uWS::OpCode, bool) /src/uWebSockets/fuzzing/../src/App.h:117:20
+    #10 0x5a6845 in operator()<uWS::WebSocket<true, true, PerSocketData> > /src/uWebSockets/fuzzing/EpollEchoServerPubSub.cpp:54:18
+    #11 0x5a6845 in __invoke<(lambda at EpollEchoServerPubSub.cpp:51:20) &, uWS::WebSocket<true, true, PerSocketData> *, std::__1::string_view, uWS::OpCode> /usr/local/bin/../include/c++/v1/type_traits:3738:23
+    #12 0x5a6845 in invoke<(lambda at EpollEchoServerPubSub.cpp:51:20) &, uWS::WebSocket<true, true, PerSocketData> *, std::__1::string_view, uWS::OpCode> /usr/local/bin/../include/c++/v1/__functional/invoke.h:93:12
+    #13 0x5a6845 in ofats::any_detail::handler_traits<void, uWS::WebSocket<true, true, test()::PerSocketData>*, std::__1::basic_string_view<char, std::__1::char_traits<char> >, uWS::OpCode>::small_handler<test()::$_1>::call(ofats::any_detail::storage&, uWS::WebSocket<true, true, test()::PerSocketData>*, std::__1::basic_string_view<char, std::__1::char_traits<char> >, uWS::OpCode) /src/uWebSockets/fuzzing/../src/MoveOnlyFunction.h:133:14
+    #14 0x581685 in call /src/uWebSockets/fuzzing/../src/MoveOnlyFunction.h:247:12
+    #15 0x581685 in operator() /src/uWebSockets/fuzzing/../src/MoveOnlyFunction.h:354:1
+    #16 0x581685 in uWS::WebSocketContext<true, true, test()::PerSocketData>::handleFragment(char*, unsigned long, unsigned int, int, bool, uWS::WebSocketState<true>*, void*) /src/uWebSockets/fuzzing/../src/WebSocketContext.h:93:21
+    #17 0x57cb64 in consumeMessage<6U, unsigned char> /src/uWebSockets/fuzzing/../src/WebSocketProtocol.h:330:21
+    #18 0x57cb64 in consume /src/uWebSockets/fuzzing/../src/WebSocketProtocol.h:426:25
+    #19 0x57cb64 in operator()<us_socket_t> /src/uWebSockets/fuzzing/../src/WebSocketContext.h:285:13
+    #20 0x57cb64 in auto uWS::WebSocketContext<true, true, test()::PerSocketData>::init()::'lambda'(auto*, char*, int)::__invoke<us_socket_t>(auto*, char*, int) /src/uWebSockets/fuzzing/../src/WebSocketContext.h:263:60
+    #21 0x5b287f in us_internal_dispatch_ready_poll /src/uWebSockets/fuzzing/../uSockets/src/loop.c:324:25
+    #22 0x5ae803 in us_loop_run /src/uWebSockets/fuzzing/../uSockets/src/eventing/epoll_kqueue.c:147:21
+    #23 0x5641f1 in run /src/uWebSockets/fuzzing/../src/Loop.h:166:9
+    #24 0x5641f1 in run /src/uWebSockets/fuzzing/../src/Loop.h:183:18
+    #25 0x5641f1 in run /src/uWebSockets/fuzzing/../src/App.h:460:9
+    #26 0x5641f1 in test() /src/uWebSockets/fuzzing/EpollEchoServerPubSub.cpp:76:10
+    #27 0x561b5f in LLVMFuzzerTestOneInput /src/uWebSockets/fuzzing/./libEpollFuzzer/epoll_fuzzer.h:740:2
+    #28 0x457a23 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #29 0x443382 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #30 0x448dfd in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #31 0x471d72 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #32 0x7f86aafbf0b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+
+DEDUP_TOKEN: operator new(unsigned long)--__libcpp_operator_new<unsigned long>--__libcpp_allocate
+HINT: if you don't care about these errors you may set ASAN_OPTIONS=detect_container_overflow=0.
+If you suspect a false positive see also: https://github.com/google/sanitizers/wiki/AddressSanitizerContainerOverflow.
+SUMMARY: AddressSanitizer: container-overflow /usr/local/bin/../include/c++/v1/string:1456:39 in __is_long
+Shadow bytes around the buggy address:
+  0x0c3a7fff7ff0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c3a7fff8000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c3a7fff8010: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c3a7fff8020: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c3a7fff8030: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c3a7fff8040: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[34mfc[1m[0m][1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m
+  0x0c3a7fff8050: [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m
+  0x0c3a7fff8060: [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m
+  0x0c3a7fff8070: [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m
+  0x0c3a7fff8080: [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m
+  0x0c3a7fff8090: [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42502594

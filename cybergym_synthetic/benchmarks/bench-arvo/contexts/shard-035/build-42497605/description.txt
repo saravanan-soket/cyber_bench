@@ -1,0 +1,47 @@
+ARVO id: 42497605
+Project: vlc
+Fuzz target: vlc-demux-dec-libfuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c
+Repo: https://github.com/videolan/vlc
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2383121433
+INFO: Loaded 1 modules   (73421 inline 8-bit counters): 73421 [0xd52988, 0xd64855), 
+INFO: Loaded 1 PC tables (73421 PCs): 73421 [0x827fc8,0x946c98), 
+/out/vlc-demux-dec-libfuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x7ffff740523c (pc 0x7ffff6cb2124 bp 0x7fffffffd530 sp 0x7fffffffd508 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7ffff6cb2124  (/lib/x86_64-linux-gnu/libc.so.6+0x16f124)
+    #1 0x4918eb in memcmp /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerInterceptors.cpp:161:16
+    #2 0x585908 in find_es_header /src/vlc/modules/demux/ty.c:579:14
+    #3 0x589801 in analyze_chunk /src/vlc/modules/demux/ty.c:1828:36
+    #4 0x58331b in probe_stream /src/vlc/modules/demux/ty.c:1719:9
+    #5 0x5824ba in Open /src/vlc/modules/demux/ty.c:351:9
+    #6 0x680ca3 in demux_Probe /src/vlc/src/input/demux.c:111:15
+    #7 0x6592f3 in vlc_module_load /src/vlc/src/modules/modules.c:243:19
+    #8 0x68070d in demux_NewAdvanced /src/vlc/src/input/demux.c:185:20
+    #9 0x6803c7 in demux_New /src/vlc/src/input/demux.c:76:12
+    #10 0x4b3365 in demux_process_stream /src/vlc/test/src/input/demux-run.c:297:22
+    #11 0x4b36df in libvlc_demux_process_memory /src/vlc/test/src/input/demux-run.c:379:12
+    #12 0x4b31d2 in LLVMFuzzerTestOneInput /src/vlc/test/vlc-demux-libfuzzer.c:54:5
+    #13 0x443543 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #14 0x42e9c2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #15 0x434697 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #16 0x45e302 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7ffff6b6383f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #18 0x409d78 in _start (/out/vlc-demux-dec-libfuzzer+0x409d78)
+
+DEDUP_TOKEN: memcmp--find_es_header
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x16f124) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42497605

@@ -1,0 +1,43 @@
+ARVO id: 42481159
+Project: binutils-gdb
+Fuzz target: fuzz_bfd
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: git://sourceware.org/git/binutils-gdb.git
+
+=== Crash report ===
+INFO: Seed: 2429889578
+INFO: Loaded 1 modules   (213623 inline 8-bit counters): 213623 [0x1a2c9b8, 0x1a60c2f), 
+INFO: Loaded 1 PC tables (213623 PCs): 213623 [0xe45cd0,0x1188440), 
+/out/fuzz_bfd: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x0000023d4000 (pc 0x000000b487af bp 0x7fffffffd820 sp 0x7fffffffd7d0 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0xb487af in _bfd_hexdump /src/binutils-gdb/bfd/vms-misc.c:110:35
+    #1 0x7750b7 in image_write /src/binutils-gdb/bfd/vms-alpha.c:1594:3
+    #2 0x772fd0 in _bfd_vms_slurp_etir /src/binutils-gdb/bfd/vms-alpha.c:2130:6
+    #3 0x772237 in vms_slurp_debug /src/binutils-gdb/bfd/vms-alpha.c:2524:8
+    #4 0x770786 in _bfd_vms_slurp_object_records /src/binutils-gdb/bfd/vms-alpha.c:2634:10
+    #5 0x76c141 in alpha_vms_object_p /src/binutils-gdb/bfd/vms-alpha.c:2831:9
+    #6 0x4b4ea4 in bfd_check_format_matches /src/binutils-gdb/bfd/format.c:328:14
+    #7 0xb92f5a in bfd_generic_archive_p /src/binutils-gdb/bfd/archive.c:920:8
+    #8 0x4b4ea4 in bfd_check_format_matches /src/binutils-gdb/bfd/format.c:328:14
+    #9 0x4b48ad in LLVMFuzzerTestOneInput /src/binutils-gdb/fuzz/fuzz_bfd.c:49:5
+    #10 0x443ba1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #11 0x42e6c1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #12 0x43437e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #13 0x45e2a2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #14 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #15 0x407b38 in _start (/out/fuzz_bfd+0x407b38)
+
+DEDUP_TOKEN: _bfd_hexdump--image_write--_bfd_vms_slurp_etir
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/binutils-gdb/bfd/vms-misc.c:110:35 in _bfd_hexdump
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42481159

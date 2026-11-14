@@ -1,0 +1,80 @@
+ARVO id: 410290510
+Project: binutils-gdb
+Fuzz target: fuzz_windres
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: git://sourceware.org/git/binutils-gdb.git
+
+=== Crash report ===
+Reading 6112 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x52100000b0e0 at pc 0x55d3054a3b97 bp 0x7ffd2251f5e0 sp 0x7ffd2251f5d8
+[1m[0m[1m[34mREAD of size 1 at 0x52100000b0e0 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x55d3054a3b96 in bfd_getl32 /src/binutils-gdb/bfd/libbfd.c:846:18
+    #1 0x55d305463fdc in bin_to_res_toolbar /src/binutils-gdb/binutils/resbin.c:1237:25
+    #2 0x55d305463fdc in bin_to_res /src/binutils-gdb/binutils/resbin.c:108:12
+    #3 0x55d305463830 in read_coff_data_entry /src/binutils-gdb/binutils/./rescoff.c:358:7
+    #4 0x55d3054604ef in read_coff_res_dir /src/binutils-gdb/binutils/./rescoff.c:317:16
+    #5 0x55d3054605b1 in read_coff_res_dir /src/binutils-gdb/binutils/./rescoff.c:309:16
+    #6 0x55d3054605b1 in read_coff_res_dir /src/binutils-gdb/binutils/./rescoff.c:309:16
+    #7 0x55d30545f79f in read_coff_rsrc /src/binutils-gdb/binutils/./rescoff.c:169:9
+    #8 0x55d305446d4c in LLVMFuzzerTestOneInput /src/binutils-gdb/binutils/fuzz_windres.c:114:5
+    #9 0x55d30543d589 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+    #10 0x55d30543d385 in LLVMFuzzerRunDriver /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #11 0x55d30543cf3d in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:311:10
+    #12 0x7ffb02c0d082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+    #13 0x55d30536473d in _start (/out/fuzz_windres+0x35c73d)
+
+DEDUP_TOKEN: bfd_getl32--bin_to_res_toolbar--bin_to_res
+[1m[32m0x52100000b0e0 is located 0 bytes after 4064-byte region [0x52100000a100,0x52100000b0e0)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x55d3053fd74f in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:68:3
+    #1 0x55d306645b2b in xmalloc /src/binutils-gdb/libiberty/./xmalloc.c:149:12
+    #2 0x55d30662890c in call_chunkfun /src/binutils-gdb/libiberty/./obstack.c:94:12
+    #3 0x55d30662890c in _obstack_begin_worker /src/binutils-gdb/libiberty/./obstack.c:141:37
+    #4 0x55d30662890c in _obstack_begin /src/binutils-gdb/libiberty/./obstack.c:164:10
+    #5 0x55d305446d42 in res_init /src/binutils-gdb/binutils/./fuzz_windres.h:125:3
+    #6 0x55d305446d42 in LLVMFuzzerTestOneInput /src/binutils-gdb/binutils/fuzz_windres.c:113:5
+    #7 0x55d30543d589 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+
+DEDUP_TOKEN: __interceptor_malloc--xmalloc--call_chunkfun
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/binutils-gdb/bfd/libbfd.c:846:18 in bfd_getl32
+Shadow bytes around the buggy address:
+  0x52100000ae00: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x52100000ae80: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x52100000af00: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x52100000af80: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x52100000b000: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x52100000b080: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x52100000b100: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x52100000b180: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x52100000b200: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x52100000b280: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x52100000b300: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/410290510

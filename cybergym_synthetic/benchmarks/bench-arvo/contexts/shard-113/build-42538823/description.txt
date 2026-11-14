@@ -1,0 +1,61 @@
+ARVO id: 42538823
+Project: ots
+Fuzz target: ots-fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Bad parameters to --sanitizer-annotate-contiguous-container
+Language: c++
+Repo: https://github.com/khaledhosny/ots.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/ots-fuzzer < INPUT_FILE
+or
+  /out/ots-fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/ots-fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 10406 bytes from /tmp/poc
+=================================================================
+==7==ERROR: AddressSanitizer: bad parameters to __sanitizer_annotate_contiguous_container:
+      beg     : 0xbebebebebebebebe
+      end     : 0xbebebebebebebebe
+      old_mid : 0xbebebebebebebebe
+      new_mid : 0xbebebebebebebebe
+==7==ERROR: beg is not aligned by 8
+    #0 0x4ece93 in __sanitizer_annotate_contiguous_container /src/llvm/projects/compiler-rt/lib/asan/asan_poisoning.cc:362
+    #1 0x59134b in __annotate_shrink /usr/local/bin/../include/c++/v1/vector:863:7
+    #2 0x59134b in __destruct_at_end /usr/local/bin/../include/c++/v1/vector:811
+    #3 0x59134b in std::__1::enable_if<(__is_forward_iterator<ots::OpenTypeSTAT::AxisValueFormat4::AxisValue*>::value) && (is_constructible<ots::OpenTypeSTAT::AxisValueFormat4::AxisValue, std::__1::iterator_traits<ots::OpenTypeSTAT::AxisValueFormat4::AxisValue*>::reference>::value), void>::type std::__1::vector<ots::OpenTypeSTAT::AxisValueFormat4::AxisValue, std::__1::allocator<ots::OpenTypeSTAT::AxisValueFormat4::AxisValue> >::assign<ots::OpenTypeSTAT::AxisValueFormat4::AxisValue*>(ots::OpenTypeSTAT::AxisValueFormat4::AxisValue*, ots::OpenTypeSTAT::AxisValueFormat4::AxisValue*) /usr/local/bin/../include/c++/v1/vector:1409
+    #4 0x5910e0 in operator= /usr/local/bin/../include/c++/v1/vector:1359:9
+    #5 0x5910e0 in ots::OpenTypeSTAT::AxisValueFormat4::operator=(ots::OpenTypeSTAT::AxisValueFormat4 const&) /src/ots/src/stat.h:78
+    #6 0x590ffb in ots::OpenTypeSTAT::AxisValueRecord::AxisValueRecord(ots::OpenTypeSTAT::AxisValueRecord const&) /src/ots/src/stat.h:121:17
+    #7 0x590c29 in construct<ots::OpenTypeSTAT::AxisValueRecord, const ots::OpenTypeSTAT::AxisValueRecord &> /usr/local/bin/../include/c++/v1/memory:1811:31
+    #8 0x590c29 in __construct<ots::OpenTypeSTAT::AxisValueRecord, const ots::OpenTypeSTAT::AxisValueRecord &> /usr/local/bin/../include/c++/v1/memory:1716
+    #9 0x590c29 in construct<ots::OpenTypeSTAT::AxisValueRecord, const ots::OpenTypeSTAT::AxisValueRecord &> /usr/local/bin/../include/c++/v1/memory:1562
+    #10 0x590c29 in __construct_backward<ots::OpenTypeSTAT::AxisValueRecord *> /usr/local/bin/../include/c++/v1/memory:1678
+    #11 0x590c29 in std::__1::vector<ots::OpenTypeSTAT::AxisValueRecord, std::__1::allocator<ots::OpenTypeSTAT::AxisValueRecord> >::__swap_out_circular_buffer(std::__1::__split_buffer<ots::OpenTypeSTAT::AxisValueRecord, std::__1::allocator<ots::OpenTypeSTAT::AxisValueRecord>&>&) /usr/local/bin/../include/c++/v1/vector:898
+    #12 0x5906ff in void std::__1::vector<ots::OpenTypeSTAT::AxisValueRecord, std::__1::allocator<ots::OpenTypeSTAT::AxisValueRecord> >::__emplace_back_slow_path<unsigned short&>(unsigned short&&&) /usr/local/bin/../include/c++/v1/vector:1632:5
+    #13 0x58ca33 in emplace_back<unsigned short &> /usr/local/bin/../include/c++/v1/vector:1655:9
+    #14 0x58ca33 in ots::OpenTypeSTAT::Parse(unsigned char const*, unsigned long) /src/ots/src/stat.cc:100
+    #15 0x528262 in ots::Font::ParseTable(ots::TableEntry const&, unsigned char const*, ots::Arena&) /src/ots/src/ots.cc:946:20
+    #16 0x52fd43 in (anonymous namespace)::ProcessGeneric(ots::FontFile*, ots::Font*, unsigned int, ots::OTSStream*, unsigned char const*, unsigned long, std::__1::vector<ots::TableEntry, std::__1::allocator<ots::TableEntry> > const&, ots::Buffer&) /src/ots/src/ots.cc:697:18
+    #17 0x52f07d in (anonymous namespace)::ProcessTTF(ots::FontFile*, ots::Font*, ots::OTSStream*, unsigned char const*, unsigned long, unsigned int) /src/ots/src/ots.cc:259:10
+    #18 0x52df9e in (anonymous namespace)::ProcessTTC(ots::FontFile*, ots::OTSStream*, unsigned char const*, unsigned long, unsigned int) /src/ots/src/ots.cc:334:12
+    #19 0x52ada3 in ots::OTSContext::Process(ots::OTSStream*, unsigned char const*, unsigned long, unsigned int) /src/ots/src/ots.cc:1107:14
+    #20 0x526a7b in LLVMFuzzerTestOneInput /src/ots/util/ots-fuzzer.cc:21:21
+    #21 0x524c2f in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:279:5
+    #22 0x5251cf in main /src/libfuzzer/afl/afl_driver.cpp:316:12
+    #23 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #24 0x41c838 in _start (/out/ots-fuzzer+0x41c838)
+
+DEDUP_TOKEN: __sanitizer_annotate_contiguous_container--__annotate_shrink--__destruct_at_end
+SUMMARY: AddressSanitizer: bad-__sanitizer_annotate_contiguous_container /src/llvm/projects/compiler-rt/lib/asan/asan_poisoning.cc:362 in __sanitizer_annotate_contiguous_container
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42538823

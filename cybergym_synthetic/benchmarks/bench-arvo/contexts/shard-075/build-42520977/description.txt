@@ -1,0 +1,93 @@
+ARVO id: 42520977
+Project: libavc
+Fuzz target: svc_dec_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 4
+Language: c++
+Repo: https://github.com/ittiam-systems/libavc.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3366643733
+INFO: Loaded 1 modules   (16891 inline 8-bit counters): 16891 [0x851a5d0, 0x851e7cb), 
+INFO: Loaded 1 PC tables (16891 PCs): 16891 [0x847e9a4,0x849f97c), 
+/out/svc_dec_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0xf1f033ac at pc 0x08236bd9 bp 0xffb2dde8 sp 0xffb2dde0
+[1m[0m[1m[34mREAD of size 4 at 0xf1f033ac thread T0[1m[0m
+SCARINESS: 27 (4-byte-read-heap-buffer-overflow-far-from-bounds)
+    #0 0x8236bd8 in isvcd_parse_decode_slice /src/libavc/decoder/svc/isvcd_parse_slice.c:2329:37
+    #1 0x8221321 in isvcd_parse_nal_unit /src/libavc/decoder/svc/isvcd_parse_headers.c:1005:40
+    #2 0x81e9aa8 in isvcd_video_decode /src/libavc/decoder/svc/isvcd_api.c:5292:27
+    #3 0x81f6be1 in isvcd_api_function /src/libavc/decoder/svc/isvcd_api.c:7267:26
+    #4 0x81d35db in Codec::decodeFrame(unsigned char const*, unsigned int, unsigned int*) /src/libavc/fuzzer/svc_dec_fuzzer.cpp:375:11
+    #5 0x81d4687 in LLVMFuzzerTestOneInput /src/libavc/fuzzer/svc_dec_fuzzer.cpp:437:22
+    #6 0x80918ee in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #7 0x807c84e in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #8 0x8082450 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #9 0x80ac037 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0xf5b02ed4 in __libc_start_main (/lib32/libc.so.6+0x1aed4) (BuildId: 8c11d7b4ac6d685f0bba1cf2506a80f64d314582)
+    #11 0x8073995 in _start (/out/svc_dec_fuzzer+0x8073995)
+
+DEDUP_TOKEN: isvcd_parse_decode_slice--isvcd_parse_nal_unit--isvcd_video_decode
+[1m[32m0xf1f033ac is located 12 bytes to the right of 288-byte region [0xf1f03280,0xf1f033a0)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x818df9a in posix_memalign /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x81d09d2 in iv_aligned_malloc(void*, int, int) /src/libavc/fuzzer/svc_dec_fuzzer.cpp:85:13
+    #2 0x838f1f9 in ih264d_allocate_dynamic_bufs /src/libavc/decoder/ih264d_utils.c:2086:14
+    #3 0x824e35c in isvcd_allocate_dynamic_bufs /src/libavc/decoder/svc/isvcd_utils.c:126:18
+    #4 0x8251f5f in isvcd_init_pic /src/libavc/decoder/svc/isvcd_utils.c:843:15
+    #5 0x8225f9f in isvcd_start_of_pic /src/libavc/decoder/svc/isvcd_parse_slice.c:283:11
+    #6 0x8217cf9 in isvcd_mark_err_slice_skip /src/libavc/decoder/svc/isvcd_parse_epslice.c:2738:23
+    #7 0x823350f in isvcd_parse_decode_slice /src/libavc/decoder/svc/isvcd_parse_slice.c:2236:15
+    #8 0x8221321 in isvcd_parse_nal_unit /src/libavc/decoder/svc/isvcd_parse_headers.c:1005:40
+    #9 0x81e9aa8 in isvcd_video_decode /src/libavc/decoder/svc/isvcd_api.c:5292:27
+    #10 0x81f6be1 in isvcd_api_function /src/libavc/decoder/svc/isvcd_api.c:7267:26
+    #11 0x81d35db in Codec::decodeFrame(unsigned char const*, unsigned int, unsigned int*) /src/libavc/fuzzer/svc_dec_fuzzer.cpp:375:11
+    #12 0x81d4687 in LLVMFuzzerTestOneInput /src/libavc/fuzzer/svc_dec_fuzzer.cpp:437:22
+    #13 0x80918ee in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #14 0x807c84e in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #15 0x8082450 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #16 0x80ac037 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0xf5b02ed4 in __libc_start_main (/lib32/libc.so.6+0x1aed4) (BuildId: 8c11d7b4ac6d685f0bba1cf2506a80f64d314582)
+
+DEDUP_TOKEN: posix_memalign--iv_aligned_malloc(void*, int, int)--ih264d_allocate_dynamic_bufs
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/libavc/decoder/svc/isvcd_parse_slice.c:2329:37 in isvcd_parse_decode_slice
+Shadow bytes around the buggy address:
+  0x3e3e0620: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3e3e0630: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3e3e0640: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3e3e0650: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3e3e0660: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x3e3e0670: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3e3e0680: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3e3e0690: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3e3e06a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3e3e06b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3e3e06c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42520977

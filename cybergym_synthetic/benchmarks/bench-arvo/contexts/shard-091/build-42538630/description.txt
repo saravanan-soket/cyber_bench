@@ -1,0 +1,40 @@
+ARVO id: 42538630
+Project: grpc
+Fuzz target: api_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/grpc/grpc
+
+=== Crash report ===
+INFO: Seed: 1895389636
+INFO: Loaded 1 modules   (46257 inline 8-bit counters): 46257 [0xaa8890, 0xab3d41), 
+INFO: Loaded 1 PC tables (46257 PCs): 46257 [0xab3d48,0xb68858), 
+/out/api_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x7fff00000000 (pc 0x7ffff6f50746 bp 0x7fffffffc9b0 sp 0x7fffffffc988 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7ffff6f50745 in strlen (/lib/x86_64-linux-gnu/libc.so.6+0x8b745)
+    #1 0x4637b0 in gpr_strdup /proc/self/cwd/src/core/lib/gpr/string.cc:43:9
+    #2 0x4920d6 in get_default_authority(grpc_channel_args const*) /proc/self/cwd/src/core/lib/surface/channel.cc:174:29
+    #3 0x491e84 in grpc_channel_create(char const*, grpc_channel_args const*, grpc_channel_stack_type, grpc_transport*) /proc/self/cwd/src/core/lib/surface/channel.cc:204:7
+    #4 0x534fa9 in client_channel_factory_create_channel(grpc_client_channel_factory*, char const*, grpc_client_channel_type, grpc_channel_args const*) /proc/self/cwd/src/core/ext/transport/chttp2/client/insecure/channel_create.cc:70:7
+    #5 0x534e37 in grpc_insecure_channel_create /proc/self/cwd/src/core/ext/transport/chttp2/client/insecure/channel_create.cc:100:27
+    #6 0x4357ed in LLVMFuzzerTestOneInput /src/grpc/test/core/end2end/fuzzers/api_fuzzer.cc:851:23
+    #7 0x446e5c in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:517:13
+    #8 0x438eec in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #9 0x43ca64 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #10 0x438bf8 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x40d258 in _start (/out/api_fuzzer+0x40d258)
+
+DEDUP_TOKEN: strlen--gpr_strdup--get_default_authority(grpc_channel_args const*)
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x8b745) in strlen
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42538630

@@ -1,0 +1,46 @@
+ARVO id: 42493010
+Project: wolfssl
+Fuzz target: fuzzer-wolfssh-server-randomize
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/wolfssl/wolfssl
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3570680846
+INFO: Loaded 1 modules   (30641 inline 8-bit counters): 30641 [0x93bbf0, 0x9433a1), 
+INFO: Loaded 1 PC tables (30641 PCs): 30641 [0x603d90,0x67b8a0), 
+/out/fuzzer-wolfssh-server-randomize: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x000080453619 (pc 0x7ffff6f49562 bp 0x7fffffffb010 sp 0x7fffffffafb0 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7ffff6f49562 in free (/lib/x86_64-linux-gnu/libc.so.6+0x84562)
+    #1 0x4b473d in wolfCrypt_custom_free /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/include/fuzzers/shared.h:196:9
+    #2 0x52b221 in wolfSSL_Free /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/memory.c:200:9
+    #3 0x508946 in wc_RsaCleanup /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/rsa.c:247:13
+    #4 0x50877e in wc_FreeRsaKey /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/rsa.c:548:5
+    #5 0x4dadea in DoUserAuthRequestRsa /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/internal.c:3975:5
+    #6 0x4da45d in DoUserAuthRequestPublicKey /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/internal.c:4272:27
+    #7 0x4d5c3d in DoUserAuthRequest /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/internal.c:4352:19
+    #8 0x4c19bd in DoPacket /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/internal.c:5300:19
+    #9 0x4bff95 in DoReceive /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/internal.c:5889:23
+    #10 0x4b6397 in wolfSSH_accept /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/ssh.c:445:25
+    #11 0x4b4bd9 in LLVMFuzzerTestOneInput /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/wolfssh-fuzzers/server.c:66:17
+    #12 0x4430a1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #13 0x42cd62 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #14 0x4330b6 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #15 0x45d0a2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #17 0x407728 in _start (/out/fuzzer-wolfssh-server-randomize+0x407728)
+
+DEDUP_TOKEN: free--wolfCrypt_custom_free--wolfSSL_Free
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x84562) in free
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42493010

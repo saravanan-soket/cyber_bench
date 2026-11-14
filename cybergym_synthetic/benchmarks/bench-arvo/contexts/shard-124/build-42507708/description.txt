@@ -1,0 +1,46 @@
+ARVO id: 42507708
+Project: librawspeed
+Fuzz target: RawParserFuzzer-GetDecoder-Decode
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 4
+Language: c++
+Repo: https://github.com/darktable-org/rawspeed.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/RawParserFuzzer-GetDecoder-Decode < INPUT_FILE
+or
+  /out/RawParserFuzzer-GetDecoder-Decode INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/RawParserFuzzer-GetDecoder-Decode [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 434 bytes from /tmp/poc
+ASAN:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x62aee93ee880 (pc 0x00000063e07c bp 0x7fffffffdeb0 sp 0x7fffffffdd20 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x63e07b in void rawspeed::DngOpcodes::PixelOpcode::applyOP<unsigned short, rawspeed::DngOpcodes::OffsetPerRowOrCol<rawspeed::DngOpcodes::DeltaRowOrColBase::SelectX>::apply(rawspeed::RawImage const&)::{lambda(unsigned int, unsigned int, unsigned short)#1}>(rawspeed::RawImage const&, rawspeed::DngOpcodes::OffsetPerRowOrCol<rawspeed::DngOpcodes::DeltaRowOrColBase::SelectX>::apply(rawspeed::RawImage const&)::{lambda(unsigned int, unsigned int, unsigned short)#1}) /src/librawspeed/src/librawspeed/common/DngOpcodes.cpp:204:39
+    #1 0x63e07b in rawspeed::DngOpcodes::OffsetPerRowOrCol<rawspeed::DngOpcodes::DeltaRowOrColBase::SelectX>::apply(rawspeed::RawImage const&) /src/librawspeed/src/librawspeed/common/DngOpcodes.cpp:312
+    #2 0x632af0 in rawspeed::DngOpcodes::applyOpCodes(rawspeed::RawImage const&) /src/librawspeed/src/librawspeed/common/DngOpcodes.cpp:393:11
+    #3 0x5a6edd in rawspeed::DngDecoder::handleMetadata(rawspeed::TiffIFD const*) /src/librawspeed/src/librawspeed/decoders/DngDecoder.cpp:420:13
+    #4 0x5a59d8 in rawspeed::DngDecoder::decodeRawInternal() /src/librawspeed/src/librawspeed/decoders/DngDecoder.cpp:368:3
+    #5 0x5f21dd in rawspeed::RawDecoder::decodeRaw() /src/librawspeed/src/librawspeed/decoders/RawDecoder.cpp:298:20
+    #6 0x558588 in LLVMFuzzerTestOneInput /src/librawspeed/fuzz/librawspeed/parsers/main.cpp:87:14
+    #7 0x6b140e in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:265:5
+    #8 0x6b199c in main /src/libfuzzer/afl/afl_driver.cpp:302:12
+    #9 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #10 0x45ef18 in _start (/out/RawParserFuzzer-GetDecoder-Decode+0x45ef18)
+
+DEDUP_TOKEN: void rawspeed::DngOpcodes::PixelOpcode::applyOP<unsigned short, rawspeed::DngOpcodes::OffsetPerRowOrCol<rawspeed::DngOpcodes::DeltaRowOrColBase::SelectX>::apply(rawspeed::RawImage const&)::{lambda(unsigned int, unsigned int, unsigned short)#1}>(rawspeed::RawImage const&, rawspeed::DngOpcodes::OffsetPerRowOrCol<rawspeed::DngOpcodes::DeltaRowOrColBase::SelectX>::apply(rawspeed::RawImage const&)::{lambda(unsigned int, unsigned int, unsigned short)#1})--rawspeed::DngOpcodes::OffsetPerRowOrCol<rawspeed::DngOpcodes::DeltaRowOrColBase::SelectX>::apply(rawspeed::RawImage const&)--rawspeed::DngOpcodes::applyOpCodes(rawspeed::RawImage const&)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/librawspeed/src/librawspeed/common/DngOpcodes.cpp:204:39 in void rawspeed::DngOpcodes::PixelOpcode::applyOP<unsigned short, rawspeed::DngOpcodes::OffsetPerRowOrCol<rawspeed::DngOpcodes::DeltaRowOrColBase::SelectX>::apply(rawspeed::RawImage const&)::{lambda(unsigned int, unsigned int, unsigned short)#1}>(rawspeed::RawImage const&, rawspeed::DngOpcodes::OffsetPerRowOrCol<rawspeed::DngOpcodes::DeltaRowOrColBase::SelectX>::apply(rawspeed::RawImage const&)::{lambda(unsigned int, unsigned int, unsigned short)#1})
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42507708

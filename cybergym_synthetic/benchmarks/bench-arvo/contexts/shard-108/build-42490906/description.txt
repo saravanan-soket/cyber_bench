@@ -1,0 +1,40 @@
+ARVO id: 42490906
+Project: mdbtools
+Fuzz target: fuzz_mdb
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c
+Repo: https://github.com/mdbtools/mdbtools
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1011164888
+INFO: Loaded 1 modules   (3119 inline 8-bit counters): 3119 [0x75c8e8, 0x75d517), 
+INFO: Loaded 1 PC tables (3119 PCs): 3119 [0x5098e0,0x515bd0), 
+/out/fuzz_mdb: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+offset 3792651327488 is beyond EOF
+Unable to bind columns from table MSysObjects (114 columns found)
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x0000003f3f47 (pc 0x0000004b57b0 bp 0x7ffdd36e1150 sp 0x7ffdd36e1110 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x4b57b0 in mdb_free_columns /src/mdbtools/src/libmdb/table.c:211:28
+    #1 0x4b5688 in mdb_free_tabledef /src/mdbtools/src/libmdb/table.c:53:2
+    #2 0x4b372d in mdb_read_catalog /src/mdbtools/src/libmdb/catalog.c:147:9
+    #3 0x4b2e81 in LLVMFuzzerTestOneInput /src/mdbtools/src/fuzz/fuzz_mdb.c:6:9
+    #4 0x4427e1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #5 0x42c572 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #6 0x4328b5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #7 0x45c762 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #8 0x7f97ec96e83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #9 0x407488 in _start (/out/fuzz_mdb+0x407488)
+
+DEDUP_TOKEN: mdb_free_columns--mdb_free_tabledef--mdb_read_catalog
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/mdbtools/src/libmdb/table.c:211:28 in mdb_free_columns
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42490906

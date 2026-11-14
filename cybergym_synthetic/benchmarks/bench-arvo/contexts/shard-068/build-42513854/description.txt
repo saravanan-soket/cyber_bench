@@ -1,0 +1,57 @@
+ARVO id: 42513854
+Project: mruby
+Fuzz target: mruby_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://github.com/mruby/mruby
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3870385106
+INFO: Loaded 1 modules   (23099 inline 8-bit counters): 23099 [0x92f270, 0x934cab), 
+INFO: Loaded 1 PC tables (23099 PCs): 23099 [0x809f58,0x864308), 
+/out/mruby_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x000000590897 bp 0x7fffffffc110 sp 0x7fffffffc0b0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x590897 in ucmp /src/mruby/mrbgems/mruby-bigint/core/bigint.c:190:17
+    #1 0x590897 in mpz_cmp /src/mruby/mrbgems/mruby-bigint/core/bigint.c:569:10
+    #2 0x590897 in mrb_bint_cmp /src/mruby/mrbgems/mruby-bigint/core/bigint.c:1284:10
+    #3 0x57b41b in cmpnum /src/mruby/src/numeric.c:1826:12
+    #4 0x57bffa in num_cmp /src/mruby/src/numeric.c:1889:7
+    #5 0x63554d in mrb_funcall_with_block /src/mruby/src/vm.c:637:13
+    #6 0x633b4a in mrb_funcall_argv /src/mruby/src/vm.c:653:10
+    #7 0x633b4a in mrb_funcall_id /src/mruby/src/vm.c:479:10
+    #8 0x57b107 in mrb_cmp /src/mruby/src/numeric.c:1963:9
+    #9 0x6a06a9 in r_check /src/mruby/src/range.c:39:7
+    #10 0x6a06a9 in range_ptr_init /src/mruby/src/range.c:80:3
+    #11 0x6a045e in mrb_range_new /src/mruby/src/range.c:456:22
+    #12 0x6455d1 in mrb_vm_exec /src/mruby/src/vm.c:2925:21
+    #13 0x63b33a in mrb_vm_run /src/mruby/src/vm.c:1208:12
+    #14 0x637a4f in mrb_top_run /src/mruby/src/vm.c
+    #15 0x5b579f in mrb_load_exec /src/mruby/mrbgems/mruby-compiler/core/parse.y:6889:7
+    #16 0x5b6a6c in mrb_load_nstring_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6961:10
+    #17 0x5b6c1c in mrb_load_string_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6973:10
+    #18 0x5b6c1c in mrb_load_string /src/mruby/mrbgems/mruby-compiler/core/parse.y:6979:10
+    #19 0x55e3a1 in LLVMFuzzerTestOneInput /src/mruby/oss-fuzz/mruby_fuzzer.c:14:5
+    #20 0x456663 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #21 0x4422f2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #22 0x447b3c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #23 0x470732 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #24 0x7ffff7c55082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #25 0x420b1d in _start (/out/mruby_fuzzer+0x420b1d)
+
+DEDUP_TOKEN: ucmp--mpz_cmp--mrb_bint_cmp
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/mruby/mrbgems/mruby-bigint/core/bigint.c:190:17 in ucmp
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42513854

@@ -1,0 +1,70 @@
+ARVO id: 42512782
+Project: ghostpdl
+Fuzz target: gs_device_pdfwrite_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://cgit.ghostscript.com/ghostpdl.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2429916850
+INFO: Loaded 3 modules   (202634 inline 8-bit counters): 13708 [0x7ffff7f619e0, 0x7ffff7f64f6c), 959 [0x7ffff7fc2a40, 0x7ffff7fc2dff), 187967 [0x3447cd0, 0x3475b0f), 
+INFO: Loaded 3 PC tables (202634 PCs): 13708 [0x7ffff7f64f70,0x7ffff7f9a830), 959 [0x7ffff7fc2e00,0x7ffff7fc69f0), 187967 [0x27378d0,0x2a15cc0), 
+/out/gs_device_pdfwrite_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x0000006fa5e6 bp 0x7fffffffce80 sp 0x7fffffffce10 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x6fa5e6 in chunk_free_object /src/ghostpdl/./base/gsmchunk.c:1110:31
+    #1 0x124e2c7 in gx_ttfMemory__free /src/ghostpdl/./base/gxttfb.c:337:5
+    #2 0x15533a0 in Context_Destroy /src/ghostpdl/./base/ttobjs.c:240:4
+    #3 0x1547d68 in ttfFont__finit /src/ghostpdl/./base/ttfmain.c:199:13
+    #4 0x124e368 in ttfFont__destroy /src/ghostpdl/./base/gxttfb.c:423:5
+    #5 0xbea670 in gs_clean_fm_pair_attributes /src/ghostpdl/./base/gxccman.c:409:9
+    #6 0xbea670 in gs_clean_fm_pair /src/ghostpdl/./base/gxccman.c:418:5
+    #7 0xbea670 in gs_purge_font_from_char_caches_forced /src/ghostpdl/./base/gxccman.c:799:17
+    #8 0xbea670 in gs_purge_font_from_char_caches /src/ghostpdl/./base/gxccman.c:832:12
+    #9 0xa410d5 in gs_font_finalize /src/ghostpdl/./base/gsfont.c:167:5
+    #10 0x6fa612 in chunk_free_object /src/ghostpdl/./base/gsmchunk.c:1112:13
+    #11 0x1116531 in pdfi_free_font_truetype /src/ghostpdl/./pdf/pdf_fontTT.c:656:9
+    #12 0x10d3396 in pdfi_free_font /src/ghostpdl/./pdf/pdf_font.c:1301:20
+    #13 0x117bf69 in pdfi_free_object /src/ghostpdl/./pdf/pdf_obj.c:259:13
+    #14 0x100ad94 in pdfi_countdown_impl /src/ghostpdl/./pdf/pdf_stack.h:100:5
+    #15 0x100ad94 in pdfi_clear_context /src/ghostpdl/./pdf/ghostpdf.c:2055:13
+    #16 0x1013da3 in pdfi_free_context /src/ghostpdl/./pdf/ghostpdf.c:2089:5
+    #17 0xff8451 in zPDFclose /src/ghostpdl/./psi/zpdfops.c:617:16
+    #18 0xe64dcb in interp /src/ghostpdl/./psi/interp.c:1725:40
+    #19 0xe64dcb in gs_call_interp /src/ghostpdl/./psi/interp.c:522:12
+    #20 0xe64dcb in gs_interpret /src/ghostpdl/./psi/interp.c:479:12
+    #21 0x567d4a in gs_main_interpret /src/ghostpdl/./psi/imain.c:257:12
+    #22 0x567d4a in gs_main_run_string_end /src/ghostpdl/./psi/imain.c:945:12
+    #23 0x567d4a in gs_main_run_string_with_length /src/ghostpdl/./psi/imain.c:889:12
+    #24 0x5631f2 in gs_main_run_string /src/ghostpdl/./psi/imain.c:870:12
+    #25 0x1197891 in run_string /src/ghostpdl/./psi/imainarg.c:1169:12
+    #26 0x1193899 in swproc /src/ghostpdl/./psi/imainarg.c:367:20
+    #27 0x119077e in gs_main_init_with_args01 /src/ghostpdl/./psi/imainarg.c:224:24
+    #28 0x1197619 in gs_main_init_with_args /src/ghostpdl/./psi/imainarg.c:289:16
+    #29 0xe4d424 in psapi_init_with_args /src/ghostpdl/./psi/psapi.c:281:12
+    #30 0x55f64c in gsapi_init_with_args /src/ghostpdl/./psi/iapi.c:253:12
+    #31 0x55e704 in fuzz_gs_device(unsigned char const*, unsigned long, int, char const*) /src/gs_fuzzlib.h:127:8
+    #32 0x55eb0a in LLVMFuzzerTestOneInput /src/gs_device_pdfwrite_fuzzer.cc:18:2
+    #33 0x456553 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #34 0x4421e2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #35 0x447a2c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #36 0x470622 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #37 0x7ffff795b082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #38 0x420a0d in _start (/out/gs_device_pdfwrite_fuzzer+0x420a0d)
+
+DEDUP_TOKEN: chunk_free_object--gx_ttfMemory__free--Context_Destroy
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/ghostpdl/./base/gsmchunk.c:1110:31 in chunk_free_object
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42512782

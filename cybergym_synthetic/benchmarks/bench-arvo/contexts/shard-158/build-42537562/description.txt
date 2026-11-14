@@ -1,0 +1,67 @@
+ARVO id: 42537562
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_LSCR_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3092567144
+INFO: Loaded 1 modules   (65944 inline 8-bit counters): 65944 [0x55d326e8cc80, 0x55d326e9ce18), 
+INFO: Loaded 1 PC tables (65944 PCs): 65944 [0x55d326e9ce18,0x55d326f9e798), 
+/out/ffmpeg_AV_CODEC_ID_LSCR_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x55d3265b3ae1 in ff_add_png_paeth_prediction /src/ffmpeg/libavcodec/pngdec.c:236:22
+    #1 0x55d3265b496f in ff_png_filter_row /src/ffmpeg/libavcodec/pngdec.c:330:17
+    #2 0x55d3265725ca in handle_row /src/ffmpeg/libavcodec/lscrdec.c:71:5
+    #3 0x55d3265725ca in decode_idat /src/ffmpeg/libavcodec/lscrdec.c:97:17
+    #4 0x55d3265725ca in decode_frame_lscr /src/ffmpeg/libavcodec/lscrdec.c:193:19
+    #5 0x55d32655427b in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:429:20
+    #6 0x55d32655427b in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:600:15
+    #7 0x55d32655427b in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:631:15
+    #8 0x55d3265537e3 in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:721:15
+    #9 0x55d3265412bc in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:534:25
+    #10 0x55d32643aa20 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #11 0x55d3264251b4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #12 0x55d32642ac4a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #13 0x55d326457042 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #14 0x7f2aa8c97082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #15 0x55d32641bc8d in _start (/out/ffmpeg_AV_CODEC_ID_LSCR_fuzzer+0x1ffc8d)
+
+DEDUP_TOKEN: ff_add_png_paeth_prediction--ff_png_filter_row--handle_row
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x55d3264dd603 in posix_memalign /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:162:3
+    #1 0x55d326ceeb48 in av_malloc /src/ffmpeg/libavutil/mem.c:107:9
+    #2 0x55d326ca1df2 in av_buffer_alloc /src/ffmpeg/libavutil/buffer.c:82:12
+    #3 0x55d326543c46 in fuzz_video_get_buffer /src/ffmpeg/tools/target_dec_fuzzer.c:132:25
+    #4 0x55d326543c46 in fuzz_get_buffer2 /src/ffmpeg/tools/target_dec_fuzzer.c:153:18
+    #5 0x55d32655f4b0 in ff_get_buffer /src/ffmpeg/libavcodec/decode.c:1621:11
+    #6 0x55d326560707 in reget_buffer_internal /src/ffmpeg/libavcodec/decode.c:1661:16
+    #7 0x55d326560707 in ff_reget_buffer /src/ffmpeg/libavcodec/decode.c:1686:15
+    #8 0x55d326570cd9 in decode_frame_lscr /src/ffmpeg/libavcodec/lscrdec.c:130:11
+    #9 0x55d32655427b in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:429:20
+    #10 0x55d32655427b in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:600:15
+    #11 0x55d32655427b in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:631:15
+    #12 0x55d3265537e3 in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:721:15
+    #13 0x55d3265412bc in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:534:25
+    #14 0x55d32643aa20 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #15 0x55d3264251b4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #16 0x55d32642ac4a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #17 0x55d326457042 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7f2aa8c97082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+
+DEDUP_TOKEN: ___interceptor_posix_memalign--av_malloc--av_buffer_alloc
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/ffmpeg/libavcodec/pngdec.c:236:22 in ff_add_png_paeth_prediction
+Unique heap origins: 58
+Stack depot allocated bytes: 9764880
+Unique origin histories: 5
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42537562

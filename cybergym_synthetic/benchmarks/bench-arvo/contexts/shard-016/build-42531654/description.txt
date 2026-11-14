@@ -1,0 +1,87 @@
+ARVO id: 42531654
+Project: upx
+Fuzz target: test_packed_file_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 4
+Language: c++
+Repo: https://github.com/upx/upx.git
+
+=== Crash report ===
+Reading 537 bytes from /tmp/poc
+[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m                       Ultimate Packer for eXecutables
+                          Copyright (C) 1996 - 2023
+UPX git-b5ed0a+ Markus Oberhumer, Laszlo Molnar & John Reiser   Dec 19th 2023
+
+testing /tmp/libfuzzer.6 =================================================================
+[1m[31m==6==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x7ffff5efd021 at pc 0x00000089d5e6 bp 0x7fffffffd700 sp 0x7fffffffd6f8
+[1m[0m[1m[34mREAD of size 4 at 0x7ffff5efd021 thread T0[1m[0m
+SCARINESS: 17 (4-byte-read-heap-buffer-overflow)
+    #0 0x89d5e5 in ucl_nrv2b_decompress_safe_le32 /src/upx/vendor/ucl/src/n2b_d.c:62:16
+    #1 0x5df15f in upx_ucl_decompress(unsigned char const*, unsigned int, unsigned char*, unsigned int*, int, upx_compress_result_t const*) /src/upx/src/compress/compress_ucl.cpp:165:13
+    #2 0x59c2a5 in upx_decompress(unsigned char const*, unsigned int, unsigned char*, unsigned int*, int, upx_compress_result_t const*) /src/upx/src/compress/compress.cpp:161:13
+    #3 0x7e1072 in ph_decompress(PackHeader&, XSpan::PtrOrSpan<unsigned char const>, XSpan::PtrOrSpan<unsigned char>, bool, Filter*) /src/upx/src/packhead.cpp:335:13
+    #4 0x7ca8b1 in Packer::decompress(XSpan::PtrOrSpan<unsigned char const>, XSpan::PtrOrSpan<unsigned char>, bool, Filter*) /src/upx/src/packer.cpp:303:5
+    #5 0x76ea6e in PackUnix::unpack(OutputFile*) /src/upx/src/p_unix.cpp:669:13
+    #6 0x7c75ea in Packer::doTest() /src/upx/src/packer.cpp:104:5
+    #7 0x88ca0e in do_one_file(char const*, char*) /src/upx/src/work.cpp:335:12
+    #8 0x88e938 in do_files(int, int, char**) /src/upx/src/work.cpp:421:13
+    #9 0x63df5a in upx_main(int, char**) /src/upx/src/main.cpp:1303:9
+    #10 0x4e9d5e in LLVMFuzzerTestOneInput /src/upx/fuzzers/test_packed_file_fuzzer.cpp:43:5
+    #11 0x4e9a6d in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+    #12 0x4e9878 in LLVMFuzzerRunDriver /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #13 0x4e9438 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:300:10
+    #14 0x7ffff7c56082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: eebe5d5f4b608b8a53ec446b63981bba373ca0ca)
+    #15 0x42aafd in _start (/out/test_packed_file_fuzzer+0x42aafd)
+
+DEDUP_TOKEN: ucl_nrv2b_decompress_safe_le32--upx_ucl_decompress(unsigned char const*, unsigned int, unsigned char*, unsigned int*, int, upx_compress_result_t const*)--upx_decompress(unsigned char const*, unsigned int, unsigned char*, unsigned int*, int, upx_compress_result_t const*)
+[1m[32m0x7ffff5efd021 is located 1 bytes to the right of 538978336-byte region [0x7fffd5cfa800,0x7ffff5efd020)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4abf36 in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0x85f82f in MemBuffer::alloc(unsigned long long) /src/upx/src/util/membuffer.cpp:179:24
+    #2 0x76e1b6 in PackUnix::unpack(OutputFile*) /src/upx/src/p_unix.cpp:632:10
+    #3 0x7c75ea in Packer::doTest() /src/upx/src/packer.cpp:104:5
+    #4 0x88ca0e in do_one_file(char const*, char*) /src/upx/src/work.cpp:335:12
+    #5 0x88e938 in do_files(int, int, char**) /src/upx/src/work.cpp:421:13
+    #6 0x63df5a in upx_main(int, char**) /src/upx/src/main.cpp:1303:9
+    #7 0x4e9d5e in LLVMFuzzerTestOneInput /src/upx/fuzzers/test_packed_file_fuzzer.cpp:43:5
+    #8 0x4e9a6d in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+
+DEDUP_TOKEN: __interceptor_malloc--MemBuffer::alloc(unsigned long long)--PackUnix::unpack(OutputFile*)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/upx/vendor/ucl/src/n2b_d.c:62:16 in ucl_nrv2b_decompress_safe_le32
+Shadow bytes around the buggy address:
+  0x10007ebd79b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007ebd79c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007ebd79d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007ebd79e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007ebd79f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x10007ebd7a00: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007ebd7a10: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007ebd7a20: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007ebd7a30: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007ebd7a40: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007ebd7a50: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==6==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42531654

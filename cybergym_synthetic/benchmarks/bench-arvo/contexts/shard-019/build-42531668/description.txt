@@ -1,0 +1,103 @@
+ARVO id: 42531668
+Project: upx
+Fuzz target: test_packed_file_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Stack-buffer-overflow READ 4
+Language: c++
+Repo: https://github.com/upx/upx.git
+
+=== Crash report ===
+Reading 946693 bytes from /tmp/poc
+[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m                       Ultimate Packer for eXecutables
+                          Copyright (C) 1996 - 2024
+UPX git-250c65+ Markus Oberhumer, Laszlo Molnar & John Reiser    Jan 4th 2024
+
+testing /tmp/libfuzzer.7                                                                                [WARNING] bad b_info at 0x623f8
+
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffff75a6470 at pc 0x0000006ca220 bp 0x7fffffffd8f0 sp 0x7fffffffd8e8
+[1m[0m[1m[34mREAD of size 4 at 0x7ffff75a6470 thread T0[1m[0m
+SCARINESS: 32 (4-byte-read-stack-buffer-overflow)
+    #0 0x6ca21f in unsigned int get_ne32<LE32, LE32>(LE32 const*) /src/upx/src/bele.h:117:5
+    #1 0x6ca21f in unsigned int get_le32<LE32, LE32>(LE32 const*) /src/upx/src/bele.h:220:59
+    #2 0x6ca21f in PackLinuxElf64::unpack(OutputFile*) /src/upx/src/p_lx_elf.cpp:7413:30
+    #3 0x7c75ea in Packer::doTest() /src/upx/src/packer.cpp:104:5
+    #4 0x88ca0e in do_one_file(char const*, char*) /src/upx/src/work.cpp:335:12
+    #5 0x88e938 in do_files(int, int, char**) /src/upx/src/work.cpp:421:13
+    #6 0x63df5a in upx_main(int, char**) /src/upx/src/main.cpp:1303:9
+    #7 0x4e9d5e in LLVMFuzzerTestOneInput /src/upx/fuzzers/test_packed_file_fuzzer.cpp:43:5
+    #8 0x4e9a6d in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+    #9 0x4e9878 in LLVMFuzzerRunDriver /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #10 0x4e9438 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:300:10
+    #11 0x7ffff7c56082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: eebe5d5f4b608b8a53ec446b63981bba373ca0ca)
+    #12 0x42aafd in _start (/out/test_packed_file_fuzzer+0x42aafd)
+
+DEDUP_TOKEN: unsigned int get_ne32<LE32, LE32>(LE32 const*)--unsigned int get_le32<LE32, LE32>(LE32 const*)--PackLinuxElf64::unpack(OutputFile*)
+[1m[32mAddress 0x7ffff75a6470 is located in stack of thread T0 at offset 1136 in frame[1m[0m
+[1m[0m    #0 0x6c50bf in PackLinuxElf64::unpack(OutputFile*) /src/upx/src/p_lx_elf.cpp:7154
+
+DEDUP_TOKEN: PackLinuxElf64::unpack(OutputFile*)
+  This frame has 23 object(s):
+    [32, 56) 'agg.tmp'
+    [96, 120) 'agg.tmp35'
+    [160, 172) 'hbuf' (line 7190)
+    [192, 216) 'agg.tmp55'
+    [256, 268) 'bhdr' (line 7198)
+    [288, 312) 'agg.tmp75'
+    [352, 368) 'u' (line 7208)
+    [384, 388) 'c_adler' (line 7213)
+    [400, 404) 'u_adler' (line 7214)
+    [416, 432) 'o_elfhdrs' (line 7218)
+    [448, 472) 'agg.tmp146'
+    [512, 536) 'agg.tmp194'
+    [576, 600) 'agg.tmp208'
+    [640, 664) 'agg.tmp220'
+    [704, 728) 'agg.tmp223'
+    [768, 792) 'd_info' (line 7316)
+    [832, 872) 'msg' (line 7323)
+    [912, 936) 'agg.tmp481'
+    [976, 988) 'b_peek' (line 7379)
+    [1008, 1032) 'agg.tmp575'
+    [1072, 1136) 'peek_arr' (line 7394)[1m[32m <== Memory access at offset 1136 overflows this variable[1m[0m
+    [1168, 1192) 'agg.tmp624'
+    [1232, 1256) 'agg.tmp742'
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/upx/src/bele.h:117:5 in unsigned int get_ne32<LE32, LE32>(LE32 const*)
+Shadow bytes around the buggy address:
+  0x10007eeacc30: [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x10007eeacc40: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x10007eeacc50: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x10007eeacc60: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x10007eeacc70: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x10007eeacc80: [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mf2[1m[0m][1m[31mf2[1m[0m
+  0x10007eeacc90: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m
+  0x10007eeacca0: [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007eeaccb0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007eeaccc0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007eeaccd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42531668

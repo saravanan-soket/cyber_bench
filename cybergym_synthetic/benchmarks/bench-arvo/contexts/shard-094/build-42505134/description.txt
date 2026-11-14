@@ -1,0 +1,52 @@
+ARVO id: 42505134
+Project: ClickHouse
+Fuzz target: codegen_select_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/ClickHouse/ClickHouse
+
+=== Crash report ===
+INFO: found LLVMFuzzerCustomMutator (0xcb1ba0). Disabling -len_control by default.
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2134957874
+INFO: Loaded 1 modules   (147478 inline 8-bit counters): 147478 [0x3b50188, 0x3b7419e), 
+INFO: Loaded 1 PC tables (147478 PCs): 147478 [0x7f0e70,0xa30fd0), 
+/out/codegen_select_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+ EXPLAIN  AST  ALTER  user  LEFT ARRAY JOIN 
+[1m[31m[1m[31mUninitialized bytes in [1m[32m__interceptor_strlen[1m[31m at offset 0 inside [0x7fffffffc908, 5)[1m[0m
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x1f9921a  (/out/codegen_select_fuzzer+0x1f9921a)
+    #1 0x1f93b2b in DB::tryParseQuery(DB::IParser&, char const*&, char const*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&, bool, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, bool, unsigned long, unsigned long) (/out/codegen_select_fuzzer+0x1f93b2b)
+    #2 0x1f9b243 in DB::parseQueryAndMovePosition(DB::IParser&, char const*&, char const*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, bool, unsigned long, unsigned long) (/out/codegen_select_fuzzer+0x1f9b243)
+    #3 0x1f9b979 in DB::parseQuery(DB::IParser&, char const*, char const*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, unsigned long, unsigned long) (/out/codegen_select_fuzzer+0x1f9b979)
+    #4 0xcb46c8 in LLVMFuzzerTestOneInput (/out/codegen_select_fuzzer+0xcb46c8)
+    #5 0xbdf423  (/out/codegen_select_fuzzer+0xbdf423)
+    #6 0xbca0e2  (/out/codegen_select_fuzzer+0xbca0e2)
+    #7 0xbcfbaa  (/out/codegen_select_fuzzer+0xbcfbaa)
+    #8 0xbf9722 in main (/out/codegen_select_fuzzer+0xbf9722)
+    #9 0x7ffff7dd20b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #10 0xba736d in _start (/out/codegen_select_fuzzer+0xba736d)
+
+DEDUP_TOKEN: DB::tryParseQuery(DB::IParser&, char const*&, char const*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&, bool, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, bool, unsigned long, unsigned long)--DB::parseQueryAndMovePosition(DB::IParser&, char const*&, char const*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, bool, unsigned long, unsigned long)
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mref.tmp.i1030[1m[35m' in the stack frame of function '[1m[32m_ZN2DB21ParserCreateUserQuery9parseImplERNS_7IParser3PosERNSt3__110shared_ptrINS_4IASTEEERNS_8ExpectedE[1m[35m'[1m[0m
+    #0 0x216db60 in DB::ParserCreateUserQuery::parseImpl(DB::IParser::Pos&, std::__1::shared_ptr<DB::IAST>&, DB::Expected&) (/out/codegen_select_fuzzer+0x216db60)
+
+DEDUP_TOKEN: DB::ParserCreateUserQuery::parseImpl(DB::IParser::Pos&, std::__1::shared_ptr<DB::IAST>&, DB::Expected&)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value (/out/codegen_select_fuzzer+0x1f9921a) 
+Executed /tmp/poc in 414 ms
+***
+*** NOTE: fuzzing was not performed, you have only
+***       executed the target code on a fixed set of inputs.
+***
+Unique heap origins: 2535
+Stack depot allocated bytes: 2293760
+Unique origin histories: 112
+History depot allocated bytes: 196608
+[1m[31mMemorySanitizer: 1 warnings reported.
+[1m[0m
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42505134

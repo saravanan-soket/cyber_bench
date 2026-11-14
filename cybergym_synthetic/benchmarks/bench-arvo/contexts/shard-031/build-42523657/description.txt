@@ -1,0 +1,46 @@
+ARVO id: 42523657
+Project: imagemagick
+Fuzz target: encoder_plasma_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 1440918973
+INFO: Loaded 1 modules   (52529 inline 8-bit counters): 52529 [0x16d8f98, 0x16e5cc9), 
+INFO: Loaded 1 PC tables (52529 PCs): 52529 [0x133d700,0x140aa10), 
+/out/encoder_plasma_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x7aeb08 in ReadImage /src/imagemagick/MagickCore/constitute.c:700:47
+    #1 0xd799b1 in ReadGRADIENTImage /src/imagemagick/coders/gradient.c:130:9
+    #2 0x7aaaa0 in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #3 0xebb7a6 in ReadPlasmaImage /src/imagemagick/coders/plasma.c:151:9
+    #4 0x7aaaa0 in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #5 0x57f49b in Magick::Image::read(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4081:12
+    #6 0x49e92f in fuzzEncoderWithStringFilename(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, unsigned char const*, unsigned long) /src/imagemagick/Magick++/fuzz/encoder_utils.cc:10:11
+    #7 0x49e515 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_plasma_fuzzer.cc:10:10
+    #8 0x4e5696 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #9 0x4a00c1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #10 0x4b4316 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #11 0x49f201 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #12 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #13 0x420138 in _start (/out/encoder_plasma_fuzzer+0x420138)
+
+DEDUP_TOKEN: ReadImage--ReadGRADIENTImage--ReadImage
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mgeometry[1m[35m' in the stack frame of function '[1m[32mReadImage[1m[35m'[1m[0m
+    #0 0x7a9480 in ReadImage /src/imagemagick/MagickCore/constitute.c:360
+
+DEDUP_TOKEN: ReadImage
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/imagemagick/MagickCore/constitute.c:700:47 in ReadImage
+Unique heap origins: 557
+Stack depot allocated bytes: 81704
+Unique origin histories: 9
+History depot allocated bytes: 216
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42523657

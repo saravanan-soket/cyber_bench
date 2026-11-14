@@ -1,0 +1,71 @@
+ARVO id: 42525529
+Project: ndpi
+Fuzz target: fuzz_process_packet
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/ntop/nDPI.git
+
+=== Crash report ===
+Reading 29 bytes from /tmp/poc
+=================================================================
+[1m[31m==8==ERROR: AddressSanitizer: use-after-poison on address 0x7fc90b0ff81d at pc 0x0000005da37a bp 0x7ffc0e16d0f0 sp 0x7ffc0e16d0e8
+[1m[0m[1m[34mREAD of size 1 at 0x7fc90b0ff81d thread T0[1m[0m
+SCARINESS: 22 (1-byte-read-use-after-poison)
+    #0 0x5da379 in ndpi_search_line /src/ndpi/src/lib/protocols/line.c:67:4
+    #1 0x511a27 in check_ndpi_detection_func /src/ndpi/src/lib/ndpi_main.c:5926:6
+    #2 0x5127a7 in ndpi_check_flow_func /src/ndpi/src/lib/ndpi_main.c
+    #3 0x51b495 in ndpi_internal_detection_process_packet /src/ndpi/src/lib/ndpi_main.c:6955:15
+    #4 0x51b495 in ndpi_detection_process_packet /src/ndpi/src/lib/ndpi_main.c:7122:22
+    #5 0x4dbf3d in LLVMFuzzerTestOneInput /src/ndpi/fuzz/fuzz_process_packet.c:24:5
+    #6 0x4dce5d in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+    #7 0x4dcc68 in LLVMFuzzerRunDriver /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #8 0x4dc828 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:300:10
+    #9 0x7fc90ce51082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #10 0x41d51d in _start (/out/fuzz_process_packet+0x41d51d)
+
+DEDUP_TOKEN: ndpi_search_line--check_ndpi_detection_func--ndpi_check_flow_func
+[1m[32m0x7fc90b0ff81d is located 29 bytes inside of 1048576-byte region [0x7fc90b0ff800,0x7fc90b1ff800)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x49e956 in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0x4dcd82 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:221:41
+
+DEDUP_TOKEN: __interceptor_malloc--ExecuteFilesOnyByOne
+SUMMARY: AddressSanitizer: use-after-poison /src/ndpi/src/lib/protocols/line.c:67:4 in ndpi_search_line
+Shadow bytes around the buggy address:
+  0x0ff9a1617eb0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0ff9a1617ec0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0ff9a1617ed0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0ff9a1617ee0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0ff9a1617ef0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x0ff9a1617f00: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m05[1m[0m][1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x0ff9a1617f10: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x0ff9a1617f20: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x0ff9a1617f30: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x0ff9a1617f40: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x0ff9a1617f50: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42525529

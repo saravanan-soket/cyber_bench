@@ -1,0 +1,94 @@
+ARVO id: 42527977
+Project: rdkit
+Fuzz target: smiles_string_to_mol_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Container-overflow READ 4
+Language: c++
+Repo: https://github.com/rdkit/rdkit.git
+
+=== Crash report ===
+Reading 21 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: container-overflow on address 0x6020000001b0 at pc 0x0000009ec52d bp 0x7fffffffd390 sp 0x7fffffffd388
+[1m[0m[1m[34mREAD of size 4 at 0x6020000001b0 thread T0[1m[0m
+SCARINESS: 17 (4-byte-read-container-overflow)
+    #0 0x9ec52c in RDKit::Canon::(anonymous namespace)::makeBondHolder(RDKit::Bond const*, unsigned int, bool, std::__1::vector<RDKit::Canon::canon_atom, std::__1::allocator<RDKit::Canon::canon_atom> > const&) /src/rdkit/Code/GraphMol/new_canon.cpp:421:40
+    #1 0x9e623f in RDKit::Canon::(anonymous namespace)::getBonds(RDKit::ROMol const&, RDKit::Atom const*, std::__1::vector<RDKit::Canon::bondholder, std::__1::allocator<RDKit::Canon::bondholder> >&, bool, std::__1::vector<RDKit::Canon::canon_atom, std::__1::allocator<RDKit::Canon::canon_atom> > const&) /src/rdkit/Code/GraphMol/new_canon.cpp:456:20
+    #2 0x9e623f in RDKit::Canon::initCanonAtoms(RDKit::ROMol const&, std::__1::vector<RDKit::Canon::canon_atom, std::__1::allocator<RDKit::Canon::canon_atom> >&, bool) /src/rdkit/Code/GraphMol/new_canon.cpp:554:5
+    #3 0x9f3a7a in RDKit::Canon::rankMolAtoms(RDKit::ROMol const&, std::__1::vector<unsigned int, std::__1::allocator<unsigned int> >&, bool, bool, bool) /src/rdkit/Code/GraphMol/new_canon.cpp:735:3
+    #4 0x6fd7a1 in RDKit::MolOps::cleanUpOrganometallics(RDKit::RWMol&) /src/rdkit/Code/GraphMol/MolOps.cpp:332:3
+    #5 0x700827 in RDKit::MolOps::sanitizeMol(RDKit::RWMol&, unsigned int&, unsigned int) /src/rdkit/Code/GraphMol/MolOps.cpp:472:5
+    #6 0x6f2780 in RDKit::MolOps::sanitizeMol(RDKit::RWMol&) /src/rdkit/Code/GraphMol/MolOps.cpp:456:3
+    #7 0x942758 in RDKit::MolOps::removeHs(RDKit::RWMol&, RDKit::MolOps::RemoveHsParameters const&, bool) /src/rdkit/Code/GraphMol/AddHs.cpp:1005:5
+    #8 0x943efe in RDKit::MolOps::removeHs(RDKit::RWMol&, bool, bool, bool) /src/rdkit/Code/GraphMol/AddHs.cpp:1023:3
+    #9 0x548296 in RDKit::SmilesToMol(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, RDKit::SmilesParserParams const&) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.cpp:436:9
+    #10 0x53f71c in RDKit::SmilesToMol(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, int, bool, std::__1::map<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >*) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.h:81:10
+    #11 0x53f71c in LLVMFuzzerTestOneInput /src/rdkit/Code/Fuzz/smiles_string_to_mol_fuzzer.cc:30:9
+    #12 0xa901bd in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+    #13 0xa8ffc8 in LLVMFuzzerRunDriver /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #14 0xa8fb88 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:300:10
+    #15 0x7ffff7c56082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #16 0x48088d in _start (/out/smiles_string_to_mol_fuzzer+0x48088d)
+
+DEDUP_TOKEN: RDKit::Canon::(anonymous namespace)::makeBondHolder(RDKit::Bond const*, unsigned int, bool, std::__1::vector<RDKit::Canon::canon_atom, std::__1::allocator<RDKit::Canon::canon_atom> > const&)--RDKit::Canon::(anonymous namespace)::getBonds(RDKit::ROMol const&, RDKit::Atom const*, std::__1::vector<RDKit::Canon::bondholder, std::__1::allocator<RDKit::Canon::bondholder> >&, bool, std::__1::vector<RDKit::Canon::canon_atom, std::__1::allocator<RDKit::Canon::canon_atom> > const&)--RDKit::Canon::initCanonAtoms(RDKit::ROMol const&, std::__1::vector<RDKit::Canon::canon_atom, std::__1::allocator<RDKit::Canon::canon_atom> >&, bool)
+[1m[32m0x6020000001b0 is located 0 bytes inside of 8-byte region [0x6020000001b0,0x6020000001b8)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x53cb0d in operator new(unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:95:3
+    #1 0x68484e in void* std::__1::__libcpp_operator_new<unsigned long>(unsigned long) /usr/local/bin/../include/c++/v1/new:245:10
+    #2 0x68484e in std::__1::__libcpp_allocate(unsigned long, unsigned long) /usr/local/bin/../include/c++/v1/new:271:10
+    #3 0x68484e in std::__1::allocator<int>::allocate(unsigned long) /usr/local/bin/../include/c++/v1/__memory/allocator.h:105:38
+    #4 0x68484e in std::__1::allocator_traits<std::__1::allocator<int> >::allocate(std::__1::allocator<int>&, unsigned long) /usr/local/bin/../include/c++/v1/__memory/allocator_traits.h:262:20
+    #5 0x68484e in std::__1::__split_buffer<int, std::__1::allocator<int>&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<int>&) /usr/local/bin/../include/c++/v1/__split_buffer:306:29
+    #6 0x68484e in void std::__1::vector<int, std::__1::allocator<int> >::__push_back_slow_path<int>(int&&) /usr/local/bin/../include/c++/v1/vector:1526:49
+    #7 0x6eb822 in std::__1::vector<int, std::__1::allocator<int> >::push_back(int&&) /usr/local/bin/../include/c++/v1/vector:1558:9
+    #8 0x6eb822 in RDKit::Bond::setStereoAtoms(unsigned int, unsigned int) /src/rdkit/Code/GraphMol/Bond.cpp:254:9
+    #9 0x64f9e3 in bool SmilesParseOps::parser::parse_doublebond_stereo<std::__1::__wrap_iter<char const*> >(std::__1::__wrap_iter<char const*>&, std::__1::__wrap_iter<char const*>, RDKit::RWMol&, unsigned int, unsigned int, RDKit::Bond::BondStereo) /src/rdkit/Code/GraphMol/SmilesParse/CXSmilesOps.cpp:1175:15
+    #10 0x5cf70b in bool SmilesParseOps::parser::parse_it<std::__1::__wrap_iter<char const*> >(std::__1::__wrap_iter<char const*>&, std::__1::__wrap_iter<char const*>, RDKit::RWMol&, unsigned int, unsigned int) /src/rdkit/Code/GraphMol/SmilesParse/CXSmilesOps.cpp:1480:12
+    #11 0x5cd7a7 in SmilesParseOps::parseCXExtensions(RDKit::RWMol&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::__wrap_iter<char const*>&, unsigned int, unsigned int) /src/rdkit/Code/GraphMol/SmilesParse/CXSmilesOps.cpp:1515:7
+    #12 0x54526b in void RDKit::(anonymous namespace)::handleCXPartAndName<RDKit::SmilesParserParams>(RDKit::RWMol*, RDKit::SmilesParserParams const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.cpp:376:9
+    #13 0x54526b in RDKit::SmilesToMol(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, RDKit::SmilesParserParams const&) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.cpp:415:3
+    #14 0x53f71c in RDKit::SmilesToMol(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, int, bool, std::__1::map<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >*) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.h:81:10
+    #15 0x53f71c in LLVMFuzzerTestOneInput /src/rdkit/Code/Fuzz/smiles_string_to_mol_fuzzer.cc:30:9
+    #16 0xa901bd in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+
+DEDUP_TOKEN: operator new(unsigned long)--void* std::__1::__libcpp_operator_new<unsigned long>(unsigned long)--std::__1::__libcpp_allocate(unsigned long, unsigned long)
+HINT: if you don't care about these errors you may set ASAN_OPTIONS=detect_container_overflow=0.
+If you suspect a false positive see also: https://github.com/google/sanitizers/wiki/AddressSanitizerContainerOverflow.
+SUMMARY: AddressSanitizer: container-overflow /src/rdkit/Code/GraphMol/new_canon.cpp:421:40 in RDKit::Canon::(anonymous namespace)::makeBondHolder(RDKit::Bond const*, unsigned int, bool, std::__1::vector<RDKit::Canon::canon_atom, std::__1::allocator<RDKit::Canon::canon_atom> > const&)
+Shadow bytes around the buggy address:
+  0x0c047fff7fe0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff7ff0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff8000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m01[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8010: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c047fff8020: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c047fff8030: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[34mfc[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c047fff8040: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c047fff8050: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c047fff8060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c047fff8070: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8080: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42527977

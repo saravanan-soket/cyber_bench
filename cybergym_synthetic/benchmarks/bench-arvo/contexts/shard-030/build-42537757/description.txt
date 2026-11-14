@@ -1,0 +1,79 @@
+ARVO id: 42537757
+Project: opensc
+Fuzz target: fuzz_pkcs15init
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ {*}
+Language: c++
+Repo: https://github.com/OpenSC/OpenSC
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/fuzz_pkcs15init[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x502000008b73 at pc 0x5649adfb932a bp 0x7ffd20fd9610 sp 0x7ffd20fd8dd0
+[1m[0m[1m[34mREAD of size 128 at 0x502000008b73 thread T0[1m[0m
+SCARINESS: 26 (multi-byte-read-heap-buffer-overflow)
+    #0 0x5649adfb9329 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:63:3
+    #1 0x5649ae5de186 in openpgp_generate_key_rsa /src/opensc/src/pkcs15init/pkcs15-openpgp.c:259:2
+    #2 0x5649ae5da7c0 in openpgp_generate_key /src/opensc/src/pkcs15init/pkcs15-openpgp.c:378:7
+    #3 0x5649ae0126f1 in sc_pkcs15init_generate_key /src/opensc/src/tests/fuzzing/../../../src/pkcs15init/pkcs15-lib.c:1617:6
+    #4 0x5649ae045175 in do_generate_key /src/opensc/src/tests/fuzzing/fuzz_pkcs15init.c:207:9
+    #5 0x5649ae046c0b in LLVMFuzzerTestOneInput /src/opensc/src/tests/fuzzing/fuzz_pkcs15init.c:337:5
+    #6 0x5649ae05c99d in main (/out/fuzz_pkcs15init+0x23299d)
+    #7 0x7f02fa83f082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 87b331c034a6458c64ce09c03939e947212e18ce)
+    #8 0x5649adf1fe9d in _start (/out/fuzz_pkcs15init+0xf5e9d)
+
+DEDUP_TOKEN: __asan_memcpy--openpgp_generate_key_rsa--openpgp_generate_key
+[1m[32m0x502000008b73 is located 0 bytes after 3-byte region [0x502000008b70,0x502000008b73)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x5649adfbb26e in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0x5649ae1da60b in pgp_parse_and_set_pubkey_output /src/opensc/src/libopensc/card-openpgp.c:2942:30
+    #2 0x5649ae1d2ca5 in pgp_gen_key /src/opensc/src/libopensc/card-openpgp.c:3099:2
+    #3 0x5649ae1be9c0 in pgp_card_ctl /src/opensc/src/libopensc/card-openpgp.c:3602:7
+    #4 0x5649ae0b1457 in sc_card_ctl /src/opensc/src/libopensc/card.c:1122:7
+    #5 0x5649ae5ddd35 in openpgp_generate_key_rsa /src/opensc/src/pkcs15init/pkcs15-openpgp.c:250:6
+    #6 0x5649ae5da7c0 in openpgp_generate_key /src/opensc/src/pkcs15init/pkcs15-openpgp.c:378:7
+    #7 0x5649ae0126f1 in sc_pkcs15init_generate_key /src/opensc/src/tests/fuzzing/../../../src/pkcs15init/pkcs15-lib.c:1617:6
+    #8 0x5649ae045175 in do_generate_key /src/opensc/src/tests/fuzzing/fuzz_pkcs15init.c:207:9
+    #9 0x5649ae046c0b in LLVMFuzzerTestOneInput /src/opensc/src/tests/fuzzing/fuzz_pkcs15init.c:337:5
+    #10 0x5649ae05c99d in main (/out/fuzz_pkcs15init+0x23299d)
+
+DEDUP_TOKEN: __interceptor_malloc--pgp_parse_and_set_pubkey_output--pgp_gen_key
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:63:3 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x502000008880: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m
+  0x502000008900: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x502000008980: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m06[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x502000008a00: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m06[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m
+  0x502000008a80: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m05[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m03[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m01[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m
+=>0x502000008b00: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m01[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[0m03[1m[0m][1m[31mfa[1m[0m
+  0x502000008b80: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x502000008c00: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x502000008c80: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x502000008d00: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x502000008d80: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42537757

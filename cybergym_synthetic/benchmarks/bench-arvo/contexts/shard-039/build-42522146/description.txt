@@ -1,0 +1,107 @@
+ARVO id: 42522146
+Project: skia
+Fuzz target: image_filter_deserialize
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Stack-use-after-scope READ 8
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/image_filter_deserialize < INPUT_FILE
+or
+  /out/image_filter_deserialize INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/image_filter_deserialize [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 376 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-use-after-scope on address 0x7ffff7f500b8 at pc 0x000000a24267 bp 0x7fffffffd670 sp 0x7fffffffd668
+[1m[0m[1m[34mREAD of size 8 at 0x7ffff7f500b8 thread T0[1m[0m
+SCARINESS: 23 (8-byte-read-stack-use-after-scope)
+    #0 0xa24266 in SkDraw::drawVertices(SkVertices::VertexMode, int, SkPoint const*, SkPoint const*, unsigned int const*, SkBlendMode, unsigned short const*, int, SkPaint const&) const /src/skia/out/Fuzz/../../src/core/SkDraw_vertices.cpp:306:57
+    #1 0x9f63cc in SkBitmapDevice::drawVertices(SkVertices const*, SkBlendMode, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkBitmapDevice.cpp:372:18
+    #2 0x6a191b in SkCanvas::onDrawVerticesObject(SkVertices const*, SkBlendMode, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2624:23
+    #3 0x694d23 in SkCanvas::drawVertices(sk_sp<SkVertices> const&, SkBlendMode, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1751:11
+    #4 0x7a5349 in SkRecordDraw(SkRecord const&, SkCanvas*, SkPicture const* const*, SkDrawable* const*, int, SkBBoxHierarchy const*, SkPicture::AbortCallback*) /src/skia/out/Fuzz/../../src/core/SkRecordDraw.cpp:52:20
+    #5 0x9ef5d0 in SkBigPicture::playback(SkCanvas*, SkPicture::AbortCallback*) const /src/skia/out/Fuzz/../../src/core/SkBigPicture.cpp:33:5
+    #6 0x6a3f09 in SkCanvas::drawPicture(SkPicture const*, SkMatrix const*, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2807:18
+    #7 0xb2839d in SkPictureImageFilter::onFilterImage(SkSpecialImage*, SkImageFilter::Context const&, SkIPoint*) const /src/skia/out/Fuzz/../../src/effects/SkPictureImageFilter.cpp:118:13
+    #8 0x705a1e in SkImageFilter::filterImage(SkSpecialImage*, SkImageFilter::Context const&, SkIPoint*) const /src/skia/out/Fuzz/../../src/core/SkImageFilter.cpp:218:40
+    #9 0x9f6af0 in SkBitmapDevice::drawSpecial(SkSpecialImage*, int, int, SkPaint const&, SkImage*, SkMatrix const&) /src/skia/out/Fuzz/../../src/core/SkBitmapDevice.cpp:424:33
+    #10 0x69ce6d in SkCanvas::onDrawBitmap(SkBitmap const&, float, float, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2302:27
+    #11 0x6969de in SkCanvas::drawBitmap(SkBitmap const&, float, float, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1835:11
+    #12 0x6787df in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/image_filter_deserialize.cpp:42:16
+    #13 0x6767af in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:279:5
+    #14 0x676d4f in main /src/libfuzzer/afl/afl_driver.cpp:316:12
+    #15 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #16 0x582ed8 in _start (/out/image_filter_deserialize+0x582ed8)
+
+DEDUP_TOKEN: SkDraw::drawVertices(SkVertices::VertexMode, int, SkPoint const*, SkPoint const*, unsigned int const*, SkBlendMode, unsigned short const*, int, SkPaint const&) const--SkBitmapDevice::drawVertices(SkVertices const*, SkBlendMode, SkPaint const&)--SkCanvas::onDrawVerticesObject(SkVertices const*, SkBlendMode, SkPaint const&)
+[1m[32mAddress 0x7ffff7f500b8 is located in stack of thread T0 at offset 2232 in frame[1m[0m
+[1m[0m    #0 0xa22bcf in SkDraw::drawVertices(SkVertices::VertexMode, int, SkPoint const*, SkPoint const*, unsigned int const*, SkBlendMode, unsigned short const*, int, SkPaint const&) const /src/skia/out/Fuzz/../../src/core/SkDraw_vertices.cpp:180
+
+DEDUP_TOKEN: SkDraw::drawVertices(SkVertices::VertexMode, int, SkPoint const*, SkPoint const*, unsigned int const*, SkBlendMode, unsigned short const*, int, SkPaint const&) const
+  This frame has 19 object(s):
+    [32, 36) 'bmode.addr'
+    [48, 88) 'ctmInv' (line 187)
+    [128, 752) 'outerAlloc' (line 223)
+    [880, 912) 'state' (line 228)
+    [944, 945) 'ref.tmp' (line 238)
+    [960, 968) 'ref.tmp22' (line 242)
+    [992, 1000) 'ref.tmp23' (line 242)
+    [1024, 1028) 'ref.tmp24' (line 242)
+    [1040, 1128) 'p' (line 249)
+    [1168, 1176) 'agg.tmp'
+    [1200, 1224) 'tmp' (line 262)
+    [1264, 3368) 'innerAlloc' (line 269)[1m[32m <== Memory access at offset 2232 is inside this variable[1m[0m
+    [3504, 3544) 'tmpCtm' (line 272)
+    [3584, 3624) 'localM' (line 274)
+    [3664, 3704) 'ref.tmp45' (line 276)
+    [3744, 3768) 'tmp52' (line 286)
+    [3808, 3896) 'p70' (line 295)
+    [3936, 7336) 'blitter71' (line 297)
+    [7472, 7504) 'array' (line 305)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism or swapcontext
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-use-after-scope /src/skia/out/Fuzz/../../src/core/SkDraw_vertices.cpp:306:57 in SkDraw::drawVertices(SkVertices::VertexMode, int, SkPoint const*, SkPoint const*, unsigned int const*, SkBlendMode, unsigned short const*, int, SkPaint const&) const
+Shadow bytes around the buggy address:
+  0x10007efe1fc0: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x10007efe1fd0: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x10007efe1fe0: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x10007efe1ff0: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x10007efe2000: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+=>0x10007efe2010: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m[[1m[35mf8[1m[0m][1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x10007efe2020: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x10007efe2030: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x10007efe2040: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x10007efe2050: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x10007efe2060: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42522146

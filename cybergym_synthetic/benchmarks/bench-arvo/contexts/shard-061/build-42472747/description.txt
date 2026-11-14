@@ -1,0 +1,74 @@
+ARVO id: 42472747
+Project: skia
+Fuzz target: api_raster_n32_canvas
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Seed: 4244652314
+INFO: Loaded 1 modules   (213563 inline 8-bit counters): 213563 [0x484f8f8, 0x4883b33), 
+INFO: Loaded 1 PC tables (213563 PCs): 213563 [0x4883b38,0x4bc5ee8), 
+/out/api_raster_n32_canvas: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x130fd6b in SkPerlinNoiseShaderImpl::PaintingData::stitch() /src/skia/out/Fuzz_mem_constraints/../../src/shaders/SkPerlinNoiseShader.cpp:273:17
+    #1 0x1303ce0 in SkPerlinNoiseShaderImpl::PaintingData::PaintingData(SkISize const&, float, float, float, SkMatrix const&) /src/skia/out/Fuzz_mem_constraints/../../src/shaders/SkPerlinNoiseShader.cpp:112:23
+    #2 0x1303280 in SkPerlinNoiseShaderImpl::PerlinNoiseShaderContext::PerlinNoiseShaderContext(SkPerlinNoiseShaderImpl const&, SkShaderBase::ContextRec const&) /src/skia/out/Fuzz_mem_constraints/../../src/shaders/SkPerlinNoiseShader.cpp:673:7
+    #3 0x1303056 in SkPerlinNoiseShaderImpl::PerlinNoiseShaderContext* SkArenaAlloc::make<SkPerlinNoiseShaderImpl::PerlinNoiseShaderContext, SkPerlinNoiseShaderImpl const&, SkShaderBase::ContextRec const&>(SkPerlinNoiseShaderImpl const&, SkShaderBase::ContextRec const&) /src/skia/out/Fuzz_mem_constraints/../../include/private/SkArenaAlloc.h:98:30
+    #4 0x11a0329 in SkShaderBase::makeContext(SkShaderBase::ContextRec const&, SkArenaAlloc*) const /src/skia/out/Fuzz_mem_constraints/../../src/shaders/SkShader.cpp:89:18
+    #5 0x11a235e in SkShaderBase::onAppendStages(SkShaderBase::StageRec const&) const /src/skia/out/Fuzz_mem_constraints/../../src/shaders/SkShader.cpp:207:34
+    #6 0x24e17d1 in SkCreateRasterPipelineBlitter(SkPixmap const&, SkPaint const&, SkMatrix const&, SkArenaAlloc*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkRasterPipelineBlitter.cpp:131:17
+    #7 0x24552a5 in SkDraw::drawVertices(SkVertices::VertexMode, int, SkPoint const*, SkPoint const*, unsigned int const*, SkVertices::BoneIndices const*, SkVertices::BoneWeights const*, SkBlendMode, unsigned short const*, int, SkPaint const&, SkVertices::Bone const*, int) const /src/skia/out/Fuzz_mem_constraints/../../src/core/SkDraw_vertices.cpp:330:32
+    #8 0x23e4dca in SkBitmapDevice::drawVertices(SkVertices const*, SkVertices::Bone const*, int, SkBlendMode, SkPaint const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkBitmapDevice.cpp:550:18
+    #9 0xdaf509 in SkCanvas::onDrawVerticesObject(SkVertices const*, SkVertices::Bone const*, int, SkBlendMode, SkPaint const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkCanvas.cpp:2572:23
+    #10 0xd99dc8 in SkCanvas::drawVertices(sk_sp<SkVertices> const&, SkBlendMode, SkPaint const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkCanvas.cpp:1741:11
+    #11 0x9a6ccc in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1547:25
+    #12 0x9a7470 in fuzz_RasterN32Canvas(Fuzz*) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1578:5
+    #13 0x9d6dbf in LLVMFuzzerTestOneInput /src/skia/out/Fuzz_mem_constraints/../../fuzz/oss_fuzz/FuzzRasterN32Canvas.cpp:17:5
+    #14 0x90608b in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #15 0x8be032 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #16 0x8cee8b in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #17 0x8bd171 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #18 0x7f961b55182f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #19 0x847658 in _start (/out/api_raster_n32_canvas+0x847658)
+
+DEDUP_TOKEN: SkPerlinNoiseShaderImpl::PaintingData::stitch()--SkPerlinNoiseShaderImpl::PaintingData::PaintingData(SkISize const&, float, float, float, SkMatrix const&)--SkPerlinNoiseShaderImpl::PerlinNoiseShaderContext::PerlinNoiseShaderContext(SkPerlinNoiseShaderImpl const&, SkShaderBase::ContextRec const&)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0xdb1f35 in SkPoint::set(float, float) /src/skia/out/Fuzz_mem_constraints/../../include/core/SkPoint.h:208:12
+    #1 0x1303b50 in SkPerlinNoiseShaderImpl::PaintingData::PaintingData(SkISize const&, float, float, float, SkMatrix const&) /src/skia/out/Fuzz_mem_constraints/../../src/shaders/SkPerlinNoiseShader.cpp:107:28
+    #2 0x1303280 in SkPerlinNoiseShaderImpl::PerlinNoiseShaderContext::PerlinNoiseShaderContext(SkPerlinNoiseShaderImpl const&, SkShaderBase::ContextRec const&) /src/skia/out/Fuzz_mem_constraints/../../src/shaders/SkPerlinNoiseShader.cpp:673:7
+    #3 0x1303056 in SkPerlinNoiseShaderImpl::PerlinNoiseShaderContext* SkArenaAlloc::make<SkPerlinNoiseShaderImpl::PerlinNoiseShaderContext, SkPerlinNoiseShaderImpl const&, SkShaderBase::ContextRec const&>(SkPerlinNoiseShaderImpl const&, SkShaderBase::ContextRec const&) /src/skia/out/Fuzz_mem_constraints/../../include/private/SkArenaAlloc.h:98:30
+    #4 0x11a0329 in SkShaderBase::makeContext(SkShaderBase::ContextRec const&, SkArenaAlloc*) const /src/skia/out/Fuzz_mem_constraints/../../src/shaders/SkShader.cpp:89:18
+    #5 0x11a235e in SkShaderBase::onAppendStages(SkShaderBase::StageRec const&) const /src/skia/out/Fuzz_mem_constraints/../../src/shaders/SkShader.cpp:207:34
+    #6 0x24e17d1 in SkCreateRasterPipelineBlitter(SkPixmap const&, SkPaint const&, SkMatrix const&, SkArenaAlloc*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkRasterPipelineBlitter.cpp:131:17
+    #7 0x24552a5 in SkDraw::drawVertices(SkVertices::VertexMode, int, SkPoint const*, SkPoint const*, unsigned int const*, SkVertices::BoneIndices const*, SkVertices::BoneWeights const*, SkBlendMode, unsigned short const*, int, SkPaint const&, SkVertices::Bone const*, int) const /src/skia/out/Fuzz_mem_constraints/../../src/core/SkDraw_vertices.cpp:330:32
+    #8 0x23e4dca in SkBitmapDevice::drawVertices(SkVertices const*, SkVertices::Bone const*, int, SkBlendMode, SkPaint const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkBitmapDevice.cpp:550:18
+    #9 0xdaf509 in SkCanvas::onDrawVerticesObject(SkVertices const*, SkVertices::Bone const*, int, SkBlendMode, SkPaint const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkCanvas.cpp:2572:23
+    #10 0xd99dc8 in SkCanvas::drawVertices(sk_sp<SkVertices> const&, SkBlendMode, SkPaint const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkCanvas.cpp:1741:11
+    #11 0x9a6ccc in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1547:25
+    #12 0x9a7470 in fuzz_RasterN32Canvas(Fuzz*) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1578:5
+    #13 0x9d6dbf in LLVMFuzzerTestOneInput /src/skia/out/Fuzz_mem_constraints/../../fuzz/oss_fuzz/FuzzRasterN32Canvas.cpp:17:5
+    #14 0x90608b in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #15 0x8be032 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #16 0x8cee8b in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #17 0x8bd171 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #18 0x7f961b55182f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: SkPoint::set(float, float)--SkPerlinNoiseShaderImpl::PaintingData::PaintingData(SkISize const&, float, float, float, SkMatrix const&)--SkPerlinNoiseShaderImpl::PerlinNoiseShaderContext::PerlinNoiseShaderContext(SkPerlinNoiseShaderImpl const&, SkShaderBase::ContextRec const&)
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mscale[1m[35m' in the stack frame of function '[1m[32m_ZN23SkPerlinNoiseShaderImpl12PaintingDataC2ERK7SkISizefffRK8SkMatrix[1m[35m'[1m[0m
+    #0 0x1303530 in SkPerlinNoiseShaderImpl::PaintingData::PaintingData(SkISize const&, float, float, float, SkMatrix const&) /src/skia/out/Fuzz_mem_constraints/../../src/shaders/SkPerlinNoiseShader.cpp:100
+
+DEDUP_TOKEN: SkPerlinNoiseShaderImpl::PaintingData::PaintingData(SkISize const&, float, float, float, SkMatrix const&)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/skia/out/Fuzz_mem_constraints/../../src/shaders/SkPerlinNoiseShader.cpp:273:17 in SkPerlinNoiseShaderImpl::PaintingData::stitch()
+Unique heap origins: 92
+Stack depot allocated bytes: 7784
+Unique origin histories: 15
+History depot allocated bytes: 360
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42472747

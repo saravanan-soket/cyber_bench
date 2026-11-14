@@ -1,0 +1,50 @@
+ARVO id: 42488775
+Project: imagemagick
+Fuzz target: ping_mvg_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 4096959854
+INFO: Loaded 1 modules   (190668 inline 8-bit counters): 190668 [0x9c80150, 0x9caea1c), 
+INFO: Loaded 1 PC tables (190668 PCs): 190668 [0x9caea1c,0x9e2307c), 
+/out/ping_mvg_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0xf3073408 (pc 0xf2b672eb bp 0xff94fbc8 sp 0xff94fbac T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0xf2b672eb in tolower_l (/lib/i386-linux-gnu/libc.so.6+0x252eb)
+    #1 0x84dd581 in LocaleLowercase /src/imagemagick/MagickCore/locale.c:1485:12
+    #2 0x863e280 in GlobExpression /src/imagemagick/MagickCore/token.c:553:66
+    #3 0x8570d6a in InterpretImageProperties /src/imagemagick/MagickCore/property.c:4061:17
+    #4 0x86bb281 in ReadCAPTIONImage /src/imagemagick/coders/caption.c:145:13
+    #5 0x83b1558 in ReadImage /src/imagemagick/MagickCore/constitute.c:563:15
+    #6 0x840bb59 in DrawPrimitive /src/imagemagick/MagickCore/draw.c:5476:30
+    #7 0x8401083 in RenderMVGContent /src/imagemagick/MagickCore/draw.c:4424:17
+    #8 0x83f753c in DrawImage /src/imagemagick/MagickCore/draw.c:4465:10
+    #9 0x879329e in ReadMVGImage /src/imagemagick/coders/mvg.c:239:10
+    #10 0x83b1558 in ReadImage /src/imagemagick/MagickCore/constitute.c:563:15
+    #11 0x8621ff6 in ReadStream /src/imagemagick/MagickCore/stream.c:1043:9
+    #12 0x8345a52 in PingBlob /src/imagemagick/MagickCore/blob.c:3647:13
+    #13 0x82666fb in Magick::Image::ping(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:3860:12
+    #14 0x8244f84 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/ping_fuzzer.cc:43:11
+    #15 0x8140b11 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:595:15
+    #16 0x812be9e in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #17 0x8131b8f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:852:9
+    #18 0x8159c37 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #19 0xf2b5a646 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x18646)
+    #20 0x8106e81 in _start (/out/ping_mvg_fuzzer+0x8106e81)
+
+DEDUP_TOKEN: tolower_l--LocaleLowercase--GlobExpression
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib/i386-linux-gnu/libc.so.6+0x252eb) in tolower_l
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42488775

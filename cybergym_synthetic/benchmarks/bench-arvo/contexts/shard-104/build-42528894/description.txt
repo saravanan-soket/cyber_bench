@@ -1,0 +1,51 @@
+ARVO id: 42528894
+Project: glog
+Fuzz target: fuzz_demangle
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/google/glog
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3275620675
+INFO: Loaded 1 modules   (1149 inline 8-bit counters): 1149 [0x6b3a38, 0x6b3eb5), 
+INFO: Loaded 1 PC tables (1149 PCs): 1149 [0x6b3eb8,0x6b8688), 
+/out/fuzz_demangle: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x7ffdf3d98b4f (pc 0x0000005780ba bp 0x7ffe06c9baf0 sp 0x7ffe06c9ba60 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x5780ba in ParseOneCharToken /src/glog/src/demangle.cc:162:7
+    #1 0x5780ba in google::ParseTemplateArg(google::State*) /src/glog/src/demangle.cc:1071:8
+    #2 0x57819d in ZeroOrMore /src/glog/src/demangle.cc:215:10
+    #3 0x57819d in google::ParseTemplateArg(google::State*) /src/glog/src/demangle.cc:1072:7
+    #4 0x56fc63 in OneOrMore /src/glog/src/demangle.cc:202:7
+    #5 0x56fc63 in ParseTemplateArgs /src/glog/src/demangle.cc:1054:7
+    #6 0x56fc63 in ParseName /src/glog/src/demangle.cc:465:7
+    #7 0x56fc63 in google::ParseEncoding(google::State*) /src/glog/src/demangle.cc:443:7
+    #8 0x574117 in google::ParseLocalName(google::State*) /src/glog/src/demangle.cc:1188:40
+    #9 0x570fb6 in google::ParseName(google::State*) /src/glog/src/demangle.cc:459:33
+    #10 0x56e1b0 in ParseEncoding /src/glog/src/demangle.cc:443:7
+    #11 0x56e1b0 in ParseMangledName /src/glog/src/demangle.cc:435:44
+    #12 0x56e1b0 in ParseTopLevelMangledName /src/glog/src/demangle.cc:1252:7
+    #13 0x56e1b0 in google::Demangle(char const*, char*, unsigned long) /src/glog/src/demangle.cc:1306:10
+    #14 0x56da74 in LLVMFuzzerTestOneInput /src/glog/src/fuzz_demangle.cc:30:3
+    #15 0x43ec13 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #16 0x42a372 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #17 0x42fc1c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #18 0x459152 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #19 0x7fa9b0ab5082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: e678fe54a5d2c2092f8e47eb0b33105e380f7340)
+    #20 0x42053d in _start (/out/fuzz_demangle+0x42053d)
+
+DEDUP_TOKEN: ParseOneCharToken--google::ParseTemplateArg(google::State*)--ZeroOrMore
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/glog/src/demangle.cc:162:7 in ParseOneCharToken
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42528894

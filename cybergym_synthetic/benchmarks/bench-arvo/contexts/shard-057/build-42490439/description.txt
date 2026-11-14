@@ -1,0 +1,118 @@
+ARVO id: 42490439
+Project: llvm-project
+Fuzz target: llvm-isel-fuzzer--x86_64-O2
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Use-after-poison READ 2
+Language: c++
+Repo: https://github.com/llvm/llvm-project.git
+
+=== Crash report ===
+/out/llvm-isel-fuzzer: Injected args: -mtriple=x86_64 -O2
+INFO: found LLVMFuzzerCustomMutator (0x817e50). Disabling -len_control by default.
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3686493855
+INFO: Loaded 1 modules   (1848796 inline 8-bit counters): 1848796 [0x10e76420, 0x110399fc), 
+INFO: Loaded 1 PC tables (1848796 PCs): 1848796 [0x11039a00,0x12c6f7c0), 
+/out/llvm-isel-fuzzer--x86_64-O2: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: use-after-poison on address 0x62100004b1aa at pc 0x000007ddf825 bp 0x7fffffffc490 sp 0x7fffffffc488
+[1m[0m[1m[34mREAD of size 2 at 0x62100004b1aa thread T0[1m[0m
+SCARINESS: 24 (2-byte-read-use-after-poison)
+    #0 0x7ddf824 in getValueType /src/llvm-project/llvm/include/llvm/CodeGen/SelectionDAGNodes.h:946:5
+    #1 0x7ddf824 in getValueType /src/llvm-project/llvm/include/llvm/CodeGen/SelectionDAGNodes.h:1101:16
+    #2 0x7ddf824 in llvm::SelectionDAG::getNode(unsigned int, llvm::SDLoc const&, llvm::EVT, llvm::SDValue, llvm::SDNodeFlags) /src/llvm-project/llvm/lib/CodeGen/SelectionDAG/SelectionDAG.cpp:4576:5
+    #3 0x7d6503e in llvm::SelectionDAG::getNode(unsigned int, llvm::SDLoc const&, llvm::EVT, llvm::SDValue) /src/llvm-project/llvm/lib/CodeGen/SelectionDAG/SelectionDAG.cpp:4352:10
+    #4 0x78b508f in visitSIGN_EXTEND /src/llvm-project/llvm/lib/CodeGen/SelectionDAG/DAGCombiner.cpp
+    #5 0x78b508f in (anonymous namespace)::DAGCombiner::visit(llvm::SDNode*) /src/llvm-project/llvm/lib/CodeGen/SelectionDAG/DAGCombiner.cpp:1652:40
+    #6 0x789c2fe in (anonymous namespace)::DAGCombiner::combine(llvm::SDNode*) /src/llvm-project/llvm/lib/CodeGen/SelectionDAG/DAGCombiner.cpp:1729:10
+    #7 0x7892f7a in Run /src/llvm-project/llvm/lib/CodeGen/SelectionDAG/DAGCombiner.cpp:1537:18
+    #8 0x7892f7a in llvm::SelectionDAG::Combine(llvm::CombineLevel, llvm::AAResults*, llvm::CodeGenOpt::Level) /src/llvm-project/llvm/lib/CodeGen/SelectionDAG/DAGCombiner.cpp:22639:36
+    #9 0x7ebd16b in llvm::SelectionDAGISel::CodeGenAndEmitDAG() /src/llvm-project/llvm/lib/CodeGen/SelectionDAG/SelectionDAGISel.cpp:794:13
+    #10 0x7eb7b9e in llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&) /src/llvm-project/llvm/lib/CodeGen/SelectionDAG/SelectionDAGISel.cpp:1606:7
+    #11 0x7eaa473 in llvm::SelectionDAGISel::runOnMachineFunction(llvm::MachineFunction&) /src/llvm-project/llvm/lib/CodeGen/SelectionDAG/SelectionDAGISel.cpp:505:3
+    #12 0x3ee5c50 in (anonymous namespace)::X86DAGToDAGISel::runOnMachineFunction(llvm::MachineFunction&) /src/llvm-project/llvm/lib/Target/X86/X86ISelDAGToDAG.cpp:192:25
+    #13 0x5ee97ae in llvm::MachineFunctionPass::runOnFunction(llvm::Function&) /src/llvm-project/llvm/lib/CodeGen/MachineFunctionPass.cpp:72:13
+    #14 0x7086e2f in llvm::FPPassManager::runOnFunction(llvm::Function&) /src/llvm-project/llvm/lib/IR/LegacyPassManager.cpp:1440:27
+    #15 0x70a3492 in llvm::FPPassManager::runOnModule(llvm::Module&) /src/llvm-project/llvm/lib/IR/LegacyPassManager.cpp:1486:16
+    #16 0x70889d5 in runOnModule /src/llvm-project/llvm/lib/IR/LegacyPassManager.cpp:1555:27
+    #17 0x70889d5 in llvm::legacy::PassManagerImpl::run(llvm::Module&) /src/llvm-project/llvm/lib/IR/LegacyPassManager.cpp:542:44
+    #18 0x818dde in LLVMFuzzerTestOneInput /src/llvm-project/llvm/tools/llvm-isel-fuzzer/llvm-isel-fuzzer.cpp:105:6
+    #19 0x71aee1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #20 0x704c72 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #21 0x70afb5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #22 0x734e62 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #23 0x7ffff6ccb83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #24 0x6dfb88 in _start (/out/llvm-isel-fuzzer--x86_64-O2+0x6dfb88)
+
+DEDUP_TOKEN: getValueType--getValueType--llvm::SelectionDAG::getNode(unsigned int, llvm::SDLoc const&, llvm::EVT, llvm::SDValue, llvm::SDNodeFlags)
+[1m[32m0x62100004b1aa is located 170 bytes inside of 4096-byte region [0x62100004b100,0x62100004c100)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x8138bd in operator new(unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:99:3
+    #1 0xe30f75 in Allocate /src/llvm-project/llvm/include/llvm/Support/AllocatorBase.h:85:12
+    #2 0xe30f75 in llvm::BumpPtrAllocatorImpl<llvm::MallocAllocator, 4096ul, 4096ul, 128ul>::StartNewSlab() /src/llvm-project/llvm/include/llvm/Support/Allocator.h:336:19
+    #3 0xe309b4 in llvm::BumpPtrAllocatorImpl<llvm::MallocAllocator, 4096ul, 4096ul, 128ul>::Allocate(unsigned long, llvm::Align) /src/llvm-project/llvm/include/llvm/Support/Allocator.h:188:5
+    #4 0x7dfdec9 in Allocate /src/llvm-project/llvm/include/llvm/Support/Allocator.h:202:12
+    #5 0x7dfdec9 in Allocate<llvm::SDNode, llvm::BumpPtrAllocatorImpl<llvm::MallocAllocator, 4096, 4096, 128> > /src/llvm-project/llvm/include/llvm/Support/Recycler.h:89:57
+    #6 0x7dfdec9 in Allocate<llvm::SDNode> /src/llvm-project/llvm/include/llvm/Support/RecyclingAllocator.h:43:47
+    #7 0x7dfdec9 in newSDNode<llvm::SDNode, unsigned int &, unsigned int, const llvm::DebugLoc &, llvm::SDVTList &> /src/llvm-project/llvm/include/llvm/CodeGen/SelectionDAG.h:380:40
+    #8 0x7dfdec9 in llvm::SelectionDAG::getNode(unsigned int, llvm::SDLoc const&, llvm::EVT, llvm::SDValue, llvm::SDValue, llvm::SDNodeFlags) /src/llvm-project/llvm/lib/CodeGen/SelectionDAG/SelectionDAG.cpp:5621:9
+    #9 0x7d6527f in llvm::SelectionDAG::getNode(unsigned int, llvm::SDLoc const&, llvm::EVT, llvm::SDValue, llvm::SDValue) /src/llvm-project/llvm/lib/CodeGen/SelectionDAG/SelectionDAG.cpp:5178:10
+    #10 0x7c2e48b in llvm::SelectionDAGBuilder::visitGetElementPtr(llvm::User const&) /src/llvm-project/llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp:3837:15
+    #11 0x7c089e0 in llvm::SelectionDAGBuilder::visit(llvm::Instruction const&) /src/llvm-project/llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp:1097:3
+    #12 0x7ebb5f9 in llvm::SelectionDAGISel::SelectBasicBlock(llvm::ilist_iterator<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void>, false, true>, llvm::ilist_iterator<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void>, false, true>, bool&) /src/llvm-project/llvm/lib/CodeGen/SelectionDAG/SelectionDAGISel.cpp:700:12
+    #13 0x7eb7b9e in llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&) /src/llvm-project/llvm/lib/CodeGen/SelectionDAG/SelectionDAGISel.cpp:1606:7
+    #14 0x7eaa473 in llvm::SelectionDAGISel::runOnMachineFunction(llvm::MachineFunction&) /src/llvm-project/llvm/lib/CodeGen/SelectionDAG/SelectionDAGISel.cpp:505:3
+    #15 0x3ee5c50 in (anonymous namespace)::X86DAGToDAGISel::runOnMachineFunction(llvm::MachineFunction&) /src/llvm-project/llvm/lib/Target/X86/X86ISelDAGToDAG.cpp:192:25
+    #16 0x5ee97ae in llvm::MachineFunctionPass::runOnFunction(llvm::Function&) /src/llvm-project/llvm/lib/CodeGen/MachineFunctionPass.cpp:72:13
+    #17 0x7086e2f in llvm::FPPassManager::runOnFunction(llvm::Function&) /src/llvm-project/llvm/lib/IR/LegacyPassManager.cpp:1440:27
+    #18 0x70a3492 in llvm::FPPassManager::runOnModule(llvm::Module&) /src/llvm-project/llvm/lib/IR/LegacyPassManager.cpp:1486:16
+    #19 0x70889d5 in runOnModule /src/llvm-project/llvm/lib/IR/LegacyPassManager.cpp:1555:27
+    #20 0x70889d5 in llvm::legacy::PassManagerImpl::run(llvm::Module&) /src/llvm-project/llvm/lib/IR/LegacyPassManager.cpp:542:44
+    #21 0x818dde in LLVMFuzzerTestOneInput /src/llvm-project/llvm/tools/llvm-isel-fuzzer/llvm-isel-fuzzer.cpp:105:6
+    #22 0x71aee1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #23 0x704c72 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #24 0x70afb5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #25 0x734e62 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #26 0x7ffff6ccb83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: operator new(unsigned long)--Allocate--llvm::BumpPtrAllocatorImpl<llvm::MallocAllocator, 4096ul, 4096ul, 128ul>::StartNewSlab()
+SUMMARY: AddressSanitizer: use-after-poison /src/llvm-project/llvm/include/llvm/CodeGen/SelectionDAGNodes.h:946:5 in getValueType
+Shadow bytes around the buggy address:
+  0x0c42800015e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c42800015f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4280001600: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4280001610: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4280001620: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+=>0x0c4280001630: [1m[34mf7[1m[0m [1m[0m02[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m[[1m[34mf7[1m[0m][1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c4280001640: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[34mf7[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c4280001650: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[34mf7[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c4280001660: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[34mf7[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c4280001670: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[34mf7[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c4280001680: [1m[0m00[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[0m02[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42490439

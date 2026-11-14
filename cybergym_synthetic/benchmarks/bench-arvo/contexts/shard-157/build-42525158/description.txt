@@ -1,0 +1,37 @@
+ARVO id: 42525158
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_MPEG1VIDEO_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+Reading 1025 bytes from /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x000000003c08 (pc 0x000000a4bd5c bp 0x7ffe589915c0 sp 0x7ffe589913d8 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0xa4bd5c in ff_put_h264_chroma_mc4_ssse3 (/out/ffmpeg_AV_CODEC_ID_MPEG1VIDEO_fuzzer+0xa4bd5c)
+    #1 0x59045b in mpv_reconstruct_mb_internal /src/ffmpeg/libavcodec/mpv_reconstruct_mb_template.c:140:21
+    #2 0x59045b in ff_mpv_reconstruct_mb /src/ffmpeg/libavcodec/mpegvideo_dec.c:1033:9
+    #3 0x577151 in mpeg_decode_slice /src/ffmpeg/libavcodec/mpeg12dec.c:1835:9
+    #4 0x56799f in decode_chunks /src/ffmpeg/libavcodec/mpeg12dec.c:2760:27
+    #5 0x55a108 in mpeg_decode_frame /src/ffmpeg/libavcodec/mpeg12dec.c:2827:11
+    #6 0x519ce2 in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:287:15
+    #7 0x519ce2 in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:533:15
+    #8 0x519ce2 in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:553:15
+    #9 0x519470 in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:641:15
+    #10 0x5028dc in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:521:25
+    #11 0xd6626d in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+
+DEDUP_TOKEN: ff_put_h264_chroma_mc4_ssse3--mpv_reconstruct_mb_internal--ff_mpv_reconstruct_mb
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/out/ffmpeg_AV_CODEC_ID_MPEG1VIDEO_fuzzer+0xa4bd5c) in ff_put_h264_chroma_mc4_ssse3
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42525158

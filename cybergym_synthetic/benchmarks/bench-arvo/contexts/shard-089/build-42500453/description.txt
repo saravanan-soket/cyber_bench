@@ -1,0 +1,36 @@
+ARVO id: 42500453
+Project: harfbuzz
+Fuzz target: hb-subset-fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/harfbuzz/harfbuzz.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/hb-subset-fuzzer[0m
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x0000009b1d40 (pc 0x0000005209e0 bp 0x7fffffffdd10 sp 0x7fffffffdd00 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x5209e0 in hb_bit_set_invertible_t::set(hb_bit_set_invertible_t const&) /work/build/../../src/harfbuzz/src/hb-bit-set-invertible.hh:119:79
+    #1 0x51fb0b in hb_sparseset_t<hb_bit_set_invertible_t>::set(hb_sparseset_t<hb_bit_set_invertible_t> const&) /work/build/../../src/harfbuzz/src/hb-set.hh:106:46
+    #2 0x51fac8 in hb_set_copy /work/build/../../src/harfbuzz/src/hb-set.cc:189:9
+    #3 0x92229a in hb_subset_plan_create(hb_face_t*, hb_subset_input_t const*) /work/build/../../src/harfbuzz/src/hb-subset-plan.cc:447:23
+    #4 0x760655 in hb_subset_or_fail /work/build/../../src/harfbuzz/src/hb-subset.cc:356:28
+    #5 0x4ca7e2 in trySubset(hb_face_t*, unsigned int const*, int, unsigned int) /work/build/../../src/harfbuzz/test/fuzzing/hb-subset-fuzzer.cc:26:23
+    #6 0x4ca4d2 in LLVMFuzzerTestOneInput /work/build/../../src/harfbuzz/test/fuzzing/hb-subset-fuzzer.cc:66:3
+    #7 0x991e7b in main (/out/hb-subset-fuzzer+0x991e7b)
+    #8 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #9 0x41c898 in _start (/out/hb-subset-fuzzer+0x41c898)
+
+DEDUP_TOKEN: hb_bit_set_invertible_t::set(hb_bit_set_invertible_t const&)--hb_sparseset_t<hb_bit_set_invertible_t>::set(hb_sparseset_t<hb_bit_set_invertible_t> const&)--hb_set_copy
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /work/build/../../src/harfbuzz/src/hb-bit-set-invertible.hh:119:79 in hb_bit_set_invertible_t::set(hb_bit_set_invertible_t const&)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42500453

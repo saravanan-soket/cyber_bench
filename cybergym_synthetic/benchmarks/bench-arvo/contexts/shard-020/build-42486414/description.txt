@@ -1,0 +1,38 @@
+ARVO id: 42486414
+Project: librawspeed
+Fuzz target: TiffParserFuzzer-GetDecoder-Decode
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/darktable-org/rawspeed.git
+
+=== Crash report ===
+INFO: Seed: 1491323906
+INFO: Loaded 1 modules (13129 guards): [0xa99bd0, 0xaa68f4), 
+/out/TiffParserFuzzer-GetDecoder-Decode: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+ASAN:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x6081000000a7 (pc 0x0000005be0c3 bp 0x7fffffffded0 sp 0x7fffffffde00 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x5be0c2 in rawspeed::MosDecoder::decodeRawInternal() /src/librawspeed/src/librawspeed/decoders/MosDecoder.cpp:118:20
+    #1 0x5ee38d in rawspeed::RawDecoder::decodeRaw() /src/librawspeed/src/librawspeed/decoders/RawDecoder.cpp:298:20
+    #2 0x56252a in LLVMFuzzerTestOneInput /src/librawspeed/fuzz/librawspeed/parsers/main.cpp:87:14
+    #3 0x6f9f89 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:460:13
+    #4 0x6fa7ba in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:399:3
+    #5 0x6d2936 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #6 0x6ddaa0 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #7 0x6d1f48 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #8 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #9 0x468ee8 in _start (/out/TiffParserFuzzer-GetDecoder-Decode+0x468ee8)
+
+DEDUP_TOKEN: rawspeed::MosDecoder::decodeRawInternal()--rawspeed::RawDecoder::decodeRaw()--LLVMFuzzerTestOneInput
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/librawspeed/src/librawspeed/decoders/MosDecoder.cpp:118:20 in rawspeed::MosDecoder::decodeRawInternal()
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42486414

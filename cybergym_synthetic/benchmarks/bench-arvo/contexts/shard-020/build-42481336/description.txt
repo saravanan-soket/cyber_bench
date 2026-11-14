@@ -1,0 +1,48 @@
+ARVO id: 42481336
+Project: arrow
+Fuzz target: arrow-ipc-stream-fuzz
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Object-size
+Language: c++
+Repo: https://github.com/apache/arrow.git
+
+=== Crash report ===
+INFO: Seed: 2435907426
+INFO: Loaded 1 modules   (271534 inline 8-bit counters): 271534 [0x150d290, 0x154f73e), 
+INFO: Loaded 1 PC tables (271534 PCs): 271534 [0x154f740,0x1974220), 
+/out/arrow-ipc-stream-fuzz: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m/usr/local/bin/../include/c++/v1/vector:1549:12:[1m[31m runtime error: [1m[0m[1mreference binding to address 0x000000000028 with insufficient space for an object of type 'int'[1m[0m
+[1m0x000000000028:[1m[30m note: [1m[0mpointer points here[1m[0m
+<memory cannot be printed>
+    #0 0xa2fc9d in operator[] /usr/local/bin/../include/c++/v1/vector:1549:5
+    #1 0xa2fc9d in arrow::UnionType::UnionType(std::__1::vector<std::__1::shared_ptr<arrow::Field>, std::__1::allocator<std::__1::shared_ptr<arrow::Field> > > const&, std::__1::vector<signed char, std::__1::allocator<signed char> > const&, arrow::UnionMode::type) /src/arrow/cpp/src/arrow/type.cc:362:5
+    #2 0xa71211 in __compressed_pair<std::__1::allocator<arrow::UnionType> &, const std::__1::vector<std::__1::shared_ptr<arrow::Field>, std::__1::allocator<std::__1::shared_ptr<arrow::Field> > > &, const std::__1::vector<signed char, std::__1::allocator<signed char> > &, arrow::UnionMode::type &> /usr/local/bin/../include/c++/v1/memory:2298:9
+    #3 0xa71211 in std::__1::__shared_ptr_emplace<arrow::UnionType, std::__1::allocator<arrow::UnionType> >::__shared_ptr_emplace<std::__1::vector<std::__1::shared_ptr<arrow::Field>, std::__1::allocator<std::__1::shared_ptr<arrow::Field> > > const&, std::__1::vector<signed char, std::__1::allocator<signed char> > const&, arrow::UnionMode::type&>(std::__1::allocator<arrow::UnionType>, std::__1::vector<std::__1::shared_ptr<arrow::Field>, std::__1::allocator<std::__1::shared_ptr<arrow::Field> > > const&, std::__1::vector<signed char, std::__1::allocator<signed char> > const&, arrow::UnionMode::type&) /usr/local/bin/../include/c++/v1/memory:3583:16
+    #4 0xa52a0b in std::__1::enable_if<!(is_array<arrow::UnionType>::value), std::__1::shared_ptr<arrow::UnionType> >::type std::__1::make_shared<arrow::UnionType, std::__1::vector<std::__1::shared_ptr<arrow::Field>, std::__1::allocator<std::__1::shared_ptr<arrow::Field> > > const&, std::__1::vector<signed char, std::__1::allocator<signed char> > const&, arrow::UnionMode::type&>(std::__1::vector<std::__1::shared_ptr<arrow::Field>, std::__1::allocator<std::__1::shared_ptr<arrow::Field> > > const&, std::__1::vector<signed char, std::__1::allocator<signed char> > const&, arrow::UnionMode::type&) /usr/local/bin/../include/c++/v1/memory:4419:26
+    #5 0xa5293b in arrow::union_(std::__1::vector<std::__1::shared_ptr<arrow::Field>, std::__1::allocator<std::__1::shared_ptr<arrow::Field> > > const&, std::__1::vector<signed char, std::__1::allocator<signed char> > const&, arrow::UnionMode::type) /src/arrow/cpp/src/arrow/type.cc:1397:10
+    #6 0xae851d in arrow::ipc::internal::(anonymous namespace)::UnionFromFlatbuffer(org::apache::arrow::flatbuf::Union const*, std::__1::vector<std::__1::shared_ptr<arrow::Field>, std::__1::allocator<std::__1::shared_ptr<arrow::Field> > > const&, std::__1::shared_ptr<arrow::DataType>*) /src/arrow/cpp/src/arrow/ipc/metadata_internal.cc:175:10
+    #7 0xacedbd in arrow::ipc::internal::(anonymous namespace)::ConcreteTypeFromFlatbuffer(org::apache::arrow::flatbuf::Type, void const*, std::__1::vector<std::__1::shared_ptr<arrow::Field>, std::__1::allocator<std::__1::shared_ptr<arrow::Field> > > const&, std::__1::shared_ptr<arrow::DataType>*) /src/arrow/cpp/src/arrow/ipc/metadata_internal.cc:358:14
+    #8 0xae5bc5 in arrow::ipc::internal::(anonymous namespace)::TypeFromFlatbuffer(org::apache::arrow::flatbuf::Field const*, std::__1::vector<std::__1::shared_ptr<arrow::Field>, std::__1::allocator<std::__1::shared_ptr<arrow::Field> > > const&, arrow::KeyValueMetadata const*, std::__1::shared_ptr<arrow::DataType>*) /src/arrow/cpp/src/arrow/ipc/metadata_internal.cc:375:3
+    #9 0xaccbb6 in arrow::ipc::internal::(anonymous namespace)::FieldFromFlatbuffer(org::apache::arrow::flatbuf::Field const*, arrow::ipc::DictionaryMemo*, std::__1::shared_ptr<arrow::Field>*) /src/arrow/cpp/src/arrow/ipc/metadata_internal.cc:786:3
+    #10 0xacc3a0 in arrow::ipc::internal::GetSchema(void const*, arrow::ipc::DictionaryMemo*, std::__1::shared_ptr<arrow::Schema>*) /src/arrow/cpp/src/arrow/ipc/metadata_internal.cc:1196:5
+    #11 0x6b51fd in arrow::ipc::RecordBatchStreamReader::RecordBatchStreamReaderImpl::ReadSchema() /src/arrow/cpp/src/arrow/ipc/reader.cc:480:12
+    #12 0x6857ae in Open /src/arrow/cpp/src/arrow/ipc/reader.cc:466:12
+    #13 0x6857ae in arrow::ipc::RecordBatchStreamReader::Open(std::__1::unique_ptr<arrow::ipc::MessageReader, std::__1::default_delete<arrow::ipc::MessageReader> >, std::__1::shared_ptr<arrow::RecordBatchReader>*) /src/arrow/cpp/src/arrow/ipc/reader.cc:585:3
+    #14 0x6865ad in arrow::ipc::RecordBatchStreamReader::Open(arrow::io::InputStream*, std::__1::shared_ptr<arrow::RecordBatchReader>*) /src/arrow/cpp/src/arrow/ipc/reader.cc:601:10
+    #15 0x695e62 in arrow::ipc::internal::FuzzIpcStream(unsigned char const*, long) /src/arrow/cpp/src/arrow/ipc/reader.cc:1164:3
+    #16 0x682b86 in LLVMFuzzerTestOneInput /src/arrow/cpp/src/arrow/ipc/stream_fuzz.cc:25:17
+    #17 0x611ef1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #18 0x5fca11 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #19 0x6026ce in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #20 0x62c5f2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #21 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #22 0x5d5e88 in _start (/out/arrow-ipc-stream-fuzz+0x5d5e88)
+
+DEDUP_TOKEN: operator[]--arrow::UnionType::UnionType(std::__1::vector<std::__1::shared_ptr<arrow::Field>, std::__1::allocator<std::__1::shared_ptr<arrow::Field> > > const&, std::__1::vector<signed char, std::__1::allocator<signed char> > const&, arrow::UnionMode::type)--__compressed_pair<std::__1::allocator<arrow::UnionType> &, const std::__1::vector<std::__1::shared_ptr<arrow::Field>, std::__1::allocator<std::__1::shared_ptr<arrow::Field> > > &, const std::__1::vector<signed char, std::__1::allocator<signed char> > &, arrow::UnionMode::type &>
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /usr/local/bin/../include/c++/v1/vector:1549:12 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42481336

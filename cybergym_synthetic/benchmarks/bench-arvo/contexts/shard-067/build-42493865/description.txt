@@ -1,0 +1,99 @@
+ARVO id: 42493865
+Project: kimageformats
+Fuzz target: kimgio_heif_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 2
+Language: c++
+Repo: https://invent.kde.org/frameworks/kimageformats.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2785623652
+INFO: Loaded 1 modules   (371967 inline 8-bit counters): 371967 [0x3f21240, 0x3f7bf3f), 
+INFO: Loaded 1 PC tables (371967 PCs): 371967 [0x3f7bf40,0x4528f30), 
+/out/kimgio_heif_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x62900001820e at pc 0x000000626b1a bp 0x7ffc0fec45d0 sp 0x7ffc0fec45c8
+[1m[0m[1m[34mREAD of size 2 at 0x62900001820e thread T0[1m[0m
+SCARINESS: 14 (2-byte-read-heap-buffer-overflow)
+    #0 0x626b19 in Op_to_sdr_planes::convert_colorspace(std::__1::shared_ptr<heif::HeifPixelImage const> const&, heif::ColorState, heif::ColorConversionOptions) /src/libheif/libheif/heif_colorconversion.cc:2464:20
+    #1 0x630186 in heif::ColorConversionPipeline::convert_image(std::__1::shared_ptr<heif::HeifPixelImage> const&) /src/libheif/libheif/heif_colorconversion.cc:3013:19
+    #2 0x630c0f in heif::convert_colorspace(std::__1::shared_ptr<heif::HeifPixelImage> const&, heif_colorspace, heif_chroma, std::__1::shared_ptr<heif::color_profile_nclx const>, int) /src/libheif/libheif/heif_colorconversion.cc:3118:19
+    #3 0x5adcc9 in heif::HeifContext::decode_image_user(unsigned int, std::__1::shared_ptr<heif::HeifPixelImage>&, heif_colorspace, heif_chroma, heif_decoding_options const*) const /src/libheif/libheif/heif_context.cc:1023:11
+    #4 0x57f842 in heif_decode_image /src/libheif/libheif/heif.cc:904:35
+    #5 0x56d524 in heif::ImageHandle::decode_image(heif_colorspace, heif_chroma, heif::ImageHandle::DecodingOptions const&) /usr/local/include/libheif/heif_cxx.h:726:23
+    #6 0x56870f in HEIFHandler::ensureDecoder() /src/kimageformats/src/imageformats/heif.cpp:412:34
+    #7 0x5639f4 in HEIFHandler::ensureParsed() const /src/kimageformats/src/imageformats/heif.cpp:355:18
+    #8 0x56393f in HEIFHandler::read(QImage*) /src/kimageformats/src/imageformats/heif.cpp:73:10
+    #9 0x56287e in LLVMFuzzerTestOneInput /src/kimgio_fuzzer.cc:57:14
+    #10 0x465ed1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #11 0x44fb92 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #12 0x455ee6 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #13 0x47fed2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #14 0x7f207984283f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #15 0x42a558 in _start (/out/kimgio_heif_fuzzer+0x42a558)
+
+DEDUP_TOKEN: Op_to_sdr_planes::convert_colorspace(std::__1::shared_ptr<heif::HeifPixelImage const> const&, heif::ColorState, heif::ColorConversionOptions)--heif::ColorConversionPipeline::convert_image(std::__1::shared_ptr<heif::HeifPixelImage> const&)--heif::convert_colorspace(std::__1::shared_ptr<heif::HeifPixelImage> const&, heif_colorspace, heif_chroma, std::__1::shared_ptr<heif::color_profile_nclx const>, int)
+[1m[32m0x62900001820f is located 0 bytes to the right of 16399-byte region [0x629000014200,0x62900001820f)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x55fe2d in operator new[](unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:102:3
+    #1 0x600457 in heif::HeifPixelImage::ImagePlane::alloc(int, int, int, heif_chroma) /src/libheif/libheif/heif_image.cc:192:21
+    #2 0x600086 in heif::HeifPixelImage::add_plane(heif_channel, int, int, int) /src/libheif/libheif/heif_image.cc:145:13
+    #3 0x6590e7 in convert_libde265_image_to_heif_image(libde265_decoder*, de265_image const*, heif_image**) /src/libheif/libheif/heif_decoder_libde265.cc:135:19
+    #4 0x658b61 in libde265_v1_decode_image(void*, heif_image**) /src/libheif/libheif/heif_decoder_libde265.cc:327:13
+    #5 0x5af55b in heif::HeifContext::decode_image_planar(unsigned int, std::__1::shared_ptr<heif::HeifPixelImage>&, heif_colorspace, heif_decoding_options const*) const /src/libheif/libheif/heif_context.cc:1090:11
+    #6 0x5af416 in heif::HeifContext::decode_image_planar(unsigned int, std::__1::shared_ptr<heif::HeifPixelImage>&, heif_colorspace, heif_decoding_options const*) const /src/libheif/libheif/heif_context.cc:1263:19
+    #7 0x5adb23 in heif::HeifContext::decode_image_user(unsigned int, std::__1::shared_ptr<heif::HeifPixelImage>&, heif_colorspace, heif_chroma, heif_decoding_options const*) const /src/libheif/libheif/heif_context.cc:1003:15
+    #8 0x57f842 in heif_decode_image /src/libheif/libheif/heif.cc:904:35
+    #9 0x56d524 in heif::ImageHandle::decode_image(heif_colorspace, heif_chroma, heif::ImageHandle::DecodingOptions const&) /usr/local/include/libheif/heif_cxx.h:726:23
+    #10 0x56870f in HEIFHandler::ensureDecoder() /src/kimageformats/src/imageformats/heif.cpp:412:34
+    #11 0x5639f4 in HEIFHandler::ensureParsed() const /src/kimageformats/src/imageformats/heif.cpp:355:18
+    #12 0x56393f in HEIFHandler::read(QImage*) /src/kimageformats/src/imageformats/heif.cpp:73:10
+    #13 0x56287e in LLVMFuzzerTestOneInput /src/kimgio_fuzzer.cc:57:14
+    #14 0x465ed1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #15 0x44fb92 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #16 0x455ee6 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #17 0x47fed2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7f207984283f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: operator new[](unsigned long)--heif::HeifPixelImage::ImagePlane::alloc(int, int, int, heif_chroma)--heif::HeifPixelImage::add_plane(heif_channel, int, int, int)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/libheif/libheif/heif_colorconversion.cc:2464:20 in Op_to_sdr_planes::convert_colorspace(std::__1::shared_ptr<heif::HeifPixelImage const> const&, heif::ColorState, heif::ColorConversionOptions)
+Shadow bytes around the buggy address:
+  0x0c527fffaff0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c527fffb000: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c527fffb010: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c527fffb020: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c527fffb030: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c527fffb040: [1m[0m00[1m[0m[[1m[0m07[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c527fffb050: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c527fffb060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c527fffb070: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c527fffb080: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c527fffb090: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42493865

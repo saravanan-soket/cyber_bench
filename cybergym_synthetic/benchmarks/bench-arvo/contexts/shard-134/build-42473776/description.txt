@@ -1,0 +1,42 @@
+ARVO id: 42473776
+Project: openthread
+Fuzz target: radio-receive-done-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/openthread/openthread
+
+=== Crash report ===
+INFO: Seed: 196603554
+INFO: Loaded 1 modules   (19664 inline 8-bit counters): 19664 [0x8c0288, 0x8c4f58), 
+INFO: Loaded 1 PC tables (19664 PCs): 19664 [0x5ebba8,0x6388a8), 
+/out/radio-receive-done-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x010000000000 (pc 0x00000043e047 bp 0x7fffffffddd0 sp 0x7fffffffdda8 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x43e046 in ot::Buffer::GetNextBuffer() const /src/openthread/src/core/./common/message.hpp:139
+    #1 0x43de81 in ot::MessagePool::FreeBuffers(ot::Buffer*) /src/openthread/src/core/common/message.cpp:164:38
+    #2 0x4b2321 in ot::Coap::ResponsesQueue::DequeueAllResponses() /src/openthread/src/core/coap/coap.cpp:809:9
+    #3 0x4b2149 in ot::Coap::CoapBase::ClearRequestsAndResponses() /src/openthread/src/core/coap/coap.cpp:81:21
+    #4 0x4b4c74 in ot::Coap::Coap::Stop() /src/openthread/src/core/coap/coap.cpp:870:5
+    #5 0x4abc44 in ot::ThreadNetif::Down() /src/openthread/src/core/thread/thread_netif.cpp:162:11
+    #6 0x43292f in otIp6SetEnabled /src/openthread/src/core/api/ip6_api.cpp:61:35
+    #7 0x43d22a in ot::Instance::Finalize() /src/openthread/src/core/common/instance.cpp:189:5
+    #8 0x43207c in LLVMFuzzerTestOneInput /src/openthread/tests/fuzz/radio_receive_done.cpp:87:9
+    #9 0x52a1e9 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:529:15
+    #10 0x5127a2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:286:6
+    #11 0x5164ba in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:715:9
+    #12 0x512528 in main /src/libfuzzer/FuzzerMain.cpp:19:10
+    #13 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #14 0x405e28 in _start (/out/radio-receive-done-fuzzer+0x405e28)
+
+DEDUP_TOKEN: ot::Buffer::GetNextBuffer() const--ot::MessagePool::FreeBuffers(ot::Buffer*)--ot::Coap::ResponsesQueue::DequeueAllResponses()
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/openthread/src/core/./common/message.hpp:139 in ot::Buffer::GetNextBuffer() const
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42473776

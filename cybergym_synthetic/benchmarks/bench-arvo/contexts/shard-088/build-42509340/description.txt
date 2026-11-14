@@ -1,0 +1,42 @@
+ARVO id: 42509340
+Project: php-src
+Fuzz target: php-fuzz-tracing-jit
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://github.com/php/php-src.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/php-fuzz-tracing-jit[0m
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x0000010727a4 bp 0x7fffebc84a40 sp 0x7fffebc84a20 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x10727a4 in zend_gc_delref /src/php-src/Zend/zend_types.h:1183:2
+    #1 0x10727a4 in i_zval_ptr_dtor /src/php-src/Zend/zend_variables.h:43:8
+    #2 0x10892bc in i_free_compiled_variables /src/php-src/Zend/zend_execute.c:3563:3
+    #3 0x10892bc in zend_leave_helper_SPEC /src/php-src/Zend/zend_vm_execute.h:1170:4
+    #4 0x10970a2 in zend_dispatch_try_catch_finally_helper_SPEC /src/php-src/Zend/zend_vm_execute.h:3071:3
+    #5 0x101015e in ZEND_HANDLE_EXCEPTION_SPEC_HANDLER /src/php-src/Zend/zend_vm_execute.h:3126:2
+    #6 0x12a9d19 in fuzzer_execute_ex /src/php-src/sapi/fuzzer/fuzzer-execute-common.h:53:14
+    #7 0xf68cf7 in ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER /src/php-src/Zend/zend_vm_execute.h:1728:4
+    #8 0x12a9d19 in fuzzer_execute_ex /src/php-src/sapi/fuzzer/fuzzer-execute-common.h:53:14
+    #9 0xec309e in zend_execute /src/php-src/Zend/zend_vm_execute.h:58977:2
+    #10 0x12aae60 in fuzzer_do_request_from_buffer /src/php-src/sapi/fuzzer/fuzzer-sapi.c:276:5
+    #11 0x12a947e in LLVMFuzzerTestOneInput /src/php-src/sapi/fuzzer/fuzzer-tracing-jit.c:34:2
+    #12 0x12ac09b in main (/out/php-fuzz-tracing-jit+0x12ac09b)
+    #13 0x7f2c1cfb40b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #14 0x60129d in _start (/out/php-fuzz-tracing-jit+0x60129d)
+
+DEDUP_TOKEN: zend_gc_delref--i_zval_ptr_dtor--i_free_compiled_variables
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/php-src/Zend/zend_types.h:1183:2 in zend_gc_delref
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42509340

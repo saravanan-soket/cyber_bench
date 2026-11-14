@@ -1,0 +1,92 @@
+ARVO id: 42482938
+Project: gdal
+Fuzz target: ogr_filesystem_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 8
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/ogr_filesystem_fuzzer < INPUT_FILE
+or
+  /out/ogr_filesystem_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/ogr_filesystem_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 128 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x60300000acd8 at pc 0x000001bcea8c bp 0x7fff323f2550 sp 0x7fff323f2548
+[1m[0m[1m[34mREAD of size 8 at 0x60300000acd8 thread T0[1m[0m
+SCARINESS: 23 (8-byte-read-heap-buffer-overflow)
+    #0 0x1bcea8b in AddGenericAttributes(NTFFileReader*, NTFRecord**, OGRFeature*) /src/gdal/gdal/ogr/ogrsf_frmts/ntf/ntf_generic.cpp:335:58
+    #1 0x1bcd4b5 in TranslateGenericCollection(NTFFileReader*, OGRNTFLayer*, NTFRecord**) /src/gdal/gdal/ogr/ogrsf_frmts/ntf/ntf_generic.cpp:478:5
+    #2 0x1bd65b2 in NTFFileReader::ReadOGRFeature(OGRNTFLayer*) /src/gdal/gdal/ogr/ogrsf_frmts/ntf/ntffilereader.cpp:1510:30
+    #3 0x1bf600f in OGRNTFLayer::GetNextFeature() /src/gdal/gdal/ogr/ogrsf_frmts/ntf/ogrntflayer.cpp:130:38
+    #4 0x574ef2 in OGR_L_GetNextFeature /src/gdal/gdal/ogr/ogrsf_frmts/generic/ogrlayer.cpp:549:48
+    #5 0x521a62 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/ogr_fuzzer.cpp:111:32
+    #6 0x521f5e in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:265:5
+    #7 0x5224ec in main /src/libfuzzer/afl/afl_driver.cpp:302:12
+    #8 0x7f7e8b46d82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #9 0x426968 in _start (/out/ogr_filesystem_fuzzer+0x426968)
+
+DEDUP_TOKEN: AddGenericAttributes(NTFFileReader*, NTFRecord**, OGRFeature*)--TranslateGenericCollection(NTFFileReader*, OGRNTFLayer*, NTFRecord**)--NTFFileReader::ReadOGRFeature(OGRNTFLayer*)
+[1m[32m0x60300000acd8 is located 0 bytes to the right of 24-byte region [0x60300000acc0,0x60300000acd8)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4e5a68 in realloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:79
+    #1 0x56bbd0 in VSIReallocVerbose /src/gdal/gdal/port/cpl_vsisimple.cpp:1221:18
+    #2 0x5364f4 in CSLAddStringMayFail /src/gdal/gdal/port/cpl_string.cpp:108:13
+    #3 0x536443 in CSLAddString /src/gdal/gdal/port/cpl_string.cpp:81:23
+    #4 0x1bd432f in NTFFileReader::ProcessAttRecGroup(NTFRecord**, char***, char***) /src/gdal/gdal/ogr/ogrsf_frmts/ntf/ntffilereader.cpp:851:33
+    #5 0x1bce589 in AddGenericAttributes(NTFFileReader*, NTFRecord**, OGRFeature*) /src/gdal/gdal/ogr/ogrsf_frmts/ntf/ntf_generic.cpp:295:20
+    #6 0x1bcd4b5 in TranslateGenericCollection(NTFFileReader*, OGRNTFLayer*, NTFRecord**) /src/gdal/gdal/ogr/ogrsf_frmts/ntf/ntf_generic.cpp:478:5
+    #7 0x1bd65b2 in NTFFileReader::ReadOGRFeature(OGRNTFLayer*) /src/gdal/gdal/ogr/ogrsf_frmts/ntf/ntffilereader.cpp:1510:30
+    #8 0x1bf600f in OGRNTFLayer::GetNextFeature() /src/gdal/gdal/ogr/ogrsf_frmts/ntf/ogrntflayer.cpp:130:38
+    #9 0x574ef2 in OGR_L_GetNextFeature /src/gdal/gdal/ogr/ogrsf_frmts/generic/ogrlayer.cpp:549:48
+    #10 0x521a62 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/ogr_fuzzer.cpp:111:32
+    #11 0x521f5e in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:265:5
+    #12 0x5224ec in main /src/libfuzzer/afl/afl_driver.cpp:302:12
+    #13 0x7f7e8b46d82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: realloc--VSIReallocVerbose--CSLAddStringMayFail
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/gdal/gdal/ogr/ogrsf_frmts/ntf/ntf_generic.cpp:335:58 in AddGenericAttributes(NTFFileReader*, NTFRecord**, OGRFeature*)
+Shadow bytes around the buggy address:
+  0x0c067fff9540: [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m05[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff9550: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m05[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff9560: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m03[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c067fff9570: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff9580: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+=>0x0c067fff9590: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff95a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff95b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff95c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff95d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff95e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42482938

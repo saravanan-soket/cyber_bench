@@ -1,0 +1,67 @@
+ARVO id: 42507876
+Project: php-src
+Fuzz target: php-fuzz-execute
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/php/php-src.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3080432380
+INFO: Loaded 1 modules   (161399 inline 8-bit counters): 161399 [0x2459620, 0x2480c97), 
+INFO: Loaded 1 PC tables (161399 PCs): 161399 [0x2480c98,0x26f7408), 
+/out/php-fuzz-execute: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x14c6215 in tolower /usr/include/ctype.h:209:37
+    #1 0x14c6215 in zend_binary_strcasecmp_l /src/php-src/Zend/zend_operators.c:2879:8
+    #2 0x14c7323 in string_case_compare_function /src/php-src/Zend/zend_operators.c:2001:13
+    #3 0xec9898 in php_array_data_compare_string_case_unstable_i /src/php-src/ext/standard/array.c:360:9
+    #4 0xec9898 in php_array_data_compare_string_case /src/php-src/ext/standard/array.c:409:1
+    #5 0x18b9763 in zend_sort_2 /src/php-src/Zend/zend_sort.c:25:6
+    #6 0x18b9763 in zend_insert_sort /src/php-src/Zend/zend_sort.c:90:4
+    #7 0x18bde61 in zend_sort /src/php-src/Zend/zend_sort.c:252:4
+    #8 0x1587016 in zend_hash_sort_ex /src/php-src/Zend/zend_hash.c:2553:2
+    #9 0xe4c52d in zif_sort /src/php-src/ext/standard/array.c:821:2
+    #10 0x15d36e2 in execute_internal /src/php-src/Zend/zend_execute.c:3540:2
+    #11 0x1c144d6 in fuzzer_execute_internal /src/php-src/sapi/fuzzer/fuzzer-execute.c:79:2
+    #12 0x16e33c2 in ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER /src/php-src/Zend/zend_vm_execute.h
+    #13 0x1c13fc6 in fuzzer_execute_ex /src/php-src/sapi/fuzzer/fuzzer-execute.c:43:14
+    #14 0x15e0152 in zend_execute /src/php-src/Zend/zend_vm_execute.h:58951:2
+    #15 0x1c15744 in fuzzer_do_request_from_buffer /src/php-src/sapi/fuzzer/fuzzer-sapi.c:261:5
+    #16 0x1c13c43 in LLVMFuzzerTestOneInput /src/php-src/sapi/fuzzer/fuzzer-execute.c:90:2
+    #17 0x6383f3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #18 0x625092 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #19 0x62aabb in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #20 0x650962 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #21 0x7f9e96dc30b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #22 0x6021ad in _start (/out/php-fuzz-execute+0x6021ad)
+
+DEDUP_TOKEN: tolower--zend_binary_strcasecmp_l--string_case_compare_function
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x6b479d in __interceptor_malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:904:3
+    #1 0x136a72d in __zend_malloc /src/php-src/Zend/zend_alloc.c:3043:14
+    #2 0x1937aeb in zend_string_alloc /src/php-src/Zend/zend_string.h:149:36
+    #3 0x1937aeb in zend_interned_strings_init /src/php-src/Zend/zend_string.c:102:8
+    #4 0x14e89a5 in zend_startup /src/php-src/Zend/zend.c:991:2
+    #5 0x11b50b0 in php_module_startup /src/php-src/main/main.c:2074:2
+    #6 0x601ab1 in startup /src/php-src/sapi/fuzzer/fuzzer-sapi.c:65:6
+    #7 0x1c148ac in fuzzer_init_php /src/php-src/sapi/fuzzer/fuzzer-sapi.c:154:6
+    #8 0x1c13d03 in LLVMFuzzerInitialize /src/php-src/sapi/fuzzer/fuzzer-execute.c:103:2
+    #9 0x628687 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #10 0x650962 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7f9e96dc30b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+
+DEDUP_TOKEN: __interceptor_malloc--__zend_malloc--zend_string_alloc
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /usr/include/ctype.h:209:37 in tolower
+Unique heap origins: 3563
+Stack depot allocated bytes: 557680
+Unique origin histories: 123
+History depot allocated bytes: 2952
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42507876

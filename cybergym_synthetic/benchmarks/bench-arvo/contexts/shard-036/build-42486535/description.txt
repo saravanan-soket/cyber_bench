@@ -1,0 +1,76 @@
+ARVO id: 42486535
+Project: sleuthkit
+Fuzz target: sleuthkit_fls_fat_fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Strncpy-param-overlap
+Language: c++
+Repo: https://github.com/sleuthkit/sleuthkit
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/sleuthkit_fls_fat_fuzzer[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: strncpy-param-overlap: memory ranges [0x603000000640,0x603000000645) and [0x603000000640, 0x603000000645) overlap
+[1m[0mSCARINESS: 10 (strncpy-param-overlap)
+    #0 0x486099 in strncpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors.cpp:481:5
+    #1 0x4e21d1 in tsk_fs_name_copy /src/sleuthkit/tsk/fs/fs_name.c:168:9
+    #2 0x4dd668 in tsk_fs_dir_find_orphans /src/sleuthkit/tsk/fs/fs_dir.c:1345:17
+    #3 0x5c9331 in fatfs_dir_open_meta /src/sleuthkit/tsk/fs/fatfs_dent.cpp:268:16
+    #4 0x4d993a in tsk_fs_dir_open_meta /src/sleuthkit/tsk/fs/fs_dir.c:289:14
+    #5 0x4dabe3 in tsk_fs_dir_walk_lcl /src/sleuthkit/tsk/fs/fs_dir.c:624:19
+    #6 0x4dbdec in tsk_fs_dir_walk_lcl /src/sleuthkit/tsk/fs/fs_dir.c:816:26
+    #7 0x4da9f5 in tsk_fs_dir_walk /src/sleuthkit/tsk/fs/fs_dir.c:929:14
+    #8 0x4d744d in tsk_fs_fls /src/sleuthkit/tsk/fs/fls_lib.c:262:12
+    #9 0x4ccde9 in LLVMFuzzerTestOneInput /src/sleuthkit_fls_fuzzer.cc:35:5
+    #10 0x4cd48b in main (/out/sleuthkit_fls_fat_fuzzer+0x4cd48b)
+    #11 0x7f6ecafe583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #12 0x41ed58 in _start (/out/sleuthkit_fls_fat_fuzzer+0x41ed58)
+
+DEDUP_TOKEN: strncpy--tsk_fs_name_copy--tsk_fs_dir_find_orphans
+[1m[32m0x603000000640 is located 0 bytes inside of 20-byte region [0x603000000640,0x603000000654)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x49a559 in realloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:164:3
+    #1 0x58deb1 in tsk_realloc /src/sleuthkit/tsk/base/mymalloc.c:47:16
+    #2 0x4e215f in tsk_fs_name_copy /src/sleuthkit/tsk/fs/fs_name.c:163:26
+    #3 0x4d94aa in tsk_fs_dir_add /src/sleuthkit/tsk/fs/fs_dir.c:255:9
+    #4 0x4de142 in find_orphan_meta_walk_cb /src/sleuthkit/tsk/fs/fs_dir.c:1200:9
+    #5 0x6584a7 in fatfs_inode_walk /src/sleuthkit/tsk/fs/fatfs_meta.c:1484:26
+    #6 0x4e186b in tsk_fs_meta_walk /src/sleuthkit/tsk/fs/fs_inode.c:214:12
+    #7 0x4dd38c in tsk_fs_dir_find_orphans /src/sleuthkit/tsk/fs/fs_dir.c:1317:9
+    #8 0x5c9331 in fatfs_dir_open_meta /src/sleuthkit/tsk/fs/fatfs_dent.cpp:268:16
+    #9 0x4d993a in tsk_fs_dir_open_meta /src/sleuthkit/tsk/fs/fs_dir.c:289:14
+    #10 0x4dabe3 in tsk_fs_dir_walk_lcl /src/sleuthkit/tsk/fs/fs_dir.c:624:19
+    #11 0x4dbdec in tsk_fs_dir_walk_lcl /src/sleuthkit/tsk/fs/fs_dir.c:816:26
+    #12 0x4da9f5 in tsk_fs_dir_walk /src/sleuthkit/tsk/fs/fs_dir.c:929:14
+    #13 0x4d744d in tsk_fs_fls /src/sleuthkit/tsk/fs/fls_lib.c:262:12
+    #14 0x4ccde9 in LLVMFuzzerTestOneInput /src/sleuthkit_fls_fuzzer.cc:35:5
+    #15 0x4cd48b in main (/out/sleuthkit_fls_fat_fuzzer+0x4cd48b)
+
+DEDUP_TOKEN: realloc--tsk_realloc--tsk_fs_name_copy
+[1m[32m0x603000000640 is located 0 bytes inside of 20-byte region [0x603000000640,0x603000000654)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x49a559 in realloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:164:3
+    #1 0x58deb1 in tsk_realloc /src/sleuthkit/tsk/base/mymalloc.c:47:16
+    #2 0x4e215f in tsk_fs_name_copy /src/sleuthkit/tsk/fs/fs_name.c:163:26
+    #3 0x4d94aa in tsk_fs_dir_add /src/sleuthkit/tsk/fs/fs_dir.c:255:9
+    #4 0x4de142 in find_orphan_meta_walk_cb /src/sleuthkit/tsk/fs/fs_dir.c:1200:9
+    #5 0x6584a7 in fatfs_inode_walk /src/sleuthkit/tsk/fs/fatfs_meta.c:1484:26
+    #6 0x4e186b in tsk_fs_meta_walk /src/sleuthkit/tsk/fs/fs_inode.c:214:12
+    #7 0x4dd38c in tsk_fs_dir_find_orphans /src/sleuthkit/tsk/fs/fs_dir.c:1317:9
+    #8 0x5c9331 in fatfs_dir_open_meta /src/sleuthkit/tsk/fs/fatfs_dent.cpp:268:16
+    #9 0x4d993a in tsk_fs_dir_open_meta /src/sleuthkit/tsk/fs/fs_dir.c:289:14
+    #10 0x4dabe3 in tsk_fs_dir_walk_lcl /src/sleuthkit/tsk/fs/fs_dir.c:624:19
+    #11 0x4dbdec in tsk_fs_dir_walk_lcl /src/sleuthkit/tsk/fs/fs_dir.c:816:26
+    #12 0x4da9f5 in tsk_fs_dir_walk /src/sleuthkit/tsk/fs/fs_dir.c:929:14
+    #13 0x4d744d in tsk_fs_fls /src/sleuthkit/tsk/fs/fls_lib.c:262:12
+    #14 0x4ccde9 in LLVMFuzzerTestOneInput /src/sleuthkit_fls_fuzzer.cc:35:5
+    #15 0x4cd48b in main (/out/sleuthkit_fls_fat_fuzzer+0x4cd48b)
+
+DEDUP_TOKEN: realloc--tsk_realloc--tsk_fs_name_copy
+SUMMARY: AddressSanitizer: strncpy-param-overlap /src/llvm-project/compiler-rt/lib/asan/asan_interceptors.cpp:481:5 in strncpy
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42486535

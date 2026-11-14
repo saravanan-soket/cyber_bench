@@ -1,0 +1,44 @@
+ARVO id: 42507356
+Project: libbpf
+Fuzz target: bpf-object-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c
+Repo: https://github.com/libbpf/libbpf
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4108099844
+INFO: Loaded 1 modules   (10517 inline 8-bit counters): 10517 [0x83846d0, 0x8386fe5), 
+INFO: Loaded 1 PC tables (10517 PCs): 10517 [0x82fdfdc,0x8312884), 
+/out/bpf-object-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x241fe404 (pc 0x0817a1df bp 0xffffcdc8 sp 0xffffc998 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x817a1df in AddressIsPoisoned /src/llvm-project/compiler-rt/lib/asan/asan_mapping.h:379:21
+    #1 0x817a1df in __asan::QuickCheckForUnpoisonedRegion(unsigned int, unsigned int) /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.h:31:13
+    #2 0x817a0b6 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #3 0x81d0f17 in bpf_object__init_user_maps /src/libbpf/src/libbpf.c:2051:4
+    #4 0x81d0f17 in bpf_object__init_maps /src/libbpf/src/libbpf.c:2606:8
+    #5 0x81d0f17 in bpf_object_open /src/libbpf/src/libbpf.c:7032:16
+    #6 0x81d3a2c in bpf_object__open_mem /src/libbpf/src/libbpf.c:7094:20
+    #7 0x81b92da in LLVMFuzzerTestOneInput /src/bpf-object-fuzzer.c:33:8
+    #8 0x80a394e in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #9 0x808edce in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x8094980 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #11 0x80bdb47 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0xf7c94ed4 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x1aed4)
+    #13 0x806ca25 in _start (/out/bpf-object-fuzzer+0x806ca25)
+
+DEDUP_TOKEN: AddressIsPoisoned--__asan::QuickCheckForUnpoisonedRegion(unsigned int, unsigned int)--__asan_memcpy
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/llvm-project/compiler-rt/lib/asan/asan_mapping.h:379:21 in AddressIsPoisoned
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42507356

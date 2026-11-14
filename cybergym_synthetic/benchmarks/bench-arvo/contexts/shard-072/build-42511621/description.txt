@@ -1,0 +1,80 @@
+ARVO id: 42511621
+Project: openexr
+Fuzz target: openexr_exrcorecheck_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 4
+Language: c++
+Repo: https://github.com/AcademySoftwareFoundation/openexr
+
+=== Crash report ===
+Reading 130 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x603000000117 at pc 0x0000008889f9 bp 0x7fffffffdb80 sp 0x7fffffffdb78
+[1m[0m[1m[34mREAD of size 4 at 0x603000000117 thread T0[1m[0m
+SCARINESS: 17 (4-byte-read-heap-buffer-overflow)
+    #0 0x8889f8 in unaligned_load32 /src/openexr/src/lib/OpenEXRCore/internal_xdr.h:249:5
+    #1 0x8889f8 in generic_unpack /src/openexr/src/lib/OpenEXRCore/unpack.c:1168:13
+    #2 0x876198 in exr_decoding_run /src/openexr/src/lib/OpenEXRCore/decoding.c:681:14
+    #3 0x4e0e77 in Imf_3_2::(anonymous namespace)::readCoreScanlinePart(_priv_exr_context_t*, int, bool, bool) /src/openexr/src/lib/OpenEXRUtil/ImfCheckFile.cpp:1291:18
+    #4 0x4e0e77 in Imf_3_2::(anonymous namespace)::checkCoreFile(_priv_exr_context_t*, bool, bool) /src/openexr/src/lib/OpenEXRUtil/ImfCheckFile.cpp:1500:17
+    #5 0x4dc76f in Imf_3_2::(anonymous namespace)::runCoreChecks(char const*, unsigned long, bool, bool) /src/openexr/src/lib/OpenEXRUtil/ImfCheckFile.cpp:1615:15
+    #6 0x4dc76f in Imf_3_2::checkOpenEXRFile(char const*, unsigned long, bool, bool, bool) /src/openexr/src/lib/OpenEXRUtil/ImfCheckFile.cpp:1655:16
+    #7 0x4d8d56 in LLVMFuzzerTestOneInput /src/openexr/src/test/OpenEXRFuzzTest/oss-fuzz/openexr_exrcorecheck_fuzzer.cc:17:5
+    #8 0x4d937a in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+    #9 0x4d914d in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:318:12
+    #10 0x7ffff7c38082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #11 0x42063d in _start (/out/openexr_exrcorecheck_fuzzer+0x42063d)
+
+DEDUP_TOKEN: unaligned_load32--generic_unpack--exr_decoding_run
+[1m[32m0x603000000117 is located 2 bytes to the right of 21-byte region [0x603000000100,0x603000000115)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x49f93d in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:129:3
+    #1 0x8d1896 in internal_decode_alloc_buffer /src/openexr/src/lib/OpenEXRCore/coding.c:276:22
+    #2 0x874962 in default_read_chunk /src/openexr/src/lib/OpenEXRCore/decoding.c:189:14
+    #3 0x875b51 in exr_decoding_run /src/openexr/src/lib/OpenEXRCore/decoding.c:641:10
+    #4 0x4e0e77 in Imf_3_2::(anonymous namespace)::readCoreScanlinePart(_priv_exr_context_t*, int, bool, bool) /src/openexr/src/lib/OpenEXRUtil/ImfCheckFile.cpp:1291:18
+    #5 0x4e0e77 in Imf_3_2::(anonymous namespace)::checkCoreFile(_priv_exr_context_t*, bool, bool) /src/openexr/src/lib/OpenEXRUtil/ImfCheckFile.cpp:1500:17
+    #6 0x4dc76f in Imf_3_2::(anonymous namespace)::runCoreChecks(char const*, unsigned long, bool, bool) /src/openexr/src/lib/OpenEXRUtil/ImfCheckFile.cpp:1615:15
+    #7 0x4dc76f in Imf_3_2::checkOpenEXRFile(char const*, unsigned long, bool, bool, bool) /src/openexr/src/lib/OpenEXRUtil/ImfCheckFile.cpp:1655:16
+    #8 0x4d8d56 in LLVMFuzzerTestOneInput /src/openexr/src/test/OpenEXRFuzzTest/oss-fuzz/openexr_exrcorecheck_fuzzer.cc:17:5
+    #9 0x4d937a in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+
+DEDUP_TOKEN: __interceptor_malloc--internal_decode_alloc_buffer--default_read_chunk
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/openexr/src/lib/OpenEXRCore/internal_xdr.h:249:5 in unaligned_load32
+Shadow bytes around the buggy address:
+  0x0c067fff7fd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c067fff7fe0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c067fff7ff0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c067fff8000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c067fff8010: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x0c067fff8020: [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m05[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff8030: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff8040: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff8050: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff8060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff8070: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42511621

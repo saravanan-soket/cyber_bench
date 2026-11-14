@@ -1,0 +1,49 @@
+ARVO id: 42522046
+Project: gdal
+Fuzz target: gdal_filesystem_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 3593810472
+INFO: Loaded 1 modules   (533753 inline 8-bit counters): 533753 [0x543b430, 0x54bd929), 
+INFO: Loaded 1 PC tables (533753 PCs): 533753 [0x54bd930,0x5ce28c0), 
+/out/gdal_filesystem_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+libpng warning: Incorrect IEND chunk length
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x000023c7e000 (pc 0x7fc23a870116 bp 0x7ffdbc45ee60 sp 0x7ffdbc45ee28 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7fc23a870115  (/lib/x86_64-linux-gnu/libc.so.6+0x14e115)
+    #1 0x2042e49 in user_read_data /src/gdal/gdal/frmts/grib/degrib/g2clib/dec_png.c:42:6
+    #2 0x227aa16 in png_crc_read (/out/gdal_filesystem_fuzzer+0x227aa16)
+    #3 0x227ab38 in png_crc_finish (/out/gdal_filesystem_fuzzer+0x227ab38)
+    #4 0x22709dd in png_read_end (/out/gdal_filesystem_fuzzer+0x22709dd)
+    #5 0x204300d in dec_png /src/gdal/gdal/frmts/grib/degrib/g2clib/dec_png.c:106:5
+    #6 0x1b16af1 in pngunpack /src/gdal/gdal/frmts/grib/degrib/g2clib/pngunpack.c:74:22
+    #7 0x1af60c3 in g2_unpack7 /src/gdal/gdal/frmts/grib/degrib/g2clib/g2_unpack7.c:211:9
+    #8 0x1af3522 in g2_getfld /src/gdal/gdal/frmts/grib/degrib/g2clib/g2_getfld.c:503:16
+    #9 0x1473b2a in unpk_g2ncep /src/gdal/gdal/frmts/grib/degrib/degrib/grib2api.c:868:11
+    #10 0x13a77c4 in ReadGrib2Record /src/gdal/gdal/frmts/grib/degrib/degrib/degrib2.cpp:1128:7
+    #11 0x5610ec in GRIBRasterBand::ReadGribData(DataSource&, int, int, double**, grib_MetaData**) /src/gdal/gdal/frmts/grib/gribdataset.cpp:728:5
+    #12 0x563885 in GRIBDataset::Open(GDALOpenInfo*) /src/gdal/gdal/frmts/grib/gribdataset.cpp:963:13
+    #13 0xbadf00 in GDALOpenEx /src/gdal/gdal/gcore/gdaldataset.cpp:2825:20
+    #14 0x43a1c1 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_fuzzer.cpp:114:24
+    #15 0x4470fc in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:512:13
+    #16 0x43af7c in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #17 0x43ee97 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:692:9
+    #18 0x43ac88 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #19 0x7fc23a74282f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #20 0x412e98 in _start (/out/gdal_filesystem_fuzzer+0x412e98)
+
+DEDUP_TOKEN: user_read_data--png_crc_read
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x14e115) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42522046

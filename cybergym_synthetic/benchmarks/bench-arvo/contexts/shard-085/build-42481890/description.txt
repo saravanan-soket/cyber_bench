@@ -1,0 +1,82 @@
+ARVO id: 42481890
+Project: opensc
+Fuzz target: fuzz_pkcs15_reader
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 8
+Language: c++
+Repo: https://github.com/OpenSC/OpenSC
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/fuzz_pkcs15_reader[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x602000000591 at pc 0x0000004961ba bp 0x7ffffffecde0 sp 0x7ffffffec5a8
+[1m[0m[1m[34mREAD of size 8 at 0x602000000591 thread T0[1m[0m
+SCARINESS: 23 (8-byte-read-heap-buffer-overflow)
+    #0 0x4961b9 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #1 0x69147a in dnie_read_binary /src/opensc/src/libopensc/card-dnie.c:1143:2
+    #2 0x4d775d in sc_read_binary /src/opensc/src/libopensc/card.c:673:6
+    #3 0x4d761c in sc_read_binary /src/opensc/src/libopensc/card.c:651:8
+    #4 0x70c12a in sc_pkcs15emu_din_66291_init_ex /src/opensc/src/libopensc/pkcs15-din-66291.c:227:13
+    #5 0x51a954 in sc_pkcs15_bind_synthetic /src/opensc/src/libopensc/pkcs15-syn.c:121:8
+    #6 0x4e9a15 in sc_pkcs15_bind /src/opensc/src/libopensc/pkcs15.c:1259:8
+    #7 0x4c7dd5 in LLVMFuzzerTestOneInput /src/opensc/src/tests/fuzzing/fuzz_pkcs15_reader.c:210:5
+    #8 0x4c9264 in HonggfuzzMain (/out/fuzz_pkcs15_reader+0x4c9264)
+    #9 0x7ffff688682f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #10 0x41e198 in _start (/out/fuzz_pkcs15_reader+0x41e198)
+
+DEDUP_TOKEN: __asan_memcpy--dnie_read_binary--sc_read_binary
+[1m[32m0x602000000591 is located 0 bytes to the right of 1-byte region [0x602000000590,0x602000000591)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x496ef2 in calloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:154:3
+    #1 0x697feb in dnie_uncompress /src/opensc/src/libopensc/card-dnie.c:958:8
+    #2 0x69785e in dnie_fill_cache /src/opensc/src/libopensc/card-dnie.c:1086:7
+    #3 0x6913cc in dnie_read_binary /src/opensc/src/libopensc/card-dnie.c:1134:9
+    #4 0x4d775d in sc_read_binary /src/opensc/src/libopensc/card.c:673:6
+    #5 0x4d761c in sc_read_binary /src/opensc/src/libopensc/card.c:651:8
+    #6 0x70c12a in sc_pkcs15emu_din_66291_init_ex /src/opensc/src/libopensc/pkcs15-din-66291.c:227:13
+    #7 0x51a954 in sc_pkcs15_bind_synthetic /src/opensc/src/libopensc/pkcs15-syn.c:121:8
+    #8 0x4e9a15 in sc_pkcs15_bind /src/opensc/src/libopensc/pkcs15.c:1259:8
+    #9 0x4c7dd5 in LLVMFuzzerTestOneInput /src/opensc/src/tests/fuzzing/fuzz_pkcs15_reader.c:210:5
+    #10 0x4c9264 in HonggfuzzMain (/out/fuzz_pkcs15_reader+0x4c9264)
+
+DEDUP_TOKEN: calloc--dnie_uncompress--dnie_fill_cache
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x0c047fff8060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8070: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8080: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8090: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff80a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+=>0x0c047fff80b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[0m01[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff80c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff80d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff80e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff80f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8100: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42481890

@@ -1,0 +1,100 @@
+ARVO id: 40096185
+Project: skia
+Fuzz target: image_decode
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Seed: 3266933699
+INFO: Loaded 1 modules   (164423 inline 8-bit counters): 164423 [0x221ae10, 0x2243057), 
+INFO: Loaded 1 PC tables (164423 PCs): 164423 [0x2243058,0x24c54c8), 
+/out/image_decode: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x62900000471f at pc 0x0000014165a2 bp 0x7fffffffd780 sp 0x7fffffffd778
+[1m[0m[1m[34mREAD of size 1 at 0x62900000471f thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x14165a1 in swizzle_index_to_n32(void*, unsigned char const*, int, int, int, int, unsigned int const*) /src/skia/out/Fuzz/../../src/codec/SkSwizzler.cpp:240:30
+    #1 0x1419663 in SkSwizzler::swizzle(void*, unsigned char const*) /src/skia/out/Fuzz/../../src/codec/SkSwizzler.cpp:1235:5
+    #2 0x151dce2 in SkWuffsCodec::onIncrementalDecode(int*) /src/skia/out/Fuzz/../../src/codec/SkWuffsCodec.cpp:516:24
+    #3 0x140dc4b in SkCodec::getPixels(SkImageInfo const&, void*, unsigned long, SkCodec::Options const*) /src/skia/out/Fuzz/../../src/codec/SkCodec.cpp:362:33
+    #4 0x17b0959 in SkCodecImageGenerator::onGetPixels(SkImageInfo const&, void*, unsigned long, SkImageGenerator::Options const&)::$_0::operator()(SkPixmap const&) const /src/skia/out/Fuzz/../../src/codec/SkCodecImageGenerator.cpp:55:42
+    #5 0x17ae5e9 in SkPixmapPriv::Orient(SkPixmap const&, SkEncodedOrigin, std::__1::function<bool (SkPixmap const&)>) /src/skia/out/Fuzz/../../src/core/SkPixmapPriv.h:49:14
+    #6 0x17ae375 in SkCodecImageGenerator::onGetPixels(SkImageInfo const&, void*, unsigned long, SkImageGenerator::Options const&) /src/skia/out/Fuzz/../../src/codec/SkCodecImageGenerator.cpp:66:12
+    #7 0x1274c57 in SkImageGenerator::getPixels(SkImageInfo const&, void*, unsigned long) /src/skia/out/Fuzz/../../src/core/SkImageGenerator.cpp:30:18
+    #8 0xad89dc in generate_pixels(SkImageGenerator*, SkPixmap const&, int, int) /src/skia/out/Fuzz/../../src/image/SkImage_Lazy.cpp:163:15
+    #9 0xad8578 in SkImage_Lazy::getROPixels(SkBitmap*, SkImage::CachingHint) const /src/skia/out/Fuzz/../../src/image/SkImage_Lazy.cpp:192:14
+    #10 0x91b76f in SkBaseDevice::drawImage(SkImage const*, float, float, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkDevice.cpp:145:23
+    #11 0x8f250f in SkCanvas::onDrawImage(SkImage const*, float, float, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2222:27
+    #12 0x8eb320 in SkCanvas::drawImage(SkImage const*, float, float, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1700:11
+    #13 0x8d3472 in FuzzImageDecode(sk_sp<SkData>) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzImage.cpp:27:21
+    #14 0x8d39bc in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzImage.cpp:34:5
+    #15 0x872095 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #16 0x8478bd in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #17 0x853106 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #18 0x846f3c in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #19 0x7ffff52fb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #20 0x7402a8 in _start (/out/image_decode+0x7402a8)
+
+DEDUP_TOKEN: swizzle_index_to_n32(void*, unsigned char const*, int, int, int, int, unsigned int const*)--SkSwizzler::swizzle(void*, unsigned char const*)--SkWuffsCodec::onIncrementalDecode(int*)
+[1m[32m0x62900000471f is located 0 bytes to the right of 17695-byte region [0x629000000200,0x62900000471f)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x80d9ff in __interceptor_malloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:146
+    #1 0xb3c648 in sk_malloc_flags(unsigned long, unsigned int) /src/skia/out/Fuzz/../../src/ports/SkMemory_malloc.cpp:71:13
+    #2 0x15204ec in SkWuffsCodec_MakeFromStream(std::__1::unique_ptr<SkStream, std::__1::default_delete<SkStream> >, SkCodec::Result*) /src/skia/out/Fuzz/../../src/codec/SkWuffsCodec.cpp:893:56
+    #3 0x140ba9d in SkCodec::MakeFromStream(std::__1::unique_ptr<SkStream, std::__1::default_delete<SkStream> >, SkCodec::Result*, SkPngChunkReader*) /src/skia/out/Fuzz/../../src/codec/SkCodec.cpp:110:24
+    #4 0x140bd59 in SkCodec::MakeFromData(sk_sp<SkData>, SkPngChunkReader*) /src/skia/out/Fuzz/../../src/codec/SkCodec.cpp:133:12
+    #5 0x17adae5 in SkCodecImageGenerator::MakeFromEncodedCodec(sk_sp<SkData>) /src/skia/out/Fuzz/../../src/codec/SkCodecImageGenerator.cpp:14:18
+    #6 0x141bad8 in SkImageGenerator::MakeFromEncodedImpl(sk_sp<SkData>) /src/skia/out/Fuzz/../../src/ports/SkImageGenerator_skia.cpp:12:12
+    #7 0x1275286 in SkImageGenerator::MakeFromEncoded(sk_sp<SkData>) /src/skia/out/Fuzz/../../src/core/SkImageGenerator.cpp:107:12
+    #8 0xad4831 in SkImage::MakeFromEncoded(sk_sp<SkData>, SkIRect const*) /src/skia/out/Fuzz/../../src/image/SkImage.cpp:124:39
+    #9 0x8d33d4 in FuzzImageDecode(sk_sp<SkData>) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzImage.cpp:15:16
+    #10 0x8d39bc in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzImage.cpp:34:5
+    #11 0x872095 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #12 0x8478bd in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #13 0x853106 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #14 0x846f3c in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #15 0x7ffff52fb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: __interceptor_malloc--sk_malloc_flags(unsigned long, unsigned int)--SkWuffsCodec_MakeFromStream(std::__1::unique_ptr<SkStream, std::__1::default_delete<SkStream> >, SkCodec::Result*)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/skia/out/Fuzz/../../src/codec/SkSwizzler.cpp:240:30 in swizzle_index_to_n32(void*, unsigned char const*, int, int, int, int, unsigned int const*)
+Shadow bytes around the buggy address:
+  0x0c527fff8890: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c527fff88a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c527fff88b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c527fff88c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c527fff88d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c527fff88e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m07[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c527fff88f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c527fff8900: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c527fff8910: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c527fff8920: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c527fff8930: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/40096185

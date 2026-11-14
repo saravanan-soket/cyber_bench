@@ -1,0 +1,145 @@
+ARVO id: 42516910
+Project: binutils-gdb
+Fuzz target: fuzz_objdump_safe
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: git://sourceware.org/git/binutils-gdb.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/fuzz_objdump_safe[0m
+
+/tmp/libfuzzer.7:     file format pe-shl
+/tmp/libfuzzer.7
+
+Characteristics 0x0
+
+Time/Date		Wed Aug 16 18:04:37 1995
+Magic			0000
+MajorLinkerVersion	0
+MinorLinkerVersion	0
+SizeOfCode		00000000
+SizeOfInitializedData	00000000
+SizeOfUninitializedData	00000000
+AddressOfEntryPoint	00000000
+BaseOfCode		00000000
+BaseOfData		00000000
+ImageBase		00000000
+SectionAlignment	00000000
+FileAlignment		00000000
+MajorOSystemVersion	0
+MinorOSystemVersion	0
+MajorImageVersion	0
+MinorImageVersion	0
+MajorSubsystemVersion	0
+MinorSubsystemVersion	0
+Win32Version		00000000
+SizeOfImage		00000000
+SizeOfHeaders		00000000
+CheckSum		00000000
+Subsystem		00000000	(unspecified)
+DllCharacteristics	00000000
+SizeOfStackReserve	00000000
+SizeOfStackCommit	00000000
+SizeOfHeapReserve	00000000
+SizeOfHeapCommit	00000000
+LoaderFlags		00000000
+NumberOfRvaAndSizes	00000000
+
+The Data Directory
+Entry 0 00000000 00000000 Export Directory [.edata (or where ever we found it)]
+Entry 1 00000000 00000000 Import Directory [parts of .idata]
+Entry 2 00000000 00000000 Resource Directory [.rsrc]
+Entry 3 00000000 00000000 Exception Directory [.pdata]
+Entry 4 00000000 00000000 Security Directory
+Entry 5 00000000 00000000 Base Relocation Directory [.reloc]
+Entry 6 00000000 00000000 Debug Directory
+Entry 7 00000000 00000000 Description Directory
+Entry 8 00000000 00000000 Special Directory
+Entry 9 00000000 00000000 Thread Storage Directory [.tls]
+Entry a 00000000 00000000 Load Configuration Directory
+Entry b 00000000 00000000 Bound Import Directory
+Entry c 00000000 00000000 Import Address Table Directory
+Entry d 00000000 00000000 Delay Import Directory
+Entry e 00000000 00000000 CLR Runtime Header
+Entry f 00000000 00000000 Reserved
+
+The Function Table (interpreted .pdata section contents)
+ vma:		Begin    Prolog   Function Flags    Exception EH
+     		Address  Length   Length   32b exc  Handler   Data
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x602000000074 at pc 0x00000094de60 bp 0x7ffe0feed4f0 sp 0x7ffe0feed4e8
+[1m[0m[1m[34mREAD of size 1 at 0x602000000074 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x94de5f in bfd_getl32 /src/binutils-gdb/bfd/libbfd.c:727:23
+    #1 0xade643 in _bfd_pe_print_ce_compressed_pdata /src/binutils-gdb/bfd/peXXigen.c:2028:20
+    #2 0xae1758 in _bfd_pe_print_private_bfd_data_common /src/binutils-gdb/bfd/peXXigen.c:2906:5
+    #3 0x13e8eb1 in pe_print_private_bfd_data /src/binutils-gdb/bfd/./peicode.h:357:8
+    #4 0x4e6708 in dump_bfd_private_header /src/binutils-gdb/binutils/./fuzz_objdump.h:4269:8
+    #5 0x4e6708 in dump_bfd /src/binutils-gdb/binutils/./fuzz_objdump.h:4912:5
+    #6 0x4e5bee in display_object_bfd /src/binutils-gdb/binutils/./fuzz_objdump.h
+    #7 0x4e5bee in display_any_bfd /src/binutils-gdb/binutils/./fuzz_objdump.h:5143:5
+    #8 0x4e59a4 in display_file /src/binutils-gdb/binutils/./fuzz_objdump.h:5164:3
+    #9 0x4e59a4 in LLVMFuzzerTestOneInput /src/binutils-gdb/binutils/fuzz_objdump.c:62:3
+    #10 0x4d873b in main (/out/fuzz_objdump_safe+0x4d873b)
+    #11 0x7f17499aa0b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #12 0x41e71d in _start (/out/fuzz_objdump_safe+0x41e71d)
+
+DEDUP_TOKEN: bfd_getl32--_bfd_pe_print_ce_compressed_pdata--_bfd_pe_print_private_bfd_data_common
+[1m[32m0x602000000074 is located 0 bytes to the right of 4-byte region [0x602000000070,0x602000000074)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x49ef0d in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:129:3
+    #1 0x94d29c in bfd_malloc /src/binutils-gdb/bfd/libbfd.c:289:9
+    #2 0x940d6b in bfd_get_full_section_contents /src/binutils-gdb/bfd/compress.c:274:21
+    #3 0x957b81 in bfd_malloc_and_get_section /src/binutils-gdb/bfd/section.c:1629:10
+    #4 0xade4f7 in _bfd_pe_print_ce_compressed_pdata /src/binutils-gdb/bfd/peXXigen.c:2008:9
+    #5 0xae1758 in _bfd_pe_print_private_bfd_data_common /src/binutils-gdb/bfd/peXXigen.c:2906:5
+    #6 0x13e8eb1 in pe_print_private_bfd_data /src/binutils-gdb/bfd/./peicode.h:357:8
+    #7 0x4e6708 in dump_bfd_private_header /src/binutils-gdb/binutils/./fuzz_objdump.h:4269:8
+    #8 0x4e6708 in dump_bfd /src/binutils-gdb/binutils/./fuzz_objdump.h:4912:5
+    #9 0x4e5bee in display_object_bfd /src/binutils-gdb/binutils/./fuzz_objdump.h
+    #10 0x4e5bee in display_any_bfd /src/binutils-gdb/binutils/./fuzz_objdump.h:5143:5
+    #11 0x4e59a4 in display_file /src/binutils-gdb/binutils/./fuzz_objdump.h:5164:3
+    #12 0x4e59a4 in LLVMFuzzerTestOneInput /src/binutils-gdb/binutils/fuzz_objdump.c:62:3
+    #13 0x4d873b in main (/out/fuzz_objdump_safe+0x4d873b)
+
+DEDUP_TOKEN: __interceptor_malloc--bfd_malloc--bfd_get_full_section_contents
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/binutils-gdb/bfd/libbfd.c:727:23 in bfd_getl32
+Shadow bytes around the buggy address:
+  0x0c047fff7fb0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff7fc0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff7fd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff7fe0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff7ff0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c047fff8000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m07[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[0m04[1m[0m][1m[31mfa[1m[0m
+  0x0c047fff8010: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8020: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8030: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8040: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8050: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42516910

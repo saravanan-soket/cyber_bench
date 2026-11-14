@@ -1,0 +1,42 @@
+ARVO id: 42528860
+Project: ffmpeg
+Fuzz target: ffmpeg_DEMUXER_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Index-out-of-bounds
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1528172623
+INFO: Loaded 1 modules   (220023 inline 8-bit counters): 220023 [0x13ff8c0, 0x1435437), 
+INFO: Loaded 1 PC tables (220023 PCs): 220023 [0xe2c998,0x1188108), 
+/out/ffmpeg_DEMUXER_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1mlibavcodec/hevc_ps.c:364:9:[1m[31m runtime error: [1m[0m[1mindex 32 out of bounds for type 'uint32_t[32]' (aka 'unsigned int[32]')[1m[0m
+    #0 0x94bddd in decode_sublayer_hrd /src/ffmpeg/libavcodec/hevc_ps.c:364:39
+    #1 0x941ffa in decode_hrd /src/ffmpeg/libavcodec/hevc_ps.c:428:13
+    #2 0x94562a in decode_vui /src/ffmpeg/libavcodec/hevc_ps.c:662:13
+    #3 0x943068 in ff_hevc_parse_sps /src/ffmpeg/libavcodec/hevc_ps.c:1088:9
+    #4 0x945cff in ff_hevc_decode_nal_sps /src/ffmpeg/libavcodec/hevc_ps.c:1295:11
+    #5 0x93e9f5 in parse_nal_units /src/ffmpeg/libavcodec/hevc_parser.c:215:13
+    #6 0x93e9f5 in hevc_parse /src/ffmpeg/libavcodec/hevc_parser.c:331:9
+    #7 0x6e58ae in av_parser_parse2 /src/ffmpeg/libavcodec/parser.c:163:13
+    #8 0x4ead38 in parse_packet /src/ffmpeg/libavformat/demux.c:1154:15
+    #9 0x4e11a4 in read_frame_internal /src/ffmpeg/libavformat/demux.c:1273:21
+    #10 0x4e493c in avformat_find_stream_info /src/ffmpeg/libavformat/demux.c:2635:15
+    #11 0x4d6781 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dem_fuzzer.c:206:11
+    #12 0x43c5b3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #13 0x427d12 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #14 0x42d5bc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #15 0x456af2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7fd588074082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 5792732f783158c66fb4f3756458ca24e46e827d)
+    #17 0x41dedd in _start (/out/ffmpeg_DEMUXER_fuzzer+0x41dedd)
+
+DEDUP_TOKEN: decode_sublayer_hrd--decode_hrd--decode_vui
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior libavcodec/hevc_ps.c:364:9 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42528860

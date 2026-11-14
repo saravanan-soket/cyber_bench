@@ -1,0 +1,80 @@
+ARVO id: 408571331
+Project: tarantool
+Fuzz target: luaL_loadbuffer_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Stack-buffer-overflow WRITE {*}
+Language: c
+Repo: https://github.com/tarantool/luajit.git
+
+=== Crash report ===
+Reading 17709 bytes from /tmp/poc
+[libprotobuf WARNING build/test/fuzz/external.protobuf_mutator/src/external.protobuf_mutator-build/external.protobuf/src/external.protobuf/src/google/protobuf/text_format.cc:350] Warning parsing text-format lua_grammar.Block: 153:33: Message type "lua_grammar.ExpressionList" has no field named "ons".
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7f81d6224121 at pc 0x559936dad3b0 bp 0x7ffcdcc6f770 sp 0x7ffcdcc6ef40
+[1m[0m[1m[34mWRITE of size 268 at 0x7f81d6224121 thread T0[1m[0m
+SCARINESS: 60 (multi-byte-write-stack-buffer-overflow)
+    #0 0x559936dad3af in __asan_memset /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:67:3
+    #1 0x5599370e2ca9 in snap_usedef /src/tarantool/third_party/luajit/src/lj_snap.c:219:3
+    #2 0x5599370e2543 in lj_snap_purge /src/tarantool/third_party/luajit/src/lj_snap.c:342:7
+    #3 0x5599370bf4cd in lj_record_ins /src/tarantool/third_party/luajit/src/lj_record.c:2077:16
+    #4 0x5599370a65da in trace_state /src/tarantool/third_party/luajit/src/lj_trace.c:694:7
+    #5 0x559936fa8ecd in lj_vm_cpcall /src/tarantool/build/third_party/luajit/src/lj_vm.S:1266
+    #6 0x5599370a4eff in lj_trace_ins /src/tarantool/third_party/luajit/src/lj_trace.c:753:10
+    #7 0x559936fbc7b4 in lj_dispatch_ins /src/tarantool/third_party/luajit/src/lj_dispatch.c:430:7
+    #8 0x559936fab2b9 in lj_vm_inshook /src/tarantool/build/third_party/luajit/src/lj_vm.S:2649
+    #9 0x559936fa4181 in lua_pcall /src/tarantool/third_party/luajit/src/lj_api.c:1173:12
+    #10 0x559936defc91 in TestOneProtoInput(lua_grammar::Block const&) /src/tarantool/test/fuzz/luaL_loadbuffer/luaL_loadbuffer_fuzzer.cc:143:6
+    #11 0x559936def1b3 in LLVMFuzzerTestOneInput /src/tarantool/test/fuzz/luaL_loadbuffer/luaL_loadbuffer_fuzzer.cc:108:1
+    #12 0x559937750ab9 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+    #13 0x5599377508b5 in LLVMFuzzerRunDriver /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #14 0x55993775046d in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:311:10
+    #15 0x7f81d677e082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #16 0x559936d13ced in _start (/out/luaL_loadbuffer_fuzzer+0x307ced)
+
+DEDUP_TOKEN: __asan_memset--snap_usedef--lj_snap_purge
+[1m[32mAddress 0x7f81d6224121 is located in stack of thread T0 at offset 289 in frame[1m[0m
+[1m[0m    #0 0x5599370e233f in lj_snap_purge /src/tarantool/third_party/luajit/src/lj_snap.c:337
+
+DEDUP_TOKEN: lj_snap_purge
+  This frame has 1 object(s):
+    [32, 289) 'udf' (line 338)[1m[32m <== Memory access at offset 289 overflows this variable[1m[0m
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:67:3 in __asan_memset
+Shadow bytes around the buggy address:
+  0x7f81d6223e80: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x7f81d6223f00: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x7f81d6223f80: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x7f81d6224000: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x7f81d6224080: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x7f81d6224100: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m01[1m[0m][1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m
+  0x7f81d6224180: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x7f81d6224200: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x7f81d6224280: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x7f81d6224300: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x7f81d6224380: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/408571331

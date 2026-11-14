@@ -1,0 +1,89 @@
+ARVO id: 42501420
+Project: mruby
+Fuzz target: mruby_fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 8
+Language: c++
+Repo: https://github.com/mruby/mruby
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/mruby_fuzzer[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x62f00000c430 at pc 0x000000571d76 bp 0x7fffffffd340 sp 0x7fffffffd338
+[1m[0m[1m[34mREAD of size 8 at 0x62f00000c430 thread T0[1m[0m
+SCARINESS: 23 (8-byte-read-heap-buffer-overflow)
+    #0 0x571d75 in value_move /src/mruby/src/value_array.h:20:15
+    #1 0x572c01 in mrb_ary_splice /src/mruby/src/array.c:804:7
+    #2 0x575e4d in mrb_ary_aset /src/mruby/src/array.c:999:3
+    #3 0x5653ff in mrb_vm_exec /src/mruby/src/vm.c:1514:18
+    #4 0x54b18b in mrb_vm_run /src/mruby/src/vm.c:1035:12
+    #5 0x549180 in mrb_top_run /src/mruby/src/vm.c
+    #6 0x50303d in mrb_load_exec /src/mruby/mrbgems/mruby-compiler/core/parse.y:6847:7
+    #7 0x503a0f in mrb_load_nstring_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6918:10
+    #8 0x503a95 in mrb_load_string_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6930:10
+    #9 0x503ad3 in mrb_load_string /src/mruby/mrbgems/mruby-compiler/core/parse.y:6936:10
+    #10 0x4cb676 in LLVMFuzzerTestOneInput /src/mruby/oss-fuzz/mruby_fuzzer.c:14:5
+    #11 0x4cbcdb in main (/out/mruby_fuzzer+0x4cbcdb)
+    #12 0x7ffff7c570b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #13 0x41d8dd in _start (/out/mruby_fuzzer+0x41d8dd)
+
+DEDUP_TOKEN: value_move--mrb_ary_splice--mrb_ary_aset
+[1m[32m0x62f00000c430 is located 0 bytes to the right of 49200-byte region [0x62f000000400,0x62f00000c430)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4988c3 in realloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:164:3
+    #1 0x4d5b4a in mrb_default_allocf /src/mruby/src/state.c:68:12
+    #2 0x53a5bb in mrb_realloc_simple /src/mruby/src/gc.c:226:8
+    #3 0x53a9de in mrb_realloc /src/mruby/src/gc.c:240:8
+    #4 0x53aad3 in mrb_malloc /src/mruby/src/gc.c:256:10
+    #5 0x53ab87 in mrb_calloc /src/mruby/src/gc.c:274:9
+    #6 0x53b483 in add_heap /src/mruby/src/gc.c:372:42
+    #7 0x53b385 in mrb_gc_init /src/mruby/src/gc.c:406:3
+    #8 0x4d5b95 in init_gc_and_core /src/mruby/src/state.c:29:3
+    #9 0x4ddc83 in mrb_core_init_protect /src/mruby/src/error.c:575:5
+    #10 0x4d5aa5 in mrb_open_core /src/mruby/src/state.c:52:7
+    #11 0x4d5cf1 in mrb_open_allocf /src/mruby/src/state.c:91:20
+    #12 0x4d5cc9 in mrb_open /src/mruby/src/state.c:75:20
+    #13 0x4cb668 in LLVMFuzzerTestOneInput /src/mruby/oss-fuzz/mruby_fuzzer.c:13:22
+    #14 0x4cbcdb in main (/out/mruby_fuzzer+0x4cbcdb)
+
+DEDUP_TOKEN: realloc--mrb_default_allocf--mrb_realloc_simple
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/mruby/src/value_array.h:20:15 in value_move
+Shadow bytes around the buggy address:
+  0x0c5e7fff9830: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c5e7fff9840: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c5e7fff9850: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c5e7fff9860: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c5e7fff9870: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c5e7fff9880: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c5e7fff9890: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c5e7fff98a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c5e7fff98b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c5e7fff98c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c5e7fff98d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42501420

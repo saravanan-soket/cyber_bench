@@ -1,0 +1,80 @@
+ARVO id: 42531102
+Project: php-src
+Fuzz target: php-fuzz-tracing-jit
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Global-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/php/php-src.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4103383361
+INFO: Loaded 2 modules   (184124 inline 8-bit counters): 147870 [0x1b67fc0, 0x1b8c15e), 36254 [0x7f4b3815cda0, 0x7f4b38165b3e), 
+INFO: Loaded 2 PC tables (184124 PCs): 147870 [0x1b8c160,0x1dcdb40), 36254 [0x7f4b38165b40,0x7f4b381f3520), 
+/out/php-fuzz-tracing-jit: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: global-buffer-overflow on address 0x0000014ef0cd at pc 0x00000091251a bp 0x7ffe2bf52fb0 sp 0x7ffe2bf52fa8
+[1m[0m[1m[34mREAD of size 1 at 0x0000014ef0cd thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-global-buffer-overflow)
+    #0 0x912519 in pcre_get_compiled_regex_cache_ex /src/php-src/ext/pcre/php_pcre.c:659:15
+    #1 0x918556 in pcre_get_compiled_regex_cache /src/php-src/ext/pcre/php_pcre.c:882:9
+    #2 0x918556 in php_do_pcre_match /src/php-src/ext/pcre/php_pcre.c:1102:13
+    #3 0x918111 in zif_preg_match /src/php-src/ext/pcre/php_pcre.c:1461:2
+    #4 0xf63404 in execute_internal /src/php-src/Zend/zend_execute.c:3858:2
+    #5 0x13422f7 in fuzzer_execute_internal /src/php-src/sapi/fuzzer/fuzzer-execute-common.h:95:2
+    #6 0x101ef5d in ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER /src/php-src/Zend/zend_vm_execute.h
+    #7 0x1341dd8 in fuzzer_execute_ex /src/php-src/sapi/fuzzer/fuzzer-execute-common.h:57:14
+    #8 0xf6d471 in zend_execute /src/php-src/Zend/zend_vm_execute.h:61613:2
+    #9 0x1342eee in fuzzer_do_request_from_buffer /src/php-src/sapi/fuzzer/fuzzer-sapi.c:276:5
+    #10 0x1341563 in LLVMFuzzerTestOneInput /src/php-src/sapi/fuzzer/fuzzer-tracing-jit.c:34:2
+    #11 0x620b03 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #12 0x60c262 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #13 0x611b0c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #14 0x63b042 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0x7f4b39e24082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: eebe5d5f4b608b8a53ec446b63981bba373ca0ca)
+    #16 0x60242d in _start (/out/php-fuzz-tracing-jit+0x60242d)
+
+DEDUP_TOKEN: pcre_get_compiled_regex_cache_ex--pcre_get_compiled_regex_cache--php_do_pcre_match
+[1m[32m0x0000014ef0cd is located 19 bytes to the left of global variable '<string literal>' defined in '/src/php-src/ext/pcre/php_pcre.c:696:37' (0x14ef0e0) of size 31
+[1m[0m  '<string literal>' is ascii string 'No ending delimiter '%c' found'
+[1m[32m0x0000014ef0cd is located 3 bytes to the right of global variable '<string literal>' defined in '/src/php-src/ext/pcre/php_pcre.c:658:19' (0x14ef0c0) of size 10
+[1m[0m  '<string literal>' is ascii string '([{< )]}>'
+SUMMARY: AddressSanitizer: global-buffer-overflow /src/php-src/ext/pcre/php_pcre.c:659:15 in pcre_get_compiled_regex_cache_ex
+Shadow bytes around the buggy address:
+  0x000080295dc0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x000080295dd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x000080295de0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x000080295df0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x000080295e00: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m01[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x000080295e10: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m06[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m[[1m[0m02[1m[0m][1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m07[1m[0m
+  0x000080295e20: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x000080295e30: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m01[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m06[1m[0m [1m[31mf9[1m[0m
+  0x000080295e40: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x000080295e50: [1m[0m00[1m[0m [1m[0m03[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m05[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x000080295e60: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m07[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42531102

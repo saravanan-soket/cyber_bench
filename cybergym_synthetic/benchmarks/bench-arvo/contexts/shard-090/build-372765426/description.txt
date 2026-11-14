@@ -1,0 +1,46 @@
+ARVO id: 372765426
+Project: poco
+Fuzz target: http_message_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/pocoproject/poco
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 832940976
+INFO: Loaded 1 modules   (34190 inline 8-bit counters): 34190 [0x55c0297d7f20, 0x55c0297e04ae), 
+INFO: Loaded 1 PC tables (34190 PCs): 34190 [0x55c0297e04b0,0x55c029865d90), 
+/out/http_message_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x50310000060f (pc 0x55c02954011d bp 0x7ffd58a1b5b0 sp 0x7ffd58a1b580 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x55c02954011d in Poco::UTF16Encoding::queryConvert(unsigned char const*, int) const /src/poco/Foundation/src/UTF16Encoding.cpp:202:10
+    #1 0x55c02951c9e8 in Poco::TextConverter::convert(void const*, int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>&, int (*)(int)) /src/poco/Foundation/src/TextConverter.cpp:84:20
+    #2 0x55c02951c9e8 in Poco::TextConverter::convert(void const*, int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>&) /src/poco/Foundation/src/TextConverter.cpp:124:9
+    #3 0x55c029409624 in Poco::Net::NTLMCredentials::parseChallengeMessage(unsigned char const*, unsigned long, Poco::Net::NTLMCredentials::ChallengeMessage&) /src/poco/Net/src/NTLMCredentials.cpp:249:14
+    #4 0x55c0293dec19 in Poco::Net::HTTPNTLMCredentials::createNTLMMessage(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&) /src/poco/Net/src/HTTPNTLMCredentials.cpp:154:8
+    #5 0x55c0293ddf86 in Poco::Net::HTTPNTLMCredentials::authenticate(Poco::Net::HTTPRequest&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&) /src/poco/Net/src/HTTPNTLMCredentials.cpp:92:28
+    #6 0x55c0293c3aac in Poco::Net::HTTPCredentials::authenticate(Poco::Net::HTTPRequest&, Poco::Net::HTTPResponse const&) /src/poco/Net/src/HTTPCredentials.cpp:104:10
+    #7 0x55c0293ae8da in LLVMFuzzerTestOneInput::$_2::operator()() const /src/http_message_fuzzer.cc:64:11
+    #8 0x55c0293ae8da in void catchExceptions<LLVMFuzzerTestOneInput::$_2>(LLVMFuzzerTestOneInput::$_2 const&) /src/http_message_fuzzer.cc:30:5
+    #9 0x55c0293ae8da in LLVMFuzzerTestOneInput /src/http_message_fuzzer.cc:55:3
+    #10 0x55c029260be0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #11 0x55c02924b374 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #12 0x55c029250e0a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #13 0x55c02927d202 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #14 0x7fb728a5a082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #15 0x55c029241e4d in _start (/out/http_message_fuzzer+0x14de4d)
+
+DEDUP_TOKEN: Poco::UTF16Encoding::queryConvert(unsigned char const*, int) const--Poco::TextConverter::convert(void const*, int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>&, int (*)(int))--Poco::TextConverter::convert(void const*, int, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>&)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/poco/Foundation/src/UTF16Encoding.cpp:202:10 in Poco::UTF16Encoding::queryConvert(unsigned char const*, int) const
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/372765426

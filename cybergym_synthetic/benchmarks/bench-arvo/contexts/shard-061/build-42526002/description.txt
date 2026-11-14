@@ -1,0 +1,76 @@
+ARVO id: 42526002
+Project: skia
+Fuzz target: image_filter_deserialize
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Seed: 2119310362
+INFO: Loaded 1 modules   (84604 inline 8-bit counters): 84604 [0x1df8498, 0x1e0cf14), 
+INFO: Loaded 1 PC tables (84604 PCs): 84604 [0x1e0cf18,0x1f576d8), 
+/out/image_filter_deserialize: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x725fe9 in SkMatrix::getType() const /src/skia/out/Fuzz/../../include/core/SkMatrix.h:128:13
+    #1 0x6fca79 in SkMatrix::isIdentity() const /src/skia/out/Fuzz/../../include/core/SkMatrix.h:144:22
+    #2 0x70288b in SkMatrix::invert(SkMatrix*) const /src/skia/out/Fuzz/../../include/core/SkMatrix.h:1166:19
+    #3 0x100fe52 in Sk2DPathEffect::Sk2DPathEffect(SkMatrix const&) /src/skia/out/Fuzz/../../src/effects/Sk2DPathEffect.cpp:18:35
+    #4 0x1011e25 in SkPath2DPathEffect::SkPath2DPathEffect(SkMatrix const&, SkPath const&) /src/skia/out/Fuzz/../../src/effects/Sk2DPathEffect.cpp:140:7
+    #5 0x1012157 in SkPath2DPathEffect::Make(SkMatrix const&, SkPath const&) /src/skia/out/Fuzz/../../include/effects/Sk2DPathEffect.h:88:40
+    #6 0x1012022 in SkPath2DPathEffect::CreateProc(SkReadBuffer&) /src/skia/out/Fuzz/../../src/effects/Sk2DPathEffect.cpp:148:12
+    #7 0x8ee314 in SkReadBuffer::readFlattenable(SkFlattenable::Type) /src/skia/out/Fuzz/../../src/core/SkReadBuffer.cpp:424:15
+    #8 0x87f3ad in sk_sp<SkPathEffect> SkReadBuffer::readFlattenable<SkPathEffect>() /src/skia/out/Fuzz/../../src/core/SkReadBuffer.h:141:35
+    #9 0x879108 in SkReadBuffer::readPathEffect() /src/skia/out/Fuzz/../../src/core/SkReadBuffer.h:147:57
+    #10 0x87868d in SkPaint::unflatten(SkReadBuffer&) /src/skia/out/Fuzz/../../src/core/SkPaint.cpp:1877:36
+    #11 0x108788c in SkPaintImageFilter::CreateProc(SkReadBuffer&) /src/skia/out/Fuzz/../../src/effects/SkPaintImageFilter.cpp:30:12
+    #12 0x8ee314 in SkReadBuffer::readFlattenable(SkFlattenable::Type) /src/skia/out/Fuzz/../../src/core/SkReadBuffer.cpp:424:15
+    #13 0x7be468 in SkFlattenable::Deserialize(SkFlattenable::Type, void const*, unsigned long, SkDeserialProcs const*) /src/skia/out/Fuzz/../../src/core/SkFlattenable.cpp:163:40
+    #14 0x6d01b5 in SkImageFilter::Deserialize(void const*, unsigned long, SkDeserialProcs const*) /src/skia/out/Fuzz/../../include/core/SkImageFilter.h:241:5
+    #15 0x6cfba9 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/image_filter_deserialize.cpp:30:24
+    #16 0x642d86 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #17 0x5fd211 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #18 0x611466 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #19 0x5fc351 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #20 0x7fd8df7b882f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #21 0x58c658 in _start (/out/image_filter_deserialize+0x58c658)
+
+DEDUP_TOKEN: SkMatrix::getType() const--SkMatrix::isIdentity() const--SkMatrix::invert(SkMatrix*) const
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x5af88d in __msan_memcpy.part.49 /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:1520
+    #1 0x100fe1b in Sk2DPathEffect::Sk2DPathEffect(SkMatrix const&) /src/skia/out/Fuzz/../../src/effects/Sk2DPathEffect.cpp:16:55
+    #2 0x1011e25 in SkPath2DPathEffect::SkPath2DPathEffect(SkMatrix const&, SkPath const&) /src/skia/out/Fuzz/../../src/effects/Sk2DPathEffect.cpp:140:7
+    #3 0x1012157 in SkPath2DPathEffect::Make(SkMatrix const&, SkPath const&) /src/skia/out/Fuzz/../../include/effects/Sk2DPathEffect.h:88:40
+    #4 0x1012022 in SkPath2DPathEffect::CreateProc(SkReadBuffer&) /src/skia/out/Fuzz/../../src/effects/Sk2DPathEffect.cpp:148:12
+    #5 0x8ee314 in SkReadBuffer::readFlattenable(SkFlattenable::Type) /src/skia/out/Fuzz/../../src/core/SkReadBuffer.cpp:424:15
+    #6 0x87f3ad in sk_sp<SkPathEffect> SkReadBuffer::readFlattenable<SkPathEffect>() /src/skia/out/Fuzz/../../src/core/SkReadBuffer.h:141:35
+    #7 0x879108 in SkReadBuffer::readPathEffect() /src/skia/out/Fuzz/../../src/core/SkReadBuffer.h:147:57
+    #8 0x87868d in SkPaint::unflatten(SkReadBuffer&) /src/skia/out/Fuzz/../../src/core/SkPaint.cpp:1877:36
+    #9 0x108788c in SkPaintImageFilter::CreateProc(SkReadBuffer&) /src/skia/out/Fuzz/../../src/effects/SkPaintImageFilter.cpp:30:12
+    #10 0x8ee314 in SkReadBuffer::readFlattenable(SkFlattenable::Type) /src/skia/out/Fuzz/../../src/core/SkReadBuffer.cpp:424:15
+    #11 0x7be468 in SkFlattenable::Deserialize(SkFlattenable::Type, void const*, unsigned long, SkDeserialProcs const*) /src/skia/out/Fuzz/../../src/core/SkFlattenable.cpp:163:40
+    #12 0x6d01b5 in SkImageFilter::Deserialize(void const*, unsigned long, SkDeserialProcs const*) /src/skia/out/Fuzz/../../include/core/SkImageFilter.h:241:5
+    #13 0x6cfba9 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/image_filter_deserialize.cpp:30:24
+    #14 0x642d86 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #15 0x5fd211 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #16 0x611466 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #17 0x5fc351 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #18 0x7fd8df7b882f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: __msan_memcpy.part.49--Sk2DPathEffect::Sk2DPathEffect(SkMatrix const&)--SkPath2DPathEffect::SkPath2DPathEffect(SkMatrix const&, SkPath const&)
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mmatrix[1m[35m' in the stack frame of function '[1m[32m_ZN18SkPath2DPathEffect10CreateProcER12SkReadBuffer[1m[35m'[1m[0m
+    #0 0x1011ea0 in SkPath2DPathEffect::CreateProc(SkReadBuffer&) /src/skia/out/Fuzz/../../src/effects/Sk2DPathEffect.cpp:143
+
+DEDUP_TOKEN: SkPath2DPathEffect::CreateProc(SkReadBuffer&)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/skia/out/Fuzz/../../include/core/SkMatrix.h:128:13 in SkMatrix::getType() const
+Unique heap origins: 50
+Stack depot allocated bytes: 3936
+Unique origin histories: 7
+History depot allocated bytes: 168
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42526002

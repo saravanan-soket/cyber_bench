@@ -1,0 +1,40 @@
+ARVO id: 42500718
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_JPEG2000_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2894712109
+INFO: Loaded 1 modules   (49589 inline 8-bit counters): 49589 [0xfb95c0, 0xfc5775), 
+INFO: Loaded 1 PC tables (49589 PCs): 49589 [0xbdefe8,0xca0b38), 
+/out/ffmpeg_AV_CODEC_ID_JPEG2000_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x61810000047f (pc 0x0000007aa1e6 bp 0x7ffe39cae1d0 sp 0x7ffe39cae0f0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x7aa1e6 in find_frame_end /src/ffmpeg/libavcodec/jpeg2000_parser.c:151:31
+    #1 0x7a9805 in jpeg2000_parse /src/ffmpeg/libavcodec/jpeg2000_parser.c:177:15
+    #2 0x5e04d8 in av_parser_parse2 /src/ffmpeg/libavcodec/parser.c:161:13
+    #3 0x576426 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:357:27
+    #4 0x478813 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) (/out/ffmpeg_AV_CODEC_ID_JPEG2000_fuzzer+0x478813)
+    #5 0x463f82 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #6 0x469c4e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) (/out/ffmpeg_AV_CODEC_ID_JPEG2000_fuzzer+0x469c4e)
+    #7 0x493522 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #8 0x7f492275c83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #9 0x43f218 in _start (/out/ffmpeg_AV_CODEC_ID_JPEG2000_fuzzer+0x43f218)
+
+DEDUP_TOKEN: find_frame_end--jpeg2000_parse--av_parser_parse2
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/ffmpeg/libavcodec/jpeg2000_parser.c:151:31 in find_frame_end
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42500718

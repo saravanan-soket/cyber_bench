@@ -1,0 +1,95 @@
+ARVO id: 415855132
+Project: gpac
+Fuzz target: fuzz_probe_analyze
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 8
+Language: c
+Repo: https://github.com/gpac/gpac
+
+=== Crash report ===
+Reading 376 bytes from /tmp/poc
+<?xml version="1.0" encoding="UTF-8"?>
+<GPACInspect>
+[31m[MPEG-2 TS] Invalid PMT es descriptor size for PID 7968
+[0m[31m[MPEG-2 TS] Invalid PID 32 for es descriptor in PMT of program 32, this PID is already assigned to a PMT
+[0m[31m[MPEG-2 TS] Invalid PMT es descriptor size for PID 7968
+[0m[31m[MPEG-2 TS] Invalid PID 32 for es descriptor in PMT of program 32, this PID is already assigned to a PMT
+[0m=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x607000001610 at pc 0x00000068b252 bp 0x7ffe81959a70 sp 0x7ffe81959a68
+[1m[0m[1m[34mREAD of size 8 at 0x607000001610 thread T0[1m[0m
+SCARINESS: 33 (8-byte-read-heap-buffer-overflow-far-from-bounds)
+    #0 0x68b251 in m2tsdmx_declare_pid /src/gpac/src/filters/dmx_m2ts.c:209:15
+    #1 0x686f0b in m2tsdmx_setup_program /src/gpac/src/filters/dmx_m2ts.c:594:4
+    #2 0x681724 in m2tsdmx_on_event /src/gpac/src/filters/dmx_m2ts.c:896:3
+    #3 0x14c202e in gf_m2ts_process_pmt /src/gpac/src/media_tools/mpegts.c
+    #4 0x14c1363 in gf_m2ts_section_complete /src/gpac/src/media_tools/mpegts.c:629:7
+    #5 0x14be2c3 in gf_m2ts_gather_section /src/gpac/src/media_tools/mpegts.c:763:2
+    #6 0x14b2442 in gf_m2ts_process_packet /src/gpac/src/media_tools/mpegts.c:2754:17
+    #7 0x14afdc7 in gf_m2ts_process_data /src/gpac/src/media_tools/mpegts.c:2846:18
+    #8 0x67df35 in m2tsdmx_process /src/gpac/src/filters/dmx_m2ts.c:1464:3
+    #9 0x51f59f in gf_filter_process_task /src/gpac/src/filter_core/filter.c:2971:7
+    #10 0x4f1fb8 in gf_fs_thread_proc /src/gpac/src/filter_core/filter_session.c:2105:3
+    #11 0x4eee61 in gf_fs_run /src/gpac/src/filter_core/filter_session.c:2405:3
+    #12 0x4e0018 in LLVMFuzzerTestOneInput /src/testsuite/oss-fuzzers/fuzz_probe_analyze.c:21:5
+    #13 0x4dfe0d in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+    #14 0x4dfc18 in LLVMFuzzerRunDriver /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #15 0x4df7d8 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:300:10
+    #16 0x7f9773175082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: eebe5d5f4b608b8a53ec446b63981bba373ca0ca)
+    #17 0x420e9d in _start (/out/fuzz_probe_analyze+0x420e9d)
+
+DEDUP_TOKEN: m2tsdmx_declare_pid--m2tsdmx_setup_program--m2tsdmx_on_event
+[1m[32m0x607000001610 is located 272 bytes to the right of 80-byte region [0x6070000014b0,0x607000001500)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4a22d6 in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0xdc8885 in gf_malloc /src/gpac/src/utils/alloc.c:150:9
+    #2 0x14c44bb in gf_m2ts_process_pmt /src/gpac/src/media_tools/mpegts.c:1449:4
+    #3 0x14c1363 in gf_m2ts_section_complete /src/gpac/src/media_tools/mpegts.c:629:7
+    #4 0x14be2c3 in gf_m2ts_gather_section /src/gpac/src/media_tools/mpegts.c:763:2
+    #5 0x14b2442 in gf_m2ts_process_packet /src/gpac/src/media_tools/mpegts.c:2754:17
+    #6 0x14afdc7 in gf_m2ts_process_data /src/gpac/src/media_tools/mpegts.c:2846:18
+    #7 0x67df35 in m2tsdmx_process /src/gpac/src/filters/dmx_m2ts.c:1464:3
+    #8 0x51f59f in gf_filter_process_task /src/gpac/src/filter_core/filter.c:2971:7
+    #9 0x4f1fb8 in gf_fs_thread_proc /src/gpac/src/filter_core/filter_session.c:2105:3
+    #10 0x4eee61 in gf_fs_run /src/gpac/src/filter_core/filter_session.c:2405:3
+    #11 0x4e0018 in LLVMFuzzerTestOneInput /src/testsuite/oss-fuzzers/fuzz_probe_analyze.c:21:5
+    #12 0x4dfe0d in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+
+DEDUP_TOKEN: malloc--gf_malloc--gf_m2ts_process_pmt
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/gpac/src/filters/dmx_m2ts.c:209:15 in m2tsdmx_declare_pid
+Shadow bytes around the buggy address:
+  0x0c0e7fff8270: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c0e7fff8280: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c0e7fff8290: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c0e7fff82a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0e7fff82b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x0c0e7fff82c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0e7fff82d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0e7fff82e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0e7fff82f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0e7fff8300: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0e7fff8310: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/415855132

@@ -1,0 +1,111 @@
+ARVO id: 42508233
+Project: libredwg
+Fuzz target: llvmfuzz
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Stack-buffer-overflow WRITE 1
+Language: c
+Repo: https://github.com/LibreDWG/libredwg
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1129562232
+INFO: Loaded 1 modules   (524389 inline 8-bit counters): 524389 [0x455ed00, 0x45ded65), 
+INFO: Loaded 1 PC tables (524389 PCs): 524389 [0x3af1d28,0x42f2378), 
+/out/llvmfuzz: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffff6db05c0 at pc 0x000000f3640b bp 0x7fffffffd6b0 sp 0x7fffffffd6a8
+[1m[0m[1m[34mWRITE of size 1 at 0x7ffff6db05c0 thread T0[1m[0m
+SCARINESS: 46 (1-byte-write-stack-buffer-overflow)
+    #0 0xf3640a in copy_bytes /src/libredwg/src/decode_r2007.c:228:12
+    #1 0xf3640a in decompress_r2007 /src/libredwg/src/decode_r2007.c:563:11
+    #2 0xf088a1 in read_file_header /src/libredwg/src/decode_r2007.c:1247:13
+    #3 0xf088a1 in read_r2007_meta_data /src/libredwg/src/decode_r2007.c:2354:11
+    #4 0x578601 in decode_R2007 /src/libredwg/src/decode.c:3843:11
+    #5 0x578601 in dwg_decode /src/libredwg/src/decode.c:248:29
+    #6 0x55ab4b in LLVMFuzzerTestOneInput /src/libredwg/examples/llvmfuzz.c:91:13
+    #7 0x4552a3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #8 0x440f32 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #9 0x44677c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #10 0x46f372 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff7a740b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #12 0x41f75d in _start (/out/llvmfuzz+0x41f75d)
+
+DEDUP_TOKEN: copy_bytes--decompress_r2007--read_file_header
+[1m[32mAddress 0x7ffff6db05c0 is located in stack of thread T0 at offset 3520 in frame[1m[0m
+[1m[0m    #0 0xf0804f in read_r2007_meta_data /src/libredwg/src/decode_r2007.c:2338
+
+DEDUP_TOKEN: read_r2007_meta_data
+  This frame has 32 object(s):
+    [32, 57) 'old_dat.sroa.0.i2047' (line 2238)
+    [96, 144) 'sec_dat.i2048' (line 2238)
+    [176, 201) 'old_dat.sroa.0.i1788' (line 1761)
+    [240, 288) 'sec_dat.i1789' (line 1761)
+    [320, 368) 'here.i1790' (line 1784)
+    [400, 424) 'hdl.i1791' (line 1784)
+    [464, 489) 'old_dat.sroa.0.i1695' (line 2050)
+    [528, 576) 'sec_dat.i1696' (line 2050)
+    [608, 633) 'old_dat.sroa.0.i1427' (line 2008)
+    [672, 720) 'sec_dat.i1428' (line 2008)
+    [752, 777) 'old_dat.sroa.0.i1280' (line 1967)
+    [816, 864) 'sec_dat.i1281' (line 1967)
+    [896, 921) 'old_dat.sroa.0.i1094' (line 2137)
+    [960, 1008) 'sec_dat.i1095' (line 2137)
+    [1040, 1065) 'old_dat.sroa.0.i936' (line 2095)
+    [1104, 1152) 'sec_dat.i937' (line 2095)
+    [1184, 1209) 'old_dat.sroa.0.i804' (line 1925)
+    [1248, 1296) 'sec_dat.i805' (line 1925)
+    [1328, 1376) 'here.i806' (line 1948)
+    [1408, 1432) 'hdl.i807' (line 1948)
+    [1472, 1497) 'old_dat.sroa.0.i' (line 1843)
+    [1536, 1584) 'sec_dat.i654' (line 1843)
+    [1616, 1620) 'size.i599' (line 2278)
+    [1632, 1680) 'sec_dat.i439' (line 1464)
+    [1712, 1760) 'str.i' (line 1464)
+    [1792, 1840) 'sec_dat.i' (line 1589)
+    [1872, 1920) 'str_dat.i' (line 1589)
+    [1952, 2000) 'here.i' (line 1631)
+    [2032, 2056) 'hdl.i' (line 1631)
+    [2096, 2104) 'ptr.i' (line 913)
+    [2128, 3112) 'data.i' (line 1215)
+    [3248, 3520) 'file_header' (line 2339)[1m[32m <== Memory access at offset 3520 overflows this variable[1m[0m
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/libredwg/src/decode_r2007.c:228:12 in copy_bytes
+Shadow bytes around the buggy address:
+  0x10007edae060: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007edae070: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007edae080: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x10007edae090: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007edae0a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x10007edae0b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mf3[1m[0m][1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m
+  0x10007edae0c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007edae0d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007edae0e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007edae0f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007edae100: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42508233

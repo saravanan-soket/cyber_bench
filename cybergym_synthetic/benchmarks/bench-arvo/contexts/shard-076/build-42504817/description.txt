@@ -1,0 +1,119 @@
+ARVO id: 42504817
+Project: geos
+Fuzz target: fuzz_geo2
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-use-after-free READ 8
+Language: c++
+Repo: https://git.osgeo.org/gitea/geos/geos.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2939807918
+INFO: Loaded 1 modules   (55602 inline 8-bit counters): 55602 [0xbe5620, 0xbf2f52), 
+INFO: Loaded 1 PC tables (55602 PCs): 55602 [0xbf2f58,0xccc278), 
+/out/fuzz_geo2: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-use-after-free on address 0x60e000000740 at pc 0x000000674182 bp 0x7fffffffd6e0 sp 0x7fffffffd6d8
+[1m[0m[1m[34mREAD of size 8 at 0x60e000000740 thread T0[1m[0m
+SCARINESS: 51 (8-byte-read-heap-use-after-free)
+    #0 0x674181 in geos::geomgraph::PlanarGraph::~PlanarGraph() /src/geos/src/geomgraph/PlanarGraph.cpp:88:9
+    #1 0x7c88da in geos::operation::overlay::OverlayOp::~OverlayOp() /src/geos/src/operation/overlay/OverlayOp.cpp:184:1
+    #2 0x7c749b in geos::operation::overlay::OverlayOp::overlayOp(geos::geom::Geometry const*, geos::geom::Geometry const*, geos::operation::overlay::OverlayOp::OpCode) /src/geos/src/operation/overlay/OverlayOp.cpp:94:1
+    #3 0x6139e8 in geos::geom::HeuristicOverlay(geos::geom::Geometry const*, geos::geom::Geometry const*, int) /src/geos/src/geom/HeuristicOverlay.cpp:446:19
+    #4 0x5fa904 in geos::geom::Geometry::Union(geos::geom::Geometry const*) const /src/geos/src/geom/Geometry.cpp:593:12
+    #5 0x576e78 in operator() /src/geos/capi/geos_ts_c.cpp:1361:27
+    #6 0x576e78 in execute<(lambda at /src/geos/capi/geos_ts_c.cpp:1360:35), nullptr> /src/geos/capi/geos_ts_c.cpp:408:16
+    #7 0x576e78 in GEOSUnion_r /src/geos/capi/geos_ts_c.cpp:1360:16
+    #8 0x56049d in LLVMFuzzerTestOneInput /src/geos/tests/fuzz/fuzz_geo2.c:57:18
+    #9 0x457a53 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #10 0x443362 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #11 0x448e2a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #12 0x471d52 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7ffff7c580b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #14 0x4205ed in _start (/out/fuzz_geo2+0x4205ed)
+
+DEDUP_TOKEN: geos::geomgraph::PlanarGraph::~PlanarGraph()--geos::operation::overlay::OverlayOp::~OverlayOp()--geos::operation::overlay::OverlayOp::overlayOp(geos::geom::Geometry const*, geos::geom::Geometry const*, geos::operation::overlay::OverlayOp::OpCode)
+[1m[32m0x60e000000740 is located 0 bytes inside of 160-byte region [0x60e000000740,0x60e0000007e0)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x55e11d in operator delete(void*) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:152:3
+    #1 0x92ef4b in operator() /usr/local/bin/../include/c++/v1/__memory/unique_ptr.h:54:5
+    #2 0x92ef4b in reset /usr/local/bin/../include/c++/v1/__memory/unique_ptr.h:315:7
+    #3 0x92ef4b in ~unique_ptr /usr/local/bin/../include/c++/v1/__memory/unique_ptr.h:269:19
+    #4 0x92ef4b in geos::geomgraph::Node::add(geos::geomgraph::EdgeEnd*) /src/geos/src/geomgraph/Node.cpp:163:1
+    #5 0x674b30 in geos::geomgraph::PlanarGraph::add(geos::geomgraph::EdgeEnd*) /src/geos/src/geomgraph/PlanarGraph.cpp:147:12
+    #6 0x675454 in geos::geomgraph::PlanarGraph::addEdges(std::__1::vector<geos::geomgraph::Edge*, std::__1::allocator<geos::geomgraph::Edge*> > const&) /src/geos/src/geomgraph/PlanarGraph.cpp:225:9
+    #7 0x7c957d in geos::operation::overlay::OverlayOp::computeOverlay(geos::operation::overlay::OverlayOp::OpCode) /src/geos/src/operation/overlay/OverlayOp.cpp:837:11
+    #8 0x7c73c2 in getResultGeometry /src/geos/src/operation/overlay/OverlayOp.cpp:191:5
+    #9 0x7c73c2 in geos::operation::overlay::OverlayOp::overlayOp(geos::geom::Geometry const*, geos::geom::Geometry const*, geos::operation::overlay::OverlayOp::OpCode) /src/geos/src/operation/overlay/OverlayOp.cpp:93:16
+    #10 0x6139e8 in geos::geom::HeuristicOverlay(geos::geom::Geometry const*, geos::geom::Geometry const*, int) /src/geos/src/geom/HeuristicOverlay.cpp:446:19
+    #11 0x5fa904 in geos::geom::Geometry::Union(geos::geom::Geometry const*) const /src/geos/src/geom/Geometry.cpp:593:12
+    #12 0x576e78 in operator() /src/geos/capi/geos_ts_c.cpp:1361:27
+    #13 0x576e78 in execute<(lambda at /src/geos/capi/geos_ts_c.cpp:1360:35), nullptr> /src/geos/capi/geos_ts_c.cpp:408:16
+    #14 0x576e78 in GEOSUnion_r /src/geos/capi/geos_ts_c.cpp:1360:16
+    #15 0x56049d in LLVMFuzzerTestOneInput /src/geos/tests/fuzz/fuzz_geo2.c:57:18
+    #16 0x457a53 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #17 0x443362 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #18 0x448e2a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #19 0x471d52 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #20 0x7ffff7c580b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+
+DEDUP_TOKEN: operator delete(void*)--operator()--reset
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x55d8bd in operator new(unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:95:3
+    #1 0x675368 in make_unique<geos::geomgraph::DirectedEdge, geos::geomgraph::Edge *&, bool> /src/geos/include/geos/util.h:65:31
+    #2 0x675368 in geos::geomgraph::PlanarGraph::addEdges(std::__1::vector<geos::geomgraph::Edge*, std::__1::allocator<geos::geomgraph::Edge*> > const&) /src/geos/src/geomgraph/PlanarGraph.cpp:219:20
+    #3 0x7c957d in geos::operation::overlay::OverlayOp::computeOverlay(geos::operation::overlay::OverlayOp::OpCode) /src/geos/src/operation/overlay/OverlayOp.cpp:837:11
+    #4 0x7c73c2 in getResultGeometry /src/geos/src/operation/overlay/OverlayOp.cpp:191:5
+    #5 0x7c73c2 in geos::operation::overlay::OverlayOp::overlayOp(geos::geom::Geometry const*, geos::geom::Geometry const*, geos::operation::overlay::OverlayOp::OpCode) /src/geos/src/operation/overlay/OverlayOp.cpp:93:16
+    #6 0x6139e8 in geos::geom::HeuristicOverlay(geos::geom::Geometry const*, geos::geom::Geometry const*, int) /src/geos/src/geom/HeuristicOverlay.cpp:446:19
+    #7 0x5fa904 in geos::geom::Geometry::Union(geos::geom::Geometry const*) const /src/geos/src/geom/Geometry.cpp:593:12
+    #8 0x576e78 in operator() /src/geos/capi/geos_ts_c.cpp:1361:27
+    #9 0x576e78 in execute<(lambda at /src/geos/capi/geos_ts_c.cpp:1360:35), nullptr> /src/geos/capi/geos_ts_c.cpp:408:16
+    #10 0x576e78 in GEOSUnion_r /src/geos/capi/geos_ts_c.cpp:1360:16
+    #11 0x56049d in LLVMFuzzerTestOneInput /src/geos/tests/fuzz/fuzz_geo2.c:57:18
+    #12 0x457a53 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #13 0x443362 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #14 0x448e2a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #15 0x471d52 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7ffff7c580b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+
+DEDUP_TOKEN: operator new(unsigned long)--make_unique<geos::geomgraph::DirectedEdge, geos::geomgraph::Edge *&, bool>--geos::geomgraph::PlanarGraph::addEdges(std::__1::vector<geos::geomgraph::Edge*, std::__1::allocator<geos::geomgraph::Edge*> > const&)
+SUMMARY: AddressSanitizer: heap-use-after-free /src/geos/src/geomgraph/PlanarGraph.cpp:88:9 in geos::geomgraph::PlanarGraph::~PlanarGraph()
+Shadow bytes around the buggy address:
+  0x0c1c7fff8090: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c1c7fff80a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c1c7fff80b0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c1c7fff80c0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c1c7fff80d0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+=>0x0c1c7fff80e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[35mfd[1m[0m][1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c1c7fff80f0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c1c7fff8100: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c1c7fff8110: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c1c7fff8120: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c1c7fff8130: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42504817

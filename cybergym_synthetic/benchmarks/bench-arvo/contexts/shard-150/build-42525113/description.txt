@@ -1,0 +1,61 @@
+ARVO id: 42525113
+Project: qt/qtqa
+Fuzz target: qtbase_corelib_serialization_qxmlstream_qxmlstreamreader_readnext
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Negative-size-param
+Language: c++
+Repo: git://code.qt.io/qt/qtqa.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3385961768
+INFO: Loaded 1 modules   (110242 inline 8-bit counters): 110242 [0xfd57f8, 0xff069a), 
+INFO: Loaded 1 PC tables (110242 PCs): 110242 [0xff06a0,0x119f0c0), 
+/out/qtbase_corelib_serialization_qxmlstream_qxmlstreamreader_readnext: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==8==ERROR: AddressSanitizer: negative-size-param: (size=-2)
+[1m[0mSCARINESS: 10 (negative-size-param)
+    #0 0x4fee4e in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #1 0x81eeab in replaceArgEscapes(QStringView, ArgEscapeData const&, long long, QStringView, QStringView, QChar) /src/qt/qtbase/src/corelib/text/qstring.cpp:8336:13
+    #2 0x81cff5 in QString::arg(QStringView, int, QChar) const /src/qt/qtbase/src/corelib/text/qstring.cpp:8431:12
+    #3 0x54c819 in QXmlStreamReaderPrivate::startDocument() /src/qt/qtbase/src/corelib/serialization/qxmlstream.cpp:1815:83
+    #4 0x539da5 in QXmlStreamReaderPrivate::parse() /src/qt/qtbase/src/corelib/serialization/qxmlstreamparser_p.h:350:13
+    #5 0x56074e in QXmlStreamReader::readNext() /src/qt/qtbase/src/corelib/serialization/qxmlstream.cpp:650:12
+    #6 0x532fd9 in LLVMFuzzerTestOneInput /src/qt/qtbase/tests/libfuzzer/corelib/serialization/qxmlstream/qxmlstreamreader/readnext/main.cpp:9:16
+    #7 0x444a13 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #8 0x430442 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #9 0x435cec in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #10 0x45e0a2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7f78b0f94082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+    #12 0x42699d in _start (/out/qtbase_corelib_serialization_qxmlstream_qxmlstreamreader_readnext+0x42699d)
+
+DEDUP_TOKEN: __asan_memcpy--replaceArgEscapes(QStringView, ArgEscapeData const&, long long, QStringView, QStringView, QChar)--QString::arg(QStringView, int, QChar) const
+[1m[32m0x62d000000c52 is located 2130 bytes inside of 32770-byte region [0x62d000000400,0x62d000008402)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4ffecc in __interceptor_realloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:85:3
+    #1 0x87bfff in QArrayData::reallocateUnaligned(QArrayData*, void*, long long, long long, QArrayData::AllocationOption) /src/qt/qtbase/src/corelib/tools/qarraydata.cpp:224:52
+    #2 0x82d0f8 in reallocateUnaligned /work/qt/include/QtCore/../../../../src/qt/qtbase/src/corelib/tools/qarraydata.h:117:17
+    #3 0x82d0f8 in reallocate /work/qt/include/QtCore/../../../../src/qt/qtbase/src/corelib/tools/qarraydataops.h:295:21
+    #4 0x82d0f8 in QArrayDataPointer<char16_t>::reallocateAndGrow(QArrayData::GrowthPosition, long long, QArrayDataPointer<char16_t>*) /work/qt/include/QtCore/../../../../src/qt/qtbase/src/corelib/tools/qarraydatapointer.h:211:26
+    #5 0x7fc65e in detachAndGrow /work/qt/include/QtCore/../../../../src/qt/qtbase/src/corelib/tools/qarraydatapointer.h:197:13
+    #6 0x7fc65e in QString::append(QChar) /src/qt/qtbase/src/corelib/text/qstring.cpp:3227:7
+    #7 0x55b021 in operator+= /work/qt/include/QtCore/../../../../src/qt/qtbase/src/corelib/text/qstring.h:388:50
+    #8 0x55b021 in QXmlStreamReaderPrivate::fastScanName(short*) /src/qt/qtbase/src/corelib/serialization/qxmlstream.cpp:1356:24
+    #9 0x53828a in QXmlStreamReaderPrivate::parse() /src/qt/qtbase/src/corelib/serialization/qxmlstreamparser_p.h:950:27
+    #10 0x56074e in QXmlStreamReader::readNext() /src/qt/qtbase/src/corelib/serialization/qxmlstream.cpp:650:12
+    #11 0x532fd9 in LLVMFuzzerTestOneInput /src/qt/qtbase/tests/libfuzzer/corelib/serialization/qxmlstream/qxmlstreamreader/readnext/main.cpp:9:16
+    #12 0x444a13 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #13 0x430442 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #14 0x435cec in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #15 0x45e0a2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7f78b0f94082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+
+DEDUP_TOKEN: __interceptor_realloc--QArrayData::reallocateUnaligned(QArrayData*, void*, long long, long long, QArrayData::AllocationOption)--reallocateUnaligned
+SUMMARY: AddressSanitizer: negative-size-param /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3 in __asan_memcpy
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42525113

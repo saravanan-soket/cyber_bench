@@ -1,0 +1,42 @@
+ARVO id: 42475054
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_AGM_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Seed: 3659197566
+INFO: Loaded 1 modules   (61493 inline 8-bit counters): 61493 [0xc15aa9, 0xc24ade), 
+INFO: Loaded 1 PC tables (61493 PCs): 61493 [0x82c3b8,0x91c708), 
+/out/ffmpeg_AV_CODEC_ID_AGM_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x0004157c6200 (pc 0x00000042b1f7 bp 0x7ffe483c24b0 sp 0x7ffe483c2320 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x42b1f6 in get_vlc2 /src/ffmpeg/libavcodec/get_bits.h:789:5
+    #1 0x42b1f6 in decode_huffman2 /src/ffmpeg/libavcodec/agm.c:1070
+    #2 0x42a53c in decode_frame /src/ffmpeg/libavcodec/agm.c:1113:19
+    #3 0x43c01d in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:433:15
+    #4 0x43be7b in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:629:15
+    #5 0x4374d8 in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:647:15
+    #6 0x4373eb in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:705:15
+    #7 0x437b4d in compat_decode /src/ffmpeg/libavcodec/decode.c:796:15
+    #8 0x429b67 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:245:23
+    #9 0x72a8f4 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:529:15
+    #10 0x712492 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:286:6
+    #11 0x7162bb in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:715:9
+    #12 0x7121fa in main /src/libfuzzer/FuzzerMain.cpp:19:10
+    #13 0x7f878522082f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #14 0x4086a8 in _start (/out/ffmpeg_AV_CODEC_ID_AGM_fuzzer+0x4086a8)
+
+DEDUP_TOKEN: get_vlc2--decode_huffman2--decode_frame
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/ffmpeg/libavcodec/get_bits.h:789:5 in get_vlc2
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42475054

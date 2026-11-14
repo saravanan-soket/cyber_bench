@@ -1,0 +1,98 @@
+ARVO id: 42539272
+Project: openthread
+Fuzz target: ip6-send-fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Stack-buffer-overflow READ 16
+Language: c++
+Repo: https://github.com/openthread/openthread
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/ip6-send-fuzzer < INPUT_FILE
+or
+  /out/ip6-send-fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/ip6-send-fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 324 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffff7f34d3c at pc 0x0000004b6635 bp 0x7fffffffda90 sp 0x7fffffffd240
+[1m[0m[1m[34mREAD of size 16 at 0x7ffff7f34d3c thread T0[1m[0m
+SCARINESS: 41 (multi-byte-read-stack-buffer-overflow)
+    #0 0x4b6634 in __interceptor_memcmp.part.77 /src/llvm/projects/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:815
+    #1 0x552442 in ot::KeyManager::SetMasterKey(otMasterKey const&) /src/openthread/src/core/thread/key_manager.cpp:107:5
+    #2 0x5ae5ef in ot::MeshCoP::Dataset::ApplyConfiguration(ot::Instance&) const /src/openthread/src/core/meshcop/dataset.cpp:616:35
+    #3 0x5357d3 in ot::MeshCoP::DatasetManager::Set(ot::MeshCoP::Dataset const&) /src/openthread/src/core/meshcop/dataset_manager.cpp:169:22
+    #4 0x538692 in ot::MeshCoP::DatasetManager::Set(ot::Coap::Header&, ot::Message&, ot::Ip6::MessageInfo const&) /src/openthread/src/core/meshcop/dataset_manager_ftd.cpp:306:9
+    #5 0x53a821 in ot::MeshCoP::ActiveDataset::HandleSet(ot::Coap::Header&, ot::Message&, ot::Ip6::MessageInfo const&) /src/openthread/src/core/meshcop/dataset_manager_ftd.cpp:721:5
+    #6 0x59dec7 in ot::Coap::CoapBase::ProcessReceivedRequest(ot::Coap::Header&, ot::Message&, ot::Ip6::MessageInfo const&) /src/openthread/src/core/coap/coap.cpp:690:23
+    #7 0x59d841 in ot::Coap::CoapBase::Receive(ot::Message&, ot::Ip6::MessageInfo const&) /src/openthread/src/core/coap/coap.cpp:535:9
+    #8 0x54c6cc in ot::Ip6::Udp::HandleMessage(ot::Message&, ot::Ip6::MessageInfo&) /src/openthread/src/core/net/udp6.cpp:278:17
+    #9 0x541f47 in ot::Ip6::Ip6::HandleDatagram(ot::Message&, ot::Ip6::Netif*, signed char, void const*, bool) /src/openthread/src/core/net/ip6.cpp:818:9
+    #10 0x543c60 in ot::Ip6::Ip6::SendRaw(ot::Message&, signed char) /src/openthread/src/core/net/ip6.cpp:715:13
+    #11 0x51bec6 in LLVMFuzzerTestOneInput /src/openthread/tests/fuzz/ip6_send.cpp:70:13
+    #12 0x614abf in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:279:5
+    #13 0x61505f in main /src/libfuzzer/afl/afl_driver.cpp:316:12
+    #14 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #15 0x41c218 in _start (/out/ip6-send-fuzzer+0x41c218)
+
+DEDUP_TOKEN: __interceptor_memcmp.part.77--ot::KeyManager::SetMasterKey(otMasterKey const&)--ot::MeshCoP::Dataset::ApplyConfiguration(ot::Instance&) const
+[1m[32mAddress 0x7ffff7f34d3c is located in stack of thread T0 at offset 316 in frame[1m[0m
+[1m[0m    #0 0x537a1f in ot::MeshCoP::DatasetManager::Set(ot::Coap::Header&, ot::Message&, ot::Ip6::MessageInfo const&) /src/openthread/src/core/meshcop/dataset_manager_ftd.cpp:94
+
+DEDUP_TOKEN: ot::MeshCoP::DatasetManager::Set(ot::Coap::Header&, ot::Message&, ot::Ip6::MessageInfo const&)
+  This frame has 11 object(s):
+    [32, 34) 'tlv' (line 96)
+    [48, 316) 'dataset' (line 104)[1m[32m <== Memory access at offset 316 overflows this variable[1m[0m
+    [384, 394) 'activeTimestamp' (line 106)
+    [416, 426) 'pendingTimestamp' (line 107)
+    [448, 453) 'channel' (line 108)
+    [480, 484) 'sessionId' (line 109)
+    [496, 506) 'meshLocalPrefix' (line 110)
+    [528, 546) 'masterKey' (line 111)
+    [592, 596) 'panId' (line 112)
+    [608, 626) 'data' (line 267)
+    [672, 688) 'destination' (line 319)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism or swapcontext
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/llvm/projects/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:815 in __interceptor_memcmp.part.77
+Shadow bytes around the buggy address:
+  0x10007efde950: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x10007efde960: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x10007efde970: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x10007efde980: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efde990: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x10007efde9a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m04[1m[0m][1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x10007efde9b0: [1m[0m00[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m05[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m02[1m[0m
+  0x10007efde9c0: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m
+  0x10007efde9d0: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efde9e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efde9f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42539272

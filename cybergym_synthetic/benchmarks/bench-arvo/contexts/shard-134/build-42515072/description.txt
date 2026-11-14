@@ -1,0 +1,46 @@
+ARVO id: 42515072
+Project: assimp
+Fuzz target: assimp_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/assimp/assimp.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3482717168
+INFO: Loaded 1 modules   (222101 inline 8-bit counters): 222101 [0x160dc90, 0x1644025), 
+INFO: Loaded 1 PC tables (222101 PCs): 222101 [0x1644028,0x19a7978), 
+/out/assimp_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Info,  T0: Load $$$___magic___$$$.
+Info,  T0: File extension not known, trying signature-based detection
+Info,  T0: Found a matching importer for this file format: Stanford Polygon Library (PLY) Importer.
+Info,  T0: Import root directory is './'
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x7ffff7fc6000 (pc 0x0000007caa20 bp 0x7fffffffcfb0 sp 0x7fffffffcf80 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7caa20 in Assimp::IOStreamBuffer<char>::getNextLine(std::__1::vector<char, std::__1::allocator<char> >&) /src/assimp/include/assimp/IOStreamBuffer.h:300:16
+    #1 0x7d4f82 in Assimp::PLY::DOM::ParseHeader(Assimp::IOStreamBuffer<char>&, std::__1::vector<char, std::__1::allocator<char> >&, bool) /src/assimp/code/AssetLib/Ply/PlyParser.cpp:427:26
+    #2 0x7d6707 in Assimp::PLY::DOM::ParseInstanceBinary(Assimp::IOStreamBuffer<char>&, Assimp::PLY::DOM*, Assimp::PLYImporter*, bool) /src/assimp/code/AssetLib/Ply/PlyParser.cpp:497:19
+    #3 0x7c9184 in Assimp::PLYImporter::InternReadFile(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, aiScene*, Assimp::IOSystem*) /src/assimp/code/AssetLib/Ply/PlyLoader.cpp:191:18
+    #4 0x4db0eb in Assimp::BaseImporter::ReadFile(Assimp::Importer*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, Assimp::IOSystem*) /src/assimp/code/Common/BaseImporter.cpp:112:9
+    #5 0x4fae3d in Assimp::Importer::ReadFile(char const*, unsigned int) /src/assimp/code/Common/Importer.cpp:717:30
+    #6 0x4f921f in Assimp::Importer::ReadFileFromMemory(void const*, unsigned long, unsigned int, char const*) /src/assimp/code/Common/Importer.cpp:512:5
+    #7 0x4b6261 in LLVMFuzzerTestOneInput /src/assimp/fuzz/assimp_fuzzer.cc:53:34
+    #8 0x440343 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #9 0x42bfd2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x43181c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #11 0x45a412 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7ffff7c56082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #13 0x40a7fd in _start (/out/assimp_fuzzer+0x40a7fd)
+
+DEDUP_TOKEN: Assimp::IOStreamBuffer<char>::getNextLine(std::__1::vector<char, std::__1::allocator<char> >&)--Assimp::PLY::DOM::ParseHeader(Assimp::IOStreamBuffer<char>&, std::__1::vector<char, std::__1::allocator<char> >&, bool)--Assimp::PLY::DOM::ParseInstanceBinary(Assimp::IOStreamBuffer<char>&, Assimp::PLY::DOM*, Assimp::PLYImporter*, bool)
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/assimp/include/assimp/IOStreamBuffer.h:300:16 in Assimp::IOStreamBuffer<char>::getNextLine(std::__1::vector<char, std::__1::allocator<char> >&)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42515072

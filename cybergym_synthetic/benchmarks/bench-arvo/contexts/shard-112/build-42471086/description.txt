@@ -1,0 +1,100 @@
+ARVO id: 42471086
+Project: harfbuzz
+Fuzz target: hb-shape-fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/harfbuzz/harfbuzz.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/hb-shape-fuzzer < INPUT_FILE
+or
+  /out/hb-shape-fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/hb-shape-fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 101 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x60b000000157 at pc 0x00000054661e bp 0x7fffffffd8d0 sp 0x7fffffffd8c8
+[1m[0m[1m[34mREAD of size 1 at 0x60b000000157 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x54661d in BEInt<unsigned short, 2>::operator unsigned short() const /src/harfbuzz/src/./hb-machinery.hh:675:13
+    #1 0x5dc551 in AAT::LookupSegmentSingle<OT::IntType<unsigned short, 2u> >::cmp(unsigned int) const /src/harfbuzz/src/./hb-aat-layout-common.hh:75:16
+    #2 0x5dc4e0 in AAT::LookupSegmentSingle<OT::IntType<unsigned short, 2u> > const* OT::VarSizedBinSearchArrayOf<AAT::LookupSegmentSingle<OT::IntType<unsigned short, 2u> > >::bsearch<unsigned int>(unsigned int const&) const /src/harfbuzz/src/./hb-open-type.hh:820:18
+    #3 0x5dc033 in AAT::LookupFormat2<OT::IntType<unsigned short, 2u> >::get_value(unsigned int) const /src/harfbuzz/src/./hb-aat-layout-common.hh:99:48
+    #4 0x5e95fc in AAT::Lookup<OT::IntType<unsigned short, 2u> >::get_value_or_null(unsigned int, unsigned int) const /src/harfbuzz/src/./hb-aat-layout-common.hh:265:18
+    #5 0x5ea4b0 in AAT::KerxSubTableFormat6::get_kerning(unsigned int, unsigned int, unsigned int) const /src/harfbuzz/src/./hb-aat-layout-kerx-table.hh:252:50
+    #6 0x5e9e43 in hb_kern_machine_t<AAT::KerxSubTableFormat6::accelerator_t>::kern(hb_font_t*, hb_buffer_t*, unsigned int) const /src/harfbuzz/src/./hb-ot-kern-table.hh:73:35
+    #7 0x5e99cf in AAT::KerxSubTableFormat6::apply(AAT::hb_aat_apply_context_t*) const /src/harfbuzz/src/./hb-aat-layout-kerx-table.hh:272:13
+    #8 0x5e75d4 in AAT::hb_aat_apply_context_t::return_t AAT::KerxTable::dispatch<AAT::hb_aat_apply_context_t>(AAT::hb_aat_apply_context_t*) const /src/harfbuzz/src/./hb-aat-layout-kerx-table.hh:363:15
+    #9 0x5d265e in AAT::kerx::apply(AAT::hb_aat_apply_context_t*) const /src/harfbuzz/src/./hb-aat-layout-kerx-table.hh:434:14
+    #10 0x5d239d in hb_aat_layout_position(hb_ot_shape_plan_t*, hb_font_t*, hb_buffer_t*) /src/harfbuzz/src/hb-aat-layout.cc:107:8
+    #11 0x586d44 in hb_ot_position_complex(hb_ot_shape_context_t const*) /src/harfbuzz/src/hb-ot-shape.cc:838:5
+    #12 0x5831b0 in hb_ot_position(hb_ot_shape_context_t const*) /src/harfbuzz/src/hb-ot-shape.cc:872:3
+    #13 0x581087 in hb_ot_shape_internal(hb_ot_shape_context_t*) /src/harfbuzz/src/hb-ot-shape.cc:953:3
+    #14 0x580b6a in _hb_ot_shape /src/harfbuzz/src/hb-ot-shape.cc:980:3
+    #15 0x567c16 in hb_shape_plan_execute /src/harfbuzz/src/./hb-shaper-list.hh:42:1
+    #16 0x566618 in hb_shape_full /src/harfbuzz/src/hb-shape.cc:141:19
+    #17 0x5301d7 in LLVMFuzzerTestOneInput /src/harfbuzz/./test/fuzzing/hb-shape-fuzzer.cc:20:5
+    #18 0x53076e in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:301:5
+    #19 0x530cde in main /src/libfuzzer/afl/afl_driver.cpp:339:12
+    #20 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #21 0x41cd18 in _start (/out/hb-shape-fuzzer+0x41cd18)
+
+DEDUP_TOKEN: BEInt<unsigned short, 2>::operator unsigned short() const--AAT::LookupSegmentSingle<OT::IntType<unsigned short, 2u> >::cmp(unsigned int) const--AAT::LookupSegmentSingle<OT::IntType<unsigned short, 2u> > const* OT::VarSizedBinSearchArrayOf<AAT::LookupSegmentSingle<OT::IntType<unsigned short, 2u> > >::bsearch<unsigned int>(unsigned int const&) const
+[1m[32m0x60b000000157 is located 2 bytes to the right of 101-byte region [0x60b0000000f0,0x60b000000155)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x52bb88 in operator new(unsigned long) /src/llvm/projects/compiler-rt/lib/asan/asan_new_delete.cc:106
+    #1 0x530689 in __libcpp_allocate /usr/local/bin/../include/c++/v1/new:257:10
+    #2 0x530689 in allocate /usr/local/bin/../include/c++/v1/memory:1800
+    #3 0x530689 in allocate /usr/local/bin/../include/c++/v1/memory:1549
+    #4 0x530689 in __vallocate /usr/local/bin/../include/c++/v1/vector:972
+    #5 0x530689 in vector /usr/local/bin/../include/c++/v1/vector:1115
+    #6 0x530689 in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:298
+    #7 0x530cde in main /src/libfuzzer/afl/afl_driver.cpp:339:12
+    #8 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: operator new(unsigned long)--__libcpp_allocate--allocate
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/harfbuzz/src/./hb-machinery.hh:675:13 in BEInt<unsigned short, 2>::operator unsigned short() const
+Shadow bytes around the buggy address:
+  0x0c167fff7fd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c167fff7fe0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c167fff7ff0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c167fff8000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c167fff8010: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c167fff8020: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m05[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c167fff8030: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c167fff8040: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c167fff8050: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c167fff8060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c167fff8070: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42471086

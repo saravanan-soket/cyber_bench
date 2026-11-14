@@ -1,0 +1,39 @@
+ARVO id: 42504637
+Project: wolfssl
+Fuzz target: cryptofuzz-sp-math-all
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Index-out-of-bounds
+Language: c++
+Repo: https://github.com/wolfssl/wolfssl
+
+=== Crash report ===
+INFO: found LLVMFuzzerCustomMutator (0x7601d0). Disabling -len_control by default.
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1991935805
+INFO: Loaded 1 modules   (175503 inline 8-bit counters): 175503 [0x1e700b0, 0x1e9ae3f), 
+INFO: Loaded 1 PC tables (175503 PCs): 175503 [0x1e9ae40,0x2148730), 
+/out/cryptofuzz-sp-math-all: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1mwolfcrypt/src/sp_int.c:4397:21:[1m[31m runtime error: [1m[0m[1mindex 131 out of bounds for type 'sp_int_digit [131]'[1m[0m
+    #0 0x8c6ba5 in sp_lshb /src/wolfssl-sp-math-all/wolfcrypt/src/sp_int.c:4397:40
+    #1 0x8c549f in sp_div /src/wolfssl-sp-math-all/wolfcrypt/src/sp_int.c:4611:19
+    #2 0x7db0cf in cryptofuzz::module::wolfCrypt_bignum::Div::Run(fuzzing::datasource::Datasource&, cryptofuzz::module::wolfCrypt_bignum::Bignum&, cryptofuzz::module::wolfCrypt_bignum::BignumCluster&) const /src/cryptofuzz-sp-math-all/modules/wolfcrypt/bn_ops.cpp:204:13
+    #3 0x7b0972 in cryptofuzz::module::wolfCrypt::OpBignumCalc(cryptofuzz::operation::BignumCalc&) /src/cryptofuzz-sp-math-all/modules/wolfcrypt/module.cpp:3347:5
+    #4 0x60b503 in cryptofuzz::ExecutorBignumCalc::callModule(std::__1::shared_ptr<cryptofuzz::Module>, cryptofuzz::operation::BignumCalc&) const /src/cryptofuzz-sp-math-all/executor.cpp:807:20
+    #5 0x5a6cb7 in cryptofuzz::ExecutorBase<cryptofuzz::Bignum, cryptofuzz::operation::BignumCalc>::Run(fuzzing::datasource::Datasource&, unsigned char const*, unsigned long) const /src/cryptofuzz-sp-math-all/executor.cpp:1668:47
+    #6 0x51389d in cryptofuzz::Driver::Run(unsigned char const*, unsigned long) const /src/cryptofuzz-sp-math-all/driver.cpp:194:36
+    #7 0x6bbc50 in LLVMFuzzerTestOneInput /src/cryptofuzz-sp-math-all/entry.cpp:491:13
+    #8 0x4a0003 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #9 0x48b572 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #10 0x4912ae in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #11 0x4baeb2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7fe3f4ea083f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #13 0x466588 in _start (/out/cryptofuzz-sp-math-all+0x466588)
+
+DEDUP_TOKEN: sp_lshb--sp_div--cryptofuzz::module::wolfCrypt_bignum::Div::Run(fuzzing::datasource::Datasource&, cryptofuzz::module::wolfCrypt_bignum::Bignum&, cryptofuzz::module::wolfCrypt_bignum::BignumCluster&) const
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior wolfcrypt/src/sp_int.c:4397:21 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42504637

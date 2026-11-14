@@ -1,0 +1,47 @@
+ARVO id: 42500410
+Project: spice-usbredir
+Fuzz target: usbredirparserfuzz
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://gitlab.freedesktop.org/spice/usbredir.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3007933343
+INFO: Loaded 1 modules   (993 inline 8-bit counters): 993 [0x82aa18, 0x82adf9), 
+INFO: Loaded 1 PC tables (993 PCs): 993 [0x82ae00,0x82ec10), 
+/out/usbredirparserfuzz: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m[1m[31mUninitialized bytes in [1m[32m__interceptor_strspn[1m[31m at offset 0 inside [0x704000000000, 1)[1m[0m
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x542d57 in usbredirfilter_string_to_rules /work/build/../../src/spice-usbredir/usbredirparser/usbredirfilter.c:59:14
+    #1 0x53b2af in usbredirparser_call_type_func /work/build/../../src/spice-usbredir/usbredirparser/usbredirparser.c:905:13
+    #2 0x536c4d in usbredirparser_do_read /work/build/../../src/spice-usbredir/usbredirparser/usbredirparser.c:1065:21
+    #3 0x525bb2 in LLVMFuzzerTestOneInput /work/build/../../src/spice-usbredir/fuzzing/usbredirparserfuzz.cc:407:19
+    #4 0x458123 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) (/out/usbredirparserfuzz+0x458123)
+    #5 0x4439f2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #6 0x4495fe in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) (/out/usbredirparserfuzz+0x4495fe)
+    #7 0x472d92 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #8 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #9 0x41ec98 in _start (/out/usbredirparserfuzz+0x41ec98)
+
+DEDUP_TOKEN: usbredirfilter_string_to_rules--usbredirparser_call_type_func--usbredirparser_do_read
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x4d313d in malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:901:3
+    #1 0x536cd1 in usbredirparser_do_read /work/build/../../src/spice-usbredir/usbredirparser/usbredirparser.c:1044:36
+    #2 0x525bb2 in LLVMFuzzerTestOneInput /work/build/../../src/spice-usbredir/fuzzing/usbredirparserfuzz.cc:407:19
+    #3 0x458123 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) (/out/usbredirparserfuzz+0x458123)
+    #4 0x4439f2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #5 0x4495fe in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) (/out/usbredirparserfuzz+0x4495fe)
+    #6 0x472d92 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #7 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: malloc--usbredirparser_do_read--LLVMFuzzerTestOneInput
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /work/build/../../src/spice-usbredir/usbredirparser/usbredirfilter.c:59:14 in usbredirfilter_string_to_rules
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42500410

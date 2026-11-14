@@ -1,0 +1,89 @@
+ARVO id: 42486431
+Project: uWebSockets
+Fuzz target: MockedEchoServer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/uNetworking/uWebSockets.git
+
+=== Crash report ===
+INFO: Seed: 1435280536
+INFO: Loaded 1 modules   (2867 inline 8-bit counters): 2867 [0x9bd5d8, 0x9be10b), 
+INFO: Loaded 1 PC tables (2867 PCs): 2867 [0x738440,0x743770), 
+/out/MockedEchoServer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x59d370 in us_socket_write /src/uWebSockets/fuzzing/uSocketsMock.c:170:9
+    #1 0x53cdae in uWS::AsyncSocket<false>::write(char const*, int, bool, int) /src/uWebSockets/fuzzing/../src/AsyncSocket.h:153:27
+    #2 0x57292e in auto uWS::WebSocketContext<false, true>::init()::'lambda'(auto*)::operator()<us_socket_t>(auto*) const /src/uWebSockets/fuzzing/../src/WebSocketContext.h:322:26
+    #3 0x59e532 in us_loop_read_mocked_data /src/uWebSockets/fuzzing/uSocketsMock.c:288:21
+    #4 0x527532 in LLVMFuzzerTestOneInput /src/uWebSockets/fuzzing/MockedEchoServer.cpp:85:5
+    #5 0x45ae41 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:559:15
+    #6 0x4465e2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:301:6
+    #7 0x44c57d in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:801:9
+    #8 0x473e62 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #9 0x7ffff6ccb83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #10 0x420d88 in _start (/out/MockedEchoServer+0x420d88)
+
+DEDUP_TOKEN: us_socket_write--uWS::AsyncSocket<false>::write(char const*, int, bool, int)--auto uWS::WebSocketContext<false, true>::init()::'lambda'(auto*)::operator()<us_socket_t>(auto*) const
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x4ce359 in __msan_memcpy /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1558:3
+    #1 0x67f026 in copy /work/msan/include/c++/v1/__string:386:56
+    #2 0x67f026 in __grow_by_and_replace /work/msan/include/c++/v1/string:2220:9
+    #3 0x67f026 in std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::append(char const*, unsigned long) /work/msan/include/c++/v1/string:2531:9
+    #4 0x53d59b in uWS::AsyncSocket<false>::write(char const*, int, bool, int) /src/uWebSockets/fuzzing/../src/AsyncSocket.h:166:45
+    #5 0x53dc0b in uWS::AsyncSocket<false>::uncork(char const*, int, bool) /src/uWebSockets/fuzzing/../src/AsyncSocket.h:240:42
+    #6 0x56547e in auto uWS::WebSocketContext<false, true>::init()::'lambda'(auto*, char*, int)::operator()<us_socket_t>(auto*, char*, int) const /src/uWebSockets/fuzzing/../src/WebSocketContext.h:288:26
+    #7 0x59e2c2 in us_loop_read_mocked_data /src/uWebSockets/fuzzing/uSocketsMock.c:278:17
+    #8 0x527532 in LLVMFuzzerTestOneInput /src/uWebSockets/fuzzing/MockedEchoServer.cpp:85:5
+    #9 0x45ae41 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:559:15
+    #10 0x4465e2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:301:6
+    #11 0x44c57d in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:801:9
+    #12 0x473e62 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7ffff6ccb83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: __msan_memcpy--copy--__grow_by_and_replace
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x4ce359 in __msan_memcpy /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1558:3
+    #1 0x53032c in formatMessage<true> /src/uWebSockets/fuzzing/../src/WebSocketProtocol.h:240:5
+    #2 0x53032c in uWS::WebSocket<false, true>::send(std::__1::basic_string_view<char, std::__1::char_traits<char> >, uWS::OpCode, bool) /src/uWebSockets/fuzzing/../src/WebSocket.h:98:9
+    #3 0x52e675 in operator()<uWS::WebSocket<false, true> > /src/uWebSockets/fuzzing/MockedEchoServer.cpp:66:21
+    #4 0x52e675 in invoke<(lambda at MockedEchoServer.cpp:54:20) &, uWS::WebSocket<false, true> *, std::__1::basic_string_view<char, std::__1::char_traits<char> >, uWS::OpCode> /src/uWebSockets/fuzzing/../src/f2/function2.hpp:184:10
+    #5 0x52e675 in fu2::abi_400::detail::type_erasure::invocation_table::function_trait<void (uWS::WebSocket<false, true>*, std::__1::basic_string_view<char, std::__1::char_traits<char> >, uWS::OpCode)>::internal_invoker<fu2::abi_400::detail::type_erasure::box<false, LLVMFuzzerTestOneInput::$_1, std::__1::allocator<LLVMFuzzerTestOneInput::$_1> >, true>::invoke(fu2::abi_400::detail::type_erasure::data_accessor*, unsigned long, uWS::WebSocket<false, true>*, std::__1::basic_string_view<char, std::__1::char_traits<char> >, uWS::OpCode) /src/uWebSockets/fuzzing/../src/f2/function2.hpp:587:1
+    #6 0x56f1e4 in invoke<0, fu2::abi_400::detail::type_erasure::data_accessor *, const unsigned long &, uWS::WebSocket<false, true> *, std::__1::basic_string_view<char, std::__1::char_traits<char> >, uWS::OpCode> /src/uWebSockets/fuzzing/../src/f2/function2.hpp:995:12
+    #7 0x56f1e4 in invoke<0, fu2::abi_400::detail::type_erasure::erasure<true, fu2::abi_400::detail::config<true, false, fu2::capacity_default>, fu2::abi_400::detail::property<true, false, void (uWS::WebSocket<false, true> *, std::__1::basic_string_view<char, std::__1::char_traits<char> >, uWS::OpCode)> > &, uWS::WebSocket<false, true> *, std::__1::basic_string_view<char, std::__1::char_traits<char> >, uWS::OpCode> /src/uWebSockets/fuzzing/../src/f2/function2.hpp:1213:37
+    #8 0x56f1e4 in operator() /src/uWebSockets/fuzzing/../src/f2/function2.hpp:775:1
+    #9 0x56f1e4 in uWS::WebSocketContext<false, true>::handleFragment(char*, unsigned long, unsigned int, int, bool, uWS::WebSocketState<true>*, void*) /src/uWebSockets/fuzzing/../src/WebSocketContext.h:93:21
+    #10 0x567ccd in bool uWS::WebSocketProtocol<true, uWS::WebSocketContext<false, true> >::consumeMessage<6u, unsigned char>(unsigned char, char*&, unsigned int&, uWS::WebSocketState<true>*, void*) /src/uWebSockets/fuzzing/../src/WebSocketProtocol.h:328:21
+    #11 0x565f32 in uWS::WebSocketProtocol<true, uWS::WebSocketContext<false, true> >::consume(char*, unsigned int, uWS::WebSocketState<true>*, void*) /src/uWebSockets/fuzzing/../src/WebSocketProtocol.h:424:25
+    #12 0x565440 in auto uWS::WebSocketContext<false, true>::init()::'lambda'(auto*, char*, int)::operator()<us_socket_t>(auto*, char*, int) const /src/uWebSockets/fuzzing/../src/WebSocketContext.h:285:13
+    #13 0x59e2c2 in us_loop_read_mocked_data /src/uWebSockets/fuzzing/uSocketsMock.c:278:17
+    #14 0x527532 in LLVMFuzzerTestOneInput /src/uWebSockets/fuzzing/MockedEchoServer.cpp:85:5
+    #15 0x45ae41 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:559:15
+    #16 0x4465e2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:301:6
+    #17 0x44c57d in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:801:9
+    #18 0x473e62 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #19 0x7ffff6ccb83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: __msan_memcpy--formatMessage<true>--uWS::WebSocket<false, true>::send(std::__1::basic_string_view<char, std::__1::char_traits<char> >, uWS::OpCode, bool)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x4ce359 in __msan_memcpy /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1558:3
+    #1 0x7ffff7bc2933 in deflate (/lib/x86_64-linux-gnu/libz.so.1+0x5933)
+
+DEDUP_TOKEN: __msan_memcpy--deflate
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x4d4a5d in malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:901:3
+    #1 0x7ffff7bc32cf in deflateInit2_ (/lib/x86_64-linux-gnu/libz.so.1+0x62cf)
+
+DEDUP_TOKEN: malloc--deflateInit2_
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/uWebSockets/fuzzing/uSocketsMock.c:170:9 in us_socket_write
+Unique heap origins: 108
+Stack depot allocated bytes: 10520
+Unique origin histories: 34
+History depot allocated bytes: 816
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42486431

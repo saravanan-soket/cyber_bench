@@ -1,0 +1,91 @@
+ARVO id: 42480439
+Project: opus
+Fuzz target: ffmpeg_AV_CODEC_ID_H264_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Stack-use-after-return READ 2
+Language: c++
+Repo: https://gitlab.xiph.org/xiph/opus.git
+
+=== Crash report ===
+INFO: Seed: 3313699644
+INFO: Loaded 1 modules (25324 guards): [0xdc0e10, 0xdd99c0), 
+/out/ffmpeg_AV_CODEC_ID_H264_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-use-after-return on address 0x7f1c0d7c20e0 at pc 0x00000074837a bp 0x7fff3199a7a0 sp 0x7fff3199a798
+[1m[0m[1m[34mREAD of size 2 at 0x7f1c0d7c20e0 thread T0[1m[0m
+SCARINESS: 52 (2-byte-read-stack-use-after-return)
+    #0 0x748379 in put_h264_qpel8_hv_lowpass_9 /src/ffmpeg/libavcodec/h264qpel_template.c:539:1
+    #1 0x710df6 in avg_h264_qpel8_mc23_9_c /src/ffmpeg/libavcodec/h264qpel_template.c:546:1
+    #2 0x5fcd78 in mc_dir_part /src/ffmpeg/libavcodec/h264_mb.c:249:5
+    #3 0x5fcd78 in mc_part_std /src/ffmpeg/libavcodec/h264_mb.c:363
+    #4 0x5fcd78 in mc_part_422_simple_16 /src/ffmpeg/libavcodec/h264_mc_template.c:59
+    #5 0x5f98d2 in hl_motion_422_simple_16 /src/ffmpeg/libavcodec/h264_mc_template.c:102:9
+    #6 0x5dd616 in hl_decode_mb_simple_16 /src/ffmpeg/libavcodec/h264_mb_template.c:172:17
+    #7 0x633094 in decode_slice /src/ffmpeg/libavcodec/h264_slice.c:2571:17
+    #8 0x62ca0c in ff_h264_execute_decode_slices /src/ffmpeg/libavcodec/h264_slice.c:2746:15
+    #9 0x534464 in decode_nal_units /src/ffmpeg/libavcodec/h264dec.c:718:27
+    #10 0x5315cd in h264_decode_frame /src/ffmpeg/libavcodec/h264dec.c:1008:17
+    #11 0x529e93 in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:417:15
+    #12 0x529984 in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:620:15
+    #13 0x520a8e in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:638:15
+    #14 0x52000d in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:678:15
+    #15 0x52193d in compat_decode /src/ffmpeg/libavcodec/decode.c:853:15
+    #16 0x518dc7 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:216:23
+    #17 0x94b909 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:458:13
+    #18 0x94c13a in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:397:3
+    #19 0x923046 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #20 0x92e5d0 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #21 0x922658 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #22 0x7f1c0d85282f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #23 0x41d658 in _start (/out/ffmpeg_AV_CODEC_ID_H264_fuzzer+0x41d658)
+
+DEDUP_TOKEN: put_h264_qpel8_hv_lowpass_9--avg_h264_qpel8_mc23_9_c--mc_dir_part
+[1m[32mAddress 0x7f1c0d7c20e0 is located in stack of thread T0 at offset 224 in frame[1m[0m
+[1m[0m    #0 0x70874f in put_h264_qpel8_mc11_9_c /src/ffmpeg/libavcodec/h264qpel_template.c:543
+
+DEDUP_TOKEN: put_h264_qpel8_mc11_9_c
+  This frame has 3 object(s):
+    [32, 240) 'full' (line 543)[1m[32m <== Memory access at offset 224 is inside this variable[1m[0m
+    [304, 432) 'halfH' (line 543)
+    [464, 592) 'halfV' (line 543)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism or swapcontext
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-use-after-return /src/ffmpeg/libavcodec/h264qpel_template.c:539:1 in put_h264_qpel8_hv_lowpass_9
+Shadow bytes around the buggy address:
+  0x0fe401af03c0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe401af03d0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe401af03e0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe401af03f0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe401af0400: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+=>0x0fe401af0410: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m[[1m[35mf5[1m[0m][1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe401af0420: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe401af0430: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe401af0440: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe401af0450: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe401af0460: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42480439

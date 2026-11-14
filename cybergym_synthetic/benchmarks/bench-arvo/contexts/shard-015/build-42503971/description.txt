@@ -1,0 +1,51 @@
+ARVO id: 42503971
+Project: freeimage-svn
+Fuzz target: load_from_memory_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://svn.code.sf.net/p/freeimage/svn
+
+=== Crash report ===
+Warning: AFL++ tools will need to set AFL_MAP_SIZE to 96832 to be able to run this instrumented program!
+======================= INFO =========================
+This binary is built for afl++.
+To run the target function on individual input(s) execute this:
+  /out/load_from_memory_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] -- /out/load_from_memory_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 64 bytes from /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x605fff202ee0 (pc 0x7fea2df04c15 bp 0x7ffecd302210 sp 0x7ffecd3019c8 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x7fea2df04c15  (/lib/x86_64-linux-gnu/libc.so.6+0x14dc15)
+    #1 0x49ae61 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #2 0x12e0d59 in _MemoryReadProc(void*, unsigned int, unsigned int, void*) /src/freeimage-svn/FreeImage/trunk/Source/FreeImage/FreeImageIO.cpp:90:4
+    #3 0x654a21 in LibRaw_freeimage_datastream::read(void*, unsigned long, unsigned long) /src/freeimage-svn/FreeImage/trunk/Source/FreeImage/PluginRAW.cpp:66:10
+    #4 0xdd31b5 in LibRaw::get4() /src/freeimage-svn/FreeImage/trunk/Source/LibRawLite/internal/../src/utils/read_utils.cpp:50:3
+    #5 0x108325b in LibRaw::parse_sinar_ia() /src/freeimage-svn/FreeImage/trunk/Source/LibRawLite/internal/../src/metadata/misc_parsers.cpp:375:11
+    #6 0x1072b3d in LibRaw::identify() /src/freeimage-svn/FreeImage/trunk/Source/LibRawLite/internal/../src/metadata/identify.cpp:656:5
+    #7 0x11d886b in LibRaw::open_datastream(LibRaw_abstract_datastream*) /src/freeimage-svn/FreeImage/trunk/Source/LibRawLite/src/utils/open.cpp:390:4
+    #8 0x650023 in Validate(FreeImageIO*, void*) /src/freeimage-svn/FreeImage/trunk/Source/FreeImage/PluginRAW.cpp:645:21
+    #9 0x514d05 in FreeImage_ValidateFIF /src/freeimage-svn/FreeImage/trunk/Source/FreeImage/Plugin.cpp:811:95
+    #10 0x503f33 in FreeImage_GetFileTypeFromHandle /src/freeimage-svn/FreeImage/trunk/Source/FreeImage/GetType.cpp:43:8
+    #11 0x504b64 in FreeImage_GetFileTypeFromMemory /src/freeimage-svn/FreeImage/trunk/Source/FreeImage/GetType.cpp:109:10
+    #12 0x4cf99c in LLVMFuzzerTestOneInput /src/load_from_memory_fuzzer.cc:33:27
+    #13 0x4cf683 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:185:7
+    #14 0x4cf683 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:237:12
+    #15 0x7fea2ddd783f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #16 0x421138 in _start (/out/load_from_memory_fuzzer+0x421138)
+
+DEDUP_TOKEN: __asan_memcpy--_MemoryReadProc(void*, unsigned int, unsigned int, void*)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x14dc15) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42503971

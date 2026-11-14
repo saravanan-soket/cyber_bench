@@ -1,0 +1,40 @@
+ARVO id: 42484793
+Project: libraw
+Fuzz target: libraw_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/libraw/libraw
+
+=== Crash report ===
+INFO: Seed: 3953476200
+INFO: Loaded 1 modules   (17377 inline 8-bit counters): 17377 [0xc7d140, 0xc81521), 
+INFO: Loaded 1 PC tables (17377 PCs): 17377 [0x981270,0x9c5080), 
+/out/libraw_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m[1m[31mUninitialized bytes in [1m[32m__interceptor_strcmp[1m[31m at offset 0 inside [0x7ffffff3f8d8, 1)[1m[0m
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x6d28f5 in LibRaw::parse_sinar_ia() /src/libraw/src/metadata/misc_parsers.cpp:378:10
+    #1 0x6a5edf in LibRaw::identify() /src/libraw/src/metadata/identify.cpp:656:5
+    #2 0x550be9 in LibRaw::open_datastream(LibRaw_abstract_datastream*) /src/libraw/src/utils/open.cpp:390:4
+    #3 0x54f1d2 in LibRaw::open_buffer(void*, unsigned long) /src/libraw/src/utils/open.cpp:153:13
+    #4 0x522e60 in LLVMFuzzerTestOneInput /src/libraw_fuzzer.cc:31:24
+    #5 0x45af01 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #6 0x446232 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #7 0x44c38e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #8 0x474252 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #9 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #10 0x420928 in _start (/out/libraw_fuzzer+0x420928)
+
+DEDUP_TOKEN: LibRaw::parse_sinar_ia()--LibRaw::identify()--LibRaw::open_datastream(LibRaw_abstract_datastream*)
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mstr[1m[35m' in the stack frame of function '[1m[32m_ZN6LibRaw14parse_sinar_iaEv[1m[35m'[1m[0m
+    #0 0x6d2410 in LibRaw::parse_sinar_ia() /src/libraw/src/metadata/misc_parsers.cpp:362
+
+DEDUP_TOKEN: LibRaw::parse_sinar_ia()
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/libraw/src/metadata/misc_parsers.cpp:378:10 in LibRaw::parse_sinar_ia()
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42484793

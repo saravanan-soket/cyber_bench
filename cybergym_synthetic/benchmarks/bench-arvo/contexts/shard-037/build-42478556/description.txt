@@ -1,0 +1,104 @@
+ARVO id: 42478556
+Project: openssl
+Fuzz target: x509
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 14
+Language: c++
+Repo: https://github.com/openssl/openssl.git
+
+=== Crash report ===
+INFO: Seed: 1557858949
+INFO: Loaded 1 modules   (41982 inline 8-bit counters): 41982 [0xe4bb50, 0xe55f4e), 
+INFO: Loaded 1 PC tables (41982 PCs): 41982 [0xe55f50,0xef9f30), 
+/out/x509: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6020000007bd at pc 0x000000432b99 bp 0x7fffffffdb50 sp 0x7fffffffd310
+[1m[0m[1m[34mREAD of size 14 at 0x6020000007bd thread T0[1m[0m
+SCARINESS: 26 (multi-byte-read-heap-buffer-overflow)
+    #0 0x432b98 in strlen /src/llvm/projects/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:365:5
+    #1 0x58c647 in CRYPTO_strdup /src/openssl/crypto/o_str.c:21:25
+    #2 0x59d00d in X509V3_add_value /src/openssl/crypto/x509/v3_utl.c:46:28
+    #3 0x8b0f94 in i2v_GENERAL_NAME /src/openssl/crypto/x509/v3_alt.c:80:18
+    #4 0x8afe95 in i2v_GENERAL_NAMES /src/openssl/crypto/x509/v3_alt.c:57:15
+    #5 0x59c82f in X509V3_EXT_print /src/openssl/crypto/x509/v3_prn.c:117:21
+    #6 0x59cd74 in X509V3_extensions_print /src/openssl/crypto/x509/v3_prn.c:164:14
+    #7 0x59af12 in X509_print_ex /src/openssl/crypto/x509/t_x509.c:201:9
+    #8 0x4ca74c in FuzzerTestOneInput /src/openssl/fuzz/x509.c:37:9
+    #9 0x51a876 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:554:15
+    #10 0x4cb36f in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:292:6
+    #11 0x4d9002 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:775:9
+    #12 0x4ca9b7 in main /src/libfuzzer/FuzzerMain.cpp:19:10
+    #13 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #14 0x41fd58 in _start (/out/x509+0x41fd58)
+
+DEDUP_TOKEN: strlen--CRYPTO_strdup--X509V3_add_value
+[1m[32m0x6020000007bd is located 0 bytes to the right of 13-byte region [0x6020000007b0,0x6020000007bd)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x49819d in malloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x5d6738 in ASN1_STRING_set /src/openssl/crypto/asn1/asn1_lib.c:284:21
+    #2 0x5c2684 in c2i_ASN1_INTEGER /src/openssl/crypto/asn1/a_int.c:300:9
+    #3 0x5e0293 in asn1_ex_c2i /src/openssl/crypto/asn1/tasn_dec.c:835:14
+    #4 0x5dd2e7 in asn1_d2i_ex_primitive /src/openssl/crypto/asn1/tasn_dec.c:761:10
+    #5 0x5db540 in asn1_item_embed_d2i /src/openssl/crypto/asn1/tasn_dec.c
+    #6 0x5de8cc in asn1_template_noexp_d2i /src/openssl/crypto/asn1/tasn_dec.c:624:15
+    #7 0x5dc8f6 in asn1_template_ex_d2i /src/openssl/crypto/asn1/tasn_dec.c:475:15
+    #8 0x5db84b in asn1_item_embed_d2i /src/openssl/crypto/asn1/tasn_dec.c:363:19
+    #9 0x5de9b1 in asn1_template_noexp_d2i /src/openssl/crypto/asn1/tasn_dec.c:614:15
+    #10 0x5dc7ab in asn1_template_ex_d2i /src/openssl/crypto/asn1/tasn_dec.c:499:16
+    #11 0x5dba2e in asn1_item_embed_d2i /src/openssl/crypto/asn1/tasn_dec.c:240:19
+    #12 0x5dee19 in asn1_template_noexp_d2i /src/openssl/crypto/asn1/tasn_dec.c:592:18
+    #13 0x5dc7ab in asn1_template_ex_d2i /src/openssl/crypto/asn1/tasn_dec.c:499:16
+    #14 0x5dbcd2 in asn1_item_embed_d2i /src/openssl/crypto/asn1/tasn_dec.c:178:20
+    #15 0x5dab04 in ASN1_item_ex_d2i /src/openssl/crypto/asn1/tasn_dec.c:124:10
+    #16 0x5da9f2 in ASN1_item_d2i /src/openssl/crypto/asn1/tasn_dec.c:114:9
+    #17 0x59c6c9 in X509V3_EXT_print /src/openssl/crypto/x509/v3_prn.c:89:19
+    #18 0x59cd74 in X509V3_extensions_print /src/openssl/crypto/x509/v3_prn.c:164:14
+    #19 0x59af12 in X509_print_ex /src/openssl/crypto/x509/t_x509.c:201:9
+    #20 0x4ca74c in FuzzerTestOneInput /src/openssl/fuzz/x509.c:37:9
+    #21 0x51a876 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:554:15
+    #22 0x4cb36f in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:292:6
+    #23 0x4d9002 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:775:9
+    #24 0x4ca9b7 in main /src/libfuzzer/FuzzerMain.cpp:19:10
+    #25 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: malloc--ASN1_STRING_set--c2i_ASN1_INTEGER
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm/projects/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:365:5 in strlen
+Shadow bytes around the buggy address:
+  0x0c047fff80a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m05[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff80b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c047fff80c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m05[1m[0m
+  0x0c047fff80d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m05[1m[0m
+  0x0c047fff80e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m05[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c047fff80f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m[[1m[0m05[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff8100: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m05[1m[0m
+  0x0c047fff8110: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m05[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m05[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8120: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8130: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8140: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42478556

@@ -1,0 +1,105 @@
+ARVO id: 42489610
+Project: wolfssl
+Fuzz target: fuzzer-wolfssh-client
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Stack-buffer-overflow READ 8
+Language: c++
+Repo: https://github.com/wolfssl/wolfssl
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/fuzzer-wolfssh-client < INPUT_FILE
+or
+  /out/fuzzer-wolfssh-client INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/fuzzer-wolfssh-client [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 4154 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7f3f103d0878 at pc 0x000000589074 bp 0x7ffd8e912190 sp 0x7ffd8e912188
+[1m[0m[1m[34mREAD of size 8 at 0x7f3f103d0878 thread T0[1m[0m
+SCARINESS: 38 (8-byte-read-stack-buffer-overflow)
+    #0 0x589073 in fp_read_unsigned_bin /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/tfm.c:3639:3
+    #1 0x58a40a in mp_read_unsigned_bin /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/tfm.c:4300:10
+    #2 0x564698 in wc_RsaPublicKeyDecodeRaw /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/asn.c:4418:9
+    #3 0x4f6ad5 in DoKexDhReply /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/internal.c:3003:23
+    #4 0x4e0058 in DoPacket /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/internal.c
+    #5 0x4dddf0 in DoReceive /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/internal.c:5882:23
+    #6 0x4d2398 in wolfSSH_connect /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/ssh.c:744:21
+    #7 0x4ccfd0 in LLVMFuzzerTestOneInput /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/wolfssh-fuzzers/client.c:35:17
+    #8 0x4cd84e in ExecuteFilesOnyByOne /src/libfuzzer/afl/afl_driver.cpp:207:5
+    #9 0x4cd84e in main /src/libfuzzer/afl/afl_driver.cpp:244:12
+    #10 0x7f3f0f31383f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #11 0x41e828 in _start (/out/fuzzer-wolfssh-client+0x41e828)
+
+DEDUP_TOKEN: fp_read_unsigned_bin--mp_read_unsigned_bin--wc_RsaPublicKeyDecodeRaw
+[1m[32mAddress 0x7f3f103d0878 is located in stack of thread T0 at offset 120 in frame[1m[0m
+[1m[0m    #0 0x4f52bf in DoKexDhReply /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/internal.c:2756
+
+DEDUP_TOKEN: DoKexDhReply
+  This frame has 21 object(s):
+    [32, 36) 'pubKeySz' (line 2759)
+    [48, 52) 'fSz' (line 2761)
+    [64, 68) 'sigSz' (line 2763)
+    [80, 84) 'scratch' (line 2764)
+    [96, 100) 'scratchLen' (line 2765)
+    [112, 113) 'kPad' (line 2766)
+    [128, 8952) 'sigKeyBlock' (line 2767)[1m[32m <== Memory access at offset 120 underflows this variable[1m[0m
+    [9216, 9220) 'begin' (line 2783)
+    [9232, 9236) 'eSz302' (line 2978)
+    [9248, 9252) 'nSz' (line 2980)
+    [9264, 9268) 'pubKeyIdx' (line 2981)
+    [9280, 9288) 'q' (line 3018)
+    [9312, 9316) 'qSz' (line 3019)
+    [9328, 9332) 'pubKeyIdx352' (line 3019)
+    [9344, 13768) 'key437' (line 3082)
+    [14032, 14040) 'r' (line 3195)
+    [14064, 14072) 's' (line 3196)
+    [14096, 14100) 'rSz' (line 3197)
+    [14112, 14116) 'sSz' (line 3197)
+    [14128, 14132) 'asnSigSz' (line 3197)
+    [14144, 14400) 'asnSig' (line 3198)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/tfm.c:3639:3 in fp_read_unsigned_bin
+Shadow bytes around the buggy address:
+  0x0fe8620720b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe8620720c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe8620720d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe8620720e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe8620720f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0fe862072100: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m01[1m[0m[[1m[31mf2[1m[0m]
+  0x0fe862072110: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe862072120: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe862072130: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe862072140: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe862072150: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42489610

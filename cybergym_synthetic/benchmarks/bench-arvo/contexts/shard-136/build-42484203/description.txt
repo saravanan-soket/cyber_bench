@@ -1,0 +1,128 @@
+ARVO id: 42484203
+Project: llvm-project
+Fuzz target: llvm-opt-fuzzer--x86_64-sccp
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/llvm/llvm-project.git
+
+=== Crash report ===
+/out/llvm-opt-fuzzer: Injected args: -mtriple=x86_64 -passes=sccp
+INFO: found LLVMFuzzerCustomMutator (0x6e85a0). Disabling -len_control by default.
+INFO: Seed: 1078409432
+INFO: Loaded 1 modules   (1547956 inline 8-bit counters): 1547956 [0x135d3fd8, 0x1374de8c), 
+INFO: Loaded 1 PC tables (1547956 PCs): 1547956 [0x1374de90,0x14eec9d0), 
+/out/llvm-opt-fuzzer--x86_64-sccp: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0xc269137 in max<unsigned int, std::__1::__less<unsigned int, unsigned int>> /usr/local/bin/../include/c++/v1/algorithm:2626:12
+    #1 0xc269137 in max<unsigned int> /usr/local/bin/../include/c++/v1/algorithm:2635:12
+    #2 0xc269137 in (anonymous namespace)::SCCPSolver::visitPHINode(llvm::PHINode&) /src/llvm-project/llvm/lib/Transforms/Scalar/SCCP.cpp:766:7
+    #3 0xc211acb in visit<llvm::ilist_iterator<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void>, false, false>> /src/llvm-project/llvm/include/llvm/IR/InstVisitor.h:90:37
+    #4 0xc211acb in visit /src/llvm-project/llvm/include/llvm/IR/InstVisitor.h:105:5
+    #5 0xc211acb in visit /src/llvm-project/llvm/include/llvm/IR/InstVisitor.h:111:34
+    #6 0xc211acb in (anonymous namespace)::SCCPSolver::Solve() /src/llvm-project/llvm/lib/Transforms/Scalar/SCCP.cpp:1398:7
+    #7 0xc2004c4 in runSCCP(llvm::Function&, llvm::DataLayout const&, llvm::TargetLibraryInfo const*) /src/llvm-project/llvm/lib/Transforms/Scalar/SCCP.cpp:1628:12
+    #8 0xc1fe922 in llvm::SCCPPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) /src/llvm-project/llvm/lib/Transforms/Scalar/SCCP.cpp:1673:8
+    #9 0xda6dc4b in llvm::detail::PassModel<llvm::Function, llvm::SCCPPass, llvm::PreservedAnalyses, llvm::AnalysisManager<llvm::Function> >::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) /src/llvm-project/llvm/include/llvm/IR/PassManagerInternal.h:79:17
+    #10 0x9dab03c in llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function> >::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) /src/llvm-project/llvm/include/llvm/IR/PassManager.h:519:21
+    #11 0xda96da6 in llvm::ModuleToFunctionPassAdaptor<llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function> > >::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) /src/llvm-project/llvm/include/llvm/IR/PassManager.h:1237:23
+    #12 0xda95e7b in llvm::detail::PassModel<llvm::Module, llvm::ModuleToFunctionPassAdaptor<llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function> > >, llvm::PreservedAnalyses, llvm::AnalysisManager<llvm::Module> >::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) /src/llvm-project/llvm/include/llvm/IR/PassManagerInternal.h:79:17
+    #13 0x9da31c2 in llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module> >::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) /src/llvm-project/llvm/include/llvm/IR/PassManager.h:519:21
+    #14 0x6ebff4 in LLVMFuzzerTestOneInput /src/llvm-project/llvm/tools/llvm-opt-fuzzer/llvm-opt-fuzzer.cpp:159:7
+    #15 0x61cfb1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #16 0x6082e2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #17 0x60e43e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #18 0x636302 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #19 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #20 0x5e29d8 in _start (/out/llvm-opt-fuzzer--x86_64-sccp+0x5e29d8)
+
+DEDUP_TOKEN: max<unsigned int, std::__1::__less<unsigned int, unsigned int>>--max<unsigned int>--(anonymous namespace)::SCCPSolver::visitPHINode(llvm::PHINode&)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x6e93b0b in ValueLatticeElement /src/llvm-project/llvm/include/llvm/Analysis/ValueLattice.h:149:59
+    #1 0x6e93b0b in llvm::ValueLatticeElement::operator=(llvm::ValueLatticeElement const&) /src/llvm-project/llvm/include/llvm/Analysis/ValueLattice.h:188:16
+    #2 0x6ec3b51 in llvm::ValueLatticeElement::mergeIn(llvm::ValueLatticeElement const&, llvm::ValueLatticeElement::MergeOptions) /src/llvm-project/llvm/include/llvm/Analysis/ValueLattice.h:406:13
+    #3 0xc242986 in (anonymous namespace)::SCCPSolver::mergeInValue(llvm::ValueLatticeElement&, llvm::Value*, llvm::ValueLatticeElement, llvm::ValueLatticeElement::MergeOptions) /src/llvm-project/llvm/lib/Transforms/Scalar/SCCP.cpp:414:12
+    #4 0xc268317 in mergeInValue /src/llvm-project/llvm/lib/Transforms/Scalar/SCCP.cpp:428:12
+    #5 0xc268317 in (anonymous namespace)::SCCPSolver::visitPHINode(llvm::PHINode&) /src/llvm-project/llvm/lib/Transforms/Scalar/SCCP.cpp:761:3
+    #6 0xc211acb in visit<llvm::ilist_iterator<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void>, false, false>> /src/llvm-project/llvm/include/llvm/IR/InstVisitor.h:90:37
+    #7 0xc211acb in visit /src/llvm-project/llvm/include/llvm/IR/InstVisitor.h:105:5
+    #8 0xc211acb in visit /src/llvm-project/llvm/include/llvm/IR/InstVisitor.h:111:34
+    #9 0xc211acb in (anonymous namespace)::SCCPSolver::Solve() /src/llvm-project/llvm/lib/Transforms/Scalar/SCCP.cpp:1398:7
+    #10 0xc2004c4 in runSCCP(llvm::Function&, llvm::DataLayout const&, llvm::TargetLibraryInfo const*) /src/llvm-project/llvm/lib/Transforms/Scalar/SCCP.cpp:1628:12
+    #11 0xc1fe922 in llvm::SCCPPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) /src/llvm-project/llvm/lib/Transforms/Scalar/SCCP.cpp:1673:8
+    #12 0xda6dc4b in llvm::detail::PassModel<llvm::Function, llvm::SCCPPass, llvm::PreservedAnalyses, llvm::AnalysisManager<llvm::Function> >::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) /src/llvm-project/llvm/include/llvm/IR/PassManagerInternal.h:79:17
+    #13 0x9dab03c in llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function> >::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) /src/llvm-project/llvm/include/llvm/IR/PassManager.h:519:21
+    #14 0xda96da6 in llvm::ModuleToFunctionPassAdaptor<llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function> > >::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) /src/llvm-project/llvm/include/llvm/IR/PassManager.h:1237:23
+    #15 0xda95e7b in llvm::detail::PassModel<llvm::Module, llvm::ModuleToFunctionPassAdaptor<llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function> > >, llvm::PreservedAnalyses, llvm::AnalysisManager<llvm::Module> >::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) /src/llvm-project/llvm/include/llvm/IR/PassManagerInternal.h:79:17
+    #16 0x9da31c2 in llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module> >::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) /src/llvm-project/llvm/include/llvm/IR/PassManager.h:519:21
+    #17 0x6ebff4 in LLVMFuzzerTestOneInput /src/llvm-project/llvm/tools/llvm-opt-fuzzer/llvm-opt-fuzzer.cpp:159:7
+    #18 0x61cfb1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #19 0x6082e2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #20 0x60e43e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #21 0x636302 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #22 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: ValueLatticeElement--llvm::ValueLatticeElement::operator=(llvm::ValueLatticeElement const&)--llvm::ValueLatticeElement::mergeIn(llvm::ValueLatticeElement const&, llvm::ValueLatticeElement::MergeOptions)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0xc27b68f in ValueLatticeElement /src/llvm-project/llvm/include/llvm/Analysis/ValueLattice.h:167:54
+    #1 0xc27b68f in InsertIntoBucket<llvm::Value *, llvm::ValueLatticeElement> /src/llvm-project/llvm/include/llvm/ADT/DenseMap.h:550:37
+    #2 0xc27b68f in std::__1::pair<llvm::DenseMapIterator<llvm::Value*, llvm::ValueLatticeElement, llvm::DenseMapInfo<llvm::Value*>, llvm::detail::DenseMapPair<llvm::Value*, llvm::ValueLatticeElement>, false>, bool> llvm::DenseMapBase<llvm::DenseMap<llvm::Value*, llvm::ValueLatticeElement, llvm::DenseMapInfo<llvm::Value*>, llvm::detail::DenseMapPair<llvm::Value*, llvm::ValueLatticeElement> >, llvm::Value*, llvm::ValueLatticeElement, llvm::DenseMapInfo<llvm::Value*>, llvm::detail::DenseMapPair<llvm::Value*, llvm::ValueLatticeElement> >::try_emplace<llvm::ValueLatticeElement>(llvm::Value*&&, llvm::ValueLatticeElement&&) /src/llvm-project/llvm/include/llvm/ADT/DenseMap.h:234:9
+    #3 0xc23844a in insert /src/llvm-project/llvm/include/llvm/ADT/DenseMap.h:215:12
+    #4 0xc23844a in (anonymous namespace)::SCCPSolver::getValueState(llvm::Value*) /src/llvm-project/llvm/lib/Transforms/Scalar/SCCP.cpp:437:25
+    #5 0xc266716 in (anonymous namespace)::SCCPSolver::visitPHINode(llvm::PHINode&) /src/llvm-project/llvm/lib/Transforms/Scalar/SCCP.cpp:729:7
+    #6 0xc211acb in visit<llvm::ilist_iterator<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void>, false, false>> /src/llvm-project/llvm/include/llvm/IR/InstVisitor.h:90:37
+    #7 0xc211acb in visit /src/llvm-project/llvm/include/llvm/IR/InstVisitor.h:105:5
+    #8 0xc211acb in visit /src/llvm-project/llvm/include/llvm/IR/InstVisitor.h:111:34
+    #9 0xc211acb in (anonymous namespace)::SCCPSolver::Solve() /src/llvm-project/llvm/lib/Transforms/Scalar/SCCP.cpp:1398:7
+    #10 0xc2004c4 in runSCCP(llvm::Function&, llvm::DataLayout const&, llvm::TargetLibraryInfo const*) /src/llvm-project/llvm/lib/Transforms/Scalar/SCCP.cpp:1628:12
+    #11 0xc1fe922 in llvm::SCCPPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) /src/llvm-project/llvm/lib/Transforms/Scalar/SCCP.cpp:1673:8
+    #12 0xda6dc4b in llvm::detail::PassModel<llvm::Function, llvm::SCCPPass, llvm::PreservedAnalyses, llvm::AnalysisManager<llvm::Function> >::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) /src/llvm-project/llvm/include/llvm/IR/PassManagerInternal.h:79:17
+    #13 0x9dab03c in llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function> >::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) /src/llvm-project/llvm/include/llvm/IR/PassManager.h:519:21
+    #14 0xda96da6 in llvm::ModuleToFunctionPassAdaptor<llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function> > >::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) /src/llvm-project/llvm/include/llvm/IR/PassManager.h:1237:23
+    #15 0xda95e7b in llvm::detail::PassModel<llvm::Module, llvm::ModuleToFunctionPassAdaptor<llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function> > >, llvm::PreservedAnalyses, llvm::AnalysisManager<llvm::Module> >::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) /src/llvm-project/llvm/include/llvm/IR/PassManagerInternal.h:79:17
+    #16 0x9da31c2 in llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module> >::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) /src/llvm-project/llvm/include/llvm/IR/PassManager.h:519:21
+    #17 0x6ebff4 in LLVMFuzzerTestOneInput /src/llvm-project/llvm/tools/llvm-opt-fuzzer/llvm-opt-fuzzer.cpp:159:7
+    #18 0x61cfb1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #19 0x6082e2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #20 0x60e43e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #21 0x636302 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #22 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: ValueLatticeElement--InsertIntoBucket<llvm::Value *, llvm::ValueLatticeElement>--std::__1::pair<llvm::DenseMapIterator<llvm::Value*, llvm::ValueLatticeElement, llvm::DenseMapInfo<llvm::Value*>, llvm::detail::DenseMapPair<llvm::Value*, llvm::ValueLatticeElement>, false>, bool> llvm::DenseMapBase<llvm::DenseMap<llvm::Value*, llvm::ValueLatticeElement, llvm::DenseMapInfo<llvm::Value*>, llvm::detail::DenseMapPair<llvm::Value*, llvm::ValueLatticeElement> >, llvm::Value*, llvm::ValueLatticeElement, llvm::DenseMapInfo<llvm::Value*>, llvm::detail::DenseMapPair<llvm::Value*, llvm::ValueLatticeElement> >::try_emplace<llvm::ValueLatticeElement>(llvm::Value*&&, llvm::ValueLatticeElement&&)
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x6e3ec9 in operator new(unsigned long) /src/llvm-project/compiler-rt/lib/msan/msan_new_delete.cpp:45:35
+    #1 0xc2327b8 in allocateBuckets /src/llvm-project/llvm/include/llvm/ADT/DenseMap.h:872:9
+    #2 0xc2327b8 in llvm::DenseMap<llvm::Value*, llvm::ValueLatticeElement, llvm::DenseMapInfo<llvm::Value*>, llvm::detail::DenseMapPair<llvm::Value*, llvm::ValueLatticeElement> >::grow(unsigned int) /src/llvm-project/llvm/include/llvm/ADT/DenseMap.h:806:5
+    #3 0xc231c0f in grow /src/llvm-project/llvm/include/llvm/ADT/DenseMap.h:537:36
+    #4 0xc231c0f in llvm::detail::DenseMapPair<llvm::Value*, llvm::ValueLatticeElement>* llvm::DenseMapBase<llvm::DenseMap<llvm::Value*, llvm::ValueLatticeElement, llvm::DenseMapInfo<llvm::Value*>, llvm::detail::DenseMapPair<llvm::Value*, llvm::ValueLatticeElement> >, llvm::Value*, llvm::ValueLatticeElement, llvm::DenseMapInfo<llvm::Value*>, llvm::detail::DenseMapPair<llvm::Value*, llvm::ValueLatticeElement> >::InsertIntoBucketImpl<llvm::Value*>(llvm::Value* const&, llvm::Value* const&, llvm::detail::DenseMapPair<llvm::Value*, llvm::ValueLatticeElement>*) /src/llvm-project/llvm/include/llvm/ADT/DenseMap.h:581:13
+    #5 0xc23150a in InsertIntoBucket<llvm::Value *const &> /src/llvm-project/llvm/include/llvm/ADT/DenseMap.h:547:17
+    #6 0xc23150a in llvm::DenseMapBase<llvm::DenseMap<llvm::Value*, llvm::ValueLatticeElement, llvm::DenseMapInfo<llvm::Value*>, llvm::detail::DenseMapPair<llvm::Value*, llvm::ValueLatticeElement> >, llvm::Value*, llvm::ValueLatticeElement, llvm::DenseMapInfo<llvm::Value*>, llvm::detail::DenseMapPair<llvm::Value*, llvm::ValueLatticeElement> >::FindAndConstruct(llvm::Value* const&) /src/llvm-project/llvm/include/llvm/ADT/DenseMap.h:326:13
+    #7 0xc2105ae in operator[] /src/llvm-project/llvm/include/llvm/ADT/DenseMap.h:330:12
+    #8 0xc2105ae in (anonymous namespace)::SCCPSolver::markOverdefined(llvm::Value*) /src/llvm-project/llvm/lib/Transforms/Scalar/SCCP.cpp:326:23
+    #9 0xc200461 in runSCCP(llvm::Function&, llvm::DataLayout const&, llvm::TargetLibraryInfo const*) /src/llvm-project/llvm/lib/Transforms/Scalar/SCCP.cpp:1623:12
+    #10 0xc1fe922 in llvm::SCCPPass::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) /src/llvm-project/llvm/lib/Transforms/Scalar/SCCP.cpp:1673:8
+    #11 0xda6dc4b in llvm::detail::PassModel<llvm::Function, llvm::SCCPPass, llvm::PreservedAnalyses, llvm::AnalysisManager<llvm::Function> >::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) /src/llvm-project/llvm/include/llvm/IR/PassManagerInternal.h:79:17
+    #12 0x9dab03c in llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function> >::run(llvm::Function&, llvm::AnalysisManager<llvm::Function>&) /src/llvm-project/llvm/include/llvm/IR/PassManager.h:519:21
+    #13 0xda96da6 in llvm::ModuleToFunctionPassAdaptor<llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function> > >::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) /src/llvm-project/llvm/include/llvm/IR/PassManager.h:1237:23
+    #14 0xda95e7b in llvm::detail::PassModel<llvm::Module, llvm::ModuleToFunctionPassAdaptor<llvm::PassManager<llvm::Function, llvm::AnalysisManager<llvm::Function> > >, llvm::PreservedAnalyses, llvm::AnalysisManager<llvm::Module> >::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) /src/llvm-project/llvm/include/llvm/IR/PassManagerInternal.h:79:17
+    #15 0x9da31c2 in llvm::PassManager<llvm::Module, llvm::AnalysisManager<llvm::Module> >::run(llvm::Module&, llvm::AnalysisManager<llvm::Module>&) /src/llvm-project/llvm/include/llvm/IR/PassManager.h:519:21
+    #16 0x6ebff4 in LLVMFuzzerTestOneInput /src/llvm-project/llvm/tools/llvm-opt-fuzzer/llvm-opt-fuzzer.cpp:159:7
+    #17 0x61cfb1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #18 0x6082e2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #19 0x60e43e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #20 0x636302 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #21 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: operator new(unsigned long)--allocateBuckets--llvm::DenseMap<llvm::Value*, llvm::ValueLatticeElement, llvm::DenseMapInfo<llvm::Value*>, llvm::detail::DenseMapPair<llvm::Value*, llvm::ValueLatticeElement> >::grow(unsigned int)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /usr/local/bin/../include/c++/v1/algorithm:2626:12 in max<unsigned int, std::__1::__less<unsigned int, unsigned int>>
+Unique heap origins: 5036
+Stack depot allocated bytes: 462048
+Unique origin histories: 1411
+History depot allocated bytes: 33864
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42484203

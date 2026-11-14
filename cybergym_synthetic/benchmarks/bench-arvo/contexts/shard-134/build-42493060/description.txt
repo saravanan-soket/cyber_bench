@@ -1,0 +1,49 @@
+ARVO id: 42493060
+Project: openh264
+Fuzz target: decoder_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-use-after-free WRITE 4
+Language: c++
+Repo: https://github.com/cisco/openh264.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 993573645
+INFO: Loaded 1 modules   (11963 inline 8-bit counters): 11963 [0x83d519c, 0x83d8057), 
+INFO: Loaded 1 PC tables (11963 PCs): 11963 [0x83d8058,0x83ef630), 
+/out/decoder_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: attempting free on address which was not malloc()-ed: 0xec81ae50 in thread T0
+[1m[0mSCARINESS: 40 (bad-free)
+    #0 0x817b756 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:127:3
+    #1 0x81c3ccc in WelsFree /src/openh264/codec/common/src/memory_align.cpp:113:5
+    #2 0x81c3ccc in WelsCommon::CMemoryAlign::WelsFree(void*, char const*) /src/openh264/codec/common/src/memory_align.cpp:154:3
+    #3 0x821a0e5 in WelsDec::FreePicture(WelsDec::SPicture*, WelsCommon::CMemoryAlign*) /src/openh264/codec/decoder/core/src/pic_queue.cpp:141:12
+    #4 0x81c61a2 in DestroyPicBuff /src/openh264/codec/decoder/core/src/decoder.cpp:272:9
+    #5 0x81c7f8b in WelsRequestMem /src/openh264/codec/decoder/core/src/decoder.cpp:516:7
+    #6 0x81ce344 in SyncPictureResolutionExt /src/openh264/codec/decoder/core/src/decoder.cpp:955:10
+    #7 0x81e9853 in AllocPicBuffOnNewSeqBegin /src/openh264/codec/decoder/core/src/decoder_core.cpp:2296:18
+    #8 0x81e9853 in InitConstructAccessUnit /src/openh264/codec/decoder/core/src/decoder_core.cpp:2323:12
+    #9 0x81e9853 in WelsDec::ConstructAccessUnit(WelsDec::TagWelsDecoderContext*, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/core/src/decoder_core.cpp:2347:12
+    #10 0x81cc642 in WelsDecodeBs /src/openh264/codec/decoder/core/src/decoder.cpp:918:7
+    #11 0x81bc124 in WelsDec::CWelsDecoder::DecodeFrame2WithCtx(WelsDec::TagWelsDecoderContext*, unsigned char const*, int, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:794:3
+    #12 0x81bf76e in WelsDec::CWelsDecoder::DecodeFrame2(unsigned char const*, int, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:913:10
+    #13 0x81b933a in WelsDec::CWelsDecoder::DecodeFrameNoDelay(unsigned char const*, int, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:712:11
+    #14 0x81b3333 in LLVMFuzzerTestOneInput /src/decoder_fuzzer.cpp:75:15
+    #15 0x80ac6ce in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #16 0x809653e in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #17 0x809c488 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #18 0x80c7a17 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #19 0xedc44646 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x18646)
+    #20 0x80709f8 in _start (/out/decoder_fuzzer+0x80709f8)
+
+DEDUP_TOKEN: free--WelsFree--WelsCommon::CMemoryAlign::WelsFree(void*, char const*)
+Address 0xec81ae50 is a wild pointer.
+SUMMARY: AddressSanitizer: bad-free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:127:3 in free
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42493060

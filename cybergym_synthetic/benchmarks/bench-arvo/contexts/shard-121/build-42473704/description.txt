@@ -1,0 +1,40 @@
+ARVO id: 42473704
+Project: openthread
+Fuzz target: ip6-send-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/openthread/openthread
+
+=== Crash report ===
+INFO: Seed: 1292164436
+INFO: Loaded 1 modules   (19713 inline 8-bit counters): 19713 [0x8c14c8, 0x8c61c9), 
+INFO: Loaded 1 PC tables (19713 PCs): 19713 [0x5ec9c8,0x6399d8), 
+/out/ip6-send-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x00c688d7f72d (pc 0x0000004cb185 bp 0x7fffffffddf0 sp 0x7fffffffddc0 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x4cb184 in ot::Dhcp6::Dhcp6Client::ProcessNextIdentityAssociation() /src/openthread/src/core/net/dhcp6_client.cpp:194:5
+    #1 0x4cb0e0 in ot::Dhcp6::Dhcp6Client::Start() /src/openthread/src/core/net/dhcp6_client.cpp:181:5
+    #2 0x4cb063 in ot::Dhcp6::Dhcp6Client::UpdateAddresses() /src/openthread/src/core/net/dhcp6_client.cpp:165:9
+    #3 0x47f317 in ot::Mle::Mle::HandleStateChanged(unsigned int) /src/openthread/src/core/thread/mle.cpp:1518:37
+    #4 0x441921 in ot::Notifier::HandleStateChanged() /src/openthread/src/core/common/notifier.cpp:158:19
+    #5 0x44288e in ot::TaskletScheduler::ProcessQueuedTasklets() /src/openthread/src/core/common/tasklet.cpp:112:14
+    #6 0x4320ce in LLVMFuzzerTestOneInput /src/openthread/tests/fuzz/ip6_send.cpp:77:9
+    #7 0x52ad19 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:529:15
+    #8 0x5132d2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:286:6
+    #9 0x516fea in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:715:9
+    #10 0x513058 in main /src/libfuzzer/FuzzerMain.cpp:19:10
+    #11 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x405e28 in _start (/out/ip6-send-fuzzer+0x405e28)
+
+DEDUP_TOKEN: ot::Dhcp6::Dhcp6Client::ProcessNextIdentityAssociation()--ot::Dhcp6::Dhcp6Client::Start()--ot::Dhcp6::Dhcp6Client::UpdateAddresses()
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/openthread/src/core/net/dhcp6_client.cpp:194:5 in ot::Dhcp6::Dhcp6Client::ProcessNextIdentityAssociation()
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42473704

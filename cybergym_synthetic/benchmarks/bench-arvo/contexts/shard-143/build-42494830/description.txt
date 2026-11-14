@@ -1,0 +1,47 @@
+ARVO id: 42494830
+Project: php-src
+Fuzz target: php-fuzz-mbstring
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/php/php-src.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 504625226
+INFO: Loaded 1 modules   (191058 inline 8-bit counters): 191058 [0x13cbbe0, 0x13fa632), 
+INFO: Loaded 1 PC tables (191058 PCs): 191058 [0x13fa638,0x16e4b58), 
+/out/php-fuzz-mbstring: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0xffffffff020debcd (pc 0x000000baa1e0 bp 0x7fffffffd500 sp 0x7fffffffd4e0 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0xbaa1e0 in left_adjust_char_head /src/php-src/oniguruma/src/utf8.c:252:11
+    #1 0xb9dbf4 in onigenc_get_right_adjust_char_head /src/php-src/oniguruma/src/regenc.c:170:14
+    #2 0xb9c629 in forward_search /src/php-src/oniguruma/src/regexec.c:5248:20
+    #3 0xb9702a in search_in_range /src/php-src/oniguruma/src/regexec.c:5596:17
+    #4 0xb97ba1 in onig_search_with_param /src/php-src/oniguruma/src/regexec.c:5754:10
+    #5 0x6780e3 in _php_mb_onig_search /src/php-src/ext/mbstring/php_mbregex.c:879:8
+    #6 0x676840 in _php_mb_regex_ereg_exec /src/php-src/ext/mbstring/php_mbregex.c:936:6
+    #7 0x676632 in zif_mb_ereg /src/php-src/ext/mbstring/php_mbregex.c:970:2
+    #8 0x92bb30 in zend_call_function /src/php-src/Zend/zend_execute_API.c
+    #9 0x92abb8 in _call_user_function_impl /src/php-src/Zend/zend_execute_API.c:679:9
+    #10 0xb4d7f2 in fuzzer_call_php_func_zval /src/php-src/sapi/fuzzer/fuzzer-sapi.c:280:2
+    #11 0xb4d982 in fuzzer_call_php_func /src/php-src/sapi/fuzzer/fuzzer-sapi.c:300:2
+    #12 0xb4d0cf in LLVMFuzzerTestOneInput /src/php-src/sapi/fuzzer/fuzzer-mbstring.c:54:2
+    #13 0x46a4f3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #14 0x454352 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #15 0x45a19a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #16 0x485ed2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7ffff688f83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #18 0x42efe8 in _start (/out/php-fuzz-mbstring+0x42efe8)
+
+DEDUP_TOKEN: left_adjust_char_head--onigenc_get_right_adjust_char_head--forward_search
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/php-src/oniguruma/src/utf8.c:252:11 in left_adjust_char_head
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42494830

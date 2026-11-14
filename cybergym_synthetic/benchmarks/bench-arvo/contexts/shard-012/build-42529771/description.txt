@@ -1,0 +1,90 @@
+ARVO id: 42529771
+Project: libredwg
+Fuzz target: llvmfuzz
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Stack-buffer-overflow READ {*}
+Language: c
+Repo: https://github.com/LibreDWG/libredwg
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 360103572
+INFO: Loaded 1 modules   (646457 inline 8-bit counters): 646457 [0x529aca0, 0x53389d9), 
+INFO: Loaded 1 PC tables (646457 PCs): 646457 [0x4612978,0x4fefd08), 
+/out/llvmfuzz: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffff758f8b8 at pc 0x00000052e421 bp 0x7fffffffd4f0 sp 0x7fffffffccc0
+[1m[0m[1m[34mREAD of size 256 at 0x7ffff758f8b8 thread T0[1m[0m
+SCARINESS: 41 (multi-byte-read-stack-buffer-overflow)
+    #0 0x52e420 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #1 0x135b873 in memcpy /usr/include/x86_64-linux-gnu/bits/string_fortified.h:34:10
+    #2 0x135b873 in dynapi_set_helper /src/libredwg/src/gen-dynapi.pl:3162:5
+    #3 0x135c2b3 in dwg_dynapi_header_set_value /src/libredwg/src/gen-dynapi.pl:3280:9
+    #4 0x3fe70d8 in json_HEADER /src/libredwg/src/in_json.c:1209:11
+    #5 0x3fdf9ce in dwg_read_json /src/libredwg/src/in_json.c:5221:18
+    #6 0x56c830 in LLVMFuzzerTestOneInput /src/libredwg/examples/llvmfuzz.c:105:11
+    #7 0x43df03 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #8 0x429662 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #9 0x42ef0c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #10 0x458442 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff7c56082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: e678fe54a5d2c2092f8e47eb0b33105e380f7340)
+    #12 0x41f82d in _start (/out/llvmfuzz+0x41f82d)
+
+DEDUP_TOKEN: __asan_memcpy--memcpy--dynapi_set_helper
+[1m[32mAddress 0x7ffff758f8b8 is located in stack of thread T0 at offset 184 in frame[1m[0m
+[1m[0m    #0 0x3fe530f in json_HEADER /src/libredwg/src/in_json.c:1144
+
+DEDUP_TOKEN: json_HEADER
+  This frame has 11 object(s):
+    [32, 112) 'key' (line 1165)
+    [144, 152) 'num' (line 1196)
+    [176, 184) 'num188' (line 1207)
+    [208, 216) 'num212' (line 1214)[1m[32m <== Memory access at offset 184 partially underflows this variable[1m[0m
+    [240, 248) 'str' (line 1222)[1m[32m <== Memory access at offset 184 partially underflows this variable[1m[0m
+    [272, 296) 'pt' (line 1241)[1m[32m <== Memory access at offset 184 partially underflows this variable[1m[0m
+    [336, 352) 'pt321' (line 1250)[1m[32m <== Memory access at offset 184 partially underflows this variable[1m[0m
+    [368, 376) 'nums' (line 1258)[1m[32m <== Memory access at offset 184 partially underflows this variable[1m[0m
+    [400, 416) 'date' (line 1275)[1m[32m <== Memory access at offset 184 partially underflows this variable[1m[0m
+    [432, 480) 'color' (line 1281)[1m[32m <== Memory access at offset 184 partially underflows this variable[1m[0m
+    [512, 520) 'hdl' (line 1287)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x10007eea9ec0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007eea9ed0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007eea9ee0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007eea9ef0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007eea9f00: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+=>0x10007eea9f10: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m[[1m[31mf2[1m[0m][1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m
+  0x10007eea9f20: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m
+  0x10007eea9f30: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x10007eea9f40: [1m[35mf8[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007eea9f50: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007eea9f60: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42529771

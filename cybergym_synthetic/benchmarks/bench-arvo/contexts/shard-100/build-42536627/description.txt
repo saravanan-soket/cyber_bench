@@ -1,0 +1,83 @@
+ARVO id: 42536627
+Project: libheif
+Fuzz target: file_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/strukturag/libheif.git
+
+=== Crash report ===
+Reading 619 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x502000000754 at pc 0x555555758298 bp 0x7fffffffd5d0 sp 0x7fffffffd5c8
+[1m[0m[1m[34mREAD of size 1 at 0x502000000754 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x555555758297 in BitReader::refill() /src/libheif/libheif/bitstream.cc:492:23
+    #1 0x555555758297 in BitReader::BitReader(unsigned char const*, int) /src/libheif/libheif/bitstream.cc:362:3
+    #2 0x555555910b8c in decode_hevc_aux_sei_messages(std::__1::vector<unsigned char, std::__1::allocator<unsigned char>> const&, std::__1::vector<std::__1::shared_ptr<SEIMessage>, std::__1::allocator<std::__1::shared_ptr<SEIMessage>>>&) /src/libheif/libheif/codecs/hevc.cc:438:15
+    #3 0x555555808c12 in HeifContext::interpret_heif_file() /src/libheif/libheif/context.cc:795:21
+    #4 0x55555581a95d in HeifContext::read_from_memory(void const*, unsigned long, bool) /src/libheif/libheif/context.cc:447:10
+    #5 0x55555569c4f9 in heif_context_read_from_memory /src/libheif/libheif/api/libheif/heif.cc:500:29
+    #6 0x555555693cc1 in LLVMFuzzerTestOneInput /src/libheif/fuzzing/file_fuzzer.cc:100:9
+    #7 0x555555693a79 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+    #8 0x555555693875 in LLVMFuzzerRunDriver /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #9 0x55555569342d in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:311:10
+    #10 0x7ffff7c38082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #11 0x5555555b8ebd in _start (/out/file_fuzzer+0x64ebd)
+
+DEDUP_TOKEN: BitReader::refill()--BitReader::BitReader(unsigned char const*, int)--decode_hevc_aux_sei_messages(std::__1::vector<unsigned char, std::__1::allocator<unsigned char>> const&, std::__1::vector<std::__1::shared_ptr<SEIMessage>, std::__1::allocator<std::__1::shared_ptr<SEIMessage>>>&)
+[1m[32m0x502000000754 is located 3 bytes after 1-byte region [0x502000000750,0x502000000751)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x55555569101d in operator new(unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:95:3
+    #1 0x5555556d16e5 in void* std::__1::__libcpp_operator_new[abi:v180000]<unsigned long>(unsigned long) /usr/local/bin/../include/c++/v1/new:268:10
+    #2 0x5555556d16e5 in std::__1::__libcpp_allocate[abi:v180000](unsigned long, unsigned long) /usr/local/bin/../include/c++/v1/new:294:10
+    #3 0x5555556d16e5 in std::__1::allocator<unsigned char>::allocate[abi:v180000](unsigned long) /usr/local/bin/../include/c++/v1/__memory/allocator.h:114:38
+    #4 0x5555556d16e5 in std::__1::__allocation_result<std::__1::allocator_traits<std::__1::allocator<unsigned char>>::pointer> std::__1::__allocate_at_least[abi:v180000]<std::__1::allocator<unsigned char>>(std::__1::allocator<unsigned char>&, unsigned long) /usr/local/bin/../include/c++/v1/__memory/allocate_at_least.h:55:19
+    #5 0x5555556d16e5 in std::__1::vector<unsigned char, std::__1::allocator<unsigned char>>::__vallocate[abi:v180000](unsigned long) /usr/local/bin/../include/c++/v1/vector:756:29
+    #6 0x5555556d16e5 in void std::__1::vector<unsigned char, std::__1::allocator<unsigned char>>::__init_with_size[abi:v180000]<unsigned char*, unsigned char*>(unsigned char*, unsigned char*, unsigned long) /usr/local/bin/../include/c++/v1/vector:775:9
+    #7 0x555555808bc9 in std::__1::vector<unsigned char, std::__1::allocator<unsigned char>>::vector(std::__1::vector<unsigned char, std::__1::allocator<unsigned char>> const&) /usr/local/bin/../include/c++/v1/vector:1279:3
+    #8 0x555555808bc9 in HeifContext::interpret_heif_file() /src/libheif/libheif/context.cc:792:31
+    #9 0x55555581a95d in HeifContext::read_from_memory(void const*, unsigned long, bool) /src/libheif/libheif/context.cc:447:10
+    #10 0x55555569c4f9 in heif_context_read_from_memory /src/libheif/libheif/api/libheif/heif.cc:500:29
+    #11 0x555555693cc1 in LLVMFuzzerTestOneInput /src/libheif/fuzzing/file_fuzzer.cc:100:9
+    #12 0x555555693a79 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+
+DEDUP_TOKEN: operator new(unsigned long)--void* std::__1::__libcpp_operator_new[abi:v180000]<unsigned long>(unsigned long)--std::__1::__libcpp_allocate[abi:v180000](unsigned long, unsigned long)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/libheif/libheif/bitstream.cc:492:23 in BitReader::refill()
+Shadow bytes around the buggy address:
+  0x502000000480: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x502000000500: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x502000000580: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x502000000600: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x502000000680: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+=>0x502000000700: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[0m01[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x502000000780: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x502000000800: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x502000000880: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x502000000900: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x502000000980: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42536627

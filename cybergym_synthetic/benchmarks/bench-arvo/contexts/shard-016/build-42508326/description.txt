@@ -1,0 +1,124 @@
+ARVO id: 42508326
+Project: curl
+Fuzz target: curl_fuzzer_http
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-use-after-free READ 4
+Language: c++
+Repo: https://github.com/curl/curl.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3313323483
+INFO: Loaded 1 modules   (68558 inline 8-bit counters): 68558 [0x8a716d0, 0x8a8229e), 
+INFO: Loaded 1 PC tables (68558 PCs): 68558 [0x8a822a0,0x8b08110), 
+/out/curl_fuzzer_http: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-use-after-free on address 0xe69016e4 at pc 0x081445f3 bp 0xffc68b18 sp 0xffc686e8
+[1m[0m[1m[34mREAD of size 4 at 0xe69016e4 thread T0[1m[0m
+SCARINESS: 45 (4-byte-read-heap-use-after-free)
+    #0 0x81445f2 in MemcmpInterceptorCommon(void*, int (*)(void const*, void const*, unsigned int), void const*, void const*, unsigned int) /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:861:7
+    #1 0x81449c1 in memcmp /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:892:10
+    #2 0x83deaa2 in nghttp2_http_record_request_method /src/nghttp2/lib/nghttp2_http.c:524:9
+    #3 0x839ef6e in session_prep_frame /src/nghttp2/lib/nghttp2_session.c:2108:9
+    #4 0x839ef6e in nghttp2_session_mem_send_internal /src/nghttp2/lib/nghttp2_session.c:2921:12
+    #5 0x83a58ea in nghttp2_session_send /src/nghttp2/lib/nghttp2_session.c:3243:15
+    #6 0x8202863 in h2_session_send /src/curl/lib/http2.c:1612:10
+    #7 0x8201ffe in h2_process_pending_input /src/curl/lib/http2.c:1411:8
+    #8 0x8204995 in http2_recv /src/curl/lib/http2.c:1788:8
+    #9 0x8248fff in Curl_read /src/curl/lib/sendf.c:696:11
+    #10 0x8265452 in readwrite_data /src/curl/lib/transfer.c:562:16
+    #11 0x8265452 in Curl_readwrite /src/curl/lib/transfer.c:1182:14
+    #12 0x8232729 in multi_runsingle /src/curl/lib/multi.c:2359:16
+    #13 0x822efc7 in curl_multi_perform /src/curl/lib/multi.c:2637:14
+    #14 0x81ec842 in fuzz_handle_transfer(fuzz_data*) /src/curl_fuzzer/curl_fuzzer.cc:383:5
+    #15 0x81eb596 in LLVMFuzzerTestOneInput /src/curl_fuzzer/curl_fuzzer.cc:93:3
+    #16 0x80d5b6e in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #17 0x80c0f9e in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #18 0x80c6b40 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #19 0x80efe37 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #20 0xe7d75ee4 in __libc_start_main (/lib32/libc.so.6+0x1eee4)
+    #21 0x809eb55 in _start (/out/curl_fuzzer_http+0x809eb55)
+
+DEDUP_TOKEN: MemcmpInterceptorCommon(void*, int (*)(void const*, void const*, unsigned int), void const*, void const*, unsigned int)--memcmp--nghttp2_http_record_request_method
+[1m[32m0xe69016e4 is located 4 bytes inside of 76-byte region [0xe69016e0,0xe690172c)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x81ac766 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:111:3
+    #1 0x820fa20 in curl_dbg_free /src/curl/lib/memdebug.c:292:5
+    #2 0x82cd95f in Curl_dyn_free /src/curl/lib/dynbuf.c:58:3
+    #3 0x8307582 in Curl_buffer_send /src/curl/lib/http.c:1398:3
+    #4 0x830ce64 in Curl_http_bodysend /src/curl/lib/http.c:2681:14
+    #5 0x83006bc in Curl_http /src/curl/lib/http.c:3238:14
+    #6 0x82320cf in multi_do /src/curl/lib/multi.c:1560:14
+    #7 0x82320cf in multi_runsingle /src/curl/lib/multi.c:2109:18
+    #8 0x822efc7 in curl_multi_perform /src/curl/lib/multi.c:2637:14
+    #9 0x81ec20f in fuzz_handle_transfer(fuzz_data*) /src/curl_fuzzer/curl_fuzzer.cc:305:3
+    #10 0x81eb596 in LLVMFuzzerTestOneInput /src/curl_fuzzer/curl_fuzzer.cc:93:3
+    #11 0x80d5b6e in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #12 0x80c0f9e in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #13 0x80c6b40 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #14 0x80efe37 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0xe7d75ee4 in __libc_start_main (/lib32/libc.so.6+0x1eee4)
+
+DEDUP_TOKEN: free--curl_dbg_free--Curl_dyn_free
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x81accd3 in __interceptor_realloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:148:3
+    #1 0x820f899 in curl_dbg_realloc /src/curl/lib/memdebug.c:260:9
+    #2 0x82ce083 in dyn_nappend /src/curl/lib/dynbuf.c:98:15
+    #3 0x82cdd2a in Curl_dyn_addn /src/curl/lib/dynbuf.c:164:10
+    #4 0x822446e in alloc_addbyter /src/curl/lib/mprintf.c:1046:6
+    #5 0x8221ce5 in dprintf_formatf /src/curl/lib/mprintf.c:845:11
+    #6 0x8224256 in Curl_dyn_vprintf /src/curl/lib/mprintf.c:1064:13
+    #7 0x82cea91 in Curl_dyn_vaddf /src/curl/lib/dynbuf.c:189:8
+    #8 0x82cea91 in Curl_dyn_addf /src/curl/lib/dynbuf.c:219:12
+    #9 0x830039b in Curl_http /src/curl/lib/http.c:3155:5
+    #10 0x82320cf in multi_do /src/curl/lib/multi.c:1560:14
+    #11 0x82320cf in multi_runsingle /src/curl/lib/multi.c:2109:18
+    #12 0x822efc7 in curl_multi_perform /src/curl/lib/multi.c:2637:14
+    #13 0x81ec20f in fuzz_handle_transfer(fuzz_data*) /src/curl_fuzzer/curl_fuzzer.cc:305:3
+    #14 0x81eb596 in LLVMFuzzerTestOneInput /src/curl_fuzzer/curl_fuzzer.cc:93:3
+    #15 0x80d5b6e in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #16 0x80c0f9e in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #17 0x80c6b40 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #18 0x80efe37 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #19 0xe7d75ee4 in __libc_start_main (/lib32/libc.so.6+0x1eee4)
+
+DEDUP_TOKEN: __interceptor_realloc--curl_dbg_realloc--dyn_nappend
+SUMMARY: AddressSanitizer: heap-use-after-free /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:861:7 in MemcmpInterceptorCommon(void*, int (*)(void const*, void const*, unsigned int), void const*, void const*, unsigned int)
+Shadow bytes around the buggy address:
+  0x3cd20280: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3cd20290: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3cd202a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3cd202b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3cd202c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x3cd202d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[35mfd[1m[0m][1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x3cd202e0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x3cd202f0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x3cd20300: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x3cd20310: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m05[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3cd20320: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42508326

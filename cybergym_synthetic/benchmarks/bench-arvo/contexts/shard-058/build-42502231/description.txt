@@ -1,0 +1,40 @@
+ARVO id: 42502231
+Project: wolfmqtt
+Fuzz target: wolfmqtt-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: UNKNOWN WRITE
+Language: c
+Repo: https://github.com/wolfSSL/wolfMQTT.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2134022042
+INFO: Loaded 1 modules   (14497 inline 8-bit counters): 14497 [0xa6c550, 0xa6fdf1), 
+INFO: Loaded 1 PC tables (14497 PCs): 14497 [0x7c6f50,0x7ff960), 
+/out/wolfmqtt-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address 0x00010000000a (pc 0x000000550330 bp 0x7fffffffd6c0 sp 0x7fffffffd6c0 T7)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+    #0 0x550330 in MqttProps_Free /src/wolfmqtt/src/mqtt_packet.c:1811:20
+    #1 0x53d41e in MqttClient_PropsFree /src/wolfmqtt/src/mqtt_client.c:2116:12
+    #2 0x54022b in MqttClient_Unsubscribe /src/wolfmqtt/src/mqtt_client.c:1861:9
+    #3 0x52a8a4 in wolfMQTTFuzzer::unsubscribe() /src/wolfmqtt-fuzzers/fuzzer.cpp:277:9
+    #4 0x52cc1a in wolfMQTTFuzzer::Run() /src/wolfmqtt-fuzzers/fuzzer.cpp:452:21
+    #5 0x52d4a9 in LLVMFuzzerTestOneInput /src/wolfmqtt-fuzzers/fuzzer.cpp:513:12
+    #6 0x4584d3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #7 0x443c12 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #8 0x4498ee in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #9 0x4733d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #11 0x41ece8 in _start (/out/wolfmqtt-fuzzer+0x41ece8)
+
+DEDUP_TOKEN: MqttProps_Free--MqttClient_PropsFree--MqttClient_Unsubscribe
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV /src/wolfmqtt/src/mqtt_packet.c:1811:20 in MqttProps_Free
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42502231

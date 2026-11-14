@@ -1,0 +1,75 @@
+ARVO id: 42473291
+Project: imagemagick
+Fuzz target: encoder_heic_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 162325243
+INFO: Loaded 1 modules   (157505 inline 8-bit counters): 157505 [0x29e97e8, 0x2a0ff29), 
+INFO: Loaded 1 PC tables (157505 PCs): 157505 [0x2a0ff30,0x2c77340), 
+/out/encoder_heic_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x1673913 in decoded_picture_buffer::get_image(int) /src/libde265/libde265/../libde265/dpb.h:58:9
+    #1 0x166e569 in decoder_context::construct_reference_picture_lists(slice_segment_header*) /src/libde265/libde265/decctx.cc:1779:35
+    #2 0x1660917 in decoder_context::process_slice_segment_header(slice_segment_header*, de265_error*, long, nal_header*, void*) /src/libde265/libde265/decctx.cc:2087:22
+    #3 0x165e519 in decoder_context::read_slice_NAL(bitreader&, NAL_unit*, nal_header&) /src/libde265/libde265/decctx.cc:639:7
+    #4 0x16672cf in decoder_context::decode_NAL(NAL_unit*) /src/libde265/libde265/decctx.cc:1230:11
+    #5 0x1667cac in decoder_context::decode(int*) /src/libde265/libde265/decctx.cc:1318:16
+    #6 0x15cb564 in libde265_v1_decode_image(void*, heif_image**) /src/libheif/src/heif_decoder_libde265.cc:285:18
+    #7 0x15a0aff in heif::HeifContext::decode_image(unsigned int, std::__1::shared_ptr<heif::HeifPixelImage>&, heif_decoding_options const*) const /src/libheif/src/heif_context.cc:795:11
+    #8 0x159c192 in heif::HeifContext::Image::decode_image(std::__1::shared_ptr<heif::HeifPixelImage>&, heif_colorspace, heif_chroma, heif_decoding_options const*) const /src/libheif/src/heif_context.cc:731:31
+    #9 0x157dd43 in heif_decode_image /src/libheif/src/heif.cc:440:33
+    #10 0x108ced8 in ReadHEICImage /src/imagemagick/coders/heic.c:261:9
+    #11 0x7c9f79 in ReadImage /src/imagemagick/MagickCore/constitute.c:500:13
+    #12 0x6f4c9a in BlobToImage /src/imagemagick/MagickCore/blob.c:469:13
+    #13 0x58a671 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4029:12
+    #14 0x4a217c in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #15 0x4ea423 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:517:13
+    #16 0x4a3646 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #17 0x4b5ba2 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #18 0x4a2781 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #19 0x7fdc235c882f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #20 0x422148 in _start (/out/encoder_heic_fuzzer+0x422148)
+
+DEDUP_TOKEN: decoded_picture_buffer::get_image(int)--decoder_context::construct_reference_picture_lists(slice_segment_header*)--decoder_context::process_slice_segment_header(slice_segment_header*, de265_error*, long, nal_header*, void*)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x166e69e in decoder_context::construct_reference_picture_lists(slice_segment_header*) /src/libde265/libde265/decctx.cc:1775:30
+    #1 0x1660917 in decoder_context::process_slice_segment_header(slice_segment_header*, de265_error*, long, nal_header*, void*) /src/libde265/libde265/decctx.cc:2087:22
+    #2 0x165e519 in decoder_context::read_slice_NAL(bitreader&, NAL_unit*, nal_header&) /src/libde265/libde265/decctx.cc:639:7
+    #3 0x16672cf in decoder_context::decode_NAL(NAL_unit*) /src/libde265/libde265/decctx.cc:1230:11
+    #4 0x1667cac in decoder_context::decode(int*) /src/libde265/libde265/decctx.cc:1318:16
+    #5 0x15cb564 in libde265_v1_decode_image(void*, heif_image**) /src/libheif/src/heif_decoder_libde265.cc:285:18
+    #6 0x15a0aff in heif::HeifContext::decode_image(unsigned int, std::__1::shared_ptr<heif::HeifPixelImage>&, heif_decoding_options const*) const /src/libheif/src/heif_context.cc:795:11
+    #7 0x159c192 in heif::HeifContext::Image::decode_image(std::__1::shared_ptr<heif::HeifPixelImage>&, heif_colorspace, heif_chroma, heif_decoding_options const*) const /src/libheif/src/heif_context.cc:731:31
+    #8 0x157dd43 in heif_decode_image /src/libheif/src/heif.cc:440:33
+    #9 0x108ced8 in ReadHEICImage /src/imagemagick/coders/heic.c:261:9
+    #10 0x7c9f79 in ReadImage /src/imagemagick/MagickCore/constitute.c:500:13
+    #11 0x6f4c9a in BlobToImage /src/imagemagick/MagickCore/blob.c:469:13
+    #12 0x58a671 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4029:12
+    #13 0x4a217c in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #14 0x4ea423 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:517:13
+    #15 0x4a3646 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #16 0x4b5ba2 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #17 0x4a2781 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #18 0x7fdc235c882f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: decoder_context::construct_reference_picture_lists(slice_segment_header*)--decoder_context::process_slice_segment_header(slice_segment_header*, de265_error*, long, nal_header*, void*)--decoder_context::read_slice_NAL(bitreader&, NAL_unit*, nal_header&)
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mRefPicListTemp0[1m[35m' in the stack frame of function '[1m[32m_ZN15decoder_context33construct_reference_picture_listsEP20slice_segment_header[1m[35m'[1m[0m
+    #0 0x166d530 in decoder_context::construct_reference_picture_lists(slice_segment_header*) /src/libde265/libde265/decctx.cc:1726
+
+DEDUP_TOKEN: decoder_context::construct_reference_picture_lists(slice_segment_header*)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/libde265/libde265/../libde265/dpb.h:58:9 in decoded_picture_buffer::get_image(int)
+Unique heap origins: 918
+Stack depot allocated bytes: 131064
+Unique origin histories: 73
+History depot allocated bytes: 1752
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42473291

@@ -1,0 +1,105 @@
+ARVO id: 42519331
+Project: assimp
+Fuzz target: assimp_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 3
+Language: c++
+Repo: https://github.com/assimp/assimp.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2772768101
+INFO: Loaded 1 modules   (206124 inline 8-bit counters): 206124 [0x1c72ec0, 0x1ca53ec), 
+INFO: Loaded 1 PC tables (206124 PCs): 206124 [0x1ca53f0,0x1fca6b0), 
+/out/assimp_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Info,  T0: Load $$$___magic___$$$.
+Info,  T0: File extension not known, trying signature-based detection
+Info,  T0: Found a matching importer for this file format: Wavefront Object Importer.
+Info,  T0: Import root directory is './'
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6020000001c0 at pc 0x0000004d94d6 bp 0x7ffda3031790 sp 0x7ffda3030f48
+[1m[0m[1m[34mREAD of size 3 at 0x6020000001c0 thread T0[1m[0m
+SCARINESS: 15 (3-byte-read-heap-buffer-overflow)
+    #0 0x4d94d5 in StrtolFixAndCheck(void*, char const*, char**, char*, int) /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:3440:3
+    #1 0x511bb2 in __interceptor_strtol /src/llvm-project/compiler-rt/lib/asan/asan_interceptors.cpp:484:3
+    #2 0xa1c685 in atoi /usr/include/stdlib.h:363:16
+    #3 0xa1c685 in Assimp::ObjFileParser::getFace(aiPrimitiveType) /src/assimp/code/AssetLib/Obj/ObjFileParser.cpp:463:30
+    #4 0xa155cb in Assimp::ObjFileParser::parseFile(Assimp::IOStreamBuffer<char>&) /src/assimp/code/AssetLib/Obj/ObjFileParser.cpp:180:13
+    #5 0xa1381c in Assimp::ObjFileParser::ObjFileParser(Assimp::IOStreamBuffer<char>&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, Assimp::IOSystem*, Assimp::ProgressHandler*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/assimp/code/AssetLib/Obj/ObjFileParser.cpp:97:5
+    #6 0xa0a49d in Assimp::ObjFileImporter::InternReadFile(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, aiScene*, Assimp::IOSystem*) /src/assimp/code/AssetLib/Obj/ObjFileImporter.cpp:141:19
+    #7 0x157d894 in Assimp::BaseImporter::ReadFile(Assimp::Importer*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, Assimp::IOSystem*) /src/assimp/code/Common/BaseImporter.cpp:112:9
+    #8 0x5b2bf1 in Assimp::Importer::ReadFile(char const*, unsigned int) /src/assimp/code/Common/Importer.cpp:717:30
+    #9 0x5afd30 in Assimp::Importer::ReadFileFromMemory(void const*, unsigned long, unsigned int, char const*) /src/assimp/code/Common/Importer.cpp:512:5
+    #10 0x55fb42 in LLVMFuzzerTestOneInput /src/assimp/fuzz/assimp_fuzzer.cc:53:34
+    #11 0x457d53 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #12 0x4439e2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #13 0x44922c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #14 0x471e22 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0x7f2e61426082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #16 0x42220d in _start (/out/assimp_fuzzer+0x42220d)
+
+DEDUP_TOKEN: StrtolFixAndCheck(void*, char const*, char**, char*, int)--__interceptor_strtol--atoi
+[1m[32m0x6020000001c0 is located 0 bytes to the right of 16-byte region [0x6020000001b0,0x6020000001c0)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x55d41d in operator new(unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:95:3
+    #1 0x601100 in __libcpp_operator_new<unsigned long> /usr/local/bin/../include/c++/v1/new:245:10
+    #2 0x601100 in __libcpp_allocate /usr/local/bin/../include/c++/v1/new:271:10
+    #3 0x601100 in allocate /usr/local/bin/../include/c++/v1/__memory/allocator.h:105:38
+    #4 0x601100 in allocate /usr/local/bin/../include/c++/v1/__memory/allocator_traits.h:262:20
+    #5 0x601100 in __split_buffer /usr/local/bin/../include/c++/v1/__split_buffer:306:29
+    #6 0x601100 in std::__1::vector<char, std::__1::allocator<char> >::__append(unsigned long) /usr/local/bin/../include/c++/v1/vector:1100:53
+    #7 0xa17132 in resize /usr/local/bin/../include/c++/v1/vector:2033:15
+    #8 0xa17132 in Assimp::IOStreamBuffer<char>::getNextDataLine(std::__1::vector<char, std::__1::allocator<char> >&, char) /src/assimp/include/assimp/IOStreamBuffer.h:242:12
+    #9 0xa14bca in Assimp::ObjFileParser::parseFile(Assimp::IOStreamBuffer<char>&) /src/assimp/code/AssetLib/Obj/ObjFileParser.cpp:123:25
+    #10 0xa1381c in Assimp::ObjFileParser::ObjFileParser(Assimp::IOStreamBuffer<char>&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, Assimp::IOSystem*, Assimp::ProgressHandler*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/assimp/code/AssetLib/Obj/ObjFileParser.cpp:97:5
+    #11 0xa0a49d in Assimp::ObjFileImporter::InternReadFile(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, aiScene*, Assimp::IOSystem*) /src/assimp/code/AssetLib/Obj/ObjFileImporter.cpp:141:19
+    #12 0x157d894 in Assimp::BaseImporter::ReadFile(Assimp::Importer*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, Assimp::IOSystem*) /src/assimp/code/Common/BaseImporter.cpp:112:9
+    #13 0x5b2bf1 in Assimp::Importer::ReadFile(char const*, unsigned int) /src/assimp/code/Common/Importer.cpp:717:30
+    #14 0x5afd30 in Assimp::Importer::ReadFileFromMemory(void const*, unsigned long, unsigned int, char const*) /src/assimp/code/Common/Importer.cpp:512:5
+    #15 0x55fb42 in LLVMFuzzerTestOneInput /src/assimp/fuzz/assimp_fuzzer.cc:53:34
+    #16 0x457d53 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #17 0x4439e2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #18 0x44922c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #19 0x471e22 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #20 0x7f2e61426082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+
+DEDUP_TOKEN: operator new(unsigned long)--__libcpp_operator_new<unsigned long>--__libcpp_allocate
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:3440:3 in StrtolFixAndCheck(void*, char const*, char**, char*, int)
+Shadow bytes around the buggy address:
+  0x0c047fff7fe0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff7ff0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff8000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8010: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff8020: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+=>0x0c047fff8030: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8040: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8050: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8070: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8080: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42519331

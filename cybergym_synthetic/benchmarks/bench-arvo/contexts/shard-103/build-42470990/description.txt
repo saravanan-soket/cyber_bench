@@ -1,0 +1,46 @@
+ARVO id: 42470990
+Project: harfbuzz
+Fuzz target: hb-shape-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/harfbuzz/harfbuzz.git
+
+=== Crash report ===
+INFO: Seed: 1258874981
+INFO: Loaded 1 modules   (17282 inline 8-bit counters): 17282 [0x8538d0, 0x857c52), 
+INFO: Loaded 1 PC tables (17282 PCs): 17282 [0x857c58,0x89b478), 
+/out/hb-shape-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x0000327f49f5 (pc 0x0000004c7857 bp 0x7fffffffc830 sp 0x7fffffffc6f8 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x4c7856 in BEInt<int, 4>::operator int() const /src/harfbuzz/src/./hb-machinery.hh:710
+    #1 0x4dcb33 in hb_kern_machine_t<AAT::KerxSubTableFormat6::accelerator_t>::kern(hb_font_t*, hb_buffer_t*, unsigned int) const /src/harfbuzz/src/./hb-ot-kern-table.hh:73:35
+    #2 0x4dc9a9 in AAT::KerxSubTableFormat6::apply(AAT::hb_aat_apply_context_t*) const /src/harfbuzz/src/./hb-aat-layout-kerx-table.hh:272:13
+    #3 0x4db79c in AAT::hb_aat_apply_context_t::return_t AAT::KerxTable::dispatch<AAT::hb_aat_apply_context_t>(AAT::hb_aat_apply_context_t*) const /src/harfbuzz/src/./hb-aat-layout-kerx-table.hh:363:15
+    #4 0x4cfcb4 in AAT::kerx::apply(AAT::hb_aat_apply_context_t*) const /src/harfbuzz/src/./hb-aat-layout-kerx-table.hh:434:14
+    #5 0x4cfac8 in hb_aat_layout_position(hb_ot_shape_plan_t*, hb_font_t*, hb_buffer_t*) /src/harfbuzz/src/hb-aat-layout.cc:107:8
+    #6 0x499df4 in hb_ot_position_complex(hb_ot_shape_context_t const*) /src/harfbuzz/src/hb-ot-shape.cc:838:5
+    #7 0x497a7f in hb_ot_position(hb_ot_shape_context_t const*) /src/harfbuzz/src/hb-ot-shape.cc:872:3
+    #8 0x4967f0 in hb_ot_shape_internal(hb_ot_shape_context_t*) /src/harfbuzz/src/hb-ot-shape.cc:953:3
+    #9 0x496647 in _hb_ot_shape /src/harfbuzz/src/hb-ot-shape.cc:980:3
+    #10 0x487111 in hb_shape_plan_execute /src/harfbuzz/src/./hb-shaper-list.hh:42:1
+    #11 0x48616a in hb_shape_full /src/harfbuzz/src/hb-shape.cc:141:19
+    #12 0x4311c3 in LLVMFuzzerTestOneInput /src/harfbuzz/./test/fuzzing/hb-shape-fuzzer.cc:20:5
+    #13 0x440de8 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:570:15
+    #14 0x43167d in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #15 0x4355ab in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #16 0x431368 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #17 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #18 0x4060a8 in _start (/out/hb-shape-fuzzer+0x4060a8)
+
+DEDUP_TOKEN: BEInt<int, 4>::operator int() const--hb_kern_machine_t<AAT::KerxSubTableFormat6::accelerator_t>::kern(hb_font_t*, hb_buffer_t*, unsigned int) const--AAT::KerxSubTableFormat6::apply(AAT::hb_aat_apply_context_t*) const
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/harfbuzz/src/./hb-machinery.hh:710 in BEInt<int, 4>::operator int() const
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42470990

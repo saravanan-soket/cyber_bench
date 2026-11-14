@@ -1,0 +1,39 @@
+ARVO id: 42539845
+Project: gdal
+Fuzz target: dxf_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 723623470
+INFO: Loaded 1 modules   (591711 inline 8-bit counters): 591711 [0x5551d30, 0x55e248f), 
+INFO: Loaded 1 PC tables (591711 PCs): 591711 [0x55e2490,0x5ee9a80), 
+/out/dxf_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0xfffffffffffffff0 (pc 0x00000058ee70 bp 0x7ffdcb965890 sp 0x7ffdcb965850 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x58ee6f in OGRSimpleCurve::getPoint(int, OGRPoint*) const /src/gdal/gdal/ogr/ogrlinestring.cpp:319:33
+    #1 0xce0301 in OGRDXFLayer::TranslateLEADER() /src/gdal/gdal/ogr/ogrsf_frmts/dxf/ogrdxf_leader.cpp:269:17
+    #2 0x990433 in OGRDXFLayer::GetNextUnfilteredFeature() /src/gdal/gdal/ogr/ogrsf_frmts/dxf/ogrdxflayer.cpp:3448:25
+    #3 0x9918ad in OGRDXFLayer::GetNextFeature() /src/gdal/gdal/ogr/ogrsf_frmts/dxf/ogrdxflayer.cpp:3511:33
+    #4 0x53f5bd in OGR_L_GetNextFeature /src/gdal/gdal/ogr/ogrsf_frmts/generic/ogrlayer.cpp:551:47
+    #5 0x439f1e in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/ogr_fuzzer.cpp:119:33
+    #6 0x44839c in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:517:13
+    #7 0x43a3ec in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #8 0x43df64 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #9 0x43a0f8 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #10 0x7fb541bea82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #11 0x412a58 in _start (/out/dxf_fuzzer+0x412a58)
+
+DEDUP_TOKEN: OGRSimpleCurve::getPoint(int, OGRPoint*) const--OGRDXFLayer::TranslateLEADER()--OGRDXFLayer::GetNextUnfilteredFeature()
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/gdal/gdal/ogr/ogrlinestring.cpp:319:33 in OGRSimpleCurve::getPoint(int, OGRPoint*) const
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42539845

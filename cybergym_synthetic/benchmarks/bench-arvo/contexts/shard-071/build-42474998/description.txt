@@ -1,0 +1,88 @@
+ARVO id: 42474998
+Project: gdal
+Fuzz target: ogr_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 4
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 3453024336
+INFO: Loaded 1 modules (288011 guards): [0x3134cd0, 0x324e0fc), 
+/out/ogr_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x60300000b09c at pc 0x000001a16ddb bp 0x7ffe6b8d3fc0 sp 0x7ffe6b8d3fb8
+[1m[0m[1m[34mREAD of size 4 at 0x60300000b09c thread T0[1m[0m
+SCARINESS: 17 (4-byte-read-heap-buffer-overflow)
+    #0 0x1a16dda in OGRPDS::OGRPDSLayer::GetNextRawFeature() /src/gdal/gdal/ogr/ogrsf_frmts/pds/ogrpdslayer.cpp:481:33
+    #1 0x1a14b97 in OGRPDS::OGRPDSLayer::GetNextFeature() /src/gdal/gdal/ogr/ogrsf_frmts/pds/ogrpdslayer.cpp:447:33
+    #2 0x5e2b42 in OGR_L_GetNextFeature /src/gdal/gdal/ogr/ogrsf_frmts/generic/ogrlayer.cpp:549:48
+    #3 0x51f78f in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/ogr_fuzzer.cpp:53:32
+    #4 0x548bd9 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:458:13
+    #5 0x54940a in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:397:3
+    #6 0x520336 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #7 0x52b89c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #8 0x51f948 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #9 0x7fb4cb81d82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #10 0x423f28 in _start (/out/ogr_fuzzer+0x423f28)
+
+DEDUP_TOKEN: OGRPDS::OGRPDSLayer::GetNextRawFeature()--OGRPDS::OGRPDSLayer::GetNextFeature()--OGR_L_GetNextFeature
+[1m[32m0x60300000b09c is located 8 bytes to the right of 20-byte region [0x60300000b080,0x60300000b094)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4e35b8 in __interceptor_malloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:66
+    #1 0xe30f62 in CPLRealloc /src/gdal/gdal/port/cpl_conv.cpp:236:19
+    #2 0x1a1241d in OGRPDS::OGRPDSLayer::ReadStructure(CPLString) /src/gdal/gdal/ogr/ogrsf_frmts/pds/ogrpdslayer.cpp:183:25
+    #3 0x1a10d3a in OGRPDS::OGRPDSLayer::OGRPDSLayer(CPLString, char const*, _IO_FILE*, CPLString, CPLString, int, int, int, unsigned char*, bool) /src/gdal/gdal/ogr/ogrsf_frmts/pds/ogrpdslayer.cpp:73:9
+    #4 0x1a0eb8a in OGRPDSDataSource::LoadTable(char const*, int, CPLString) /src/gdal/gdal/ogr/ogrsf_frmts/pds/ogrpdsdatasource.cpp:260:31
+    #5 0x1a103ec in OGRPDSDataSource::Open(char const*) /src/gdal/gdal/ogr/ogrsf_frmts/pds/ogrpdsdatasource.cpp:355:17
+    #6 0x10c8b5b in OGRPDSDriverOpen(GDALOpenInfo*) /src/gdal/gdal/ogr/ogrsf_frmts/pds/ogrpdsdriver.cpp:54:16
+    #7 0xd5d9f8 in GDALOpenEx /src/gdal/gdal/gcore/gdaldataset.cpp:2817:20
+    #8 0x5f8a25 in OGROpen /src/gdal/gdal/ogr/ogrsf_frmts/generic/ogrsfdriverregistrar.cpp:113:24
+    #9 0x51f734 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/ogr_fuzzer.cpp:45:26
+    #10 0x548bd9 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:458:13
+    #11 0x54940a in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:397:3
+    #12 0x520336 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #13 0x52b89c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #14 0x51f948 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #15 0x7fb4cb81d82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: __interceptor_malloc--CPLRealloc--OGRPDS::OGRPDSLayer::ReadStructure(CPLString)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/gdal/gdal/ogr/ogrsf_frmts/pds/ogrpdslayer.cpp:481:33 in OGRPDS::OGRPDSLayer::GetNextRawFeature()
+Shadow bytes around the buggy address:
+  0x0c067fff95c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c067fff95d0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff95e0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c067fff95f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c067fff9600: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x0c067fff9610: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff9620: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c067fff9630: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff9640: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c067fff9650: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c067fff9660: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42474998

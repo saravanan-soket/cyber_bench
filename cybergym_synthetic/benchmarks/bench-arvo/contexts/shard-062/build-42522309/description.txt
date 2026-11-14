@@ -1,0 +1,39 @@
+ARVO id: 42522309
+Project: libraw
+Fuzz target: libraw_nef_fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/libraw/libraw
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/libraw_nef_fuzzer[0m
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==8==ERROR: AddressSanitizer: SEGV on unknown address 0x7f1de2cfa7fd (pc 0x0000004ffded bp 0x7ffd7b5e89f0 sp 0x7ffd7b5e89d0 T0)
+[1m[0m==8==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x4ffded in libraw_sget4_static(short, unsigned char*) /src/libraw/src/utils/read_utils.cpp
+    #1 0x4ffd89 in LibRaw::sget4(unsigned char*) /src/libraw/src/utils/read_utils.cpp:54:12
+    #2 0x649f86 in LibRaw::parseAdobeRAFMakernote() /src/libraw/src/metadata/fuji.cpp:191:19
+    #3 0x61d515 in LibRaw::parse_tiff_ifd(int) /src/libraw/src/metadata/tiff.cpp:1335:17
+    #4 0x61d40b in LibRaw::parse_tiff_ifd(int) /src/libraw/src/metadata/tiff.cpp
+    #5 0x6235cc in LibRaw::parse_tiff(int) /src/libraw/src/metadata/tiff.cpp:1495:9
+    #6 0x5c3c4f in LibRaw::identify() /src/libraw/src/metadata/identify.cpp:503:14
+    #7 0x4f8222 in LibRaw::open_datastream(LibRaw_abstract_datastream*) /src/libraw/src/utils/open.cpp:464:4
+    #8 0x4f730f in LibRaw::open_buffer(void const*, unsigned long) /src/libraw/src/utils/open.cpp:227:13
+    #9 0x4cc08d in LLVMFuzzerTestOneInput /src/libraw_fuzzer.cc:41:24
+    #10 0x4cc88b in main (/out/libraw_nef_fuzzer+0x4cc88b)
+    #11 0x7f1ce5f8c83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #12 0x41d3b8 in _start (/out/libraw_nef_fuzzer+0x41d3b8)
+
+DEDUP_TOKEN: libraw_sget4_static(short, unsigned char*)--LibRaw::sget4(unsigned char*)--LibRaw::parseAdobeRAFMakernote()
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/libraw/src/utils/read_utils.cpp in libraw_sget4_static(short, unsigned char*)
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42522309

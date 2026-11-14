@@ -1,0 +1,45 @@
+ARVO id: 42519749
+Project: imagemagick
+Fuzz target: encoder_six_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/encoder_six_fuzzer < INPUT_FILE
+or
+  /out/encoder_six_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/encoder_six_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 15 bytes from /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x7fff79c59890 (pc 0x000000990e30 bp 0x7fffffffdd50 sp 0x7fffffffdbe0 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x990e2f in sixel_decode /src/imagemagick/coders/sixel.c:462:73
+    #1 0x992d71 in ReadSIXELImage /src/imagemagick/coders/sixel.c:1028:7
+    #2 0x62c107 in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #3 0x5cddcf in BlobToImage /src/imagemagick/MagickCore/blob.c:466:13
+    #4 0x526d84 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4008:12
+    #5 0x51d3ea in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:20:11
+    #6 0x51dbcf in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:279:5
+    #7 0x51e16f in main /src/libfuzzer/afl/afl_driver.cpp:316:12
+    #8 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #9 0x41d618 in _start (/out/encoder_six_fuzzer+0x41d618)
+
+DEDUP_TOKEN: sixel_decode--ReadSIXELImage--ReadImage
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/imagemagick/coders/sixel.c:462:73 in sixel_decode
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42519749

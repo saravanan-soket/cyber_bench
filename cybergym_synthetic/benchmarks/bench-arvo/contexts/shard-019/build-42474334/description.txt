@@ -1,0 +1,55 @@
+ARVO id: 42474334
+Project: radare2
+Fuzz target: ia_fuzz
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/radare/radare2
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/ia_fuzz < INPUT_FILE
+or
+  /out/ia_fuzz INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/ia_fuzz [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 3218 bytes from /tmp/poc
+3
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x61f10005087f (pc 0x0000008babfe bp 0x7ffecaf042b0 sp 0x7ffecaf04270 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x8babfd in r_uleb128 /src/radare2/libr/util/uleb128.c:23:7
+    #1 0xa9562d in parse_class /src/radare2/libr/../libr/bin/p/bin_dex.c:1552:7
+    #2 0xa94375 in dex_loadcode /src/radare2/libr/../libr/bin/p/bin_dex.c:1673:4
+    #3 0xa90a35 in entries /src/radare2/libr/../libr/bin/p/bin_dex.c:1811:3
+    #4 0xbb11c7 in r_bin_object_set_items /src/radare2/libr/bin/obj.c:338:16
+    #5 0xbb0b0f in r_bin_object_new /src/radare2/libr/bin/obj.c:239:2
+    #6 0xa6a568 in r_bin_file_new_from_bytes /src/radare2/libr/bin/bfile.c:467:18
+    #7 0xa71428 in r_bin_open_io /src/radare2/libr/bin/bin.c:417:13
+    #8 0x5f241f in cmd_open_bin /src/radare2/libr/core/./cmd_open.c:302:6
+    #9 0x54174c in cmd_open /src/radare2/libr/core/./cmd_open.c:1358:3
+    #10 0x61b857 in r_cmd_call /src/radare2/libr/core/cmd_api.c:246:10
+    #11 0x5697ca in r_core_cmd_subst_i /src/radare2/libr/core/cmd.c:3035:12
+    #12 0x51530d in r_core_cmd_subst /src/radare2/libr/core/cmd.c:2021:9
+    #13 0x50eb4d in r_core_cmd /src/radare2/libr/core/cmd.c:3769:9
+    #14 0x4f5ad5 in LLVMFuzzerTestOneInput /src/radare2/targets/ia_fuzz.cc:13:2
+    #15 0x1014cca in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:156:5
+    #16 0x1014f31 in main /src/libfuzzer/afl/afl_driver.cpp:193:12
+    #17 0x7fdb321a482f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #18 0x41efa8 in _start (/out/ia_fuzz+0x41efa8)
+
+DEDUP_TOKEN: r_uleb128--parse_class--dex_loadcode
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/radare2/libr/util/uleb128.c:23:7 in r_uleb128
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42474334

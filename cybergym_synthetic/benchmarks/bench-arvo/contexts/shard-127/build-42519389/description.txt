@@ -1,0 +1,72 @@
+ARVO id: 42519389
+Project: serenity
+Fuzz target: FuzzICOLoader
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/SerenityOS/serenity
+
+=== Crash report ===
+Reading 26 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: use-after-poison on address 0x7ffff5cfd81a at pc 0x000000574020 bp 0x7fffffffda50 sp 0x7fffffffda48
+[1m[0m[1m[34mREAD of size 1 at 0x7ffff5cfd81a thread T0[1m[0m
+SCARINESS: 22 (1-byte-read-use-after-poison)
+    #0 0x57401f in Gfx::InputStreamer::read_u8() /src/serenity/Userland/Libraries/LibGfx/BMPLoader.cpp:183:16
+    #1 0x57401f in Gfx::InputStreamer::read_u24() /src/serenity/Userland/Libraries/LibGfx/BMPLoader.cpp:193:16
+    #2 0x57401f in Gfx::decode_bmp_color_table(Gfx::BMPLoadingContext&) /src/serenity/Userland/Libraries/LibGfx/BMPLoader.cpp:913:49
+    #3 0x57401f in Gfx::decode_bmp_pixel_data(Gfx::BMPLoadingContext&) /src/serenity/Userland/Libraries/LibGfx/BMPLoader.cpp:1171:74
+    #4 0x57401f in Gfx::BMPImageDecoderPlugin::frame(unsigned long) /src/serenity/Userland/Libraries/LibGfx/BMPLoader.cpp:1489:75
+    #5 0x502017 in Gfx::load_ico_bitmap(Gfx::ICOLoadingContext&, AK::Optional<unsigned long>) /src/serenity/Userland/Libraries/LibGfx/ICOLoader.cpp:164:50
+    #6 0x502017 in Gfx::ICOImageDecoderPlugin::frame(unsigned long) /src/serenity/Userland/Libraries/LibGfx/ICOLoader.cpp:248:24
+    #7 0x4ddd6a in LLVMFuzzerTestOneInput /src/serenity/Meta/Lagom/Fuzzers/FuzzICOLoader.cpp:14:19
+    #8 0x4ddc4a in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+    #9 0x4dda1c in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:318:12
+    #10 0x7ffff7c19082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #11 0x41edcd in _start (/out/FuzzICOLoader+0x41edcd)
+
+DEDUP_TOKEN: Gfx::InputStreamer::read_u8()--Gfx::InputStreamer::read_u24()--Gfx::decode_bmp_color_table(Gfx::BMPLoadingContext&)
+[1m[32m0x7ffff5cfd81a is located 26 bytes inside of 1048576-byte region [0x7ffff5cfd800,0x7ffff5dfd800)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4a0206 in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0x4ddb69 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:200:41
+
+DEDUP_TOKEN: __interceptor_malloc--ExecuteFilesOnyByOne
+SUMMARY: AddressSanitizer: use-after-poison /src/serenity/Userland/Libraries/LibGfx/BMPLoader.cpp:183:16 in Gfx::InputStreamer::read_u8()
+Shadow bytes around the buggy address:
+  0x10007eb97ab0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007eb97ac0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007eb97ad0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007eb97ae0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007eb97af0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x10007eb97b00: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m02[1m[0m][1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x10007eb97b10: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x10007eb97b20: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x10007eb97b30: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x10007eb97b40: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x10007eb97b50: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42519389

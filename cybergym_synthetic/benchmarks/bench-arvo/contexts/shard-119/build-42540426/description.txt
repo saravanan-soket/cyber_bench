@@ -1,0 +1,129 @@
+ARVO id: 42540426
+Project: imagemagick
+Fuzz target: encoder_dng_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Stack-buffer-overflow WRITE 1
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 1589966956
+INFO: Loaded 1 modules   (137950 inline 8-bit counters): 137950 [0x1c842e0, 0x1ca5dbe), 
+INFO: Loaded 1 PC tables (137950 PCs): 137950 [0x1ca5dc0,0x1ec0ba0), 
+/out/encoder_dng_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7f02aa60242f at pc 0x00000129ae42 bp 0x7ffee4f77d40 sp 0x7ffee4f77d38
+[1m[0m[1m[34mWRITE of size 1 at 0x7f02aa60242f thread T0[1m[0m
+SCARINESS: 46 (1-byte-write-stack-buffer-overflow)
+    #0 0x129ae41 in stread(char*, unsigned long, LibRaw_abstract_datastream*) /src/libraw/internal/dcraw_common.cpp:122:16
+    #1 0x12b9446 in LibRaw::parse_makernote(int, int) /src/libraw/internal/dcraw_common.cpp:10745:9
+    #2 0x12dcf49 in LibRaw::parse_exif(int) /src/libraw/internal/dcraw_common.cpp:12088:9
+    #3 0x12cafa1 in LibRaw::parse_tiff_ifd(int) /src/libraw/internal/dcraw_common.cpp:13394:7
+    #4 0x12e3f56 in LibRaw::parse_tiff(int) /src/libraw/internal/dcraw_common.cpp:14198:9
+    #5 0x12f8211 in LibRaw::identify() /src/libraw/internal/dcraw_common.cpp:17853:14
+    #6 0x120e74c in LibRaw::open_datastream(LibRaw_abstract_datastream*) /src/libraw/src/libraw_cxx.cpp:2011:5
+    #7 0x120b6c6 in LibRaw::open_file(char const*, long long) /src/libraw/src/libraw_cxx.cpp:1049:13
+    #8 0x961ea4 in ReadDNGImage /src/imagemagick/coders/dng.c:301:13
+    #9 0x6cbad8 in ReadImage /src/imagemagick/MagickCore/constitute.c:500:13
+    #10 0x666a65 in BlobToImage /src/imagemagick/MagickCore/blob.c:491:9
+    #11 0x5b2852 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4015:12
+    #12 0x526a1e in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #13 0x550631 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:517:13
+    #14 0x5277da in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #15 0x53308b in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #16 0x526e7c in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #17 0x7f02a960982f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #18 0x41e868 in _start (/out/encoder_dng_fuzzer+0x41e868)
+
+DEDUP_TOKEN: stread(char*, unsigned long, LibRaw_abstract_datastream*)--LibRaw::parse_makernote(int, int)--LibRaw::parse_exif(int)
+[1m[32mAddress 0x7f02aa60242f is located in stack of thread T0 at offset 1071 in frame[1m[0m
+[1m[0m    #0 0x12b6b1f in LibRaw::parse_makernote(int, int) /src/libraw/internal/dcraw_common.cpp:10501
+
+DEDUP_TOKEN: LibRaw::parse_makernote(int, int)
+  This frame has 45 object(s):
+    [32, 36) 'tag' (line 10506)
+    [48, 52) 'type' (line 10506)
+    [64, 68) 'len' (line 10506)
+    [80, 84) 'save' (line 10506)
+    [96, 112) 'wb' (line 10507)
+    [128, 452) 'buf97' (line 10508)
+    [528, 538) 'buf' (line 10510)
+    [560, 604) 'SamsungKey' (line 10511)
+    [640, 648) 'table_buf_0x0116' (line 10527)
+    [672, 674) 'table_buf_0x0116_len' (line 10528)
+    [688, 696) 'table_buf_0x2010' (line 10529)
+    [720, 722) 'table_buf_0x2010_len' (line 10530)
+    [736, 744) 'table_buf_0x9050' (line 10531)
+    [768, 770) 'table_buf_0x9050_len' (line 10532)
+    [784, 792) 'table_buf_0x9400' (line 10533)
+    [816, 818) 'table_buf_0x9400_len' (line 10534)
+    [832, 840) 'table_buf_0x9402' (line 10535)
+    [864, 866) 'table_buf_0x9402_len' (line 10536)
+    [880, 888) 'table_buf_0x9403' (line 10537)
+    [912, 914) 'table_buf_0x9403_len' (line 10538)
+    [928, 936) 'table_buf_0x9406' (line 10539)
+    [960, 962) 'table_buf_0x9406_len' (line 10540)
+    [976, 984) 'table_buf_0x940c' (line 10541)
+    [1008, 1010) 'table_buf_0x940c_len' (line 10542)
+    [1024, 1032) 'table_buf_0x940e' (line 10543)
+    [1056, 1058) 'table_buf_0x940e_len' (line 10544)
+    [1072, 1136) 'FujiSerial' (line 10740)[1m[32m <== Memory access at offset 1071 underflows this variable[1m[0m
+    [1168, 1200) 'words' (line 10741)
+    [1232, 1234) 'yy' (line 10742)
+    [1248, 1251) 'mm' (line 10742)
+    [1264, 1267) 'dd' (line 10742)
+    [1280, 1296) 'ystr' (line 10742)
+    [1312, 1328) 'ynum' (line 10742)
+    [1344, 1348) 'c574' (line 10744)
+    [1360, 1424) 'tbuf' (line 10756)
+    [1456, 1520) 'tbuf711' (line 10782)
+    [1552, 1616) 'tbuf743' (line 10798)
+    [1648, 1649) 'uc' (line 11013)
+    [1664, 1665) 'sc' (line 11014)
+    [1680, 1688) 'sOlyID' (line 11036)
+    [1712, 1729) 'buffer' (line 11084)
+    [1776, 1785) 'buffer1743' (line 11135)
+    [1808, 1809) 'uc2001' (line 11234)
+    [1824, 1844) 'LensInfo' (line 11319)
+    [1888, 1889) 'cc' (line 11428)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/libraw/internal/dcraw_common.cpp:122:16 in stread(char*, unsigned long, LibRaw_abstract_datastream*)
+Shadow bytes around the buggy address:
+  0x0fe0d54b8430: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x0fe0d54b8440: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x0fe0d54b8450: [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x0fe0d54b8460: [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m
+  0x0fe0d54b8470: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m
+=>0x0fe0d54b8480: [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m[[1m[31mf2[1m[0m][1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x0fe0d54b8490: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m03[1m[0m [1m[31mf2[1m[0m [1m[0m03[1m[0m [1m[31mf2[1m[0m
+  0x0fe0d54b84a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x0fe0d54b84b0: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x0fe0d54b84c0: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m
+  0x0fe0d54b84d0: [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42540426

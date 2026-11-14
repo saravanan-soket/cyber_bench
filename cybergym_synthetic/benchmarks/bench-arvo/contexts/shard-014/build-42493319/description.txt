@@ -1,0 +1,50 @@
+ARVO id: 42493319
+Project: openthread
+Fuzz target: cli-uart-received-fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/openthread/openthread
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for afl++.
+To run the target function on individual input(s) execute this:
+  /out/cli-uart-received-fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] -- /out/cli-uart-received-fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 2210 bytes from /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x000000197d9d (pc 0x0000004ab4f0 bp 0x7fffffffd3b0 sp 0x7fffffffcb28 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x4ab4f0 in __sanitizer::internal_strlen(char const*) /src/llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_libc.cpp:167:10
+    #1 0x439c86 in printf_common(void*, char const*, __va_list_tag*) /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors_format.inc:551:18
+    #2 0x439fac in vsnprintf /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:1651:1
+    #3 0x4fec77 in ot::Cli::Interpreter::OutputFormatV(char const*, __va_list_tag*) /src/openthread/build/../src/cli/cli.cpp:4915:5
+    #4 0x4ec936 in ot::Cli::Interpreter::OutputLine(char const*, ...) /src/openthread/build/../src/cli/cli.cpp:4879:5
+    #5 0x52a776 in ot::Cli::SrpServer::ProcessDomain(unsigned char, char**) /src/openthread/build/../src/cli/cli_srp_server.cpp:75:22
+    #6 0x52c725 in ot::Cli::SrpServer::Process(unsigned char, char**) /src/openthread/build/../src/cli/cli_srp_server.cpp:59:13
+    #7 0x4e9c36 in ot::Cli::Interpreter::ProcessSrp(unsigned char, char**) /src/openthread/build/../src/cli/cli.cpp:3887:9
+    #8 0x4fb9fb in ot::Cli::Interpreter::ProcessLine(char*, unsigned short) /src/openthread/build/../src/cli/cli.cpp:4544:22
+    #9 0x4cf851 in ot::Cli::Uart::ProcessCommand() /src/openthread/build/../src/cli/cli_uart.cpp:230:9
+    #10 0x4ce1bf in ot::Cli::Uart::ReceiveTask(unsigned char const*, unsigned short) /src/openthread/build/../src/cli/cli_uart.cpp:147:29
+    #11 0x4cff38 in otPlatUartReceived /src/openthread/build/../src/cli/cli_uart.cpp:336:56
+    #12 0x4cae68 in LLVMFuzzerTestOneInput /src/openthread/build/../tests/fuzz/cli_uart_received.cpp:68:5
+    #13 0x8b4823 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:185:7
+    #14 0x8b4823 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:237:12
+    #15 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #16 0x41c1f8 in _start (/out/cli-uart-received-fuzzer+0x41c1f8)
+
+DEDUP_TOKEN: __sanitizer::internal_strlen(char const*)--printf_common(void*, char const*, __va_list_tag*)--vsnprintf
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_libc.cpp:167:10 in __sanitizer::internal_strlen(char const*)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42493319

@@ -1,0 +1,46 @@
+ARVO id: 42529829
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_FOURXM_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Seed: 1237880007
+INFO: Loaded 1 modules   (39204 inline 8-bit counters): 39204 [0xef1050, 0xefa974), 
+INFO: Loaded 1 PC tables (39204 PCs): 39204 [0xb500e8,0xbe9328), 
+/out/ffmpeg_AV_CODEC_ID_FOURXM_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x010000000084 (pc 0x0000004c3229 bp 0x010000000084 sp 0x7fffa7ceeaa0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x4c3228 in __asan::Allocator::Reallocate(void*, unsigned long, __sanitizer::BufferedStackTrace*) /src/llvm/projects/compiler-rt/lib/asan/asan_allocator.cc
+    #1 0x4c3135 in __asan::asan_realloc(void*, unsigned long, __sanitizer::BufferedStackTrace*) /src/llvm/projects/compiler-rt/lib/asan/asan_allocator.cc:904:34
+    #2 0x53941a in realloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:165:10
+    #3 0x9c223d in av_fast_realloc /src/ffmpeg/libavutil/mem.c:488:11
+    #4 0x56d174 in decode_frame /src/ffmpeg/libavcodec/4xm.c:889:22
+    #5 0x58b3c4 in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:433:15
+    #6 0x58b021 in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:629:15
+    #7 0x5805a1 in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:647:15
+    #8 0x5803b2 in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:705:15
+    #9 0x581880 in compat_decode /src/ffmpeg/libavcodec/decode.c:841:15
+    #10 0x56b43a in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:257:23
+    #11 0x4742d1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:553:15
+    #12 0x45f4d1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:286:6
+    #13 0x464eda in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:767:9
+    #14 0x48d382 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #15 0x7f820140c82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #16 0x41e7c8 in _start (/out/ffmpeg_AV_CODEC_ID_FOURXM_fuzzer+0x41e7c8)
+
+DEDUP_TOKEN: __asan::Allocator::Reallocate(void*, unsigned long, __sanitizer::BufferedStackTrace*)--__asan::asan_realloc(void*, unsigned long, __sanitizer::BufferedStackTrace*)--realloc
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/llvm/projects/compiler-rt/lib/asan/asan_allocator.cc in __asan::Allocator::Reallocate(void*, unsigned long, __sanitizer::BufferedStackTrace*)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42529829

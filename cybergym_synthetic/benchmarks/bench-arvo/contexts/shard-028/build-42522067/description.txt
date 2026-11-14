@@ -1,0 +1,68 @@
+ARVO id: 42522067
+Project: mruby
+Fuzz target: mruby_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/mruby/mruby
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3699618234
+INFO: Loaded 1 modules   (23965 inline 8-bit counters): 23965 [0x9e0336, 0x9e60d3), 
+INFO: Loaded 1 PC tables (23965 PCs): 23965 [0x91c088,0x979a58), 
+/out/mruby_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x639ac7 in mrb_type /src/mruby/include/mruby/boxing_word.h:222:10
+    #1 0x639ac7 in assign_class_name /src/mruby/src/variable.c:367:43
+    #2 0x639ac7 in mrb_obj_iv_set_force /src/mruby/src/variable.c:335:3
+    #3 0x648036 in mrb_obj_iv_set /src/mruby/src/variable.c:347:3
+    #4 0x648036 in mrb_vm_const_set /src/mruby/src/variable.c:857:3
+    #5 0x56019a in mrb_vm_exec /src/mruby/src/vm.c:1589:7
+    #6 0x55388a in mrb_vm_run /src/mruby/src/vm.c:1302:12
+    #7 0x54e1af in mrb_top_run /src/mruby/src/vm.c
+    #8 0x6ab733 in mrb_load_exec /src/mruby/mrbgems/mruby-compiler/core/parse.y:6914:7
+    #9 0x6ad65e in mrb_load_nstring_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6986:10
+    #10 0x6ada1f in mrb_load_string_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6998:10
+    #11 0x6ada1f in mrb_load_string /src/mruby/mrbgems/mruby-compiler/core/parse.y:7004:10
+    #12 0x535a05 in LLVMFuzzerTestOneInput /src/mruby/oss-fuzz/mruby_fuzzer.c:14:5
+    #13 0x43f063 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #14 0x42a7c2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #15 0x43006c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #16 0x4595a2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7fd33825d082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #18 0x42098d in _start (/out/mruby_fuzzer+0x42098d)
+
+DEDUP_TOKEN: mrb_type--assign_class_name--mrb_obj_iv_set_force
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x584c12 in mrb_vm_exec /src/mruby/src/vm.c:1830:24
+    #1 0x55388a in mrb_vm_run /src/mruby/src/vm.c:1302:12
+    #2 0x54e1af in mrb_top_run /src/mruby/src/vm.c
+    #3 0x6ab733 in mrb_load_exec /src/mruby/mrbgems/mruby-compiler/core/parse.y:6914:7
+    #4 0x6ad65e in mrb_load_nstring_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6986:10
+    #5 0x6ada1f in mrb_load_string_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6998:10
+    #6 0x6ada1f in mrb_load_string /src/mruby/mrbgems/mruby-compiler/core/parse.y:7004:10
+    #7 0x535a05 in LLVMFuzzerTestOneInput /src/mruby/oss-fuzz/mruby_fuzzer.c:14:5
+    #8 0x43f063 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #9 0x42a7c2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x43006c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #11 0x4595a2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7fd33825d082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+
+DEDUP_TOKEN: mrb_vm_exec--mrb_vm_run--mrb_top_run
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mretval[1m[35m' in the stack frame of function '[1m[32mmrb_struct_s_def[1m[35m'[1m[0m
+    #0 0x832b10 in mrb_struct_s_def /src/mruby/mrbgems/mruby-struct/src/struct.c:255
+
+DEDUP_TOKEN: mrb_struct_s_def
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/mruby/include/mruby/boxing_word.h:222:10 in mrb_type
+Unique heap origins: 877
+Stack depot allocated bytes: 9764880
+Unique origin histories: 110
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42522067

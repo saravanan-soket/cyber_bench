@@ -1,0 +1,104 @@
+ARVO id: 42475345
+Project: harfbuzz
+Fuzz target: hb-subset-fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 2
+Language: c++
+Repo: https://github.com/harfbuzz/harfbuzz.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/hb-subset-fuzzer < INPUT_FILE
+or
+  /out/hb-subset-fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/hb-subset-fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 68 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6040000000fa at pc 0x0000004ce94d bp 0x7fffbea92ed0 sp 0x7fffbea92ec8
+[1m[0m[1m[34mREAD of size 2 at 0x6040000000fa thread T0[1m[0m
+SCARINESS: 14 (2-byte-read-heap-buffer-overflow)
+    #0 0x4ce94c in BEInt<unsigned short, 2>::operator unsigned short() const /src/harfbuzz/src/./hb.hh:588:59
+    #1 0x4ce7aa in OT::IntType<unsigned short, 2u>::operator unsigned int() const /src/harfbuzz/src/./hb-open-type.hh:63:40
+    #2 0x5a4d54 in OT::AxisValue::sanitize(hb_sanitize_context_t*) const /src/harfbuzz/src/./hb-ot-stat-table.hh:192:13
+    #3 0x5a4759 in bool OT::OffsetTo<OT::AxisValue, OT::IntType<unsigned short, 2u>, true>::sanitize<>(hb_sanitize_context_t*, void const*) const /src/harfbuzz/src/./hb-open-type.hh:338:5
+    #4 0x5a4170 in bool OT::UnsizedArrayOf<OT::OffsetTo<OT::AxisValue, OT::IntType<unsigned short, 2u>, true> >::sanitize<OT::UnsizedArrayOf<OT::OffsetTo<OT::AxisValue, OT::IntType<unsigned short, 2u>, true> > const*>(hb_sanitize_context_t*, unsigned int, OT::UnsizedArrayOf<OT::OffsetTo<OT::AxisValue, OT::IntType<unsigned short, 2u>, true> > const*&&) const /src/harfbuzz/src/./hb-open-type.hh:450:11
+    #5 0x5a32df in bool OT::OffsetTo<OT::UnsizedArrayOf<OT::OffsetTo<OT::AxisValue, OT::IntType<unsigned short, 2u>, true> >, OT::IntType<unsigned int, 4u>, false>::sanitize<OT::IntType<unsigned short, 2u> const&, OT::UnsizedArrayOf<OT::OffsetTo<OT::AxisValue, OT::IntType<unsigned short, 2u>, true> > const*>(hb_sanitize_context_t*, void const*, OT::IntType<unsigned short, 2u> const&, OT::UnsizedArrayOf<OT::OffsetTo<OT::AxisValue, OT::IntType<unsigned short, 2u>, true> > const*&&) const /src/harfbuzz/src/./hb-open-type.hh:338:5
+    #6 0x5a2c95 in OT::STAT::sanitize(hb_sanitize_context_t*) const /src/harfbuzz/src/./hb-ot-stat-table.hh:255:5
+    #7 0x5a2834 in hb_blob_t* hb_sanitize_context_t::sanitize_blob<OT::STAT>(hb_blob_t*) /src/harfbuzz/src/./hb-sanitize.hh:322:15
+    #8 0x5a2674 in hb_table_lazy_loader_t<OT::STAT, 13u>::create(hb_face_t*) /src/harfbuzz/src/./hb-machinery.hh:293:37
+    #9 0x5a22f3 in hb_lazy_loader_t<OT::STAT, hb_table_lazy_loader_t<OT::STAT, 13u>, hb_face_t, 13u, hb_blob_t>::get_stored() const /src/harfbuzz/src/./hb-machinery.hh:222:26
+    #10 0x5a225a in hb_lazy_loader_t<OT::STAT, hb_table_lazy_loader_t<OT::STAT, 13u>, hb_face_t, 13u, hb_blob_t>::get() const /src/harfbuzz/src/./hb-machinery.hh:245:58
+    #11 0x5a0832 in _nameid_closure(hb_face_t*, hb_set_t*) /src/harfbuzz/src/hb-subset-plan.cc:209:9
+    #12 0x5a0353 in hb_subset_plan_create(hb_face_t*, hb_subset_input_t*) /src/harfbuzz/src/hb-subset-plan.cc:245:3
+    #13 0x4c9bf6 in hb_subset /src/harfbuzz/src/hb-subset.cc:296:28
+    #14 0x4c6a9d in trySubset(hb_face_t*, unsigned int const*, int, bool, bool, bool) /src/harfbuzz/./test/fuzzing/hb-subset-fuzzer.cc:28:23
+    #15 0x4c67c5 in LLVMFuzzerTestOneInput /src/harfbuzz/./test/fuzzing/hb-subset-fuzzer.cc:65:3
+    #16 0x4c6f2a in ExecuteFilesOnyByOne /src/libfuzzer/afl/afl_driver.cpp:216:5
+    #17 0x4c6f2a in main /src/libfuzzer/afl/afl_driver.cpp:253
+    #18 0x7fa30f1fc82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #19 0x41ddf8 in _start (/out/hb-subset-fuzzer+0x41ddf8)
+
+DEDUP_TOKEN: BEInt<unsigned short, 2>::operator unsigned short() const--OT::IntType<unsigned short, 2u>::operator unsigned int() const--OT::AxisValue::sanitize(hb_sanitize_context_t*) const
+[1m[32m0x6040000000fa is located 0 bytes to the right of 42-byte region [0x6040000000d0,0x6040000000fa)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x494f0d in malloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:145:3
+    #1 0x5c452d in hb_blob_t::try_make_writable() /src/harfbuzz/src/hb-blob.cc:470:23
+    #2 0x5c509e in hb_blob_get_data_writable /src/harfbuzz/src/hb-blob.cc:378:14
+    #3 0x5a2885 in hb_blob_t* hb_sanitize_context_t::sanitize_blob<OT::STAT>(hb_blob_t*) /src/harfbuzz/src/./hb-sanitize.hh:341:17
+    #4 0x5a2674 in hb_table_lazy_loader_t<OT::STAT, 13u>::create(hb_face_t*) /src/harfbuzz/src/./hb-machinery.hh:293:37
+    #5 0x5a22f3 in hb_lazy_loader_t<OT::STAT, hb_table_lazy_loader_t<OT::STAT, 13u>, hb_face_t, 13u, hb_blob_t>::get_stored() const /src/harfbuzz/src/./hb-machinery.hh:222:26
+    #6 0x5a225a in hb_lazy_loader_t<OT::STAT, hb_table_lazy_loader_t<OT::STAT, 13u>, hb_face_t, 13u, hb_blob_t>::get() const /src/harfbuzz/src/./hb-machinery.hh:245:58
+    #7 0x5a0832 in _nameid_closure(hb_face_t*, hb_set_t*) /src/harfbuzz/src/hb-subset-plan.cc:209:9
+    #8 0x5a0353 in hb_subset_plan_create(hb_face_t*, hb_subset_input_t*) /src/harfbuzz/src/hb-subset-plan.cc:245:3
+    #9 0x4c9bf6 in hb_subset /src/harfbuzz/src/hb-subset.cc:296:28
+    #10 0x4c6a9d in trySubset(hb_face_t*, unsigned int const*, int, bool, bool, bool) /src/harfbuzz/./test/fuzzing/hb-subset-fuzzer.cc:28:23
+    #11 0x4c67c5 in LLVMFuzzerTestOneInput /src/harfbuzz/./test/fuzzing/hb-subset-fuzzer.cc:65:3
+    #12 0x4c6f2a in ExecuteFilesOnyByOne /src/libfuzzer/afl/afl_driver.cpp:216:5
+    #13 0x4c6f2a in main /src/libfuzzer/afl/afl_driver.cpp:253
+    #14 0x7fa30f1fc82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: malloc--hb_blob_t::try_make_writable()--hb_blob_get_data_writable
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/harfbuzz/src/./hb.hh:588:59 in BEInt<unsigned short, 2>::operator unsigned short() const
+Shadow bytes around the buggy address:
+  0x0c087fff7fc0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c087fff7fd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c087fff7fe0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c087fff7ff0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c087fff8000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c087fff8010: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m02[1m[0m]
+  0x0c087fff8020: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c087fff8030: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c087fff8040: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c087fff8050: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c087fff8060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42475345

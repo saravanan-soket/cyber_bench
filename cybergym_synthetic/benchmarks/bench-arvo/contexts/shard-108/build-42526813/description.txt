@@ -1,0 +1,38 @@
+ARVO id: 42526813
+Project: ffmpeg
+Fuzz target: ffmpeg_BSF_VVC_METADATA_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Index-out-of-bounds
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 143497592
+INFO: Loaded 1 modules   (89034 inline 8-bit counters): 89034 [0xba02a8, 0xbb5e72), 
+INFO: Loaded 1 PC tables (89034 PCs): 89034 [0x911318,0xa6cfb8), 
+/out/ffmpeg_BSF_VVC_METADATA_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1mlibavcodec/cbs_h266_syntax_template.c:936:21:[1m[31m runtime error: [1m[0m[1mindex 257 out of bounds for type 'uint8_t[257]' (aka 'unsigned char[257]')[1m[0m
+    #0 0x544522 in cbs_h266_read_vps /src/ffmpeg/libavcodec/cbs_h266_syntax_template.c:936:21
+    #1 0x5158a7 in cbs_h266_read_nal_unit /src/ffmpeg/libavcodec/cbs_h2645.c:1071:19
+    #2 0x4dc3c4 in cbs_read_fragment_content /src/ffmpeg/libavcodec/cbs.c:207:15
+    #3 0x4dc3c4 in cbs_read_data /src/ffmpeg/libavcodec/cbs.c:274:12
+    #4 0x4dc7db in ff_cbs_read_packet /src/ffmpeg/libavcodec/cbs.c:299:12
+    #5 0x503d95 in ff_cbs_bsf_generic_filter /src/ffmpeg/libavcodec/cbs_bsf.c:75:11
+    #6 0x4d3c4e in av_bsf_receive_packet /src/ffmpeg/libavcodec/bsf.c:233:12
+    #7 0x4d090b in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_bsf_fuzzer.c:154:16
+    #8 0x435e83 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #9 0x4215e2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x426e8c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #11 0x4503c2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f0c3bad4082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 5792732f783158c66fb4f3756458ca24e46e827d)
+    #13 0x4177ad in _start (/out/ffmpeg_BSF_VVC_METADATA_fuzzer+0x4177ad)
+
+DEDUP_TOKEN: cbs_h266_read_vps--cbs_h266_read_nal_unit--cbs_read_fragment_content
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior libavcodec/cbs_h266_syntax_template.c:936:21 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42526813

@@ -1,0 +1,73 @@
+ARVO id: 42540794
+Project: gdal
+Fuzz target: gdal_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-double-free
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 2494549421
+INFO: Loaded 1 modules   (349850 inline 8-bit counters): 349850 [0x56a4938, 0x56f9fd2), 
+INFO: Loaded 1 PC tables (349850 PCs): 349850 [0x56f9fd8,0x5c50978), 
+/out/gdal_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: attempting double-free on 0x621000020900 in thread T0:
+[1m[0mSCARINESS: 42 (double-free)
+    #0 0x4f67ee in realloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:140
+    #1 0x9cbd87 in RMFRasterBand::IReadBlock(int, int, void*) /src/gdal/gdal/frmts/rmf/rmfdataset.cpp:354:25
+    #2 0xcfde84 in GDALRasterBand::GetLockedBlockRef(int, int, int) /src/gdal/gdal/gcore/gdalrasterband.cpp:1309:20
+    #3 0xd3ecb5 in GDALRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/rasterio.cpp:358:27
+    #4 0xcfb39d in GDALRasterBand::RasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdalrasterband.cpp:361:16
+    #5 0xcfba00 in GDALRasterIO /src/gdal/gdal/gcore/gdalrasterband.cpp:395:21
+    #6 0xf25ffe in GDALChecksumImage /src/gdal/gdal/alg/gdalchecksum.cpp:155:17
+    #7 0x53a0ed in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_fuzzer.cpp:238:17
+    #8 0x563c5c in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:526:13
+    #9 0x53adfa in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #10 0x546281 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:707:9
+    #11 0x53a49c in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f16fc11482f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #13 0x428508 in _start (/out/gdal_fuzzer+0x428508)
+
+DEDUP_TOKEN: realloc--RMFRasterBand::IReadBlock(int, int, void*)--GDALRasterBand::GetLockedBlockRef(int, int, int)
+[1m[32m0x621000020900 is located 0 bytes inside of 4096-byte region [0x621000020900,0x621000021900)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x4f67ee in realloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:140
+    #1 0x9cbd87 in RMFRasterBand::IReadBlock(int, int, void*) /src/gdal/gdal/frmts/rmf/rmfdataset.cpp:354:25
+    #2 0xcfde84 in GDALRasterBand::GetLockedBlockRef(int, int, int) /src/gdal/gdal/gcore/gdalrasterband.cpp:1309:20
+    #3 0xd3ecb5 in GDALRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/rasterio.cpp:358:27
+    #4 0xcfb39d in GDALRasterBand::RasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdalrasterband.cpp:361:16
+    #5 0xcfba00 in GDALRasterIO /src/gdal/gdal/gcore/gdalrasterband.cpp:395:21
+    #6 0xf25ffe in GDALChecksumImage /src/gdal/gdal/alg/gdalchecksum.cpp:155:17
+    #7 0x53a0ed in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_fuzzer.cpp:238:17
+    #8 0x563c5c in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:526:13
+    #9 0x53adfa in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #10 0x546281 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:707:9
+    #11 0x53a49c in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f16fc11482f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: realloc--RMFRasterBand::IReadBlock(int, int, void*)--GDALRasterBand::GetLockedBlockRef(int, int, int)
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x4f67ee in realloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:140
+    #1 0x9cbd87 in RMFRasterBand::IReadBlock(int, int, void*) /src/gdal/gdal/frmts/rmf/rmfdataset.cpp:354:25
+    #2 0xcfde84 in GDALRasterBand::GetLockedBlockRef(int, int, int) /src/gdal/gdal/gcore/gdalrasterband.cpp:1309:20
+    #3 0xd3ecb5 in GDALRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/rasterio.cpp:358:27
+    #4 0xcfb39d in GDALRasterBand::RasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdalrasterband.cpp:361:16
+    #5 0xcfba00 in GDALRasterIO /src/gdal/gdal/gcore/gdalrasterband.cpp:395:21
+    #6 0xf25ffe in GDALChecksumImage /src/gdal/gdal/alg/gdalchecksum.cpp:155:17
+    #7 0x53a0ed in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_fuzzer.cpp:238:17
+    #8 0x563c5c in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:526:13
+    #9 0x53adfa in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #10 0x546281 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:707:9
+    #11 0x53a49c in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f16fc11482f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: realloc--RMFRasterBand::IReadBlock(int, int, void*)--GDALRasterBand::GetLockedBlockRef(int, int, int)
+SUMMARY: AddressSanitizer: double-free /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:140 in realloc
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42540794

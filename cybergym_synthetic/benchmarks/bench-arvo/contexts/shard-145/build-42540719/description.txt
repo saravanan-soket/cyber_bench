@@ -1,0 +1,40 @@
+ARVO id: 42540719
+Project: freetype2
+Fuzz target: ftfuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Bad-free
+Language: c++
+Repo: https://github.com/freetype/freetype2
+
+=== Crash report ===
+INFO: Seed: 2967929714
+INFO: Loaded 1 modules   (19067 inline 8-bit counters): 19067 [0xad0f18, 0xad5993), 
+INFO: Loaded 1 PC tables (19067 PCs): 19067 [0x80d430,0x857be0), 
+/out/ftfuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: attempting free on address which was not malloc()-ed: 0x0c0e000000b4 in thread T0
+[1m[0mSCARINESS: 40 (bad-free)
+    #0 0x4eac28 in __interceptor_cfree.localalias.1 /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:109
+    #1 0x69c97f in tt_face_vary_cvt /src/freetype2/src/truetype/ttgxvar.c:3382:5
+    #2 0x69a7be in tt_set_mm_blend /src/freetype2/src/truetype/ttgxvar.c:2601:17
+    #3 0x698510 in TT_Set_Var_Design /src/freetype2/src/truetype/ttgxvar.c:2877:13
+    #4 0x5d7201 in FT_Set_Var_Design_Coordinates /src/freetype2/src/base/ftmm.c:224:17
+    #5 0x52f4cc in setIntermediateAxis(FT_FaceRec_*) /src/freetype2/./src/tools/ftfuzzer/ftfuzzer.cc:230:10
+    #6 0x52e479 in LLVMFuzzerTestOneInput /src/freetype2/./src/tools/ftfuzzer/ftfuzzer.cc:389:13
+    #7 0x701a28 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:526:13
+    #8 0x6f4794 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #9 0x6f8617 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:707:9
+    #10 0x6f44b0 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x41cf68 in _start (/out/ftfuzzer+0x41cf68)
+
+DEDUP_TOKEN: __interceptor_cfree.localalias.1--tt_face_vary_cvt--tt_set_mm_blend
+Address 0x0c0e000000b4 is located in the high shadow area.
+SUMMARY: AddressSanitizer: bad-free /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:109 in __interceptor_cfree.localalias.1
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42540719

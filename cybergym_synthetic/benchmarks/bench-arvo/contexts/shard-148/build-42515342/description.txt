@@ -1,0 +1,49 @@
+ARVO id: 42515342
+Project: lcms
+Fuzz target: cms_universal_transform_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Negative-size-param
+Language: c++
+Repo: https://github.com/mm2/Little-CMS.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1272471678
+INFO: Loaded 1 modules   (7658 inline 8-bit counters): 7658 [0x834c670, 0x834e45a), 
+INFO: Loaded 1 PC tables (7658 PCs): 7658 [0x82cb2d8,0x82da228), 
+/out/cms_universal_transform_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: negative-size-param: (size=-1)
+[1m[0mSCARINESS: 10 (negative-size-param)
+    #0 0x8183a9e in __asan_memmove /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:30:3
+    #1 0x81e856e in PackChunkyBytes /src/lcms/src/cmspack.c:1718:9
+    #2 0x81fcffa in PrecalculatedXFORM /src/lcms/src/cmsxform.c:429:22
+    #3 0x81f587b in cmsDoTransform /src/lcms/src/cmsxform.c:206:5
+    #4 0x81c7b90 in LLVMFuzzerTestOneInput /src/cms_universal_transform_fuzzer.c:83:3
+    #5 0x808894e in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #6 0x80738ae in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #7 0x80794b0 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #8 0x80a3097 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #9 0xf7c99ed4 in __libc_start_main (/lib32/libc.so.6+0x1aed4) (BuildId: 8c11d7b4ac6d685f0bba1cf2506a80f64d314582)
+    #10 0x806a9f5 in _start (/out/cms_universal_transform_fuzzer+0x806a9f5)
+
+DEDUP_TOKEN: __asan_memmove--PackChunkyBytes--PrecalculatedXFORM
+[1m[32m0xf2d03600 is located 0 bytes inside of 240-byte region [0xf2d03600,0xf2d036f0)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x81843df in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0x81c7b27 in LLVMFuzzerTestOneInput /src/cms_universal_transform_fuzzer.c:69:28
+    #2 0x808894e in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #3 0x80738ae in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #4 0x80794b0 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #5 0x80a3097 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #6 0xf7c99ed4 in __libc_start_main (/lib32/libc.so.6+0x1aed4) (BuildId: 8c11d7b4ac6d685f0bba1cf2506a80f64d314582)
+
+DEDUP_TOKEN: __interceptor_malloc--LLVMFuzzerTestOneInput--fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int)
+SUMMARY: AddressSanitizer: negative-size-param /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:30:3 in __asan_memmove
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42515342

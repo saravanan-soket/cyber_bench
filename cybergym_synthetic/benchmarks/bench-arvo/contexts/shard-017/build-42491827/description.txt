@@ -1,0 +1,44 @@
+ARVO id: 42491827
+Project: php-src
+Fuzz target: php-fuzz-unserializehash
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/php/php-src.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1936888555
+INFO: Loaded 1 modules   (118743 inline 8-bit counters): 118743 [0x1c55650, 0x1c72627), 
+INFO: Loaded 1 PC tables (118743 PCs): 118743 [0x1c72628,0x1e42398), 
+/out/php-fuzz-unserializehash: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address 0x70210000c354 (pc 0x7ffff6df7d48 bp 0x7fffffffd600 sp 0x7fffffffcdb8 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7ffff6df7d48  (/lib/x86_64-linux-gnu/libc.so.6+0x14dd48)
+    #1 0x4f44a2 in __msan_memcpy /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1559:15
+    #2 0x93d39f in XXH_memcpy /src/php-src/ext/hash/xxhash/xxhash.h:916:12
+    #3 0x933800 in XXH_INLINE_XXH32_update /src/php-src/ext/hash/xxhash/xxhash.h:1468:13
+    #4 0x932e48 in PHP_XXH32Update /src/php-src/ext/hash/hash_xxhash.c:56:2
+    #5 0x87af78 in zif_hash_update /src/php-src/ext/hash/hash.c:698:2
+    #6 0x1095250 in zend_call_function /src/php-src/Zend/zend_execute_API.c:911:4
+    #7 0x1092715 in _call_user_function_impl /src/php-src/Zend/zend_execute_API.c:659:9
+    #8 0x14a5418 in fuzzer_call_php_func_zval /src/php-src/sapi/fuzzer/fuzzer-sapi.c:278:2
+    #9 0x14a3cf7 in LLVMFuzzerTestOneInput /src/php-src/sapi/fuzzer/fuzzer-unserializehash.c:63:4
+    #10 0x4801d1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #11 0x469f62 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #12 0x4702a5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #13 0x49a152 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #14 0x7ffff6cca83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #15 0x444e78 in _start (/out/php-fuzz-unserializehash+0x444e78)
+
+DEDUP_TOKEN: __msan_memcpy--XXH_memcpy
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x14dd48) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42491827

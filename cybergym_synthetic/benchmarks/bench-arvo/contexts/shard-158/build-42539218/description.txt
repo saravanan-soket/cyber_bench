@@ -1,0 +1,81 @@
+ARVO id: 42539218
+Project: imagemagick
+Fuzz target: encoder_mvg_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 3927397573
+INFO: Loaded 1 modules   (52650 inline 8-bit counters): 52650 [0x16dfdd8, 0x16ecb82), 
+INFO: Loaded 1 PC tables (52650 PCs): 52650 [0x13439e0,0x1411480), 
+/out/encoder_mvg_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x84b8f7 in TraceStrokePolygon /src/imagemagick/MagickCore/draw.c:6090:37
+    #1 0x83d80d in DrawStrokePolygon /src/imagemagick/MagickCore/draw.c:4903:20
+    #2 0x83c759 in DrawDashPolygon /src/imagemagick/MagickCore/draw.c:1587:19
+    #3 0x8312fb in DrawPrimitive /src/imagemagick/MagickCore/draw.c:4766:18
+    #4 0x81f97d in DrawImage /src/imagemagick/MagickCore/draw.c:3272:17
+    #5 0xe3cb86 in ReadMVGImage /src/imagemagick/coders/mvg.c:222:10
+    #6 0x7ab450 in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #7 0x6d8908 in BlobToImage /src/imagemagick/MagickCore/blob.c:469:13
+    #8 0x57f819 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4015:12
+    #9 0x49e6fc in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:43:11
+    #10 0x4e5726 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #11 0x49fbb1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #12 0x4b3e06 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #13 0x49ecf1 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #14 0x7ff0ddf1b82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #15 0x420138 in _start (/out/encoder_mvg_fuzzer+0x420138)
+
+DEDUP_TOKEN: TraceStrokePolygon--DrawStrokePolygon--DrawDashPolygon
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x45153d in __msan_memcpy.part.49 /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:1520
+    #1 0x845cdd in TraceStrokePolygon /src/imagemagick/MagickCore/draw.c:6077:42
+    #2 0x83d80d in DrawStrokePolygon /src/imagemagick/MagickCore/draw.c:4903:20
+    #3 0x83c759 in DrawDashPolygon /src/imagemagick/MagickCore/draw.c:1587:19
+    #4 0x8312fb in DrawPrimitive /src/imagemagick/MagickCore/draw.c:4766:18
+    #5 0x81f97d in DrawImage /src/imagemagick/MagickCore/draw.c:3272:17
+    #6 0xe3cb86 in ReadMVGImage /src/imagemagick/coders/mvg.c:222:10
+    #7 0x7ab450 in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #8 0x6d8908 in BlobToImage /src/imagemagick/MagickCore/blob.c:469:13
+    #9 0x57f819 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4015:12
+    #10 0x49e6fc in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:43:11
+    #11 0x4e5726 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #12 0x49fbb1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #13 0x4b3e06 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #14 0x49ecf1 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #15 0x7ff0ddf1b82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: __msan_memcpy.part.49--TraceStrokePolygon--DrawStrokePolygon
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x451810 in malloc /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:939
+    #1 0x9c0b97 in AcquireQuantumMemory /src/imagemagick/MagickCore/memory.c:541:10
+    #2 0x83bc90 in DrawDashPolygon /src/imagemagick/MagickCore/draw.c:1514:34
+    #3 0x8312fb in DrawPrimitive /src/imagemagick/MagickCore/draw.c:4766:18
+    #4 0x81f97d in DrawImage /src/imagemagick/MagickCore/draw.c:3272:17
+    #5 0xe3cb86 in ReadMVGImage /src/imagemagick/coders/mvg.c:222:10
+    #6 0x7ab450 in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #7 0x6d8908 in BlobToImage /src/imagemagick/MagickCore/blob.c:469:13
+    #8 0x57f819 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4015:12
+    #9 0x49e6fc in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:43:11
+    #10 0x4e5726 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #11 0x49fbb1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #12 0x4b3e06 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #13 0x49ecf1 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #14 0x7ff0ddf1b82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: malloc--AcquireQuantumMemory--DrawDashPolygon
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/imagemagick/MagickCore/draw.c:6090:37 in TraceStrokePolygon
+Unique heap origins: 668
+Stack depot allocated bytes: 96344
+Unique origin histories: 7
+History depot allocated bytes: 168
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42539218

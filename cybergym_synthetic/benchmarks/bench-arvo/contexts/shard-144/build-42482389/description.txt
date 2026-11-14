@@ -1,0 +1,37 @@
+ARVO id: 42482389
+Project: binutils-gdb
+Fuzz target: fuzz_bfd
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: git://sourceware.org/git/binutils-gdb.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/fuzz_bfd[0m
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x60703e3e3e5e (pc 0x7ffff6f50746 bp 0x7fffffffdc30 sp 0x7fffffffd3e8 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x7ffff6f50746 in strlen (/lib/x86_64-linux-gnu/libc.so.6+0x8b746)
+    #1 0x42f418 in strlen /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc
+    #2 0xf12798 in setup_sections /src/binutils-gdb/bfd/som.c:2202:10
+    #3 0xf0dee0 in som_object_p /src/binutils-gdb/bfd/som.c:2521:8
+    #4 0x4cf965 in bfd_check_format_matches /src/binutils-gdb/bfd/format.c:343:17
+    #5 0xfa10a4 in bfd_generic_archive_p /src/binutils-gdb/bfd/archive.c:920:8
+    #6 0x4cf965 in bfd_check_format_matches /src/binutils-gdb/bfd/format.c:343:17
+    #7 0x4c79b8 in LLVMFuzzerTestOneInput /src/binutils-gdb/fuzz/fuzz_bfd.c:49:5
+    #8 0x4c8157 in main (/out/fuzz_bfd+0x4c8157)
+    #9 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #10 0x41c5d8 in _start (/out/fuzz_bfd+0x41c5d8)
+
+DEDUP_TOKEN: strlen--strlen--setup_sections
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x8b746) in strlen
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42482389

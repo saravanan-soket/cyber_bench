@@ -1,0 +1,48 @@
+ARVO id: 42501970
+Project: valijson
+Fuzz target: fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/tristanpenman/valijson
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2982216591
+INFO: Loaded 1 modules   (7898 inline 8-bit counters): 7898 [0x7d33c8, 0x7d52a2), 
+INFO: Loaded 1 PC tables (7898 PCs): 7898 [0x706510,0x7252b0), 
+/out/fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x5d6827 in __test_for_eof /usr/local/bin/../include/c++/v1/__iterator/istreambuf_iterator.h:62:21
+    #1 0x5d6827 in equal /usr/local/bin/../include/c++/v1/__iterator/istreambuf_iterator.h:88:17
+    #2 0x5d6827 in operator!=<char, std::__1::char_traits<char> > /usr/local/bin/../include/c++/v1/__iterator/istreambuf_iterator.h:101:30
+    #3 0x5d6827 in std::__1::_MetaBase<__is_exactly_cpp17_input_iterator<std::__1::istreambuf_iterator<char, std::__1::char_traits<char> > >::value>::_EnableIfImpl<void> std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__init<std::__1::istreambuf_iterator<char, std::__1::char_traits<char> > >(std::__1::istreambuf_iterator<char, std::__1::char_traits<char> >, std::__1::istreambuf_iterator<char, std::__1::char_traits<char> >) /usr/local/bin/../include/c++/v1/string:2150:20
+    #4 0x5ce7b8 in basic_string<std::__1::istreambuf_iterator<char, std::__1::char_traits<char> >, void> /usr/local/bin/../include/c++/v1/string:2226:5
+    #5 0x5ce7b8 in assign<std::__1::istreambuf_iterator<char, std::__1::char_traits<char> > > /usr/local/bin/../include/c++/v1/string:2501:24
+    #6 0x5ce7b8 in valijson::utils::loadFile(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&) /src/valijson/include/valijson/utils/file_utils.hpp:37:10
+    #7 0x56e31d in bool valijson::utils::loadDocument<rapidjson::UTF8<char>, rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator> >(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, rapidjson::GenericDocument<rapidjson::UTF8<char>, rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>, rapidjson::CrtAllocator>&) /src/valijson/include/valijson/utils/rapidjson_utils.hpp:18:10
+    #8 0x56cffa in LLVMFuzzerTestOneInput /src/valijson/tests/fuzzing/fuzzer.cpp:27:10
+    #9 0x49e5b3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #10 0x48b252 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #11 0x490c7b in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #12 0x4b6b22 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7ffff7c570b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #14 0x46836d in _start (/out/fuzzer+0x46836d)
+
+DEDUP_TOKEN: __test_for_eof--equal--operator!=<char, std::__1::char_traits<char> >
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mfile[1m[35m' in the stack frame of function '[1m[32m_ZN8valijson5utils8loadFileERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEERS7_[1m[35m'[1m[0m
+    #0 0x5ce2d0 in valijson::utils::loadFile(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&) /src/valijson/include/valijson/utils/file_utils.hpp:18
+
+DEDUP_TOKEN: valijson::utils::loadFile(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /usr/local/bin/../include/c++/v1/__iterator/istreambuf_iterator.h:62:21 in __test_for_eof
+Unique heap origins: 28
+Stack depot allocated bytes: 1848
+Unique origin histories: 6
+History depot allocated bytes: 144
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42501970

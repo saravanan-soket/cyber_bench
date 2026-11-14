@@ -1,0 +1,42 @@
+ARVO id: 42492530
+Project: ndpi
+Fuzz target: fuzz_ndpi_reader
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/ntop/nDPI.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3871378446
+INFO: Loaded 1 modules   (29102 inline 8-bit counters): 29102 [0x9519e8, 0x958b96), 
+INFO: Loaded 1 PC tables (29102 PCs): 29102 [0x958b98,0x9ca678), 
+/out/fuzz_ndpi_reader: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x0000eb73c1b3 (pc 0x7ffff70130ed bp 0x7fffffffd630 sp 0x7fffffffd588 T7)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+    #0 0x7ffff70130ed  (/lib/x86_64-linux-gnu/libc.so.6+0x14e0ed)
+    #1 0x529112 in reassembly_fragment /src/ndpi/src/lib/ndpi_utils.c:2046:5
+    #2 0x529943 in check_for_sequence /src/ndpi/src/lib/ndpi_utils.c:2164:14
+    #3 0x5128ac in ndpi_connection_tracking /src/ndpi/src/lib/ndpi_main.c:3905:12
+    #4 0x516f9c in ndpi_detection_process_packet /src/ndpi/src/lib/ndpi_main.c:4786:3
+    #5 0x4c274d in packet_processing /src/ndpi/example/reader_util.c:1509:31
+    #6 0x4c169c in ndpi_workflow_process_packet /src/ndpi/example/reader_util.c:1987:10
+    #7 0x4b50d0 in LLVMFuzzerTestOneInput /src/ndpi/fuzz/fuzz_ndpi_reader.c:89:2
+    #8 0x443e11 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #9 0x42dad2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #10 0x433e26 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #11 0x45de12 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #13 0x408498 in _start (/out/fuzz_ndpi_reader+0x408498)
+
+DEDUP_TOKEN: reassembly_fragment--check_for_sequence
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x14e0ed) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42492530

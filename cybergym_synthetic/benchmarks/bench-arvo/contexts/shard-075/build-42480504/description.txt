@@ -1,0 +1,89 @@
+ARVO id: 42480504
+Project: opus
+Fuzz target: ffmpeg_AV_CODEC_ID_VP9_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Stack-buffer-overflow WRITE 2
+Language: c++
+Repo: https://gitlab.xiph.org/xiph/opus.git
+
+=== Crash report ===
+INFO: Seed: 1315418008
+INFO: Loaded 1 modules (20156 guards): [0xd7a410, 0xd8df00), 
+/out/ffmpeg_AV_CODEC_ID_VP9_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7f5f849e18a0 at pc 0x0000005bc6f5 bp 0x7fffad56e470 sp 0x7fffad56e468
+[1m[0m[1m[34mWRITE of size 2 at 0x7f5f849e18a0 thread T0[1m[0m
+SCARINESS: 48 (2-byte-write-stack-buffer-overflow)
+    #0 0x5bc6f4 in do_bilin_2d_c /src/ffmpeg/libavcodec/vp9dsp_template.c:2175:24
+    #1 0x5bc6f4 in put_bilin_2d_hv_c /src/ffmpeg/libavcodec/vp9dsp_template.c:2205
+    #2 0x5b6a07 in put_bilin_16hv_c /src/ffmpeg/libavcodec/vp9dsp_template.c:2254:1
+    #3 0x6b8131 in mc_chroma_unscaled /src/ffmpeg/libavcodec/vp9recon.c:365:9
+    #4 0x6b8131 in inter_pred_16bpp /src/ffmpeg/libavcodec/vp9_mc_template.c:418
+    #5 0x6602a6 in inter_recon /src/ffmpeg/libavcodec/vp9recon.c:580:13
+    #6 0x6602a6 in ff_vp9_inter_recon_16bpp /src/ffmpeg/libavcodec/vp9recon.c:638
+    #7 0x560793 in ff_vp9_decode_block /src/ffmpeg/libavcodec/vp9block.c:1391:13
+    #8 0x55b3ce in decode_sb /src/ffmpeg/libavcodec/vp9.c:953:17
+    #9 0x55b86c in decode_sb /src/ffmpeg/libavcodec/vp9.c:968:17
+    #10 0x54a51d in vp9_decode_frame /src/ffmpeg/libavcodec/vp9.c:1314:29
+    #11 0x529e93 in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:417:15
+    #12 0x529984 in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:620:15
+    #13 0x520a8e in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:638:15
+    #14 0x52000d in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:678:15
+    #15 0x52193d in compat_decode /src/ffmpeg/libavcodec/decode.c:853:15
+    #16 0x518dc7 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:216:23
+    #17 0x91b509 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:458:13
+    #18 0x91bd3a in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:397:3
+    #19 0x8f2c46 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #20 0x8fe1d0 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #21 0x8f2258 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #22 0x7f5f84a2c82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #23 0x41d658 in _start (/out/ffmpeg_AV_CODEC_ID_VP9_fuzzer+0x41d658)
+
+DEDUP_TOKEN: do_bilin_2d_c--put_bilin_2d_hv_c--put_bilin_16hv_c
+[1m[32mAddress 0x7f5f849e18a0 is located in stack of thread T0 at offset 8352 in frame[1m[0m
+[1m[0m    #0 0x5bc2ff in put_bilin_2d_hv_c /src/ffmpeg/libavcodec/vp9dsp_template.c:2205
+
+DEDUP_TOKEN: put_bilin_2d_hv_c
+  This frame has 1 object(s):
+    [32, 8352) 'tmp.i' (line 2164)[1m[32m <== Memory access at offset 8352 overflows this variable[1m[0m
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism or swapcontext
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/ffmpeg/libavcodec/vp9dsp_template.c:2175:24 in do_bilin_2d_c
+Shadow bytes around the buggy address:
+  0x0fec709342c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fec709342d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fec709342e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fec709342f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fec70934300: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0fec70934310: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mf3[1m[0m][1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m
+  0x0fec70934320: [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m
+  0x0fec70934330: [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fec70934340: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fec70934350: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fec70934360: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42480504

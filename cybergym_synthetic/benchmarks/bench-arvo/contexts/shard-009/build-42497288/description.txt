@@ -1,0 +1,84 @@
+ARVO id: 42497288
+Project: sleuthkit
+Fuzz target: sleuthkit_fls_hfs_fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/sleuthkit/sleuthkit
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/sleuthkit_fls_hfs_fuzzer[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x604000000574 at pc 0x0000004e92f2 bp 0x7ffea6950ee0 sp 0x7ffea6950ed8
+[1m[0m[1m[34mREAD of size 1 at 0x604000000574 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x4e92f1 in hfs_cat_traverse /src/sleuthkit/tsk/fs/hfs.c:869:30
+    #1 0x4ed047 in hfs_cat_get_record_offset /src/sleuthkit/tsk/fs/hfs.c:1113:9
+    #2 0x4ebe90 in hfs_cat_file_lookup /src/sleuthkit/tsk/fs/hfs.c:1533:11
+    #3 0x4ee1bd in hfs_inode_lookup /src/sleuthkit/tsk/fs/hfs.c:2522:9
+    #4 0x4e0a2d in tsk_fs_file_open_meta /src/sleuthkit/tsk/fs/fs_file.c:128:9
+    #5 0x4f0839 in hfs_open /src/sleuthkit/tsk/fs/hfs.c:6706:12
+    #6 0x4e6df4 in tsk_fs_open_img_decrypt /src/sleuthkit/tsk/fs/fs_open.c:252:16
+    #7 0x4e705f in tsk_fs_open_img /src/sleuthkit/tsk/fs/fs_open.c:108:12
+    #8 0x4cdfa3 in LLVMFuzzerTestOneInput /src/sleuthkit_fls_fuzzer.cc:33:8
+    #9 0x4ce69b in main (/out/sleuthkit_fls_hfs_fuzzer+0x4ce69b)
+    #10 0x7fc2af1f883f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #11 0x41f228 in _start (/out/sleuthkit_fls_hfs_fuzzer+0x41f228)
+
+DEDUP_TOKEN: hfs_cat_traverse--hfs_cat_get_record_offset--hfs_cat_file_lookup
+[1m[32m0x604000000574 is located 0 bytes to the right of 36-byte region [0x604000000550,0x604000000574)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x49a6dd in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x590edb in tsk_malloc /src/sleuthkit/tsk/base/mymalloc.c:32:16
+    #2 0x4e7a0b in hfs_cat_traverse /src/sleuthkit/tsk/fs/hfs.c:751:26
+    #3 0x4ed047 in hfs_cat_get_record_offset /src/sleuthkit/tsk/fs/hfs.c:1113:9
+    #4 0x4ebe90 in hfs_cat_file_lookup /src/sleuthkit/tsk/fs/hfs.c:1533:11
+    #5 0x4ee1bd in hfs_inode_lookup /src/sleuthkit/tsk/fs/hfs.c:2522:9
+    #6 0x4e0a2d in tsk_fs_file_open_meta /src/sleuthkit/tsk/fs/fs_file.c:128:9
+    #7 0x4f0839 in hfs_open /src/sleuthkit/tsk/fs/hfs.c:6706:12
+    #8 0x4e6df4 in tsk_fs_open_img_decrypt /src/sleuthkit/tsk/fs/fs_open.c:252:16
+    #9 0x4e705f in tsk_fs_open_img /src/sleuthkit/tsk/fs/fs_open.c:108:12
+    #10 0x4cdfa3 in LLVMFuzzerTestOneInput /src/sleuthkit_fls_fuzzer.cc:33:8
+    #11 0x4ce69b in main (/out/sleuthkit_fls_hfs_fuzzer+0x4ce69b)
+
+DEDUP_TOKEN: malloc--tsk_malloc--hfs_cat_traverse
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/sleuthkit/tsk/fs/hfs.c:869:30 in hfs_cat_traverse
+Shadow bytes around the buggy address:
+  0x0c087fff8050: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c087fff8060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c087fff8070: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c087fff8080: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c087fff8090: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+=>0x0c087fff80a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m04[1m[0m][1m[31mfa[1m[0m
+  0x0c087fff80b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c087fff80c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c087fff80d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c087fff80e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c087fff80f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42497288

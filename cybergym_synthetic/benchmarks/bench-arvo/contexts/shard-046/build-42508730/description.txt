@@ -1,0 +1,190 @@
+ARVO id: 42508730
+Project: bitcoin-core
+Fuzz target: wallet_notifications
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/bitcoin/bitcoin.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3362245726
+INFO: Loaded 1 modules   (303007 inline 8-bit counters): 303007 [0x55555956e8d0, 0x5555595b886f), 
+INFO: Loaded 1 PC tables (303007 PCs): 303007 [0x5555595b8870,0x555559a58260), 
+/out/wallet_notifications: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x5555571bfcd4 in Set<unsigned char *> /src/bitcoin-core/src/./key.h:77:20
+    #1 0x5555571bfcd4 in CExtKey::SetSeed(Span<unsigned char const>) /src/bitcoin-core/src/key.cpp:348:9
+    #2 0x55555762e784 in wallet::CWallet::SetupDescriptorScriptPubKeyMans() /src/bitcoin-core/src/wallet/wallet.cpp:3289:20
+    #3 0x55555761936a in wallet::CWallet::Create(wallet::WalletContext&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::unique_ptr<wallet::WalletDatabase, std::__1::default_delete<wallet::WalletDatabase> >, unsigned long, bilingual_str&, std::__1::vector<bilingual_str, std::__1::allocator<bilingual_str> >&) /src/bitcoin-core/src/wallet/wallet.cpp:2729:33
+    #4 0x55555760dc88 in wallet::CreateWallet(wallet::WalletContext&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::optional<bool>, wallet::DatabaseOptions&, wallet::DatabaseStatus&, bilingual_str&, std::__1::vector<bilingual_str, std::__1::allocator<bilingual_str> >&) /src/bitcoin-core/src/wallet/wallet.cpp:309:45
+    #5 0x555555e3cc10 in wallet::(anonymous namespace)::FuzzedWallet::FuzzedWallet(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/bitcoin-core/src/wallet/test/fuzz/notifications.cpp:53:18
+    #6 0x555555e3627e in wallet::(anonymous namespace)::wallet_notifications_fuzz_target(Span<unsigned char const>) /src/bitcoin-core/src/wallet/test/fuzz/notifications.cpp:91:18
+    #7 0x555555e5479c in __invoke<void (*&)(Span<const unsigned char>), Span<const unsigned char> > /usr/local/bin/../include/c++/v1/type_traits:3663:23
+    #8 0x555555e5479c in __call<void (*&)(Span<const unsigned char>), Span<const unsigned char> > /usr/local/bin/../include/c++/v1/__functional/invoke.h:61:9
+    #9 0x555555e5479c in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:172:16
+    #10 0x555555e5479c in std::__1::__function::__func<void (*)(Span<unsigned char const>), std::__1::allocator<void (*)(Span<unsigned char const>)>, void (Span<unsigned char const>)>::operator()(Span<unsigned char const>&&) /usr/local/bin/../include/c++/v1/__functional/function.h:346:12
+    #11 0x5555575b9953 in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:499:16
+    #12 0x5555575b9953 in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:1176:12
+    #13 0x5555575b9953 in LLVMFuzzerTestOneInput /src/bitcoin-core/src/test/fuzz/fuzz.cpp:119:5
+    #14 0x555555d63ea2 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #15 0x555555d4fb72 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #16 0x555555d553ab in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #17 0x555555d7deb2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7ffff7c570b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #19 0x555555d2e49d in _start (/out/wallet_notifications+0x7da49d)
+
+DEDUP_TOKEN: Set<unsigned char *>--CExtKey::SetSeed(Span<unsigned char const>)--wallet::CWallet::SetupDescriptorScriptPubKeyMans()
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x5555575b1fe1 in (anonymous namespace)::sha512::Transform(unsigned long*, unsigned char const*) /src/bitcoin-core/src/crypto/sha512.cpp:137:10
+    #1 0x5555575a1ead in CSHA512::Write(unsigned char const*, unsigned long) /src/bitcoin-core/src/crypto/sha512.cpp:168:9
+    #2 0x5555575b2322 in CSHA512::Finalize(unsigned char*) /src/bitcoin-core/src/crypto/sha512.cpp:191:5
+    #3 0x55555755deb8 in CHMAC_SHA512::Finalize(unsigned char*) /src/bitcoin-core/src/crypto/hmac_sha512.cpp:33:27
+    #4 0x5555571bfa23 in CExtKey::SetSeed(Span<unsigned char const>) /src/bitcoin-core/src/key.cpp:347:76
+    #5 0x55555762e784 in wallet::CWallet::SetupDescriptorScriptPubKeyMans() /src/bitcoin-core/src/wallet/wallet.cpp:3289:20
+    #6 0x55555761936a in wallet::CWallet::Create(wallet::WalletContext&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::unique_ptr<wallet::WalletDatabase, std::__1::default_delete<wallet::WalletDatabase> >, unsigned long, bilingual_str&, std::__1::vector<bilingual_str, std::__1::allocator<bilingual_str> >&) /src/bitcoin-core/src/wallet/wallet.cpp:2729:33
+    #7 0x55555760dc88 in wallet::CreateWallet(wallet::WalletContext&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::optional<bool>, wallet::DatabaseOptions&, wallet::DatabaseStatus&, bilingual_str&, std::__1::vector<bilingual_str, std::__1::allocator<bilingual_str> >&) /src/bitcoin-core/src/wallet/wallet.cpp:309:45
+    #8 0x555555e3cc10 in wallet::(anonymous namespace)::FuzzedWallet::FuzzedWallet(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/bitcoin-core/src/wallet/test/fuzz/notifications.cpp:53:18
+    #9 0x555555e3627e in wallet::(anonymous namespace)::wallet_notifications_fuzz_target(Span<unsigned char const>) /src/bitcoin-core/src/wallet/test/fuzz/notifications.cpp:91:18
+    #10 0x555555e5479c in __invoke<void (*&)(Span<const unsigned char>), Span<const unsigned char> > /usr/local/bin/../include/c++/v1/type_traits:3663:23
+    #11 0x555555e5479c in __call<void (*&)(Span<const unsigned char>), Span<const unsigned char> > /usr/local/bin/../include/c++/v1/__functional/invoke.h:61:9
+    #12 0x555555e5479c in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:172:16
+    #13 0x555555e5479c in std::__1::__function::__func<void (*)(Span<unsigned char const>), std::__1::allocator<void (*)(Span<unsigned char const>)>, void (Span<unsigned char const>)>::operator()(Span<unsigned char const>&&) /usr/local/bin/../include/c++/v1/__functional/function.h:346:12
+    #14 0x5555575b9953 in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:499:16
+    #15 0x5555575b9953 in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:1176:12
+    #16 0x5555575b9953 in LLVMFuzzerTestOneInput /src/bitcoin-core/src/test/fuzz/fuzz.cpp:119:5
+    #17 0x555555d63ea2 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #18 0x555555d4fb72 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #19 0x555555d553ab in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #20 0x555555d7deb2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #21 0x7ffff7c570b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+
+DEDUP_TOKEN: (anonymous namespace)::sha512::Transform(unsigned long*, unsigned char const*)--CSHA512::Write(unsigned char const*, unsigned long)--CSHA512::Finalize(unsigned char*)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x5555575b1fe1 in (anonymous namespace)::sha512::Transform(unsigned long*, unsigned char const*) /src/bitcoin-core/src/crypto/sha512.cpp:137:10
+    #1 0x5555575a1fa5 in CSHA512::Write(unsigned char const*, unsigned long) /src/bitcoin-core/src/crypto/sha512.cpp:173:9
+    #2 0x55555755dc6f in CHMAC_SHA512::CHMAC_SHA512(unsigned char const*, unsigned long) /src/bitcoin-core/src/crypto/hmac_sha512.cpp:22:11
+    #3 0x5555571bf971 in CExtKey::SetSeed(Span<unsigned char const>) /src/bitcoin-core/src/key.cpp:347:5
+    #4 0x55555762e784 in wallet::CWallet::SetupDescriptorScriptPubKeyMans() /src/bitcoin-core/src/wallet/wallet.cpp:3289:20
+    #5 0x55555761936a in wallet::CWallet::Create(wallet::WalletContext&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::unique_ptr<wallet::WalletDatabase, std::__1::default_delete<wallet::WalletDatabase> >, unsigned long, bilingual_str&, std::__1::vector<bilingual_str, std::__1::allocator<bilingual_str> >&) /src/bitcoin-core/src/wallet/wallet.cpp:2729:33
+    #6 0x55555760dc88 in wallet::CreateWallet(wallet::WalletContext&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::optional<bool>, wallet::DatabaseOptions&, wallet::DatabaseStatus&, bilingual_str&, std::__1::vector<bilingual_str, std::__1::allocator<bilingual_str> >&) /src/bitcoin-core/src/wallet/wallet.cpp:309:45
+    #7 0x555555e3cc10 in wallet::(anonymous namespace)::FuzzedWallet::FuzzedWallet(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/bitcoin-core/src/wallet/test/fuzz/notifications.cpp:53:18
+    #8 0x555555e3627e in wallet::(anonymous namespace)::wallet_notifications_fuzz_target(Span<unsigned char const>) /src/bitcoin-core/src/wallet/test/fuzz/notifications.cpp:91:18
+    #9 0x555555e5479c in __invoke<void (*&)(Span<const unsigned char>), Span<const unsigned char> > /usr/local/bin/../include/c++/v1/type_traits:3663:23
+    #10 0x555555e5479c in __call<void (*&)(Span<const unsigned char>), Span<const unsigned char> > /usr/local/bin/../include/c++/v1/__functional/invoke.h:61:9
+    #11 0x555555e5479c in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:172:16
+    #12 0x555555e5479c in std::__1::__function::__func<void (*)(Span<unsigned char const>), std::__1::allocator<void (*)(Span<unsigned char const>)>, void (Span<unsigned char const>)>::operator()(Span<unsigned char const>&&) /usr/local/bin/../include/c++/v1/__functional/function.h:346:12
+    #13 0x5555575b9953 in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:499:16
+    #14 0x5555575b9953 in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:1176:12
+    #15 0x5555575b9953 in LLVMFuzzerTestOneInput /src/bitcoin-core/src/test/fuzz/fuzz.cpp:119:5
+    #16 0x555555d63ea2 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #17 0x555555d4fb72 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #18 0x555555d553ab in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #19 0x555555d7deb2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #20 0x7ffff7c570b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+
+DEDUP_TOKEN: (anonymous namespace)::sha512::Transform(unsigned long*, unsigned char const*)--CSHA512::Write(unsigned char const*, unsigned long)--CHMAC_SHA512::CHMAC_SHA512(unsigned char const*, unsigned long)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x55555755dc15 in CHMAC_SHA512::CHMAC_SHA512(unsigned char const*, unsigned long) /src/bitcoin-core/src/crypto/hmac_sha512.cpp:21:17
+    #1 0x5555571bf971 in CExtKey::SetSeed(Span<unsigned char const>) /src/bitcoin-core/src/key.cpp:347:5
+    #2 0x55555762e784 in wallet::CWallet::SetupDescriptorScriptPubKeyMans() /src/bitcoin-core/src/wallet/wallet.cpp:3289:20
+    #3 0x55555761936a in wallet::CWallet::Create(wallet::WalletContext&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::unique_ptr<wallet::WalletDatabase, std::__1::default_delete<wallet::WalletDatabase> >, unsigned long, bilingual_str&, std::__1::vector<bilingual_str, std::__1::allocator<bilingual_str> >&) /src/bitcoin-core/src/wallet/wallet.cpp:2729:33
+    #4 0x55555760dc88 in wallet::CreateWallet(wallet::WalletContext&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::optional<bool>, wallet::DatabaseOptions&, wallet::DatabaseStatus&, bilingual_str&, std::__1::vector<bilingual_str, std::__1::allocator<bilingual_str> >&) /src/bitcoin-core/src/wallet/wallet.cpp:309:45
+    #5 0x555555e3cc10 in wallet::(anonymous namespace)::FuzzedWallet::FuzzedWallet(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/bitcoin-core/src/wallet/test/fuzz/notifications.cpp:53:18
+    #6 0x555555e3627e in wallet::(anonymous namespace)::wallet_notifications_fuzz_target(Span<unsigned char const>) /src/bitcoin-core/src/wallet/test/fuzz/notifications.cpp:91:18
+    #7 0x555555e5479c in __invoke<void (*&)(Span<const unsigned char>), Span<const unsigned char> > /usr/local/bin/../include/c++/v1/type_traits:3663:23
+    #8 0x555555e5479c in __call<void (*&)(Span<const unsigned char>), Span<const unsigned char> > /usr/local/bin/../include/c++/v1/__functional/invoke.h:61:9
+    #9 0x555555e5479c in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:172:16
+    #10 0x555555e5479c in std::__1::__function::__func<void (*)(Span<unsigned char const>), std::__1::allocator<void (*)(Span<unsigned char const>)>, void (Span<unsigned char const>)>::operator()(Span<unsigned char const>&&) /usr/local/bin/../include/c++/v1/__functional/function.h:346:12
+    #11 0x5555575b9953 in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:499:16
+    #12 0x5555575b9953 in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:1176:12
+    #13 0x5555575b9953 in LLVMFuzzerTestOneInput /src/bitcoin-core/src/test/fuzz/fuzz.cpp:119:5
+    #14 0x555555d63ea2 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #15 0x555555d4fb72 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #16 0x555555d553ab in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #17 0x555555d7deb2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7ffff7c570b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+
+DEDUP_TOKEN: CHMAC_SHA512::CHMAC_SHA512(unsigned char const*, unsigned long)--CExtKey::SetSeed(Span<unsigned char const>)--wallet::CWallet::SetupDescriptorScriptPubKeyMans()
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x55555755dc15 in CHMAC_SHA512::CHMAC_SHA512(unsigned char const*, unsigned long) /src/bitcoin-core/src/crypto/hmac_sha512.cpp:21:17
+    #1 0x5555571bf971 in CExtKey::SetSeed(Span<unsigned char const>) /src/bitcoin-core/src/key.cpp:347:5
+    #2 0x55555762e784 in wallet::CWallet::SetupDescriptorScriptPubKeyMans() /src/bitcoin-core/src/wallet/wallet.cpp:3289:20
+    #3 0x55555761936a in wallet::CWallet::Create(wallet::WalletContext&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::unique_ptr<wallet::WalletDatabase, std::__1::default_delete<wallet::WalletDatabase> >, unsigned long, bilingual_str&, std::__1::vector<bilingual_str, std::__1::allocator<bilingual_str> >&) /src/bitcoin-core/src/wallet/wallet.cpp:2729:33
+    #4 0x55555760dc88 in wallet::CreateWallet(wallet::WalletContext&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::optional<bool>, wallet::DatabaseOptions&, wallet::DatabaseStatus&, bilingual_str&, std::__1::vector<bilingual_str, std::__1::allocator<bilingual_str> >&) /src/bitcoin-core/src/wallet/wallet.cpp:309:45
+    #5 0x555555e3cc10 in wallet::(anonymous namespace)::FuzzedWallet::FuzzedWallet(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/bitcoin-core/src/wallet/test/fuzz/notifications.cpp:53:18
+    #6 0x555555e3627e in wallet::(anonymous namespace)::wallet_notifications_fuzz_target(Span<unsigned char const>) /src/bitcoin-core/src/wallet/test/fuzz/notifications.cpp:91:18
+    #7 0x555555e5479c in __invoke<void (*&)(Span<const unsigned char>), Span<const unsigned char> > /usr/local/bin/../include/c++/v1/type_traits:3663:23
+    #8 0x555555e5479c in __call<void (*&)(Span<const unsigned char>), Span<const unsigned char> > /usr/local/bin/../include/c++/v1/__functional/invoke.h:61:9
+    #9 0x555555e5479c in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:172:16
+    #10 0x555555e5479c in std::__1::__function::__func<void (*)(Span<unsigned char const>), std::__1::allocator<void (*)(Span<unsigned char const>)>, void (Span<unsigned char const>)>::operator()(Span<unsigned char const>&&) /usr/local/bin/../include/c++/v1/__functional/function.h:346:12
+    #11 0x5555575b9953 in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:499:16
+    #12 0x5555575b9953 in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:1176:12
+    #13 0x5555575b9953 in LLVMFuzzerTestOneInput /src/bitcoin-core/src/test/fuzz/fuzz.cpp:119:5
+    #14 0x555555d63ea2 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #15 0x555555d4fb72 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #16 0x555555d553ab in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #17 0x555555d7deb2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7ffff7c570b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+
+DEDUP_TOKEN: CHMAC_SHA512::CHMAC_SHA512(unsigned char const*, unsigned long)--CExtKey::SetSeed(Span<unsigned char const>)--wallet::CWallet::SetupDescriptorScriptPubKeyMans()
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x55555755dc15 in CHMAC_SHA512::CHMAC_SHA512(unsigned char const*, unsigned long) /src/bitcoin-core/src/crypto/hmac_sha512.cpp:21:17
+    #1 0x5555571bf971 in CExtKey::SetSeed(Span<unsigned char const>) /src/bitcoin-core/src/key.cpp:347:5
+    #2 0x55555762e784 in wallet::CWallet::SetupDescriptorScriptPubKeyMans() /src/bitcoin-core/src/wallet/wallet.cpp:3289:20
+    #3 0x55555761936a in wallet::CWallet::Create(wallet::WalletContext&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::unique_ptr<wallet::WalletDatabase, std::__1::default_delete<wallet::WalletDatabase> >, unsigned long, bilingual_str&, std::__1::vector<bilingual_str, std::__1::allocator<bilingual_str> >&) /src/bitcoin-core/src/wallet/wallet.cpp:2729:33
+    #4 0x55555760dc88 in wallet::CreateWallet(wallet::WalletContext&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::optional<bool>, wallet::DatabaseOptions&, wallet::DatabaseStatus&, bilingual_str&, std::__1::vector<bilingual_str, std::__1::allocator<bilingual_str> >&) /src/bitcoin-core/src/wallet/wallet.cpp:309:45
+    #5 0x555555e3cc10 in wallet::(anonymous namespace)::FuzzedWallet::FuzzedWallet(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/bitcoin-core/src/wallet/test/fuzz/notifications.cpp:53:18
+    #6 0x555555e3627e in wallet::(anonymous namespace)::wallet_notifications_fuzz_target(Span<unsigned char const>) /src/bitcoin-core/src/wallet/test/fuzz/notifications.cpp:91:18
+    #7 0x555555e5479c in __invoke<void (*&)(Span<const unsigned char>), Span<const unsigned char> > /usr/local/bin/../include/c++/v1/type_traits:3663:23
+    #8 0x555555e5479c in __call<void (*&)(Span<const unsigned char>), Span<const unsigned char> > /usr/local/bin/../include/c++/v1/__functional/invoke.h:61:9
+    #9 0x555555e5479c in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:172:16
+    #10 0x555555e5479c in std::__1::__function::__func<void (*)(Span<unsigned char const>), std::__1::allocator<void (*)(Span<unsigned char const>)>, void (Span<unsigned char const>)>::operator()(Span<unsigned char const>&&) /usr/local/bin/../include/c++/v1/__functional/function.h:346:12
+    #11 0x5555575b9953 in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:499:16
+    #12 0x5555575b9953 in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:1176:12
+    #13 0x5555575b9953 in LLVMFuzzerTestOneInput /src/bitcoin-core/src/test/fuzz/fuzz.cpp:119:5
+    #14 0x555555d63ea2 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #15 0x555555d4fb72 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #16 0x555555d553ab in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #17 0x555555d7deb2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7ffff7c570b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+
+DEDUP_TOKEN: CHMAC_SHA512::CHMAC_SHA512(unsigned char const*, unsigned long)--CExtKey::SetSeed(Span<unsigned char const>)--wallet::CWallet::SetupDescriptorScriptPubKeyMans()
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x55555755dc15 in CHMAC_SHA512::CHMAC_SHA512(unsigned char const*, unsigned long) /src/bitcoin-core/src/crypto/hmac_sha512.cpp:21:17
+    #1 0x5555571bf971 in CExtKey::SetSeed(Span<unsigned char const>) /src/bitcoin-core/src/key.cpp:347:5
+    #2 0x55555762e784 in wallet::CWallet::SetupDescriptorScriptPubKeyMans() /src/bitcoin-core/src/wallet/wallet.cpp:3289:20
+    #3 0x55555761936a in wallet::CWallet::Create(wallet::WalletContext&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::unique_ptr<wallet::WalletDatabase, std::__1::default_delete<wallet::WalletDatabase> >, unsigned long, bilingual_str&, std::__1::vector<bilingual_str, std::__1::allocator<bilingual_str> >&) /src/bitcoin-core/src/wallet/wallet.cpp:2729:33
+    #4 0x55555760dc88 in wallet::CreateWallet(wallet::WalletContext&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::optional<bool>, wallet::DatabaseOptions&, wallet::DatabaseStatus&, bilingual_str&, std::__1::vector<bilingual_str, std::__1::allocator<bilingual_str> >&) /src/bitcoin-core/src/wallet/wallet.cpp:309:45
+    #5 0x555555e3cc10 in wallet::(anonymous namespace)::FuzzedWallet::FuzzedWallet(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/bitcoin-core/src/wallet/test/fuzz/notifications.cpp:53:18
+    #6 0x555555e3627e in wallet::(anonymous namespace)::wallet_notifications_fuzz_target(Span<unsigned char const>) /src/bitcoin-core/src/wallet/test/fuzz/notifications.cpp:91:18
+    #7 0x555555e5479c in __invoke<void (*&)(Span<const unsigned char>), Span<const unsigned char> > /usr/local/bin/../include/c++/v1/type_traits:3663:23
+    #8 0x555555e5479c in __call<void (*&)(Span<const unsigned char>), Span<const unsigned char> > /usr/local/bin/../include/c++/v1/__functional/invoke.h:61:9
+    #9 0x555555e5479c in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:172:16
+    #10 0x555555e5479c in std::__1::__function::__func<void (*)(Span<unsigned char const>), std::__1::allocator<void (*)(Span<unsigned char const>)>, void (Span<unsigned char const>)>::operator()(Span<unsigned char const>&&) /usr/local/bin/../include/c++/v1/__functional/function.h:346:12
+    #11 0x5555575b9953 in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:499:16
+    #12 0x5555575b9953 in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:1176:12
+    #13 0x5555575b9953 in LLVMFuzzerTestOneInput /src/bitcoin-core/src/test/fuzz/fuzz.cpp:119:5
+    #14 0x555555d63ea2 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #15 0x555555d4fb72 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #16 0x555555d553ab in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #17 0x555555d7deb2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7ffff7c570b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+
+DEDUP_TOKEN: CHMAC_SHA512::CHMAC_SHA512(unsigned char const*, unsigned long)--CExtKey::SetSeed(Span<unsigned char const>)--wallet::CWallet::SetupDescriptorScriptPubKeyMans()
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mrkey[1m[35m' in the stack frame of function '[1m[32m_ZN12CHMAC_SHA512C2EPKhm[1m[35m'[1m[0m
+    #0 0x55555755d810 in CHMAC_SHA512::CHMAC_SHA512(unsigned char const*, unsigned long) /src/bitcoin-core/src/crypto/hmac_sha512.cpp:10
+
+DEDUP_TOKEN: CHMAC_SHA512::CHMAC_SHA512(unsigned char const*, unsigned long)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/bitcoin-core/src/./key.h:77:20 in Set<unsigned char *>
+Unique heap origins: 37966
+Stack depot allocated bytes: 6553600
+Unique origin histories: 18288
+History depot allocated bytes: 393216
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42508730

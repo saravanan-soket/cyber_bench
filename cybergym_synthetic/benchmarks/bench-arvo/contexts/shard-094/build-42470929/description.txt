@@ -1,0 +1,101 @@
+ARVO id: 42470929
+Project: wireshark
+Fuzz target: fuzzshark_ip
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/wireshark/wireshark.git
+
+=== Crash report ===
+oss-fuzzshark: disabling: udp
+oss-fuzzshark: disabling: udplite
+oss-fuzzshark: disabling: ospf
+oss-fuzzshark: disabling: bgp
+oss-fuzzshark: disabling: dhcp
+oss-fuzzshark: disabling: json
+oss-fuzzshark: disabling: snort
+oss-fuzzshark: configured for dissector: ip
+INFO: Seed: 2760309570
+INFO: Loaded 1 modules   (325420 inline 8-bit counters): 325420 [0xd1dfe40, 0xd22f56c), 
+INFO: Loaded 1 PC tables (325420 PCs): 325420 [0xd22f570,0xd726830), 
+/out/fuzzshark_ip: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x02007fdf475d (pc 0x0000005e0bd5 bp 0x7fffffffc030 sp 0x7fffffffbfd0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x5e0bd4 in do_throw /src/wireshark/epan/except.c:198:46
+    #1 0x5e0614 in except_throw /src/wireshark/epan/except.c:292:5
+    #2 0x6c1a97 in fast_ensure_contiguous /src/wireshark/epan/tvbuff.c:827:3
+    #3 0x6c1265 in tvb_get_guint8 /src/wireshark/epan/tvbuff.c:923:8
+    #4 0x9fb05d in try_get_ber_length /src/wireshark/epan/dissectors/packet-ber.c:1331:23
+    #5 0x9ff50a in get_ber_length /src/wireshark/epan/dissectors/packet-ber.c:1379:12
+    #6 0x9ff50a in dissect_ber_sequence /src/wireshark/epan/dissectors/packet-ber.c:2233
+    #7 0x2002967 in dissect_mms_Confirmed_ResponsePDU /work/build/epan/dissectors/./asn1/mms/mms.cnf:3965:12
+    #8 0xa03d07 in dissect_ber_choice /src/wireshark/epan/dissectors/packet-ber.c:2941:21
+    #9 0x2001b4d in dissect_mms_MMSpdu /work/build/epan/dissectors/./asn1/mms/mms.cnf:39:12
+    #10 0x200234d in dissect_mms /work/build/epan/dissectors/./asn1/mms/packet-mms-template.c:151:10
+    #11 0x2002781 in dissect_mms_heur /work/build/epan/dissectors/./asn1/mms/packet-mms-template.c:240:2
+    #12 0x5f4cde in dissector_try_heuristic /src/wireshark/epan/packet.c:2750:9
+    #13 0x154a0e9 in ositp_decode_DT /src/wireshark/epan/dissectors/packet-ositp.c:1166:9
+    #14 0x154a0e9 in dissect_ositp_internal /src/wireshark/epan/dissectors/packet-ositp.c:2125
+    #15 0x5ef303 in call_dissector_through_handle /src/wireshark/epan/packet.c:706:9
+    #16 0x5ef303 in call_dissector_work /src/wireshark/epan/packet.c:791
+    #17 0x5ebdeb in call_dissector_only /src/wireshark/epan/packet.c:3141:8
+    #18 0x5ebdeb in call_dissector_with_data /src/wireshark/epan/packet.c:3154
+    #19 0xbc5cfa in dissect_clnp /src/wireshark/epan/dissectors/packet-clnp.c:237:9
+    #20 0x5ef303 in call_dissector_through_handle /src/wireshark/epan/packet.c:706:9
+    #21 0x5ef303 in call_dissector_work /src/wireshark/epan/packet.c:791
+    #22 0x5ef846 in dissector_try_uint_new /src/wireshark/epan/packet.c:1383:8
+    #23 0x5ef846 in dissector_try_uint /src/wireshark/epan/packet.c:1407
+    #24 0x15467ea in dissect_osi /src/wireshark/epan/dissectors/packet-osi.c:451:7
+    #25 0x5ef303 in call_dissector_through_handle /src/wireshark/epan/packet.c:706:9
+    #26 0x5ef303 in call_dissector_work /src/wireshark/epan/packet.c:791
+    #27 0x5ef846 in dissector_try_uint_new /src/wireshark/epan/packet.c:1383:8
+    #28 0x5ef846 in dissector_try_uint /src/wireshark/epan/packet.c:1407
+    #29 0x15dcba7 in dissect_ppp_common /src/wireshark/epan/dissectors/packet-ppp.c:4788:10
+    #30 0x15ca437 in dissect_ppp_raw_hdlc /src/wireshark/epan/dissectors/packet-ppp.c:6004:17
+    #31 0x5ef303 in call_dissector_through_handle /src/wireshark/epan/packet.c:706:9
+    #32 0x5ef303 in call_dissector_work /src/wireshark/epan/packet.c:791
+    #33 0x5eedb9 in dissector_try_uint_new /src/wireshark/epan/packet.c:1383:8
+    #34 0xef5efe in dissect_gre /src/wireshark/epan/dissectors/packet-gre.c:501:14
+    #35 0x5ef303 in call_dissector_through_handle /src/wireshark/epan/packet.c:706:9
+    #36 0x5ef303 in call_dissector_work /src/wireshark/epan/packet.c:791
+    #37 0x5eedb9 in dissector_try_uint_new /src/wireshark/epan/packet.c:1383:8
+    #38 0x10f2863 in ip_try_dissect /src/wireshark/epan/dissectors/packet-ip.c:1831:7
+    #39 0x113072b in ipv6_dissect_next /src/wireshark/epan/dissectors/packet-ipv6.c:2458:9
+    #40 0x1132200 in dissect_ipv6 /src/wireshark/epan/dissectors/packet-ipv6.c:2406:5
+    #41 0x5ef303 in call_dissector_through_handle /src/wireshark/epan/packet.c:706:9
+    #42 0x5ef303 in call_dissector_work /src/wireshark/epan/packet.c:791
+    #43 0x5ebdeb in call_dissector_only /src/wireshark/epan/packet.c:3141:8
+    #44 0x5ebdeb in call_dissector_with_data /src/wireshark/epan/packet.c:3154
+    #45 0x10f309c in dissect_ip /src/wireshark/epan/dissectors/packet-ip.c:2315:5
+    #46 0x5ef303 in call_dissector_through_handle /src/wireshark/epan/packet.c:706:9
+    #47 0x5ef303 in call_dissector_work /src/wireshark/epan/packet.c:791
+    #48 0x5f7c02 in call_dissector_only /src/wireshark/epan/packet.c:3141:8
+    #49 0x5f7c02 in call_all_postdissectors /src/wireshark/epan/packet.c:3516
+    #50 0xea411c in dissect_frame /src/wireshark/epan/dissectors/packet-frame.c:681:5
+    #51 0x5ef303 in call_dissector_through_handle /src/wireshark/epan/packet.c:706:9
+    #52 0x5ef303 in call_dissector_work /src/wireshark/epan/packet.c:791
+    #53 0x5ebdeb in call_dissector_only /src/wireshark/epan/packet.c:3141:8
+    #54 0x5ebdeb in call_dissector_with_data /src/wireshark/epan/packet.c:3154
+    #55 0x5eb5ab in dissect_record /src/wireshark/epan/packet.c:580:3
+    #56 0x5dfb93 in epan_dissect_run /src/wireshark/epan/epan.c:534:2
+    #57 0x5325bc in LLVMFuzzerTestOneInput /src/wireshark/tools/oss-fuzzshark/fuzzshark.c:360:2
+    #58 0x55d8e5 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:570:15
+    #59 0x533c1d in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #60 0x53f466 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #61 0x53329c in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #62 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #63 0x41f148 in _start (/out/fuzzshark_ip+0x41f148)
+
+DEDUP_TOKEN: do_throw--except_throw--fast_ensure_contiguous
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/wireshark/epan/except.c:198:46 in do_throw
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42470929

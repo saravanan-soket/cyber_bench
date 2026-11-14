@@ -1,0 +1,53 @@
+ARVO id: 42493457
+Project: qt
+Fuzz target: qtbase_gui_text_qtextdocument_sethtml
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: git://code.qt.io/qt/qtbase.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3628868994
+INFO: Loaded 1 modules   (340383 inline 8-bit counters): 340383 [0xb1c1620, 0xb2147bf), 
+INFO: Loaded 1 PC tables (340383 PCs): 340383 [0xb2147c0,0xb4ad4b8), 
+/out/qtbase_gui_text_qtextdocument_sethtml: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+QStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-root'
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x0ffffff8 (pc 0xf1c30ab3 bp 0xffa5d068 sp 0xffa5cc28 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0xf1c30ab3  (/lib/i386-linux-gnu/libc.so.6+0x129ab3)
+    #1 0xf1c2ecd4  (/lib/i386-linux-gnu/libc.so.6+0x127cd4)
+    #2 0x8193904 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #3 0x8fa0cee in QVariant /work/qtbase/include/QtCore/../../../../src/qt/qtbase/src/corelib/kernel/qvariant.h:239:50
+    #4 0x8fa0cee in insertOne /work/qtbase/include/QtCore/../../../../src/qt/qtbase/src/corelib/tools/qarraydataops.h:763:25
+    #5 0x8fa0cee in void QtPrivate::QMovableArrayOps<QVariant>::emplace<QVariant>(int, QVariant&&) /work/qtbase/include/QtCore/../../../../src/qt/qtbase/src/corelib/tools/qarraydataops.h:824:29
+    #6 0x8f86cff in emplaceBack<QVariant> /work/qtbase/include/QtCore/../../../../src/qt/qtbase/src/corelib/tools/qlist.h:805:8
+    #7 0x8f86cff in append /work/qtbase/include/QtCore/../../../../src/qt/qtbase/src/corelib/tools/qlist.h:390:13
+    #8 0x8f86cff in operator<< /work/qtbase/include/QtCore/../../../../src/qt/qtbase/src/corelib/tools/qlist.h:637:7
+    #9 0x8f86cff in QTextFormat::setProperty(int, QList<QTextLength> const&) /src/qt/qtbase/src/gui/text/qtextformat.cpp:1217:14
+    #10 0x8e87d8e in setColumnWidthConstraints /work/qtbase/include/QtGui/../../../../src/qt/qtbase/src/gui/text/qtextformat.h:977:7
+    #11 0x8e87d8e in QTextHtmlImporter::scanTable(int) /src/qt/qtbase/src/gui/text/qtextdocumentfragment.cpp:987:18
+    #12 0x8e7e429 in QTextHtmlImporter::processSpecialNodes() /src/qt/qtbase/src/gui/text/qtextdocumentfragment.cpp:712:23
+    #13 0x8e7b15a in QTextHtmlImporter::import() /src/qt/qtbase/src/gui/text/qtextdocumentfragment.cpp:517:13
+    #14 0x8dfb3d1 in QTextDocument::setHtml(QString const&) /src/qt/qtbase/src/gui/text/qtextdocument.cpp:1259:72
+    #15 0x81cbcfd in LLVMFuzzerTestOneInput /src/qt/qtbase/tests/libfuzzer/gui/text/qtextdocument/sethtml/main.cpp:39:21
+    #16 0x80c6031 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #17 0x80b05ce in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #18 0x80b64f4 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #19 0x80dfcd7 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #20 0xf1b1f646 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x18646)
+    #21 0x808aa71 in _start (/out/qtbase_gui_text_qtextdocument_sethtml+0x808aa71)
+
+DEDUP_TOKEN: __asan_memcpy
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib/i386-linux-gnu/libc.so.6+0x129ab3) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42493457

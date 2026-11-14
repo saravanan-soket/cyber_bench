@@ -1,0 +1,106 @@
+ARVO id: 42502085
+Project: file
+Fuzz target: magic_fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ {*}
+Language: c++
+Repo: https://github.com/file/file.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/magic_fuzzer[0m
+sat_len = 15751 ss = 512
+cdf.c,477: cdf_calloc 15751 512
+cdf.c,491: cdf_calloc 1 512
+Chain: 2
+cdf.c,749: cdf_calloc 1 512
+Chain: 1
+cdf.c,698: cdf_calloc 4 136
+cdf.c,702: cdf_malloc 512
+Chain: 3
+cdf.c,594: cdf_calloc 1 512
+Cannot find type 2 `FileHeader'
+Chain: 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20
+cdf.c,594: cdf_calloc 17 512
+section len: 8260 properties 18
+cdf.c,929: cdf_realloc 432
+0) id=0x1 type=0x4 offs=0x98,0x30
+1) id=0x80000000 type=0x13 offs=0xa0,0x30
+2) id=0x2 type=0x5 offs=0x28,0x30
+3) id=0xfb type=0x4 offs=0xbc,0x30
+4) id=0x4 type=0x1f offs=0xc8,0x30
+o=8 l=253(256), t=8052 s=
+5) id=0x5 type=0x1f offs=0xd8,0x30
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x625000002300 at pc 0x00000043f59d bp 0x7fffffffdb00 sp 0x7fffffffd280
+[1m[0m[1m[34mREAD of size 8425 at 0x625000002300 thread T0[1m[0m
+SCARINESS: 26 (multi-byte-read-heap-buffer-overflow)
+    #0 0x43f59c in printf_common(void*, char const*, __va_list_tag*) /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors_format.inc:553:9
+    #1 0x4409a9 in __interceptor_vprintf /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:1657:1
+    #2 0x4409a9 in printf /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:1715:1
+    #3 0x5354ef in cdf_read_property_info /src/file/src/cdf.c:1092:5
+    #4 0x5363ee in cdf_unpack_summary_info /src/file/src/cdf.c:1151:6
+    #5 0x509111 in cdf_file_summary_info /src/file/src/readcdf.c:305:6
+    #6 0x509111 in cdf_check_summary_info /src/file/src/readcdf.c:401:11
+    #7 0x50881c in file_trycdf /src/file/src/readcdf.c:635:7
+    #8 0x503d70 in file_buffer /src/file/src/funcs.c:408:7
+    #9 0x4e406b in magic_buffer /src/file/src/magic.c:542:6
+    #10 0x4d8964 in LLVMFuzzerTestOneInput /src/magic_fuzzer.cc:52:3
+    #11 0x4d8f7b in main (/out/magic_fuzzer+0x4d8f7b)
+    #12 0x7ffff7c580b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #13 0x41e79d in _start (/out/magic_fuzzer+0x41e79d)
+
+DEDUP_TOKEN: printf_common(void*, char const*, __va_list_tag*)--__interceptor_vprintf--printf
+[1m[32m0x625000002300 is located 0 bytes to the right of 8704-byte region [0x625000000100,0x625000002300)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x49f3b2 in __interceptor_calloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:138:3
+    #1 0x53181c in cdf_calloc /src/file/src/cdf.c:121:9
+    #2 0x53181c in cdf_read_long_sector_chain /src/file/src/cdf.c:594:17
+    #3 0x5343b7 in cdf_read_sector_chain /src/file/src/cdf.c:678:10
+    #4 0x5343b7 in cdf_read_user_stream /src/file/src/cdf.c:855:9
+    #5 0x5343b7 in cdf_read_summary_info /src/file/src/cdf.c:837:9
+    #6 0x5087b2 in file_trycdf /src/file/src/readcdf.c:629:11
+    #7 0x503d70 in file_buffer /src/file/src/funcs.c:408:7
+    #8 0x4e406b in magic_buffer /src/file/src/magic.c:542:6
+    #9 0x4d8964 in LLVMFuzzerTestOneInput /src/magic_fuzzer.cc:52:3
+    #10 0x4d8f7b in main (/out/magic_fuzzer+0x4d8f7b)
+
+DEDUP_TOKEN: __interceptor_calloc--cdf_calloc--cdf_read_long_sector_chain
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors_format.inc:553:9 in printf_common(void*, char const*, __va_list_tag*)
+Shadow bytes around the buggy address:
+  0x0c4a7fff8410: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c4a7fff8420: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c4a7fff8430: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c4a7fff8440: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c4a7fff8450: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c4a7fff8460:[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4a7fff8470: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4a7fff8480: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4a7fff8490: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4a7fff84a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4a7fff84b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42502085

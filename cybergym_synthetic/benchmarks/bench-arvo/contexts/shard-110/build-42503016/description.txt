@@ -1,0 +1,45 @@
+ARVO id: 42503016
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_ARGO_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow WRITE 8
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 505457841
+INFO: Loaded 1 modules   (56316 inline 8-bit counters): 56316 [0xed24d0, 0xee00cc), 
+INFO: Loaded 1 PC tables (56316 PCs): 56316 [0xcf2aa0,0xdcea60), 
+/out/ffmpeg_AV_CODEC_ID_ARGO_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x7f9e1148b100 (pc 0x7f9e12175bdd bp 0x7ffc5dfa8340 sp 0x7ffc5dfa7af8 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x7f9e12175bdd  (/lib/x86_64-linux-gnu/libc.so.6+0x18ebdd)
+    #1 0x542163 in __asan_memset /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:26:3
+    #2 0x581090 in decode_mad1 /src/ffmpeg/libavcodec/argo.c:168:25
+    #3 0x581090 in decode_frame /src/ffmpeg/libavcodec/argo.c:625:19
+    #4 0x5982d8 in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:326:15
+    #5 0x5982d8 in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:517:15
+    #6 0x5982d8 in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:537:15
+    #7 0x597b32 in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:604:15
+    #8 0x57d80c in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:387:25
+    #9 0x477f13 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #10 0x464bb2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #11 0x46a5db in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #12 0x490482 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7f9e1200e0b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #14 0x441ccd in _start (/out/ffmpeg_AV_CODEC_ID_ARGO_fuzzer+0x441ccd)
+
+DEDUP_TOKEN: __asan_memset--decode_mad1
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x18ebdd) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42503016

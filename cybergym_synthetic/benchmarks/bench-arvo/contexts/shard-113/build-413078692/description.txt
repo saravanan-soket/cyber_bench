@@ -1,0 +1,42 @@
+ARVO id: 413078692
+Project: pcre2
+Fuzz target: pcre2_fuzzer_3l
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Negative-size-param
+Language: c++
+Repo: https://github.com/PCRE2Project/pcre2
+
+=== Crash report ===
+Running LLVMFuzzerInitialize ...
+continue...
+Reading 29 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: negative-size-param: (size=-32)
+[1m[0mSCARINESS: 10 (negative-size-param)
+    #0 0x5558464f8316 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:63:3
+    #1 0x555846800310 in recurse_update_offsets /src/pcre2/src/pcre2_match.c:544:5
+    #2 0x5558467f90a6 in match /src/pcre2/src/pcre2_match.c:6455:11
+    #3 0x5558467bf8e3 in pcre2_match_8 /src/pcre2/src/pcre2_match.c:7901:8
+    #4 0x55584653ba9b in LLVMFuzzerTestOneInput /src/pcre2/src/pcre2_fuzzsupport.c:594:19
+    #5 0x55584653a329 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+    #6 0x55584653a125 in LLVMFuzzerRunDriver /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #7 0x555846539cdd in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:311:10
+    #8 0x7f47ae33f082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+    #9 0x5558464614dd in _start (/out/pcre2_fuzzer_3l+0x314dd)
+
+DEDUP_TOKEN: __asan_memcpy--recurse_update_offsets--match
+[1m[32m0x52a000000598 is located 920 bytes inside of 20480-byte region [0x52a000000200,0x52a000005200)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x5558464fa4ef in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:68:3
+    #1 0x5558467be290 in pcre2_match_8 /src/pcre2/src/pcre2_match.c:7456:28
+    #2 0x55584653ba9b in LLVMFuzzerTestOneInput /src/pcre2/src/pcre2_fuzzsupport.c:594:19
+    #3 0x55584653a329 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+
+DEDUP_TOKEN: __interceptor_malloc--pcre2_match_8--LLVMFuzzerTestOneInput
+SUMMARY: AddressSanitizer: negative-size-param /src/pcre2/src/pcre2_match.c:544:5 in recurse_update_offsets
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/413078692

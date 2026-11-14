@@ -1,0 +1,40 @@
+ARVO id: 370597908
+Project: libarchive
+Fuzz target: libarchive_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Object-size
+Language: c++
+Repo: https://github.com/libarchive/libarchive.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3454249151
+INFO: Loaded 1 modules   (21995 inline 8-bit counters): 21995 [0x55ebf5249830, 0x55ebf524ee1b), 
+INFO: Loaded 1 PC tables (21995 PCs): 21995 [0x55ebf524ee20,0x55ebf52a4cd0), 
+/out/libarchive_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m/src/libarchive/libarchive/archive_read_support_format_rar5.c:1867:6:[1m[31m runtime error: [1m[0m[1mstore to address 0x55ebfa37c086 with insufficient space for an object of type 'char'[1m[0m
+[1m0x55ebfa37c086:[1m[30m note: [1m[0mpointer points here[1m[0m
+ 6f 6e 6c 79 2c 00  20 bc 70 ea 0d 7f 00 00  00 00 00 00 00 00 00 00  31 00 00 00 00 00 00 00  e0 bb
+[1m[32m             ^ [1m[0m
+    #0 0x55ebf501d78d in process_head_file /src/libarchive/libarchive/archive_read_support_format_rar5.c:1867:17
+    #1 0x55ebf501c931 in process_head_service /src/libarchive/libarchive/archive_read_support_format_rar5.c:1971:12
+    #2 0x55ebf501c29d in process_base_block /src/libarchive/libarchive/archive_read_support_format_rar5.c:2279:10
+    #3 0x55ebf5017d7c in rar5_read_header /src/libarchive/libarchive/archive_read_support_format_rar5.c:2445:9
+    #4 0x55ebf4fd3324 in _archive_read_next_header2 /src/libarchive/libarchive/archive_read.c:646:7
+    #5 0x55ebf4fd30d9 in _archive_read_next_header /src/libarchive/libarchive/archive_read.c:684:8
+    #6 0x55ebf4fc6811 in LLVMFuzzerTestOneInput /src/libarchive_fuzzer.cc:46:15
+    #7 0x55ebf4f28c90 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #8 0x55ebf4f13f05 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #9 0x55ebf4f1999f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #10 0x55ebf4f44c42 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7f0dea543082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #12 0x55ebf4f0c0ed in _start (/out/libarchive_fuzzer+0xf60ed)
+
+DEDUP_TOKEN: process_head_file--process_head_service--process_base_block
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /src/libarchive/libarchive/archive_read_support_format_rar5.c:1867:6 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/370597908

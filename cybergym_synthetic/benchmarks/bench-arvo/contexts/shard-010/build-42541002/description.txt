@@ -1,0 +1,147 @@
+ARVO id: 42541002
+Project: mupdf
+Fuzz target: pdf_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow WRITE 1
+Language: c++
+Repo: git://git.ghostscript.com/mupdf.git
+
+=== Crash report ===
+INFO: Seed: 3224178723
+INFO: Loaded 1 modules   (73733 inline 8-bit counters): 73733 [0x33ca170, 0x33dc175), 
+INFO: Loaded 1 PC tables (73733 PCs): 73733 [0x1040848,0x1160898), 
+/out/pdf_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+error: cannot recognize version marker
+warning: trying to repair broken xref
+warning: repairing PDF document
+warning: object missing 'endobj' token
+error: zlib error: invalid distance too far back
+warning: read error; treating as end of file
+error: corrupt object stream (28 0 R)
+warning: ignoring broken object stream (28 0 R)
+error: zlib error: invalid distance too far back
+warning: read error; treating as end of file
+error: freetype: cannot load font: unknown file format
+warning: ignored error when loading embedded font; attempting to load system font
+error: no XObject subtype specified
+error: no XObject subtype specified
+error: no XObject subtype specified
+error: no XObject subtype specified
+error: no XObject subtype specified
+error: no XObject subtype specified
+error: zlib error: invalid distance too far back
+warning: read error; treating as end of file
+error: no XObject subtype specified
+error: no XObject subtype specified
+error: zlib error: invalid distance too far back
+warning: read error; treating as end of file
+error: zlib error: invalid distance too far back
+warning: read error; treating as end of file
+error: zlib error: invalid distance too far back
+warning: read error; treating as end of file
+error: no XObject subtype specified
+error: no XObject subtype specified
+error: no XObject subtype specified
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x621000038138 at pc 0x0000007781de bp 0x7fffffffc710 sp 0x7fffffffc708
+[1m[0m[1m[34mWRITE of size 1 at 0x621000038138 thread T0[1m[0m
+SCARINESS: 31 (1-byte-write-heap-buffer-overflow)
+    #0 0x7781dd in next_null /src/mupdf/source/fitz/filter-basic.c:96:11
+    #1 0x6b8da7 in fz_available /src/mupdf/include/mupdf/fitz/stream.h:342:7
+    #2 0x6b8b69 in fz_read /src/mupdf/source/fitz/stream-read.c:15:7
+    #3 0x6b93b3 in fz_read_best /src/mupdf/source/fitz/stream-read.c:86:8
+    #4 0x87a5d7 in pdf_load_image_stream /src/mupdf/source/pdf/pdf-stream.c:598:10
+    #5 0x87a8e3 in pdf_load_compressed_stream /src/mupdf/source/pdf/pdf-stream.c:634:16
+    #6 0x817c7f in pdf_load_image_imp /src/mupdf/source/pdf/pdf-image.c:172:13
+    #7 0x8184c9 in pdf_load_image /src/mupdf/source/pdf/pdf-image.c:296:10
+    #8 0x8258e8 in pdf_process_Do /src/mupdf/source/pdf/pdf-interpret.c:339:22
+    #9 0x82103a in pdf_process_keyword /src/mupdf/source/pdf/pdf-interpret.c:762:19
+    #10 0x81ba7e in pdf_process_stream /src/mupdf/source/pdf/pdf-interpret.c:937:6
+    #11 0x81b128 in pdf_process_contents /src/mupdf/source/pdf/pdf-interpret.c:1031:3
+    #12 0x871b02 in pdf_run_page_contents_with_usage /src/mupdf/source/pdf/pdf-run.c:87:3
+    #13 0x87129a in pdf_run_page_contents /src/mupdf/source/pdf/pdf-run.c:116:3
+    #14 0x5d84b3 in fz_run_page_contents /src/mupdf/source/fitz/document.c:375:4
+    #15 0x5d896a in fz_run_page /src/mupdf/source/fitz/document.c:407:2
+    #16 0x6c5127 in fz_new_pixmap_from_page /src/mupdf/source/fitz/util.c:233:3
+    #17 0x6c5454 in fz_new_pixmap_from_page_number /src/mupdf/source/fitz/util.c:257:9
+    #18 0x52e8a4 in LLVMFuzzerTestOneInput /src/mupdf/source/fuzz/pdf_fuzzer.cc:33:13
+    #19 0x55858c in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:526:13
+    #20 0x52f43a in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #21 0x53ac09 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:707:9
+    #22 0x52eadc in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #23 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #24 0x41dbc8 in _start (/out/pdf_fuzzer+0x41dbc8)
+
+DEDUP_TOKEN: next_null--fz_available--fz_read
+[1m[32m0x621000038138 is located 0 bytes to the right of 4152-byte region [0x621000037100,0x621000038138)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4eba57 in malloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:121
+    #1 0x680632 in do_scavenging_malloc /src/mupdf/source/fitz/memory.c:23:7
+    #2 0x680b1d in fz_calloc /src/mupdf/source/fitz/memory.c:125:6
+    #3 0x773e8b in fz_open_null_n_terminator /src/mupdf/source/fitz/filter-basic.c:146:10
+    #4 0x7745d3 in fz_open_pdf_stream /src/mupdf/source/fitz/filter-basic.c:210:9
+    #5 0x87947e in pdf_open_raw_filter /src/mupdf/source/pdf/pdf-stream.c:301:13
+    #6 0x879b78 in pdf_open_filter /src/mupdf/source/pdf/pdf-stream.c:327:9
+    #7 0x879972 in pdf_open_image_stream /src/mupdf/source/pdf/pdf-stream.c:434:9
+    #8 0x87a508 in pdf_load_image_stream /src/mupdf/source/pdf/pdf-stream.c:591:8
+    #9 0x87a8e3 in pdf_load_compressed_stream /src/mupdf/source/pdf/pdf-stream.c:634:16
+    #10 0x817c7f in pdf_load_image_imp /src/mupdf/source/pdf/pdf-image.c:172:13
+    #11 0x8184c9 in pdf_load_image /src/mupdf/source/pdf/pdf-image.c:296:10
+    #12 0x8258e8 in pdf_process_Do /src/mupdf/source/pdf/pdf-interpret.c:339:22
+    #13 0x82103a in pdf_process_keyword /src/mupdf/source/pdf/pdf-interpret.c:762:19
+    #14 0x81ba7e in pdf_process_stream /src/mupdf/source/pdf/pdf-interpret.c:937:6
+    #15 0x81b128 in pdf_process_contents /src/mupdf/source/pdf/pdf-interpret.c:1031:3
+    #16 0x871b02 in pdf_run_page_contents_with_usage /src/mupdf/source/pdf/pdf-run.c:87:3
+    #17 0x87129a in pdf_run_page_contents /src/mupdf/source/pdf/pdf-run.c:116:3
+    #18 0x5d84b3 in fz_run_page_contents /src/mupdf/source/fitz/document.c:375:4
+    #19 0x5d896a in fz_run_page /src/mupdf/source/fitz/document.c:407:2
+    #20 0x6c5127 in fz_new_pixmap_from_page /src/mupdf/source/fitz/util.c:233:3
+    #21 0x6c5454 in fz_new_pixmap_from_page_number /src/mupdf/source/fitz/util.c:257:9
+    #22 0x52e8a4 in LLVMFuzzerTestOneInput /src/mupdf/source/fuzz/pdf_fuzzer.cc:33:13
+    #23 0x55858c in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:526:13
+    #24 0x52f43a in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #25 0x53ac09 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:707:9
+    #26 0x52eadc in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #27 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: malloc--do_scavenging_malloc--fz_calloc
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/mupdf/source/fitz/filter-basic.c:96:11 in next_null
+Shadow bytes around the buggy address:
+  0x0c427fffefd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c427fffefe0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c427fffeff0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c427ffff000: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c427ffff010: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c427ffff020: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c427ffff030: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c427ffff040: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c427ffff050: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c427ffff060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c427ffff070: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42541002

@@ -1,0 +1,51 @@
+ARVO id: 42535166
+Project: ninja
+Fuzz target: fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/ninja-build/ninja
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2528001993
+INFO: Loaded 1 modules   (5957 inline 8-bit counters): 5957 [0x55df80847518, 0x55df80848c5d), 
+INFO: Loaded 1 PC tables (5957 PCs): 5957 [0x55df80848c60,0x55df808600b0), 
+/out/fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x55df806cec50 in __libcpp_operator_new<unsigned long> /usr/local/bin/../include/c++/v1/new:268:10
+    #1 0x55df806cec50 in __libcpp_allocate /usr/local/bin/../include/c++/v1/new:294:10
+    #2 0x55df806cec50 in allocate /usr/local/bin/../include/c++/v1/__memory/allocator.h:114:38
+    #3 0x55df806cec50 in allocate /usr/local/bin/../include/c++/v1/__memory/allocator_traits.h:268:20
+    #4 0x55df806cec50 in basic_string /usr/local/bin/../include/c++/v1/string:854:33
+    #5 0x55df806cec50 in operator+<char, std::__1::char_traits<char>, std::__1::allocator<char> > /usr/local/bin/../include/c++/v1/string:4167:13
+    #6 0x55df806cec50 in Lexer::Error(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*) /src/ninja/src/lexer.cc:40:19
+    #7 0x55df806bf868 in Parser::ExpectToken(Lexer::Token, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*) /src/ninja/src/parser.cc:46:19
+    #8 0x55df806c9da1 in ManifestParser::ParseLet(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*, EvalString*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*) /src/ninja/src/manifest_parser.cc:179:8
+    #9 0x55df806bff54 in ManifestParser::Parse(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*) /src/ninja/src/manifest_parser.cc:64:12
+    #10 0x55df806be787 in Parser::Load(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*, Lexer*) /src/ninja/src/parser.cc:37:10
+    #11 0x55df8069ab0a in LLVMFuzzerTestOneInput /src/ninja/misc/manifest_fuzzer.cc:37:9
+    #12 0x55df805975d0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #13 0x55df80581d64 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #14 0x55df805877fa in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #15 0x55df805b3bf2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7f9706003082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 87b331c034a6458c64ce09c03939e947212e18ce)
+    #17 0x55df8057883d in _start (/out/fuzzer+0x7783d)
+
+DEDUP_TOKEN: __libcpp_operator_new<unsigned long>--__libcpp_allocate--allocate
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mmessage[1m[35m' in the stack frame[1m[0m
+    #0 0x55df806bf3e0 in Parser::ExpectToken(Lexer::Token, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*) /src/ninja/src/parser.cc:43:5
+
+DEDUP_TOKEN: Parser::ExpectToken(Lexer::Token, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /usr/local/bin/../include/c++/v1/new:268:10 in __libcpp_operator_new<unsigned long>
+Unique heap origins: 49
+Stack depot allocated bytes: 9764880
+Unique origin histories: 15
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42535166

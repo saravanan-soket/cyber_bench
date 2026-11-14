@@ -1,0 +1,63 @@
+ARVO id: 42529255
+Project: wireshark
+Fuzz target: fuzzshark_ip_proto-udp
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/wireshark/wireshark.git
+
+=== Crash report ===
+oss-fuzzshark: configured for dissector: udp in table: ip.proto
+INFO: Seed: 1176934381
+INFO: Loaded 1 modules   (273158 guards): 273158 [0x41db060, 0x42e5c78), 
+/out/fuzzshark_ip_proto-udp: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x0000069ae000 (pc 0x00000185f03c bp 0x0000fffff15c sp 0x7fffffff9b20 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x185f03b in _gcry_aes_cbc_enc (/out/fuzzshark_ip_proto-udp+0x185f03b)
+    #1 0x188a462 in cmac_write (/out/fuzzshark_ip_proto-udp+0x188a462)
+    #2 0x188a557 in _gcry_cipher_cmac_authenticate (/out/fuzzshark_ip_proto-udp+0x188a557)
+    #3 0x183bbc5 in gcry_mac_write (/out/fuzzshark_ip_proto-udp+0x183bbc5)
+    #4 0x1725955 in AirPDcapTDLSDeriveKey /src/wireshark/epan/crypt/airpdcap.c:2267:5
+    #5 0x172309e in AirPDcapScanForKeys /src/wireshark/epan/crypt/airpdcap.c:741:13
+    #6 0x1722522 in AirPDcapPacketProcess /src/wireshark/epan/crypt/airpdcap.c
+    #7 0xcac73a in dissect_ieee80211_common /src/wireshark/epan/dissectors/packet-ieee80211.c:18703:9
+    #8 0xc99b39 in dissect_ieee80211_withoutfcs /src/wireshark/epan/dissectors/packet-ieee80211.c:19329:3
+    #9 0x46d11f in call_dissector_through_handle /src/wireshark/epan/packet.c:690:8
+    #10 0x469275 in call_dissector_work /src/wireshark/epan/packet.c:768:9
+    #11 0x467dea in call_dissector_with_data /src/wireshark/epan/packet.c:3068:8
+    #12 0xeaec3c in dissect_lwapp /src/wireshark/epan/dissectors/packet-lwapp.c:448:9
+    #13 0x46d11f in call_dissector_through_handle /src/wireshark/epan/packet.c:690:8
+    #14 0x469275 in call_dissector_work /src/wireshark/epan/packet.c:768:9
+    #15 0x46906d in dissector_try_uint_new /src/wireshark/epan/packet.c:1343:8
+    #16 0x469478 in dissector_try_uint /src/wireshark/epan/packet.c:1367:9
+    #17 0x1586786 in decode_udp_ports /src/wireshark/epan/dissectors/packet-udp.c:684:7
+    #18 0x1588c25 in dissect /src/wireshark/epan/dissectors/packet-udp.c:1140:5
+    #19 0x158766f in dissect_udp /src/wireshark/epan/dissectors/packet-udp.c:1146:3
+    #20 0x46d11f in call_dissector_through_handle /src/wireshark/epan/packet.c:690:8
+    #21 0x469275 in call_dissector_work /src/wireshark/epan/packet.c:768:9
+    #22 0x46c988 in call_all_postdissectors /src/wireshark/epan/packet.c:3408:3
+    #23 0xaf19c0 in dissect_frame /src/wireshark/epan/dissectors/packet-frame.c:657:5
+    #24 0x46d11f in call_dissector_through_handle /src/wireshark/epan/packet.c:690:8
+    #25 0x469275 in call_dissector_work /src/wireshark/epan/packet.c:768:9
+    #26 0x467dea in call_dissector_with_data /src/wireshark/epan/packet.c:3068:8
+    #27 0x467bd5 in dissect_record /src/wireshark/epan/packet.c:573:3
+    #28 0x462aa5 in epan_dissect_run /src/wireshark/epan/epan.c:467:2
+    #29 0x42fde8 in LLVMFuzzerTestOneInput /src/wireshark/tools/oss-fuzzshark/fuzzshark.c:298:2
+    #30 0x43c424 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:465:13
+    #31 0x4306fc in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #32 0x4345d9 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:689:9
+    #33 0x430408 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #34 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #35 0x408f08 in _start (/out/fuzzshark_ip_proto-udp+0x408f08)
+
+DEDUP_TOKEN: _gcry_aes_cbc_enc--cmac_write--_gcry_cipher_cmac_authenticate
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV (/out/fuzzshark_ip_proto-udp+0x185f03b) in _gcry_aes_cbc_enc
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42529255

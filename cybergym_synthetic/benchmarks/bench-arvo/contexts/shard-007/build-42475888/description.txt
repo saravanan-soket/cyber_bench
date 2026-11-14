@@ -1,0 +1,69 @@
+ARVO id: 42475888
+Project: skia
+Fuzz target: sksl2spirv
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Seed: 277660324
+INFO: Loaded 1 modules   (173958 inline 8-bit counters): 173958 [0x3477ca8, 0x34a242e), 
+INFO: Loaded 1 PC tables (173958 PCs): 173958 [0x34a2430,0x3749c90), 
+/out/sksl2spirv: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x1364a5a in std::__1::pair<std::__1::__hash_iterator<std::__1::__hash_node<std::__1::__hash_value_type<std::__1::pair<ConstantValue, ConstantType>, unsigned int>, void*>*>, bool> std::__1::__hash_table<std::__1::__hash_value_type<std::__1::pair<ConstantValue, ConstantType>, unsigned int>, std::__1::__unordered_map_hasher<std::__1::pair<ConstantValue, ConstantType>, std::__1::__hash_value_type<std::__1::pair<ConstantValue, ConstantType>, unsigned int>, std::__1::hash<std::__1::pair<ConstantValue, ConstantType> >, true>, std::__1::__unordered_map_equal<std::__1::pair<ConstantValue, ConstantType>, std::__1::__hash_value_type<std::__1::pair<ConstantValue, ConstantType>, unsigned int>, std::__1::equal_to<std::__1::pair<ConstantValue, ConstantType> >, true>, std::__1::allocator<std::__1::__hash_value_type<std::__1::pair<ConstantValue, ConstantType>, unsigned int> > >::__emplace_unique_key_args<std::__1::pair<ConstantValue, ConstantType>, std::__1::piecewise_construct_t const&, std::__1::tuple<std::__1::pair<ConstantValue, ConstantType> const&>, std::__1::tuple<> >(std::__1::pair<ConstantValue, ConstantType> const&, std::__1::piecewise_construct_t const&, std::__1::tuple<std::__1::pair<ConstantValue, ConstantType> const&>&&, std::__1::tuple<>&&) /usr/local/bin/../include/c++/v1/__hash_table:2137:31
+    #1 0x133284d in std::__1::unordered_map<std::__1::pair<ConstantValue, ConstantType>, unsigned int, std::__1::hash<std::__1::pair<ConstantValue, ConstantType> >, std::__1::equal_to<std::__1::pair<ConstantValue, ConstantType> >, std::__1::allocator<std::__1::pair<std::__1::pair<ConstantValue, ConstantType> const, unsigned int> > >::operator[](std::__1::pair<ConstantValue, ConstantType> const&) /usr/local/bin/../include/c++/v1/unordered_map:1557:21
+    #2 0x130443a in SkSL::SPIRVCodeGenerator::writeIntLiteral(SkSL::IntLiteral const&) /src/skia/out/Fuzz/../../src/sksl/SkSLSPIRVCodeGenerator.cpp:2450:9
+    #3 0x1336ed0 in SkSL::SPIRVCodeGenerator::writeVarDeclarations(SkSL::VarDeclarations const&, SkSL::OutputStream&) /src/skia/out/Fuzz/../../src/sksl/SkSLSPIRVCodeGenerator.cpp:2768:33
+    #4 0x133422b in SkSL::SPIRVCodeGenerator::writeBlock(SkSL::Block const&, SkSL::OutputStream&) /src/skia/out/Fuzz/../../src/sksl/SkSLSPIRVCodeGenerator.cpp:2821:15
+    #5 0x1333ca2 in SkSL::SPIRVCodeGenerator::writeFunction(SkSL::FunctionDefinition const&, SkSL::OutputStream&) /src/skia/out/Fuzz/../../src/sksl/SkSLSPIRVCodeGenerator.cpp:2515:11
+    #6 0x133d528 in SkSL::SPIRVCodeGenerator::writeInstructions(SkSL::Program const&, SkSL::OutputStream&) /src/skia/out/Fuzz/../../src/sksl/SkSLSPIRVCodeGenerator.cpp:3130:19
+    #7 0x1340302 in SkSL::SPIRVCodeGenerator::generateCode() /src/skia/out/Fuzz/../../src/sksl/SkSLSPIRVCodeGenerator.cpp:3204:11
+    #8 0x107affa in SkSL::Compiler::toSPIRV(SkSL::Program&, SkSL::OutputStream&) /src/skia/out/Fuzz/../../src/sksl/SkSLCompiler.cpp:1389:22
+    #9 0x107b985 in SkSL::Compiler::toSPIRV(SkSL::Program&, SkSL::String*) /src/skia/out/Fuzz/../../src/sksl/SkSLCompiler.cpp:1397:25
+    #10 0x85fb92 in FuzzSKSL2SPIRV(sk_sp<SkData>) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSKSL2SPIRV.cpp:24:31
+    #11 0x860456 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSKSL2SPIRV.cpp:33:5
+    #12 0x7ae5a4 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:529:15
+    #13 0x79cae1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:286:6
+    #14 0x7a188b in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:715:9
+    #15 0x7c71b2 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #16 0x7ffff567582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #17 0x763368 in _start (/out/sksl2spirv+0x763368)
+
+DEDUP_TOKEN: std::__1::pair<std::__1::__hash_iterator<std::__1::__hash_node<std::__1::__hash_value_type<std::__1::pair<ConstantValue, ConstantType>, unsigned int>, void*>*>, bool> std::__1::__hash_table<std::__1::__hash_value_type<std::__1::pair<ConstantValue, ConstantType>, unsigned int>, std::__1::__unordered_map_hasher<std::__1::pair<ConstantValue, ConstantType>, std::__1::__hash_value_type<std::__1::pair<ConstantValue, ConstantType>, unsigned int>, std::__1::hash<std::__1::pair<ConstantValue, ConstantType> >, true>, std::__1::__unordered_map_equal<std::__1::pair<ConstantValue, ConstantType>, std::__1::__hash_value_type<std::__1::pair<ConstantValue, ConstantType>, unsigned int>, std::__1::equal_to<std::__1::pair<ConstantValue, ConstantType> >, true>, std::__1::allocator<std::__1::__hash_value_type<std::__1::pair<ConstantValue, ConstantType>, unsigned int> > >::__emplace_unique_key_args<std::__1::pair<ConstantValue, ConstantType>, std::__1::piecewise_construct_t const&, std::__1::tuple<std::__1::pair<ConstantValue, ConstantType> const&>, std::__1::tuple<> >(std::__1::pair<ConstantValue, ConstantType> const&, std::__1::piecewise_construct_t const&, std::__1::tuple<std::__1::pair<ConstantValue, ConstantType> const&>&&, std::__1::tuple<>&&)--std::__1::unordered_map<std::__1::pair<ConstantValue, ConstantType>, unsigned int, std::__1::hash<std::__1::pair<ConstantValue, ConstantType> >, std::__1::equal_to<std::__1::pair<ConstantValue, ConstantType> >, std::__1::allocator<std::__1::pair<std::__1::pair<ConstantValue, ConstantType> const, unsigned int> > >::operator[](std::__1::pair<ConstantValue, ConstantType> const&)--SkSL::SPIRVCodeGenerator::writeIntLiteral(SkSL::IntLiteral const&)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x13323eb in std::__1::pair<ConstantValue, ConstantType>::pair<long const&, ConstantType&, false>(long const&, ConstantType&) /usr/local/bin/../include/c++/v1/utility:450:45
+    #1 0x130420e in SkSL::SPIRVCodeGenerator::writeIntLiteral(SkSL::IntLiteral const&) /src/skia/out/Fuzz/../../src/sksl/SkSLSPIRVCodeGenerator.cpp:2444:44
+    #2 0x1336ed0 in SkSL::SPIRVCodeGenerator::writeVarDeclarations(SkSL::VarDeclarations const&, SkSL::OutputStream&) /src/skia/out/Fuzz/../../src/sksl/SkSLSPIRVCodeGenerator.cpp:2768:33
+    #3 0x133422b in SkSL::SPIRVCodeGenerator::writeBlock(SkSL::Block const&, SkSL::OutputStream&) /src/skia/out/Fuzz/../../src/sksl/SkSLSPIRVCodeGenerator.cpp:2821:15
+    #4 0x1333ca2 in SkSL::SPIRVCodeGenerator::writeFunction(SkSL::FunctionDefinition const&, SkSL::OutputStream&) /src/skia/out/Fuzz/../../src/sksl/SkSLSPIRVCodeGenerator.cpp:2515:11
+    #5 0x133d528 in SkSL::SPIRVCodeGenerator::writeInstructions(SkSL::Program const&, SkSL::OutputStream&) /src/skia/out/Fuzz/../../src/sksl/SkSLSPIRVCodeGenerator.cpp:3130:19
+    #6 0x1340302 in SkSL::SPIRVCodeGenerator::generateCode() /src/skia/out/Fuzz/../../src/sksl/SkSLSPIRVCodeGenerator.cpp:3204:11
+    #7 0x107affa in SkSL::Compiler::toSPIRV(SkSL::Program&, SkSL::OutputStream&) /src/skia/out/Fuzz/../../src/sksl/SkSLCompiler.cpp:1389:22
+    #8 0x107b985 in SkSL::Compiler::toSPIRV(SkSL::Program&, SkSL::String*) /src/skia/out/Fuzz/../../src/sksl/SkSLCompiler.cpp:1397:25
+    #9 0x85fb92 in FuzzSKSL2SPIRV(sk_sp<SkData>) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSKSL2SPIRV.cpp:24:31
+    #10 0x860456 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSKSL2SPIRV.cpp:33:5
+    #11 0x7ae5a4 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:529:15
+    #12 0x79cae1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:286:6
+    #13 0x7a188b in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:715:9
+    #14 0x7c71b2 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #15 0x7ffff567582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: std::__1::pair<ConstantValue, ConstantType>::pair<long const&, ConstantType&, false>(long const&, ConstantType&)--SkSL::SPIRVCodeGenerator::writeIntLiteral(SkSL::IntLiteral const&)--SkSL::SPIRVCodeGenerator::writeVarDeclarations(SkSL::VarDeclarations const&, SkSL::OutputStream&)
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mtype[1m[35m' in the stack frame of function '[1m[32m_ZN4SkSL18SPIRVCodeGenerator15writeIntLiteralERKNS_10IntLiteralE[1m[35m'[1m[0m
+    #0 0x1303d40 in SkSL::SPIRVCodeGenerator::writeIntLiteral(SkSL::IntLiteral const&) /src/skia/out/Fuzz/../../src/sksl/SkSLSPIRVCodeGenerator.cpp:2433
+
+DEDUP_TOKEN: SkSL::SPIRVCodeGenerator::writeIntLiteral(SkSL::IntLiteral const&)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /usr/local/bin/../include/c++/v1/__hash_table:2137:31 in std::__1::pair<std::__1::__hash_iterator<std::__1::__hash_node<std::__1::__hash_value_type<std::__1::pair<ConstantValue, ConstantType>, unsigned int>, void*>*>, bool> std::__1::__hash_table<std::__1::__hash_value_type<std::__1::pair<ConstantValue, ConstantType>, unsigned int>, std::__1::__unordered_map_hasher<std::__1::pair<ConstantValue, ConstantType>, std::__1::__hash_value_type<std::__1::pair<ConstantValue, ConstantType>, unsigned int>, std::__1::hash<std::__1::pair<ConstantValue, ConstantType> >, true>, std::__1::__unordered_map_equal<std::__1::pair<ConstantValue, ConstantType>, std::__1::__hash_value_type<std::__1::pair<ConstantValue, ConstantType>, unsigned int>, std::__1::equal_to<std::__1::pair<ConstantValue, ConstantType> >, true>, std::__1::allocator<std::__1::__hash_value_type<std::__1::pair<ConstantValue, ConstantType>, unsigned int> > >::__emplace_unique_key_args<std::__1::pair<ConstantV
+Unique heap origins: 1305
+Stack depot allocated bytes: 178896
+Unique origin histories: 380
+History depot allocated bytes: 9120
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42475888

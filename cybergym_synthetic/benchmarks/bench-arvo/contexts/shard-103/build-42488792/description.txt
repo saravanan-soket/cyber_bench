@@ -1,0 +1,36 @@
+ARVO id: 42488792
+Project: boringssl
+Fuzz target: client
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Incorrect-function-pointer-type
+Language: c++
+Repo: https://boringssl.googlesource.com/boringssl
+
+=== Crash report ===
+INFO: Seed: 1549507455
+INFO: Loaded 1 modules (25718 guards): [0x9256a0, 0x93e878), 
+/out/client: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m/src/boringssl/ssl/t1_lib.cc:1212:7:[1m[31m runtime error: [1m[0m[1mcall to function NPNSelectCallback(ssl_st*, unsigned char**, unsigned char*, unsigned char const*, unsigned int, void*) through pointer to incorrect function type 'int (*)(bssl::SSLConnection *, unsigned char **, unsigned char *, const unsigned char *, unsigned int, void *)'[1m[0m
+[1m/src/boringssl/fuzz/client.cc:50:[1m[30m note: [1m[0mNPNSelectCallback(ssl_st*, unsigned char**, unsigned char*, unsigned char const*, unsigned int, void*) defined here[1m[0m
+    #0 0x471b9a in bssl::ext_npn_parse_serverhello(bssl::SSL_HANDSHAKE*, unsigned char*, cbs_st*) /src/boringssl/ssl/t1_lib.cc:1212:7
+    #1 0x46d83f in bssl::ssl_scan_serverhello_tlsext(bssl::SSL_HANDSHAKE*, cbs_st*, int*) /src/boringssl/ssl/t1_lib.cc:2958:10
+    #2 0x46d56e in bssl::ssl_parse_serverhello_tlsext(bssl::SSL_HANDSHAKE*, cbs_st*) /src/boringssl/ssl/t1_lib.cc:3013:7
+    #3 0x4841ef in bssl::ssl3_get_server_hello(bssl::SSL_HANDSHAKE*) /src/boringssl/ssl/handshake_client.cc:1060:8
+    #4 0x482583 in bssl::ssl3_connect(bssl::SSL_HANDSHAKE*) /src/boringssl/ssl/handshake_client.cc:261:15
+    #5 0x45a8d1 in SSL_do_handshake /src/boringssl/ssl/ssl_lib.cc:807:13
+    #6 0x451a64 in LLVMFuzzerTestOneInput /src/boringssl/fuzz/client.cc:129:7
+    #7 0x437596 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:475:13
+    #8 0x42bac0 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:272:6
+    #9 0x42fe7b in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:689:9
+    #10 0x42b7bc in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x4060f8 in _start (/out/client+0x4060f8)
+
+DEDUP_TOKEN: bssl::ext_npn_parse_serverhello(bssl::SSL_HANDSHAKE*, unsigned char*, cbs_st*)--bssl::ssl_scan_serverhello_tlsext(bssl::SSL_HANDSHAKE*, cbs_st*, int*)--bssl::ssl_parse_serverhello_tlsext(bssl::SSL_HANDSHAKE*, cbs_st*)
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /src/boringssl/ssl/t1_lib.cc:1212:7 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42488792

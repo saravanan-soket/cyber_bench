@@ -1,0 +1,97 @@
+ARVO id: 42536171
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_HEVC_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 4
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2257447838
+INFO: Loaded 1 modules   (79380 inline 8-bit counters): 79380 [0x5a69dc50, 0x5a6b1264), 
+INFO: Loaded 1 PC tables (79380 PCs): 79380 [0x5a6b1264,0x5a74c304), 
+/out/ffmpeg_AV_CODEC_ID_HEVC_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0xec203514 at pc 0x59cd41f4 bp 0xffea54c8 sp 0xffea54c0
+[1m[0m[1m[34mREAD of size 4 at 0xec203514 thread T0[1m[0m
+SCARINESS: 27 (4-byte-read-heap-buffer-overflow-far-from-bounds)
+    #0 0x59cd41f3 in init_slice_rpl /src/ffmpeg/libavcodec/hevc/refs.c:286:24
+    #1 0x59cd41f3 in ff_hevc_slice_rpl /src/ffmpeg/libavcodec/hevc/refs.c:308:11
+    #2 0x59c2369f in decode_slice_data /src/ffmpeg/libavcodec/hevc/hevcdec.c:2783:15
+    #3 0x59c2369f in decode_slice /src/ffmpeg/libavcodec/hevc/hevcdec.c:3192:11
+    #4 0x59c2369f in decode_nal_unit /src/ffmpeg/libavcodec/hevc/hevcdec.c:3263:15
+    #5 0x59c2369f in decode_nal_units /src/ffmpeg/libavcodec/hevc/hevcdec.c:3364:15
+    #6 0x59c17458 in hevc_decode_frame /src/ffmpeg/libavcodec/hevc/hevcdec.c:3440:14
+    #7 0x59bfa8a0 in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:429:20
+    #8 0x59bfa8a0 in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:600:15
+    #9 0x59bfa8a0 in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:631:15
+    #10 0x59bfa00b in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:721:15
+    #11 0x59be71b4 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:533:25
+    #12 0x59a7ee1d in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #13 0x59a692f6 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #14 0x59a6eb02 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #15 0x59a9b1d7 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0xf17dced4 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x1aed4) (BuildId: 00537087f0a4c4381deb83f49cc19e6abfd47a12)
+    #17 0x59a60d34 in _start (/out/ffmpeg_AV_CODEC_ID_HEVC_fuzzer+0x138d34)
+
+DEDUP_TOKEN: init_slice_rpl--ff_hevc_slice_rpl--decode_slice_data
+[1m[32m0xec203514 is located 1708 bytes after 104-byte region [0xec202e00,0xec202e68)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x59ba0ada in posix_memalign /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x5a42ccc0 in av_malloc /src/ffmpeg/libavutil/mem.c:107:9
+    #2 0x5a42ccc0 in av_malloc_array /src/ffmpeg/libavutil/mem.c:214:12
+    #3 0x59fb1b6c in ff_h2645_packet_split /src/ffmpeg/libavcodec/h2645_parse.c:544:38
+    #4 0x59c1a0ee in decode_nal_units /src/ffmpeg/libavcodec/hevc/hevcdec.c:3303:11
+    #5 0x59c17458 in hevc_decode_frame /src/ffmpeg/libavcodec/hevc/hevcdec.c:3440:14
+    #6 0x59bfa8a0 in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:429:20
+    #7 0x59bfa8a0 in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:600:15
+    #8 0x59bfa8a0 in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:631:15
+    #9 0x59bfa00b in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:721:15
+    #10 0x59be71b4 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:533:25
+    #11 0x59a7ee1d in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #12 0x59a692f6 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #13 0x59a6eb02 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #14 0x59a9b1d7 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0xf17dced4 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x1aed4) (BuildId: 00537087f0a4c4381deb83f49cc19e6abfd47a12)
+
+DEDUP_TOKEN: posix_memalign--av_malloc--av_malloc_array
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/ffmpeg/libavcodec/hevc/refs.c:286:24 in init_slice_rpl
+Shadow bytes around the buggy address:
+  0xec203280: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0xec203300: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0xec203380: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0xec203400: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0xec203480: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0xec203500: [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0xec203580: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0xec203600: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0xec203680: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0xec203700: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0xec203780: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42536171

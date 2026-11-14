@@ -1,0 +1,43 @@
+ARVO id: 42514084
+Project: gdal
+Fuzz target: cad_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Bad-cast
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 2563631434
+INFO: Loaded 1 modules (469320 guards): [0x57e62f0, 0x59b0810), 
+/out/cad_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1mcadlayer.cpp:159:44:[1m[31m runtime error: [1m[0m[1mdowncast of address 0x000016fe5030 which does not point to an object of type 'CADAttdef'[1m[0m
+[1m0x000016fe5030:[1m[30m note: [1m[0mobject is of type 'CADAttrib'[1m[0m
+ 00 00 00 00  e8 c6 b1 04 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00
+[1m[32m              ^~~~~~~~~~~~~~~~~~~~~~~[1m[0m
+              vptr for 'CADAttrib'
+    #0 0x925292 in CADLayer::addHandle(long, CADObject::ObjectType, long) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/cadlayer.cpp:159:44
+    #1 0x9360c2 in CADTables::FillLayer(CADEntityObject const*) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/cadtables.cpp:168:20
+    #2 0x934fea in CADTables::ReadLayersTable(CADFile*, long) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/cadtables.cpp:141:9
+    #3 0x933cc6 in CADTables::ReadTable(CADFile*, CADTables::TableType) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/cadtables.cpp:59:20
+    #4 0x4eb7eb in OpenCADFile(CADFileIO*, CADFile::OpenOptions, bool) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/opencad.cpp:109:25
+    #5 0x93c06f in GDALCADDataset::Open(GDALOpenInfo*, CADFileIO*, long, long) /src/gdal/gdal/ogr/ogrsf_frmts/cad/gdalcaddataset.cpp:146:17
+    #6 0x4c42c1 in OGRCADDriverOpen(GDALOpenInfo*) /src/gdal/gdal/ogr/ogrsf_frmts/cad/ogrcaddriver.cpp:110:16
+    #7 0x71f44f in GDALOpenEx /src/gdal/gdal/gcore/gdaldataset.cpp:2817:20
+    #8 0x4e92b1 in OGROpen /src/gdal/gdal/ogr/ogrsf_frmts/generic/ogrsfdriverregistrar.cpp:113:24
+    #9 0x4393c0 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/ogr_fuzzer.cpp:96:26
+    #10 0x447ecd in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:458:13
+    #11 0x4482a7 in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:397:3
+    #12 0x439874 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #13 0x43d948 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #14 0x4394fc in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #15 0x7fe3d420f82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #16 0x4120d8 in _start (/out/cad_fuzzer+0x4120d8)
+
+DEDUP_TOKEN: CADLayer::addHandle(long, CADObject::ObjectType, long)--CADTables::FillLayer(CADEntityObject const*)--CADTables::ReadLayersTable(CADFile*, long)
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior cadlayer.cpp:159:44 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42514084

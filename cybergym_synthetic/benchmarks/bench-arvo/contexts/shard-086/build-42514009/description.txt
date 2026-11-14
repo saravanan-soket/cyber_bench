@@ -1,0 +1,52 @@
+ARVO id: 42514009
+Project: duckdb
+Fuzz target: parse_fuzz_test
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://github.com/duckdb/duckdb
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4244106939
+INFO: Loaded 1 modules   (724885 inline 8-bit counters): 724885 [0x5092930, 0x51438c5), 
+INFO: Loaded 1 PC tables (724885 PCs): 724885 [0x51438c8,0x5c53218), 
+/out/parse_fuzz_test: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x000000580820 bp 0x7fffffffd2f0 sp 0x7fffffffd1c0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x580820 in __is_long /usr/local/bin/../include/c++/v1/string:1445:39
+    #1 0x580820 in size /usr/local/bin/../include/c++/v1/string:964:17
+    #2 0x580820 in duckdb::StringUtil::Split(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/duckdb/src/common/string_util.cpp:173:26
+    #3 0x57fe4d in duckdb::FileSystem::ExtractBaseName(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/duckdb/src/common/file_system.cpp:135:13
+    #4 0x2d55c00 in duckdb::ExtensionHelper::InstallExtension(duckdb::DatabaseInstance&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, bool) /src/duckdb/src/main/extension/extension_install.cpp:39:24
+    #5 0x86ed96 in duckdb::PipelineExecutor::FetchFromSource(duckdb::DataChunk&) /src/duckdb/src/parallel/pipeline_executor.cpp:334:19
+    #6 0x862849 in duckdb::PipelineExecutor::ExecutePull(duckdb::DataChunk&) /src/duckdb/src/parallel/pipeline_executor.cpp:208:5
+    #7 0x8622b0 in duckdb::Executor::FetchChunk() /src/duckdb/src/parallel/executor.cpp:529:18
+    #8 0x6edbec in duckdb::ClientContext::FetchInternal(duckdb::ClientContextLock&, duckdb::Executor&, duckdb::BaseQueryResult&) /src/duckdb/src/main/client_context.cpp:94:25
+    #9 0x6f0ec4 in duckdb::ClientContext::FetchResultInternal(duckdb::ClientContextLock&, duckdb::PendingQueryResult&) /src/duckdb/src/main/client_context.cpp:233:17
+    #10 0x700902 in duckdb::PendingQueryResult::ExecuteInternal(duckdb::ClientContextLock&) /src/duckdb/src/main/pending_query_result.cpp:56:25
+    #11 0x70afa2 in ExecutePendingQueryInternal /src/duckdb/src/main/client_context.cpp:764:15
+    #12 0x70afa2 in duckdb::ClientContext::Query(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, bool) /src/duckdb/src/main/client_context.cpp:698:21
+    #13 0x71e42a in duckdb::Connection::Query(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/duckdb/src/main/connection.cpp:71:25
+    #14 0x5613df in LLVMFuzzerTestOneInput /src/duckdb/./test/ossfuzz/parse_fuzz_test.cpp:15:21
+    #15 0x459073 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #16 0x444d02 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #17 0x44a54c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #18 0x473142 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #19 0x7ffff7c56082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #20 0x42352d in _start (/out/parse_fuzz_test+0x42352d)
+
+DEDUP_TOKEN: __is_long--size--duckdb::StringUtil::Split(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /usr/local/bin/../include/c++/v1/string:1445:39 in __is_long
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42514009

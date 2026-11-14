@@ -1,0 +1,47 @@
+ARVO id: 42496364
+Project: wasm3
+Fuzz target: fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c
+Repo: https://github.com/wasm3/wasm3
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2451206269
+INFO: Loaded 1 modules   (3370 inline 8-bit counters): 3370 [0x82d420, 0x82e14a), 
+INFO: Loaded 1 PC tables (3370 PCs): 3370 [0x5d0d98,0x5de038), 
+/out/fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x005c943ffff0 (pc 0x0000004aa57c bp 0x7fffffffd678 sp 0x7fffffffcdf8 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x4aa57c in atomic_load<__sanitizer::atomic_uint8_t> /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_atomic_clang_x86.h:46:14
+    #1 0x4aa57c in __asan::Allocator::Reallocate(void*, unsigned long, __sanitizer::BufferedStackTrace*) /src/llvm-project/compiler-rt/lib/asan/asan_allocator.cpp:729:24
+    #2 0x4aa4a5 in __asan::asan_realloc(void*, unsigned long, __sanitizer::BufferedStackTrace*) /src/llvm-project/compiler-rt/lib/asan/asan_allocator.cpp:1009:34
+    #3 0x5238d5 in realloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:165:10
+    #4 0x5aac54 in m3_Realloc /src/wasm3/source/m3_core.c:127:21
+    #5 0x559899 in ResizeMemory /src/wasm3/source/m3_env.c:378:24
+    #6 0x559899 in InitMemory /src/wasm3/source/m3_env.c:334:18
+    #7 0x5a55b9 in CompileBlockStatements /src/wasm3/source/m3_compile.c:2477:1
+    #8 0x5a7ae6 in CompileFunction /src/wasm3/source/m3_compile.c:2767:1
+    #9 0x55d1bc in m3_FindFunction /src/wasm3/source/m3_env.c:686:1
+    #10 0x556e2f in LLVMFuzzerTestOneInput /src/wasm3/platforms/app_fuzz/fuzzer.c:33:30
+    #11 0x459c43 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #12 0x443a52 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #13 0x44989a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #14 0x475582 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #16 0x41e738 in _start (/out/fuzzer+0x41e738)
+
+DEDUP_TOKEN: atomic_load<__sanitizer::atomic_uint8_t>--__asan::Allocator::Reallocate(void*, unsigned long, __sanitizer::BufferedStackTrace*)--__asan::asan_realloc(void*, unsigned long, __sanitizer::BufferedStackTrace*)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_atomic_clang_x86.h:46:14 in atomic_load<__sanitizer::atomic_uint8_t>
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42496364

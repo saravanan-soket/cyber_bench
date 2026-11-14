@@ -1,0 +1,38 @@
+ARVO id: 398053003
+Project: ndpi
+Fuzz target: fuzz_process_packet
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Check failed
+Language: c++
+Repo: https://github.com/ntop/nDPI.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 826921384
+INFO: Loaded 1 modules   (22750 inline 8-bit counters): 22750 [0x55b67e7747a8, 0x55b67e77a086), 
+INFO: Loaded 1 PC tables (22750 PCs): 22750 [0x55b67e77a088,0x55b67e7d2e68), 
+/out/fuzz_process_packet: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer: bad pointer 0x000000000020
+MemorySanitizer: CHECK failed: sanitizer_allocator_secondary.h:177 "((IsAligned(reinterpret_cast<uptr>(p), page_size_))) != (0)" (0x0, 0x0) (tid=7)
+    #0 0x55b67e31d4a9 in CheckUnwind() /src/llvm-project/compiler-rt/lib/msan/msan.cpp:431:3
+    #1 0x55b67e307db2 in __sanitizer::CheckFailed(char const*, int, char const*, unsigned long long, unsigned long long) /src/llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_termination.cpp:86:5
+    #2 0x55b67e31ebdf in GetMetaData /src/llvm-project/compiler-rt/lib/msan/../sanitizer_common/sanitizer_allocator_secondary.h
+    #3 0x55b67e31ebdf in __sanitizer::CombinedAllocator<__sanitizer::SizeClassAllocator64<__msan::AP64>, __sanitizer::LargeMmapAllocatorPtrArrayDynamic>::GetMetaData(void const*) /src/llvm-project/compiler-rt/lib/msan/../sanitizer_common/sanitizer_allocator_combined.h:126:23
+    #4 0x55b67e31e8e8 in __msan::MsanDeallocate(__sanitizer::BufferedStackTrace*, void*) /src/llvm-project/compiler-rt/lib/msan/msan_allocator.cpp:243:59
+    #5 0x55b67e323d5b in free /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:219:3
+    #6 0x55b67e3b9ac8 in ndpi_free_flow_data /src/ndpi/src/lib/ndpi_main.c:6833:2
+    #7 0x55b67e38a57b in LLVMFuzzerTestOneInput /src/ndpi/fuzz/fuzz_process_packet.c:38:3
+    #8 0x55b67e280210 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #9 0x55b67e26b485 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #10 0x55b67e270f1f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #11 0x55b67e29c1c2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f87de61e082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+    #13 0x55b67e26366d in _start (/out/fuzz_process_packet+0x1a966d)
+
+DEDUP_TOKEN: CheckUnwind()--__sanitizer::CheckFailed(char const*, int, char const*, unsigned long long, unsigned long long)--GetMetaData
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/398053003

@@ -1,0 +1,41 @@
+ARVO id: 42484067
+Project: ndpi
+Fuzz target: fuzz_ndpi_reader
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://github.com/ntop/nDPI.git
+
+=== Crash report ===
+INFO: Seed: 844497783
+INFO: Loaded 1 modules   (17963 inline 8-bit counters): 17963 [0xa9e5c5, 0xaa2bf0), 
+INFO: Loaded 1 PC tables (17963 PCs): 17963 [0xaa2bf0,0xae8ea0), 
+/out/fuzz_ndpi_reader: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address (pc 0x7ffff6f50746 bp 0x7fffffffd5c0 sp 0x7fffffffd588 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Dissassemble the provided pc to learn which register was used.
+    #0 0x7ffff6f50746 in strlen (/lib/x86_64-linux-gnu/libc.so.6+0x8b746)
+    #1 0x4d6bb1 in strlen /src/llvm-project/compiler-rt/lib/msan/../sanitizer_common/sanitizer_common_interceptors.inc:368:19
+    #2 0x546bd0 in ndpi_strdup /src/ndpi/src/lib/ndpi_main.c:134:13
+    #3 0x536aef in process_ndpi_collected_info /src/ndpi/example/reader_util.c:1113:36
+    #4 0x53f406 in packet_processing /src/ndpi/example/reader_util.c:1424:2
+    #5 0x53b56a in ndpi_workflow_process_packet /src/ndpi/example/reader_util.c:1854:10
+    #6 0x5260d6 in LLVMFuzzerTestOneInput /src/ndpi/fuzz/fuzz_ndpi_reader.c:83:5
+    #7 0x45a9a1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #8 0x4454c1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #9 0x44b17e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #10 0x4750a2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #11 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x41e938 in _start (/out/fuzz_ndpi_reader+0x41e938)
+
+DEDUP_TOKEN: strlen--strlen--ndpi_strdup
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x8b746) in strlen
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42484067

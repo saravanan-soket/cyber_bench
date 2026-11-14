@@ -1,0 +1,44 @@
+ARVO id: 42533132
+Project: imagemagick
+Fuzz target: encoder_mvg_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 379230293
+INFO: Loaded 1 modules   (52933 inline 8-bit counters): 52933 [0x16f0bb8, 0x16fda7d), 
+INFO: Loaded 1 PC tables (52933 PCs): 52933 [0x13554e0,0x1424130), 
+/out/encoder_mvg_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+attribute not recognized: f
+Magick: MemoryAllocationFailed `No such file or directory' @ fatal/draw.c/DrawImage/3293.
+==7== ERROR: libFuzzer: fuzz target exited
+    #0 0x446a9c in __sanitizer_print_stack_trace /src/llvm/projects/compiler-rt/lib/msan/msan.cc:653
+    #1 0x4dfba5 in fuzzer::Fuzzer::ExitCallback() /src/libfuzzer/FuzzerLoop.cpp:248:5
+    #2 0x45c0d3 in MSanAtExitWrapper(void*) /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:1151
+    #3 0x7ffff6efeff7  (/lib/x86_64-linux-gnu/libc.so.6+0x39ff7)
+    #4 0x7ffff6eff044 in exit (/lib/x86_64-linux-gnu/libc.so.6+0x3a044)
+    #5 0x8c0750 in DefaultFatalErrorHandler /src/imagemagick/MagickCore/exception.c:339:3
+    #6 0x8bcb3a in CatchException /src/imagemagick/MagickCore/exception.c:217:7
+    #7 0x82c4cf in DrawImage /src/imagemagick/MagickCore/draw.c:3293:9
+    #8 0xe4a748 in ReadMVGImage /src/imagemagick/coders/mvg.c:222:10
+    #9 0x7b4b5f in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #10 0x6e1fc8 in BlobToImage /src/imagemagick/MagickCore/blob.c:469:13
+    #11 0x585599 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4015:12
+    #12 0x49e63c in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:43:11
+    #13 0x4e6475 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:517:13
+    #14 0x49faf2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #15 0x4b1eff in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #16 0x49ec31 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #17 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #18 0x41f9b8 in _start (/out/encoder_mvg_fuzzer+0x41f9b8)
+
+DEDUP_TOKEN: __sanitizer_print_stack_trace--fuzzer::Fuzzer::ExitCallback()--MSanAtExitWrapper(void*)
+SUMMARY: libFuzzer: fuzz target exited
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42533132

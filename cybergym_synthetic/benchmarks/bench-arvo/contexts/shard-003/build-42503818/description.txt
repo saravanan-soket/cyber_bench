@@ -1,0 +1,40 @@
+ARVO id: 42503818
+Project: imagemagick
+Fuzz target: crop_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Index-out-of-bounds
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 943625139
+INFO: Loaded 1 modules   (354017 inline 8-bit counters): 354017 [0x19dcd88, 0x1a33469), 
+INFO: Loaded 1 PC tables (354017 PCs): 354017 [0x1a33470,0x1f9a280), 
+/out/crop_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1msrc/demosaic/ahd_demosaic.cpp:156:7:[1m[31m runtime error: [1m[0m[1mindex -1 out of bounds for type 'ushort [3]'[1m[0m
+    #0 0x124ba88 in LibRaw::ahd_interpolate_r_and_b_in_rgb_and_convert_to_cielab(int, int, unsigned short (*) [512][3], short (*) [512][3]) /src/libraw/src/demosaic/ahd_demosaic.cpp:156:17
+    #1 0x124d8e6 in ahd_interpolate_r_and_b_and_convert_to_cielab /src/libraw/src/demosaic/ahd_demosaic.cpp:170:5
+    #2 0x124d8e6 in LibRaw::ahd_interpolate() /src/libraw/src/demosaic/ahd_demosaic.cpp:345:13
+    #3 0x117c42c in LibRaw::dcraw_process() /src/libraw/src/postprocessing/dcraw_process.cpp:166:9
+    #4 0x10c89da in libraw_dcraw_process /src/libraw/src/libraw_c_api.cpp:247:16
+    #5 0x992f67 in ReadDNGImage /src/imagemagick/coders/dng.c:512:13
+    #6 0x75e7d0 in ReadImage /src/imagemagick/MagickCore/constitute.c:563:15
+    #7 0x71212f in BlobToImage /src/imagemagick/MagickCore/blob.c:497:9
+    #8 0x60ef8f in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4041:12
+    #9 0x5fae93 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/crop_fuzzer.cc:20:11
+    #10 0x567193 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #11 0x551df2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #12 0x5578a5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #13 0x5811f2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #14 0x7f0900046082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #15 0x52f08d in _start (/out/crop_fuzzer+0x52f08d)
+
+DEDUP_TOKEN: LibRaw::ahd_interpolate_r_and_b_in_rgb_and_convert_to_cielab(int, int, unsigned short (*) [512][3], short (*) [512][3])--ahd_interpolate_r_and_b_and_convert_to_cielab--LibRaw::ahd_interpolate()
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior src/demosaic/ahd_demosaic.cpp:156:7 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42503818

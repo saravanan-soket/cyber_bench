@@ -1,0 +1,142 @@
+ARVO id: 42493451
+Project: wireshark
+Fuzz target: fuzzshark_ip
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/wireshark/wireshark.git
+
+=== Crash report ===
+Warning: AFL++ tools will need to set AFL_MAP_SIZE to 383296 to be able to run this instrumented program!
+======================= INFO =========================
+This binary is built for afl++.
+To run the target function on individual input(s) execute this:
+  /out/fuzzshark_ip INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] -- /out/fuzzshark_ip [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Running LLVMFuzzerInitialize ...
+oss-fuzzshark: disabling: udp
+oss-fuzzshark: disabling: udplite
+oss-fuzzshark: disabling: ospf
+oss-fuzzshark: disabling: bgp
+oss-fuzzshark: disabling: dhcp
+oss-fuzzshark: disabling: json
+oss-fuzzshark: disabling: snort
+oss-fuzzshark: configured for dissector: ip
+continue...
+Reading 984 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6020000d9bd0 at pc 0x00000405493f bp 0x7fffffffc850 sp 0x7fffffffc848
+[1m[0m[1m[34mREAD of size 1 at 0x6020000d9bd0 thread T0[1m[0m
+SCARINESS: 22 (1-byte-read-heap-buffer-overflow-far-from-bounds)
+    #0 0x405493e in dissect_vjc_uncomp /src/wireshark/epan/dissectors/packet-vj-comp.c:305:25
+    #1 0x83674b in call_dissector_through_handle /src/wireshark/epan/packet.c:720:9
+    #2 0x81f995 in call_dissector_work /src/wireshark/epan/packet.c:813:9
+    #3 0x81f2a6 in dissector_try_uint_new /src/wireshark/epan/packet.c:1413:8
+    #4 0x8209a8 in dissector_try_uint /src/wireshark/epan/packet.c:1437:9
+    #5 0x338c7aa in dissect_ppp_common /src/wireshark/epan/dissectors/packet-ppp.c:4786:10
+    #6 0x336a39d in dissect_ppp_raw_hdlc /src/wireshark/epan/dissectors/packet-ppp.c:6002:17
+    #7 0x83674b in call_dissector_through_handle /src/wireshark/epan/packet.c:720:9
+    #8 0x81f995 in call_dissector_work /src/wireshark/epan/packet.c:813:9
+    #9 0x81f2a6 in dissector_try_uint_new /src/wireshark/epan/packet.c:1413:8
+    #10 0x1fd726e in dissect_gre /src/wireshark/epan/dissectors/packet-gre.c:491:14
+    #11 0x83674b in call_dissector_through_handle /src/wireshark/epan/packet.c:720:9
+    #12 0x81f995 in call_dissector_work /src/wireshark/epan/packet.c:813:9
+    #13 0x81f2a6 in dissector_try_uint_new /src/wireshark/epan/packet.c:1413:8
+    #14 0x25a27fd in ip_try_dissect /src/wireshark/epan/dissectors/packet-ip.c:1817:7
+    #15 0x263397e in ipv6_dissect_next /src/wireshark/epan/dissectors/packet-ipv6.c:2609:9
+    #16 0x26362d6 in dissect_ipv6 /src/wireshark/epan/dissectors/packet-ipv6.c:2557:5
+    #17 0x83674b in call_dissector_through_handle /src/wireshark/epan/packet.c:720:9
+    #18 0x81f995 in call_dissector_work /src/wireshark/epan/packet.c:813:9
+    #19 0x8189f9 in call_dissector_with_data /src/wireshark/epan/packet.c:3246:8
+    #20 0x83674b in call_dissector_through_handle /src/wireshark/epan/packet.c:720:9
+    #21 0x81f995 in call_dissector_work /src/wireshark/epan/packet.c:813:9
+    #22 0x833b07 in call_all_postdissectors /src/wireshark/epan/packet.c:3608:3
+    #23 0x1edb88c in dissect_frame /src/wireshark/epan/dissectors/packet-frame.c:901:5
+    #24 0x83674b in call_dissector_through_handle /src/wireshark/epan/packet.c:720:9
+    #25 0x81f995 in call_dissector_work /src/wireshark/epan/packet.c:813:9
+    #26 0x8189f9 in call_dissector_with_data /src/wireshark/epan/packet.c:3246:8
+    #27 0x816a6d in dissect_record /src/wireshark/epan/packet.c:594:3
+    #28 0x7fae47 in epan_dissect_run /src/wireshark/epan/epan.c:594:2
+    #29 0x4d01c4 in LLVMFuzzerTestOneInput /src/wireshark/fuzz/fuzzshark.c:381:2
+    #30 0x5660f73 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:185:7
+    #31 0x5660f73 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:237:12
+    #32 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #33 0x41ec78 in _start (/out/fuzzshark_ip+0x41ec78)
+
+DEDUP_TOKEN: dissect_vjc_uncomp--call_dissector_through_handle--call_dissector_work
+[1m[32m0x6020000d9bd0 is located 48 bytes to the right of 16-byte region [0x6020000d9b90,0x6020000d9ba0)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x499b5d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x56d05b8 in g_malloc (/out/fuzzshark_ip+0x56d05b8)
+    #2 0xa11b78 in tvb_memdup /src/wireshark/epan/tvbuff.c:905:10
+    #3 0x40542f1 in dissect_vjc_uncomp /src/wireshark/epan/dissectors/packet-vj-comp.c:296:49
+    #4 0x83674b in call_dissector_through_handle /src/wireshark/epan/packet.c:720:9
+    #5 0x81f995 in call_dissector_work /src/wireshark/epan/packet.c:813:9
+    #6 0x81f2a6 in dissector_try_uint_new /src/wireshark/epan/packet.c:1413:8
+    #7 0x8209a8 in dissector_try_uint /src/wireshark/epan/packet.c:1437:9
+    #8 0x338c7aa in dissect_ppp_common /src/wireshark/epan/dissectors/packet-ppp.c:4786:10
+    #9 0x336a39d in dissect_ppp_raw_hdlc /src/wireshark/epan/dissectors/packet-ppp.c:6002:17
+    #10 0x83674b in call_dissector_through_handle /src/wireshark/epan/packet.c:720:9
+    #11 0x81f995 in call_dissector_work /src/wireshark/epan/packet.c:813:9
+    #12 0x81f2a6 in dissector_try_uint_new /src/wireshark/epan/packet.c:1413:8
+    #13 0x1fd726e in dissect_gre /src/wireshark/epan/dissectors/packet-gre.c:491:14
+    #14 0x83674b in call_dissector_through_handle /src/wireshark/epan/packet.c:720:9
+    #15 0x81f995 in call_dissector_work /src/wireshark/epan/packet.c:813:9
+    #16 0x81f2a6 in dissector_try_uint_new /src/wireshark/epan/packet.c:1413:8
+    #17 0x25a27fd in ip_try_dissect /src/wireshark/epan/dissectors/packet-ip.c:1817:7
+    #18 0x263397e in ipv6_dissect_next /src/wireshark/epan/dissectors/packet-ipv6.c:2609:9
+    #19 0x26362d6 in dissect_ipv6 /src/wireshark/epan/dissectors/packet-ipv6.c:2557:5
+    #20 0x83674b in call_dissector_through_handle /src/wireshark/epan/packet.c:720:9
+    #21 0x81f995 in call_dissector_work /src/wireshark/epan/packet.c:813:9
+    #22 0x8189f9 in call_dissector_with_data /src/wireshark/epan/packet.c:3246:8
+    #23 0x83674b in call_dissector_through_handle /src/wireshark/epan/packet.c:720:9
+    #24 0x81f995 in call_dissector_work /src/wireshark/epan/packet.c:813:9
+    #25 0x833b07 in call_all_postdissectors /src/wireshark/epan/packet.c:3608:3
+    #26 0x1edb88c in dissect_frame /src/wireshark/epan/dissectors/packet-frame.c:901:5
+    #27 0x83674b in call_dissector_through_handle /src/wireshark/epan/packet.c:720:9
+    #28 0x81f995 in call_dissector_work /src/wireshark/epan/packet.c:813:9
+    #29 0x8189f9 in call_dissector_with_data /src/wireshark/epan/packet.c:3246:8
+
+DEDUP_TOKEN: malloc--g_malloc--tvb_memdup
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/wireshark/epan/dissectors/packet-vj-comp.c:305:25 in dissect_vjc_uncomp
+Shadow bytes around the buggy address:
+  0x0c0480013320: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m
+  0x0c0480013330: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m05[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c0480013340: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m06[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m06[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+  0x0c0480013350: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c0480013360: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c0480013370: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0480013380: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0480013390: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c04800133a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c04800133b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c04800133c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42493451

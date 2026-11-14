@@ -1,0 +1,96 @@
+ARVO id: 42493861
+Project: irssi
+Fuzz target: server-fuzz
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/irssi/irssi
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for afl++.
+To run the target function on individual input(s) execute this:
+  /out/server-fuzz INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] -- /out/server-fuzz [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Running LLVMFuzzerInitialize ...
+continue...
+Reading 54 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6020000bc2ff at pc 0x0000006bc3a5 bp 0x7fffffffd9b0 sp 0x7fffffffd9a8
+[1m[0m[1m[34mREAD of size 1 at 0x6020000bc2ff thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x6bc3a4 in unescape_tag /work/Build/../../src/irssi/src/irc/core/irc.c:395:9
+    #1 0x6bba65 in irc_parse_message_tags /work/Build/../../src/irssi/src/irc/core/irc.c:437:3
+    #2 0x6bccda in irc_server_event_tags /work/Build/../../src/irssi/src/irc/core/irc.c:453:15
+    #3 0x550155 in signal_emit_real /work/Build/../../src/irssi/src/core/signals.c:242:3
+    #4 0x5514b3 in signal_emit_id /work/Build/../../src/irssi/src/core/signals.c:304:3
+    #5 0x6bd7fa in irc_parse_incoming_line /work/Build/../../src/irssi/src/irc/core/irc.c:524:3
+    #6 0x550155 in signal_emit_real /work/Build/../../src/irssi/src/core/signals.c:242:3
+    #7 0x54f308 in signal_emit /work/Build/../../src/irssi/src/core/signals.c:286:3
+    #8 0x4ce3d8 in LLVMFuzzerTestOneInput /work/Build/../../src/irssi/src/fe-fuzz/server.c:185:3
+    #9 0x7c4353 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:185:7
+    #10 0x7c4353 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:237:12
+    #11 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #12 0x41e948 in _start (/out/server-fuzz+0x41e948)
+
+DEDUP_TOKEN: unescape_tag--irc_parse_message_tags--irc_server_event_tags
+[1m[32m0x6020000bc2ff is located 0 bytes to the right of 15-byte region [0x6020000bc2f0,0x6020000bc2ff)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x49982d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x85abdf in g_malloc /work/Build/build-subprojects/glib/../../../../src/irssi/subprojects/glib-2.58.3/glib/gmem.c:99:13
+    #2 0x8da2e9 in g_strdup /work/Build/build-subprojects/glib/../../../../src/irssi/subprojects/glib-2.58.3/glib/gstrfuncs.c:363:17
+    #3 0x8e5cb8 in g_strsplit /work/Build/build-subprojects/glib/../../../../src/irssi/subprojects/glib-2.58.3/glib/gstrfuncs.c:2361:51
+    #4 0x6bba40 in irc_parse_message_tags /work/Build/../../src/irssi/src/irc/core/irc.c:436:8
+    #5 0x6bccda in irc_server_event_tags /work/Build/../../src/irssi/src/irc/core/irc.c:453:15
+    #6 0x550155 in signal_emit_real /work/Build/../../src/irssi/src/core/signals.c:242:3
+    #7 0x5514b3 in signal_emit_id /work/Build/../../src/irssi/src/core/signals.c:304:3
+    #8 0x6bd7fa in irc_parse_incoming_line /work/Build/../../src/irssi/src/irc/core/irc.c:524:3
+    #9 0x550155 in signal_emit_real /work/Build/../../src/irssi/src/core/signals.c:242:3
+    #10 0x54f308 in signal_emit /work/Build/../../src/irssi/src/core/signals.c:286:3
+    #11 0x4ce3d8 in LLVMFuzzerTestOneInput /work/Build/../../src/irssi/src/fe-fuzz/server.c:185:3
+    #12 0x7c4353 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:185:7
+    #13 0x7c4353 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:237:12
+
+DEDUP_TOKEN: malloc--g_malloc--g_strdup
+SUMMARY: AddressSanitizer: heap-buffer-overflow /work/Build/../../src/irssi/src/irc/core/irc.c:395:9 in unescape_tag
+Shadow bytes around the buggy address:
+  0x0c048000f800: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m07[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m05[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c048000f810: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m03[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c048000f820: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c048000f830: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m02[1m[0m
+  0x0c048000f840: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m07[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m07[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m01[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c048000f850: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m01[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m[[1m[0m07[1m[0m]
+  0x0c048000f860: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c048000f870: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c048000f880: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c048000f890: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c048000f8a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42493861

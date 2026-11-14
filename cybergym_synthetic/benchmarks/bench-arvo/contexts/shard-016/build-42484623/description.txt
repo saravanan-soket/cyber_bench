@@ -1,0 +1,43 @@
+ARVO id: 42484623
+Project: libraw
+Fuzz target: libraw_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/libraw/libraw
+
+=== Crash report ===
+INFO: Seed: 764548575
+INFO: Loaded 1 modules   (17383 inline 8-bit counters): 17383 [0xc7f140, 0xc83527), 
+INFO: Loaded 1 PC tables (17383 PCs): 17383 [0x982be0,0x9c6a50), 
+/out/libraw_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+unknown file: data corrupted at 2
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x5cba7e in LibRaw::ljpeg_diff(unsigned short*) /src/libraw/src/decoders/decoders_dcraw.cpp:369:17
+    #1 0x5d54ad in LibRaw::pentax_load_raw() /src/libraw/src/decoders/decoders_dcraw.cpp:817:14
+    #2 0x5248e1 in LibRaw::unpack() /src/libraw/src/decoders/unpack.cpp:287:7
+    #3 0x522889 in LLVMFuzzerTestOneInput /src/libraw_fuzzer.cc:37:20
+    #4 0x45ab11 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #5 0x446292 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #6 0x44c2ee in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #7 0x473c62 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #8 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #9 0x420928 in _start (/out/libraw_fuzzer+0x420928)
+
+DEDUP_TOKEN: LibRaw::ljpeg_diff(unsigned short*)--LibRaw::pentax_load_raw()--LibRaw::unpack()
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mhuff[1m[35m' in the stack frame of function '[1m[32m_ZN6LibRaw15pentax_load_rawEv[1m[35m'[1m[0m
+    #0 0x5d4800 in LibRaw::pentax_load_raw() /src/libraw/src/decoders/decoders_dcraw.cpp:796
+
+DEDUP_TOKEN: LibRaw::pentax_load_raw()
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/libraw/src/decoders/decoders_dcraw.cpp:369:17 in LibRaw::ljpeg_diff(unsigned short*)
+Unique heap origins: 30
+Stack depot allocated bytes: 2376
+Unique origin histories: 9
+History depot allocated bytes: 216
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42484623

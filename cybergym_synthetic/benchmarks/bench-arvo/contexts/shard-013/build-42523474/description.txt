@@ -1,0 +1,90 @@
+ARVO id: 42523474
+Project: libheif
+Fuzz target: kimgio_heif_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/strukturag/libheif.git
+
+=== Crash report ===
+Reading 2849 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x61d00000093c at pc 0x00000069f804 bp 0x7ffcddd06ad0 sp 0x7ffcddd06ac8
+[1m[0m[1m[34mREAD of size 1 at 0x61d00000093c thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x69f803 in RegionGeometry::parse_signed(std::__1::vector<unsigned char, std::__1::allocator<unsigned char> > const&, int, unsigned int*) /src/libheif/libheif/region.cc
+    #1 0x69f803 in RegionGeometry_Polygon::parse(std::__1::vector<unsigned char, std::__1::allocator<unsigned char> > const&, int, unsigned int*) /src/libheif/libheif/region.cc:209:11
+    #2 0x69aeac in RegionItem::parse(std::__1::vector<unsigned char, std::__1::allocator<unsigned char> > const&) /src/libheif/libheif/region.cc:95:27
+    #3 0x56fd06 in heif::HeifContext::interpret_heif_file() /src/libheif/libheif/heif_context.cc:959:20
+    #4 0x577812 in heif::HeifContext::read_from_memory(void const*, unsigned long, bool) /src/libheif/libheif/heif_context.cc:447:10
+    #5 0x501778 in heif_context_read_from_memory /src/libheif/libheif/heif.cc:447:29
+    #6 0x4f142d in HEIFHandler::ensureDecoder() /src/kimageformats/src/imageformats/heif.cpp:434:29
+    #7 0x4eaa0b in HEIFHandler::ensureParsed() const /src/kimageformats/src/imageformats/heif.cpp:410:26
+    #8 0x4eaa0b in HEIFHandler::read(QImage*) /src/kimageformats/src/imageformats/heif.cpp:75:10
+    #9 0x4e9acc in LLVMFuzzerTestOneInput /src/kimgio_fuzzer.cc:59:14
+    #10 0x4099caa in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+    #11 0x4099a7c in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:318:12
+    #12 0x7ff6f5bae082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #13 0x42ad8d in _start (/out/kimgio_heif_fuzzer+0x42ad8d)
+
+DEDUP_TOKEN: RegionGeometry::parse_signed(std::__1::vector<unsigned char, std::__1::allocator<unsigned char> > const&, int, unsigned int*)--RegionGeometry_Polygon::parse(std::__1::vector<unsigned char, std::__1::allocator<unsigned char> > const&, int, unsigned int*)--RegionItem::parse(std::__1::vector<unsigned char, std::__1::allocator<unsigned char> > const&)
+[1m[32m0x61d00000093c is located 0 bytes to the right of 2236-byte region [0x61d000000080,0x61d00000093c)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4e700d in operator new(unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:95:3
+    #1 0x5d61ce in void* std::__1::__libcpp_operator_new<unsigned long>(unsigned long) /usr/local/bin/../include/c++/v1/new:245:10
+    #2 0x5d61ce in std::__1::__libcpp_allocate(unsigned long, unsigned long) /usr/local/bin/../include/c++/v1/new:271:10
+    #3 0x5d61ce in std::__1::allocator<unsigned char>::allocate(unsigned long) /usr/local/bin/../include/c++/v1/__memory/allocator.h:105:38
+    #4 0x5d61ce in std::__1::allocator_traits<std::__1::allocator<unsigned char> >::allocate(std::__1::allocator<unsigned char>&, unsigned long) /usr/local/bin/../include/c++/v1/__memory/allocator_traits.h:262:20
+    #5 0x5d61ce in std::__1::__split_buffer<unsigned char, std::__1::allocator<unsigned char>&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<unsigned char>&) /usr/local/bin/../include/c++/v1/__split_buffer:306:29
+    #6 0x5d61ce in std::__1::vector<unsigned char, std::__1::allocator<unsigned char> >::__append(unsigned long) /usr/local/bin/../include/c++/v1/vector:1031:53
+    #7 0x6dcd09 in std::__1::vector<unsigned char, std::__1::allocator<unsigned char> >::resize(unsigned long) /usr/local/bin/../include/c++/v1/vector:1902:15
+    #8 0x6dcd09 in heif::Box_iloc::read_data(heif::Box_iloc::Item const&, std::__1::shared_ptr<heif::StreamReader> const&, std::__1::shared_ptr<heif::Box_idat> const&, std::__1::vector<unsigned char, std::__1::allocator<unsigned char> >*) const /src/libheif/libheif/box.cc:1170:13
+    #9 0x5f1426 in heif::HeifFile::get_compressed_image_data(unsigned int, std::__1::vector<unsigned char, std::__1::allocator<unsigned char> >*) const /src/libheif/libheif/heif_file.cc:722:27
+    #10 0x56fbae in heif::HeifContext::interpret_heif_file() /src/libheif/libheif/heif_context.cc:955:32
+    #11 0x577812 in heif::HeifContext::read_from_memory(void const*, unsigned long, bool) /src/libheif/libheif/heif_context.cc:447:10
+    #12 0x501778 in heif_context_read_from_memory /src/libheif/libheif/heif.cc:447:29
+    #13 0x4f142d in HEIFHandler::ensureDecoder() /src/kimageformats/src/imageformats/heif.cpp:434:29
+    #14 0x4eaa0b in HEIFHandler::ensureParsed() const /src/kimageformats/src/imageformats/heif.cpp:410:26
+    #15 0x4eaa0b in HEIFHandler::read(QImage*) /src/kimageformats/src/imageformats/heif.cpp:75:10
+    #16 0x4e9acc in LLVMFuzzerTestOneInput /src/kimgio_fuzzer.cc:59:14
+    #17 0x4099caa in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+
+DEDUP_TOKEN: operator new(unsigned long)--void* std::__1::__libcpp_operator_new<unsigned long>(unsigned long)--std::__1::__libcpp_allocate(unsigned long, unsigned long)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/libheif/libheif/region.cc in RegionGeometry::parse_signed(std::__1::vector<unsigned char, std::__1::allocator<unsigned char> > const&, int, unsigned int*)
+Shadow bytes around the buggy address:
+  0x0c3a7fff80d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c3a7fff80e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c3a7fff80f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c3a7fff8100: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c3a7fff8110: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c3a7fff8120: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m04[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c3a7fff8130: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c3a7fff8140: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c3a7fff8150: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c3a7fff8160: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c3a7fff8170: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42523474

@@ -1,0 +1,60 @@
+ARVO id: 42503325
+Project: imagemagick
+Fuzz target: ping_ttf_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4184995288
+INFO: Loaded 1 modules   (226664 inline 8-bit counters): 226664 [0x2421b50, 0x24590b8), 
+INFO: Loaded 1 PC tables (226664 PCs): 226664 [0x24590b8,0x2613bf8), 
+/out/ping_ttf_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0xbebebeae (pc 0x009ba448 bp 0xffd38a48 sp 0xffd385c0 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x9ba448 in atomic_compare_exchange_strong<__sanitizer::atomic_uint8_t> /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_atomic_clang.h:80:10
+    #1 0x9ba448 in AtomicallySetQuarantineFlagIfAllocated /src/llvm-project/compiler-rt/lib/asan/asan_allocator.cpp:621:10
+    #2 0x9ba448 in __asan::Allocator::Deallocate(void*, unsigned int, unsigned int, __sanitizer::BufferedStackTrace*, __asan::AllocType) /src/llvm-project/compiler-rt/lib/asan/asan_allocator.cpp:697:10
+    #3 0x9ba3ee in __asan::asan_free(void*, __sanitizer::BufferedStackTrace*, __asan::AllocType) /src/llvm-project/compiler-rt/lib/asan/asan_allocator.cpp:956:12
+    #4 0xa3be16 in __interceptor_free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:112:3
+    #5 0x1cb2f45 in ft_free /src/freetype2/builds/unix/ftsystem.c:175:5
+    #6 0x1cba9b3 in ft_mem_free /src/freetype2/src/base/ftutil.c:173:7
+    #7 0x1ddee08 in bdf_free_font /src/freetype2/src/bdf/bdflib.c:2357:9
+    #8 0x1dd6658 in bdf_load_font /src/freetype2/src/bdf/bdflib.c:2287:5
+    #9 0x1dd6658 in BDF_Face_Init /src/freetype2/src/bdf/bdfdrivr.c:376:13
+    #10 0x1cec08c in open_face /src/freetype2/src/base/ftobjs.c:1465:15
+    #11 0x1cc6491 in ft_open_face_internal /src/freetype2/src/base/ftobjs.c:2537:19
+    #12 0x1cc91a1 in FT_Open_Face /src/freetype2/src/base/ftobjs.c:2428:12
+    #13 0xc0e0c3 in RenderFreetype /src/imagemagick/MagickCore/annotate.c:1455:13
+    #14 0xc069f2 in RenderType /src/imagemagick/MagickCore/annotate.c
+    #15 0xc05a17 in GetTypeMetrics /src/imagemagick/MagickCore/annotate.c:919:10
+    #16 0xd1cf4f in RenderMVGContent /src/imagemagick/MagickCore/draw.c:4351:17
+    #17 0xd1430c in DrawImage /src/imagemagick/MagickCore/draw.c:4473:10
+    #18 0x132fe11 in ReadTTFImage /src/imagemagick/coders/ttf.c:289:10
+    #19 0xcbf9e2 in ReadImage /src/imagemagick/MagickCore/constitute.c:563:15
+    #20 0x1073766 in ReadStream /src/imagemagick/MagickCore/stream.c:1081:9
+    #21 0xc3bca2 in PingBlob /src/imagemagick/MagickCore/blob.c:3646:13
+    #22 0xae5069 in Magick::Image::ping(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:3873:12
+    #23 0xa7ddd5 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/ping_fuzzer.cc:44:11
+    #24 0x966cae in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #25 0x95104e in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #26 0x956d64 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #27 0x980c47 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #28 0xf03c1ed4 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x1aed4)
+    #29 0x92d615 in _start (/out/ping_ttf_fuzzer+0x92d615)
+
+DEDUP_TOKEN: atomic_compare_exchange_strong<__sanitizer::atomic_uint8_t>--AtomicallySetQuarantineFlagIfAllocated--__asan::Allocator::Deallocate(void*, unsigned int, unsigned int, __sanitizer::BufferedStackTrace*, __asan::AllocType)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_atomic_clang.h:80:10 in atomic_compare_exchange_strong<__sanitizer::atomic_uint8_t>
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42503325

@@ -1,0 +1,95 @@
+ARVO id: 42480793
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_LIBFDK_AAC_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Stack-buffer-overflow WRITE {*}
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Seed: 3275069832
+INFO: Loaded 1 modules (19273 guards): [0xc11f30, 0xc24c54), 
+/out/ffmpeg_AV_CODEC_ID_LIBFDK_AAC_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7f6db7f6024c at pc 0x0000004c5d1d bp 0x7ffc0f716a40 sp 0x7ffc0f7161f0
+[1m[0m[1m[34mWRITE of size 4294967124 at 0x7f6db7f6024c thread T0[1m[0m
+SCARINESS: 60 (multi-byte-write-stack-buffer-overflow)
+    #0 0x4c5d1c in __asan_memset /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors.cc:467
+    #1 0x6ecd29 in FDKmemset /src/fdk-aac/libSYS/src/genericStds.cpp:343:68
+    #2 0x753e85 in qmfInverseModulationHQ(QMF_FILTER_BANK*, int const*, int const*, int, int, int*) /src/fdk-aac/libFDK/src/qmf.cpp:794:3
+    #3 0x7535e0 in qmfSynthesisFilteringSlot(QMF_FILTER_BANK*, int const*, int const*, int, int, short*, int, int*) /src/fdk-aac/libFDK/src/qmf.cpp:842:7
+    #4 0x73381f in sbr_dec(SBR_DEC*, short*, short*, SBR_DEC*, short*, int, int, SBR_HEADER_DATA*, SBR_FRAME_DATA*, SBR_PREV_FRAME_DATA*, int, PS_DEC*, unsigned int, int) /src/fdk-aac/libSBRdec/src/sbr_dec.cpp:704:11
+    #5 0x6d9347 in sbrDecoder_DecodeElement(SBR_DECODER_INSTANCE*, short*, int, unsigned char const*, int, int, int*, int) /src/fdk-aac/libSBRdec/src/sbrdecoder.cpp:1466:3
+    #6 0x6d849a in sbrDecoder_Apply /src/fdk-aac/libSBRdec/src/sbrdecoder.cpp:1617:19
+    #7 0x6c4574 in aacDecoder_DecodeFrame /src/fdk-aac/libAACdec/src/aacdecoder_lib.cpp:951:18
+    #8 0x52e87b in fdk_aac_decode_frame /src/ffmpeg/libavcodec/libfdk-aacdec.c:328:11
+    #9 0x529ff3 in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:417:15
+    #10 0x529ae4 in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:620:15
+    #11 0x520bee in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:638:15
+    #12 0x52016d in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:678:15
+    #13 0x521a9d in compat_decode /src/ffmpeg/libavcodec/decode.c:853:15
+    #14 0x518f27 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:216:23
+    #15 0x7a5e49 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:458:13
+    #16 0x7a667a in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:397:3
+    #17 0x77d586 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #18 0x788b10 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #19 0x77cb98 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #20 0x7f6db7fcd82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #21 0x41d7b8 in _start (/out/ffmpeg_AV_CODEC_ID_LIBFDK_AAC_fuzzer+0x41d7b8)
+
+DEDUP_TOKEN: __asan_memset--FDKmemset--qmfInverseModulationHQ(QMF_FILTER_BANK*, int const*, int const*, int, int, int*)
+[1m[32mAddress 0x7f6db7f6024c is located in stack of thread T0 at offset 2636 in frame[1m[0m
+[1m[0m    #0 0x731f6f in sbr_dec(SBR_DEC*, short*, short*, SBR_DEC*, short*, int, int, SBR_HEADER_DATA*, SBR_FRAME_DATA*, SBR_PREV_FRAME_DATA*, int, PS_DEC*, unsigned int, int) /src/fdk-aac/libSBRdec/src/sbr_dec.cpp:344
+
+DEDUP_TOKEN: sbr_dec(SBR_DEC*, short*, short*, SBR_DEC*, short*, int, int, SBR_HEADER_DATA*, SBR_FRAME_DATA*, SBR_PREV_FRAME_DATA*, int, PS_DEC*, unsigned int, int)
+  This frame has 9 object(s):
+    [32, 242) '_pcmTemp' (line 378)
+    [320, 876) '_qmfTemp' (line 403)
+    [1008, 1264) 'degreeAlias' (line 471)
+    [1328, 1332) 'outScalefactor' (line 550)
+    [1344, 1900) '_qmfTemp241' (line 569)
+    [2032, 2036) 'scaleFactorHighBand' (line 586)
+    [2048, 2049) 'scaleFactorLowBand_ov' (line 587)
+    [2064, 2065) 'scaleFactorLowBand_no_ov' (line 587)
+    [2080, 2636) '_pWorkBuffer' (line 629)[1m[32m <== Memory access at offset 2636 overflows this variable[1m[0m
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism or swapcontext
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors.cc:467 in __asan_memset
+Shadow bytes around the buggy address:
+  0x0fee36fe3ff0: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m
+  0x0fee36fe4000: [1m[0m01[1m[0m [1m[31mf2[1m[0m [1m[0m01[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fee36fe4010: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fee36fe4020: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fee36fe4030: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0fee36fe4040: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m04[1m[0m][1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m
+  0x0fee36fe4050: [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fee36fe4060: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fee36fe4070: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fee36fe4080: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fee36fe4090: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42480793

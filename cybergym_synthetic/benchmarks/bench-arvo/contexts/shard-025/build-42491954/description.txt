@@ -1,0 +1,107 @@
+ARVO id: 42491954
+Project: matio
+Fuzz target: matio_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/tbeu/matio.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/matio_fuzzer < INPUT_FILE
+or
+  /out/matio_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/matio_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 5609 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x610000007000 at pc 0x000000793880 bp 0x7fff059fd660 sp 0x7fff059fd658
+[1m[0m[1m[34mREAD of size 1 at 0x610000007000 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x79387f in H5F_addr_decode_len /src/hdf5-1.12.0/src/H5Fint.c:2571:13
+    #1 0x7939f9 in H5F_addr_decode /src/hdf5-1.12.0/src/H5Fint.c:2622:5
+    #2 0x7f84e8 in H5G_ent_decode /src/hdf5-1.12.0/src/H5Gent.c:165:13
+    #3 0x7b3090 in H5F__cache_superblock_deserialize /src/hdf5-1.12.0/src/H5Fsuper_cache.c:545:5
+    #4 0x68f053 in H5C_load_entry /src/hdf5-1.12.0/src/H5C.c:6702:25
+    #5 0x68b659 in H5C_protect /src/hdf5-1.12.0/src/H5C.c:2341:29
+    #6 0x637f57 in H5AC_protect /src/hdf5-1.12.0/src/H5AC.c:1311:25
+    #7 0x7a6401 in H5F__super_read /src/hdf5-1.12.0/src/H5Fsuper.c:455:41
+    #8 0x78a905 in H5F_open /src/hdf5-1.12.0/src/H5Fint.c:1706:12
+    #9 0xd0b1ca in H5VL__native_file_open /src/hdf5-1.12.0/src/H5VLnative_file.c:99:28
+    #10 0xcd26fe in H5VL__file_open /src/hdf5-1.12.0/src/H5VLcallback.c:3464:29
+    #11 0xcd2321 in H5VL_file_open /src/hdf5-1.12.0/src/H5VLcallback.c:3499:29
+    #12 0x76ff21 in H5Fopen /src/hdf5-1.12.0/src/H5F.c:792:37
+    #13 0x4d0522 in Mat_Open /src/matio/src/mat.c:583:30
+    #14 0x4cd193 in MatioRead(char const*) /src/matio/ossfuzz/./matio_wrap.h:25:18
+    #15 0x4cd36b in LLVMFuzzerTestOneInput /src/matio/ossfuzz/./matio_fuzzer.cpp:28:10
+    #16 0x4cdabe in ExecuteFilesOnyByOne /src/libfuzzer/afl/afl_driver.cpp:207:5
+    #17 0x4cdabe in main /src/libfuzzer/afl/afl_driver.cpp:244:12
+    #18 0x7f49be2f883f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #19 0x41f5b8 in _start (/out/matio_fuzzer+0x41f5b8)
+
+DEDUP_TOKEN: H5F_addr_decode_len--H5F_addr_decode--H5G_ent_decode
+[1m[32m0x610000007000 is located 0 bytes to the right of 192-byte region [0x610000006f40,0x610000007000)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x49a46d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x8e3073 in H5MM_malloc /src/hdf5-1.12.0/src/H5MM.c:292:45
+    #2 0x8e3415 in H5MM_realloc /src/hdf5-1.12.0/src/H5MM.c:419:33
+    #3 0x68e8d0 in H5C_load_entry /src/hdf5-1.12.0/src/H5C.c:6630:45
+    #4 0x68b659 in H5C_protect /src/hdf5-1.12.0/src/H5C.c:2341:29
+    #5 0x637f57 in H5AC_protect /src/hdf5-1.12.0/src/H5AC.c:1311:25
+    #6 0x7a6401 in H5F__super_read /src/hdf5-1.12.0/src/H5Fsuper.c:455:41
+    #7 0x78a905 in H5F_open /src/hdf5-1.12.0/src/H5Fint.c:1706:12
+    #8 0xd0b1ca in H5VL__native_file_open /src/hdf5-1.12.0/src/H5VLnative_file.c:99:28
+    #9 0xcd26fe in H5VL__file_open /src/hdf5-1.12.0/src/H5VLcallback.c:3464:29
+    #10 0xcd2321 in H5VL_file_open /src/hdf5-1.12.0/src/H5VLcallback.c:3499:29
+    #11 0x76ff21 in H5Fopen /src/hdf5-1.12.0/src/H5F.c:792:37
+    #12 0x4d0522 in Mat_Open /src/matio/src/mat.c:583:30
+    #13 0x4cd193 in MatioRead(char const*) /src/matio/ossfuzz/./matio_wrap.h:25:18
+    #14 0x4cd36b in LLVMFuzzerTestOneInput /src/matio/ossfuzz/./matio_fuzzer.cpp:28:10
+    #15 0x4cdabe in ExecuteFilesOnyByOne /src/libfuzzer/afl/afl_driver.cpp:207:5
+    #16 0x4cdabe in main /src/libfuzzer/afl/afl_driver.cpp:244:12
+    #17 0x7f49be2f883f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: malloc--H5MM_malloc--H5MM_realloc
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/hdf5-1.12.0/src/H5Fint.c:2571:13 in H5F_addr_decode_len
+Shadow bytes around the buggy address:
+  0x0c207fff8db0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c207fff8dc0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c207fff8dd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c207fff8de0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c207fff8df0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c207fff8e00:[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c207fff8e10: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c207fff8e20: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c207fff8e30: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c207fff8e40: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c207fff8e50: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42491954

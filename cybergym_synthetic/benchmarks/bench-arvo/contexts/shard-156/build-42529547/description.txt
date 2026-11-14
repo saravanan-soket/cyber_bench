@@ -1,0 +1,47 @@
+ARVO id: 42529547
+Project: igraph
+Fuzz target: read_pajek
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c
+Repo: https://github.com/igraph/igraph
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2118133039
+INFO: Loaded 1 modules   (10908 inline 8-bit counters): 10908 [0x83708a0, 0x837333c), 
+INFO: Loaded 1 PC tables (10908 PCs): 10908 [0x82e6ba8,0x82fc088), 
+/out/read_pajek: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x010100f1 (pc 0x080ff6d7 bp 0x00000001 sp 0xffffc530 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x80ff6d7 in atomic_load<__sanitizer::atomic_uint8_t> /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_atomic_clang_x86.h:46:14
+    #1 0x80ff6d7 in __asan::Allocator::Reallocate(void*, unsigned int, __sanitizer::BufferedStackTrace*) /src/llvm-project/compiler-rt/lib/asan/asan_allocator.cpp:717:24
+    #2 0x80ff611 in __asan::asan_realloc(void*, unsigned int, __sanitizer::BufferedStackTrace*) /src/llvm-project/compiler-rt/lib/asan/asan_allocator.cpp:982:34
+    #3 0x818198a in __interceptor_realloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:86:10
+    #4 0x822b692 in igraph_strvector_set_len /src/igraph/src/core/strvector.c:187:11
+    #5 0x822b5d9 in igraph_strvector_set /src/igraph/src/core/strvector.c:159:12
+    #6 0x82145ab in add_string_attribute /src/igraph/src/io/pajek-parser.y:651:3
+    #7 0x820bae7 in add_string_vertex_attribute /src/igraph/src/io/pajek-parser.y:660:10
+    #8 0x820bae7 in igraph_pajek_yyparse /src/igraph/src/io/pajek-parser.y:325:10
+    #9 0x82022a6 in igraph_read_graph_pajek /src/igraph/src/io/pajek.c:209:15
+    #10 0x81c4af8 in LLVMFuzzerTestOneInput /src/igraph/./fuzzing/read_pajek.cpp:41:9
+    #11 0x80859ce in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #12 0x807092e in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #13 0x8076530 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #14 0x80a0117 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0xf7c99ed4 in __libc_start_main (/lib32/libc.so.6+0x1aed4) (BuildId: 94ef826288f65de53d1a40ffd9e5da1c7f174fd7)
+    #16 0x8067a75 in _start (/out/read_pajek+0x8067a75)
+
+DEDUP_TOKEN: atomic_load<__sanitizer::atomic_uint8_t>--__asan::Allocator::Reallocate(void*, unsigned int, __sanitizer::BufferedStackTrace*)--__asan::asan_realloc(void*, unsigned int, __sanitizer::BufferedStackTrace*)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_atomic_clang_x86.h:46:14 in atomic_load<__sanitizer::atomic_uint8_t>
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42529547

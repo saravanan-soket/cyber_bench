@@ -1,0 +1,46 @@
+ARVO id: 42513212
+Project: mruby
+Fuzz target: mruby_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/mruby/mruby
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3608913962
+INFO: Loaded 1 modules   (22769 inline 8-bit counters): 22769 [0x998ee9, 0x99e7da), 
+INFO: Loaded 1 PC tables (22769 PCs): 22769 [0x8dd9b8,0x9368c8), 
+/out/mruby_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address 0xfffffffffffffff8 (pc 0x000000595d28 bp 0x7ffe392d8010 sp 0x7ffe392d7e70 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x595d28 in digits /src/mruby/mrbgems/mruby-bigint/core/bigint.c:109:25
+    #1 0x595d28 in mpz_sizeinbase /src/mruby/mrbgems/mruby-bigint/core/bigint.c:628:17
+    #2 0x595d28 in mrb_bint_to_s /src/mruby/mrbgems/mruby-bigint/core/bigint.c:1352:17
+    #3 0x573ced in int_to_s /src/mruby/src/numeric.c:1793:12
+    #4 0x6ff5a2 in mrb_vm_exec /src/mruby/src/vm.c
+    #5 0x6c8428 in mrb_vm_run /src/mruby/src/vm.c:1208:12
+    #6 0x6c231e in mrb_top_run /src/mruby/src/vm.c
+    #7 0x5d0558 in mrb_load_exec /src/mruby/mrbgems/mruby-compiler/core/parse.y:6889:7
+    #8 0x5d2454 in mrb_load_nstring_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6961:10
+    #9 0x5d2810 in mrb_load_string_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6973:10
+    #10 0x5d2810 in mrb_load_string /src/mruby/mrbgems/mruby-compiler/core/parse.y:6979:10
+    #11 0x528007 in LLVMFuzzerTestOneInput /src/mruby/oss-fuzz/mruby_fuzzer.c:14:5
+    #12 0x456423 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #13 0x4420b2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #14 0x4478fc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #15 0x4704f2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7f7036a2f082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #17 0x4208dd in _start (/out/mruby_fuzzer+0x4208dd)
+
+DEDUP_TOKEN: digits--mpz_sizeinbase--mrb_bint_to_s
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV /src/mruby/mrbgems/mruby-bigint/core/bigint.c:109:25 in digits
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42513212

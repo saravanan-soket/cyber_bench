@@ -1,0 +1,117 @@
+ARVO id: 42535415
+Project: quickjs
+Fuzz target: fuzz_eval
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-use-after-free WRITE 8
+Language: c
+Repo: https://github.com/bellard/quickjs
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2349630985
+INFO: Loaded 1 modules   (31519 inline 8-bit counters): 31519 [0x55c6af9b21d0, 0x55c6af9b9cef), 
+INFO: Loaded 1 PC tables (31519 PCs): 31519 [0x55c6af9b9cf0,0x55c6afa34ee0), 
+/out/fuzz_eval: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-use-after-free on address 0x50f000ba1488 at pc 0x55c6af59eacd bp 0x7ffce4436490 sp 0x7ffce4436488
+[1m[0m[1m[34mWRITE of size 8 at 0x50f000ba1488 thread T0[1m[0m
+SCARINESS: 52 (8-byte-write-heap-use-after-free)
+    #0 0x55c6af59eacc in list_del /src/quickjs/./list.h:75:16
+    #1 0x55c6af59eacc in gc_decref /src/quickjs/quickjs.c:5765:13
+    #2 0x55c6af59eacc in JS_RunGC /src/quickjs/quickjs.c:5863:5
+    #3 0x55c6af5995da in JS_FreeRuntime /src/quickjs/quickjs.c:1957:5
+    #4 0x55c6af593f42 in LLVMFuzzerTestOneInput /src/quickjs/fuzz/fuzz_eval.c:47:5
+    #5 0x55c6af4466a0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #6 0x55c6af430e34 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #7 0x55c6af4368ca in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #8 0x55c6af462cc2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #9 0x7fc38a713082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 87b331c034a6458c64ce09c03939e947212e18ce)
+    #10 0x55c6af42790d in _start (/out/fuzz_eval+0x11d90d)
+
+DEDUP_TOKEN: list_del--gc_decref--JS_RunGC
+[1m[32m0x50f000ba1488 is located 8 bytes inside of 168-byte region [0x50f000ba1480,0x50f000ba1528)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x55c6af554996 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3
+    #1 0x55c6af6a9fa0 in js_free_rt /src/quickjs/quickjs.c:1321:5
+    #2 0x55c6af6a9fa0 in js_free /src/quickjs/quickjs.c:1376:5
+    #3 0x55c6af6a9fa0 in async_func_init /src/quickjs/quickjs.c:18909:9
+    #4 0x55c6af598b8b in js_generator_function_call /src/quickjs/quickjs.c:19161:21
+    #5 0x55c6af5ebe64 in JS_CallInternal /src/quickjs/quickjs.c:16231:16
+    #6 0x55c6af5fba4e in JS_CallInternal /src/quickjs/quickjs.c:16638:27
+    #7 0x55c6af626a19 in JS_CallFree /src/quickjs/quickjs.c:18717:19
+    #8 0x55c6af626a19 in JS_EvalFunctionInternal /src/quickjs/quickjs.c:34401:19
+    #9 0x55c6af64f911 in __JS_EvalInternal /src/quickjs/quickjs.c:34536:19
+    #10 0x55c6af628453 in JS_EvalInternal /src/quickjs/quickjs.c:34554:12
+    #11 0x55c6af628453 in JS_EvalThis /src/quickjs/quickjs.c:34585:11
+    #12 0x55c6af628453 in JS_Eval /src/quickjs/quickjs.c:34593:12
+    #13 0x55c6af593deb in LLVMFuzzerTestOneInput /src/quickjs/fuzz/fuzz_eval.c:38:19
+    #14 0x55c6af4466a0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #15 0x55c6af430e34 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #16 0x55c6af4368ca in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #17 0x55c6af462cc2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7fc38a713082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 87b331c034a6458c64ce09c03939e947212e18ce)
+
+DEDUP_TOKEN: __interceptor_free--js_free_rt--js_free
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x55c6af554c3e in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0x55c6af671294 in js_def_malloc /src/quickjs/quickjs.c:1729:11
+    #2 0x55c6af6a9213 in js_malloc_rt /src/quickjs/quickjs.c:1316:12
+    #3 0x55c6af6a9213 in js_mallocz_rt /src/quickjs/quickjs.c:1337:11
+    #4 0x55c6af6a9213 in js_mallocz /src/quickjs/quickjs.c:1366:11
+    #5 0x55c6af6a9213 in async_func_init /src/quickjs/quickjs.c:18893:9
+    #6 0x55c6af598b8b in js_generator_function_call /src/quickjs/quickjs.c:19161:21
+    #7 0x55c6af5ebe64 in JS_CallInternal /src/quickjs/quickjs.c:16231:16
+    #8 0x55c6af5fba4e in JS_CallInternal /src/quickjs/quickjs.c:16638:27
+    #9 0x55c6af626a19 in JS_CallFree /src/quickjs/quickjs.c:18717:19
+    #10 0x55c6af626a19 in JS_EvalFunctionInternal /src/quickjs/quickjs.c:34401:19
+    #11 0x55c6af64f911 in __JS_EvalInternal /src/quickjs/quickjs.c:34536:19
+    #12 0x55c6af628453 in JS_EvalInternal /src/quickjs/quickjs.c:34554:12
+    #13 0x55c6af628453 in JS_EvalThis /src/quickjs/quickjs.c:34585:11
+    #14 0x55c6af628453 in JS_Eval /src/quickjs/quickjs.c:34593:12
+    #15 0x55c6af593deb in LLVMFuzzerTestOneInput /src/quickjs/fuzz/fuzz_eval.c:38:19
+    #16 0x55c6af4466a0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #17 0x55c6af430e34 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #18 0x55c6af4368ca in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #19 0x55c6af462cc2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #20 0x7fc38a713082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 87b331c034a6458c64ce09c03939e947212e18ce)
+
+DEDUP_TOKEN: __interceptor_malloc--js_def_malloc--js_malloc_rt
+SUMMARY: AddressSanitizer: heap-use-after-free /src/quickjs/./list.h:75:16 in list_del
+Shadow bytes around the buggy address:
+  0x50f000ba1200: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x50f000ba1280: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x50f000ba1300: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x50f000ba1380: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x50f000ba1400: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x50f000ba1480: [1m[35mfd[1m[0m[[1m[35mfd[1m[0m][1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x50f000ba1500: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x50f000ba1580: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x50f000ba1600: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x50f000ba1680: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x50f000ba1700: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42535415

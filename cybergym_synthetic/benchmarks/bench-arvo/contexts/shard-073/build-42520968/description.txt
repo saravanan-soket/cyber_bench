@@ -1,0 +1,55 @@
+ARVO id: 42520968
+Project: ghostpdl
+Fuzz target: gstoraster_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://cgit.ghostscript.com/ghostpdl.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2881366308
+INFO: Loaded 3 modules   (223635 inline 8-bit counters): 13672 [0x7ffff7f619e0, 0x7ffff7f64f48), 959 [0x7ffff7fc2a40, 0x7ffff7fc2dff), 209004 [0x3829770, 0x385c7dc), 
+INFO: Loaded 3 PC tables (223635 PCs): 13672 [0x7ffff7f64f48,0x7ffff7f9a5c8), 959 [0x7ffff7fc2e00,0x7ffff7fc69f0), 209004 [0x2a90070,0x2dc0730), 
+/out/gstoraster_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+gsapi_init_with_args: error -100
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x00000125f3a9 bp 0x7fffffffd230 sp 0x7fffffffd190 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x125f3a9 in gs_function_Sd_init /src/ghostpdl/./base/gsfunc0.c:1463:34
+    #1 0xfe2cf0 in sampled_data_finish /src/ghostpdl/./psi/zfsample.c:587:16
+    #2 0xe8bbc6 in interp /src/ghostpdl/./psi/interp.c:1351:28
+    #3 0xe8bbc6 in gs_call_interp /src/ghostpdl/./psi/interp.c:522:12
+    #4 0xe8bbc6 in gs_interpret /src/ghostpdl/./psi/interp.c:479:12
+    #5 0x5771d3 in gs_main_interpret /src/ghostpdl/./psi/imain.c:257:12
+    #6 0x5771d3 in gs_main_run_string_end /src/ghostpdl/./psi/imain.c:945:12
+    #7 0x5771d3 in gs_main_run_string_with_length /src/ghostpdl/./psi/imain.c:889:12
+    #8 0x57904d in gs_main_run_string /src/ghostpdl/./psi/imain.c:870:12
+    #9 0x57904d in gs_main_finit /src/ghostpdl/./psi/imain.c:1284:13
+    #10 0x57aad2 in gs_to_exit_with_code /src/ghostpdl/./psi/imain.c:1444:12
+    #11 0x57aad2 in gs_to_exit /src/ghostpdl/./psi/imain.c:1449:12
+    #12 0xe78863 in psapi_exit /src/ghostpdl/./psi/psapi.c:517:5
+    #13 0x56effa in gsapi_exit /src/ghostpdl/./psi/iapi.c:440:12
+    #14 0x56dd9b in fuzz_gs_device(unsigned char const*, unsigned long, int, char const*, char const*, int) /src/gs_fuzzlib.h:144:8
+    #15 0x56e152 in gs_to_raster_fuzz /src/gs_fuzzlib.h:66:9
+    #16 0x56e152 in LLVMFuzzerTestOneInput /src/gstoraster_fuzzer.cc:23:2
+    #17 0x43f1c3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #18 0x42a922 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #19 0x4301cc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #20 0x459702 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #21 0x7ffff7962082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #22 0x420aed in _start (/out/gstoraster_fuzzer+0x420aed)
+
+DEDUP_TOKEN: gs_function_Sd_init--sampled_data_finish--interp
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/ghostpdl/./base/gsfunc0.c:1463:34 in gs_function_Sd_init
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42520968

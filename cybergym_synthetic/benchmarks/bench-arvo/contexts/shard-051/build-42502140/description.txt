@@ -1,0 +1,139 @@
+ARVO id: 42502140
+Project: assimp
+Fuzz target: assimp_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Stack-buffer-overflow READ 8
+Language: c++
+Repo: https://github.com/assimp/assimp.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/assimp_fuzzer < INPUT_FILE
+or
+  /out/assimp_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/assimp_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 4123 bytes from /tmp/poc
+Info,  T0: Load $$$___magic___$$$.
+Info,  T0: Found a matching importer for this file format: LightWave Scene Importer.
+Info,  T0: Import root directory is './'
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffff7f7f9b0 at pc 0x0000004f1b73 bp 0x7fffffffd9f0 sp 0x7fffffffd9e8
+[1m[0m[1m[34mREAD of size 8 at 0x7ffff7f7f9b0 thread T0[1m[0m
+SCARINESS: 48 (8-byte-read-stack-buffer-overflow-far-from-bounds)
+    #0 0x4f1b72 in std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__get_long_pointer() const /usr/local/bin/../include/c++/v1/string:1505:34
+    #1 0x4f1b04 in std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__get_pointer() const /usr/local/bin/../include/c++/v1/string:1517:31
+    #2 0x4f1a9c in std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::data() const /usr/local/bin/../include/c++/v1/string:1245:75
+    #3 0x4d602c in std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::c_str() const /usr/local/bin/../include/c++/v1/string:1243:55
+    #4 0x7f27d9 in Assimp::LWSImporter::InternReadFile(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, aiScene*, Assimp::IOSystem*) /src/assimp/code/AssetLib/LWS/LWSLoader.cpp:540:54
+    #5 0x11f7b39 in Assimp::BaseImporter::ReadFile(Assimp::Importer*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, Assimp::IOSystem*) /src/assimp/code/Common/BaseImporter.cpp:127:9
+    #6 0x51c222 in Assimp::Importer::ReadFile(char const*, unsigned int) /src/assimp/code/Common/Importer.cpp:665:30
+    #7 0x51b0d5 in Assimp::Importer::ReadFileFromMemory(void const*, unsigned long, unsigned int, char const*) /src/assimp/code/Common/Importer.cpp:502:5
+    #8 0x4d1531 in LLVMFuzzerTestOneInput /src/assimp/fuzz/assimp_fuzzer.cc:53:34
+    #9 0x4d1a8e in ExecuteFilesOnyByOne /src/libfuzzer/afl/afl_driver.cpp:217:5
+    #10 0x4d1a8e in main /src/libfuzzer/afl/afl_driver.cpp:254:12
+    #11 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #12 0x4236f8 in _start (/out/assimp_fuzzer+0x4236f8)
+
+DEDUP_TOKEN: std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__get_long_pointer() const--std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__get_pointer() const--std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::data() const
+[1m[32mAddress 0x7ffff7f7f9b0 is located in stack of thread T0 at offset 432 in frame[1m[0m
+[1m[0m    #0 0x7f22ef in Assimp::LWSImporter::InternReadFile(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, aiScene*, Assimp::IOSystem*) /src/assimp/code/AssetLib/LWS/LWSLoader.cpp:499
+
+DEDUP_TOKEN: Assimp::LWSImporter::InternReadFile(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, aiScene*, Assimp::IOSystem*)
+  This frame has 51 object(s):
+    [32, 40) 'pScene.addr'
+    [64, 72) 'file' (line 501)
+    [96, 120) 'ref.tmp' (line 501)
+    [160, 184) 'ref.tmp3' (line 505)
+    [224, 248) 'ref.tmp4' (line 505)
+    [288, 312) 'mBuffer' (line 509)
+    [352, 424) 'root' (line 513)[1m[32m <== Memory access at offset 432 overflows this variable[1m[0m
+    [464, 472) 'dummy' (line 514)
+    [496, 504) 'batch' (line 518)
+    [528, 552) 'nodes' (line 521)
+    [592, 600) 'it' (line 528)
+    [624, 632) 'ref.tmp24' (line 528)
+    [656, 680) 'ref.tmp39' (line 535)
+    [720, 744) 'ref.tmp64' (line 541)
+    [784, 792) 'ref.tmp75' (line 547)
+    [816, 824) 'ref.tmp76' (line 547)
+    [848, 856) 'c' (line 548)
+    [880, 884) 'layer' (line 566)
+    [896, 992) 'props' (line 569)
+    [1024, 1184) 'd' (line 573)
+    [1248, 1272) 'path' (line 584)
+    [1312, 1336) 'ref.tmp157' (line 584)
+    [1376, 1536) 'd186' (line 593)
+    [1600, 1624) 'path203' (line 602)
+    [1664, 1688) 'ref.tmp204' (line 602)
+    [1728, 1888) 'd231' (line 611)
+    [1952, 2112) 'd270' (line 634)
+    [2176, 2232) 'ref.tmp288' (line 644)
+    [2272, 2280) 'ref.tmp357' (line 670)
+    [2304, 2312) 'ref.tmp358' (line 670)
+    [2336, 2344) 'envelopeIt' (line 678)
+    [2368, 2376) 'ref.tmp391' (line 678)
+    [2400, 2560) 'd465' (line 709)
+    [2624, 2784) 'd513' (line 732)
+    [2848, 2856) 'ndIt' (line 826)
+    [2880, 2888) 'ref.tmp784' (line 826)
+    [2912, 2920) 'dit' (line 829)
+    [2944, 2952) 'ref.tmp796' (line 829)
+    [2976, 2984) 'ref.tmp828' (line 837)
+    [3008, 3016) 'ndIt851' (line 845)
+    [3040, 3048) 'ref.tmp855' (line 845)
+    [3072, 3096) 'ref.tmp880' (line 851)
+    [3136, 3144) 'cams' (line 866)
+    [3168, 3176) 'lights' (line 870)
+    [3200, 3224) 'attach' (line 872)
+    [3264, 3288) 'anims' (line 873)
+    [3328, 3336) 'ndIt924' (line 877)
+    [3360, 3368) 'ref.tmp928' (line 877)
+    [3392, 3416) 'monster_cheat' (line 903)
+    [3456, 3480) 'flipper' (line 907)
+    [3520, 3600) 'builder' (line 922)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /usr/local/bin/../include/c++/v1/string:1505:34 in std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__get_long_pointer() const
+Shadow bytes around the buggy address:
+  0x10007efe7ee0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe7ef0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe7f00: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m
+  0x10007efe7f10: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m
+  0x10007efe7f20: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x10007efe7f30: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m[[1m[31mf2[1m[0m][1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m
+  0x10007efe7f40: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m
+  0x10007efe7f50: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x10007efe7f60: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m
+  0x10007efe7f70: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x10007efe7f80: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42502140

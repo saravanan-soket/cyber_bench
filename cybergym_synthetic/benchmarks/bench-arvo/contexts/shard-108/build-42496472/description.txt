@@ -1,0 +1,45 @@
+ARVO id: 42496472
+Project: openthread
+Fuzz target: cli-received-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/openthread/openthread
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 590035076
+INFO: Loaded 1 modules   (41905 inline 8-bit counters): 41905 [0xbafe00, 0xbba1b1), 
+INFO: Loaded 1 PC tables (41905 PCs): 41905 [0x75b118,0x7fec28), 
+/out/cli-received-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x00007f54ab0f (pc 0x0000005231c2 bp 0x7fffffffd710 sp 0x7fffffffd6c0 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x5231c2 in ot::Dns::Name::AppendMultipleLabels(char const*, unsigned char, ot::Message&) /src/openthread/build/../src/core/net/dns_types.cpp:183:32
+    #1 0x523130 in ot::Dns::Name::AppendMultipleLabels(char const*, ot::Message&) /src/openthread/build/../src/core/net/dns_types.cpp:169:12
+    #2 0x522b81 in ot::Dns::Name::AppendName(char const*, ot::Message&) /src/openthread/build/../src/core/net/dns_types.cpp:263:5
+    #3 0x520fd5 in ot::Dns::Client::AllocateQuery(ot::Dns::Client::QueryInfo const&, char const*, char const*, ot::Message*&) /src/openthread/build/../src/core/net/dns_client.cpp:703:5
+    #4 0x520d1f in ot::Dns::Client::StartQuery(ot::Dns::Client::QueryInfo&, ot::Dns::Client::QueryConfig const*, char const*, char const*, void*) /src/openthread/build/../src/core/net/dns_client.cpp:680:5
+    #5 0x520e03 in ot::Dns::Client::Browse(char const*, void (*)(otError, otDnsBrowseResponse const*, void*), void*, ot::Dns::Client::QueryConfig const*) /src/openthread/build/../src/core/net/dns_client.cpp:623:12
+    #6 0x4d7761 in otDnsClientBrowse /src/openthread/build/../src/core/api/dns_api.cpp:132:40
+    #7 0x4b7d67 in ot::Cli::Interpreter::ProcessDns(unsigned char, ot::Utils::CmdLineParser::Arg*) /src/openthread/build/../src/cli/cli.cpp:1478:9
+    #8 0x4c1991 in ot::Cli::Interpreter::ProcessLine(char*) /src/openthread/build/../src/cli/cli.cpp:4895:22
+    #9 0x4c2a58 in otCliInputLine /src/openthread/build/../src/cli/cli.cpp:5259:35
+    #10 0x4b4619 in LLVMFuzzerTestOneInput /src/openthread/build/../tests/fuzz/cli_received.cpp:79:5
+    #11 0x442713 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #12 0x42c522 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #13 0x43236a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #14 0x45e052 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #16 0x407208 in _start (/out/cli-received-fuzzer+0x407208)
+
+DEDUP_TOKEN: ot::Dns::Name::AppendMultipleLabels(char const*, unsigned char, ot::Message&)--ot::Dns::Name::AppendMultipleLabels(char const*, ot::Message&)--ot::Dns::Name::AppendName(char const*, ot::Message&)
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/openthread/build/../src/core/net/dns_types.cpp:183:32 in ot::Dns::Name::AppendMultipleLabels(char const*, unsigned char, ot::Message&)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42496472

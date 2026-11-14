@@ -1,0 +1,43 @@
+ARVO id: 42475896
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_IFF_ILBM_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/ffmpeg_AV_CODEC_ID_IFF_ILBM_fuzzer < INPUT_FILE
+or
+  /out/ffmpeg_AV_CODEC_ID_IFF_ILBM_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/ffmpeg_AV_CODEC_ID_IFF_ILBM_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 2125 bytes from /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x611000400400 (pc 0x0000004e692c bp 0x7ffdbe1dcaf0 sp 0x7ffdbe1dca60 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x4e692b in extract_header /src/ffmpeg/libavcodec/iff.c:360:54
+    #1 0x4de971 in decode_init /src/ffmpeg/libavcodec/iff.c:431:16
+    #2 0x504a14 in avcodec_open2 /src/ffmpeg/libavcodec/utils.c:934:15
+    #3 0x4c82e4 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:202:15
+    #4 0x94d35a in ExecuteFilesOnyByOne /src/libfuzzer/afl/afl_driver.cpp:216:5
+    #5 0x94d35a in main /src/libfuzzer/afl/afl_driver.cpp:253
+    #6 0x7f14a2ebb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #7 0x41e788 in _start (/out/ffmpeg_AV_CODEC_ID_IFF_ILBM_fuzzer+0x41e788)
+
+DEDUP_TOKEN: extract_header--decode_init--avcodec_open2
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/ffmpeg/libavcodec/iff.c:360:54 in extract_header
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42475896

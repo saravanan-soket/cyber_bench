@@ -1,0 +1,105 @@
+ARVO id: 42470357
+Project: skia
+Fuzz target: api_image_filter
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 8
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Seed: 3771008816
+INFO: Loaded 3 modules   (386131 inline 8-bit counters): 1396 [0x7ffff52eadf0, 0x7ffff52eb364), 198238 [0x7ffff7616710, 0x7ffff7646d6e), 186497 [0x2f1e808, 0x2f4c089), 
+INFO: Loaded 3 PC tables (386131 PCs): 1396 [0x7ffff52eb368,0x7ffff52f0aa8), 198238 [0x7ffff7646d70,0x7ffff794d350), 186497 [0x2f4c090,0x32248a0), 
+/out/api_image_filter: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x611000000cb8 at pc 0x000000b94a28 bp 0x7fffffffcfc0 sp 0x7fffffffcfb8
+[1m[0m[1m[34mREAD of size 8 at 0x611000000cb8 thread T0[1m[0m
+SCARINESS: 23 (8-byte-read-heap-buffer-overflow)
+    #0 0xb94a27 in SkPath::Iter::doNext(SkPoint*) /src/skia/out/Fuzz/../../src/core/SkPath.cpp:2094:20
+    #1 0xb9d58c in is_degenerate(SkPath const&) /src/skia/out/Fuzz/../../src/core/SkPath.cpp:62:39
+    #2 0xb9d108 in SkAutoPathBoundsUpdate::init(SkPath*) /src/skia/out/Fuzz/../../src/core/SkPath.cpp:131:23
+    #3 0xb8d788 in SkPath::addOval(SkRect const&, SkPath::Direction, unsigned int) /src/skia/out/Fuzz/../../src/core/SkPath.cpp:1288:28
+    #4 0xb8e465 in SkPath::addOval(SkRect const&, SkPath::Direction) /src/skia/out/Fuzz/../../src/core/SkPath.cpp:1268:18
+    #5 0xb8e8e4 in SkPath::addCircle(float, float, float, SkPath::Direction) /src/skia/out/Fuzz/../../src/core/SkPath.cpp:1315:15
+    #6 0x93a6ef in FuzzPath(Fuzz*, SkPath*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCommon.cpp:104:23
+    #7 0x93a387 in FuzzPath(Fuzz*, SkPath*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCommon.cpp:138:17
+    #8 0x93a387 in FuzzPath(Fuzz*, SkPath*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCommon.cpp:138:17
+    #9 0x92fed7 in make_fuzz_patheffect(Fuzz*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:469:13
+    #10 0x927f81 in fuzz_paint(Fuzz*, SkPaint*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:931:29
+    #11 0x91d548 in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1284:17
+    #12 0x92c7cd in make_fuzz_picture(Fuzz*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1708:5
+    #13 0x923476 in make_fuzz_imageFilter(Fuzz*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:842:40
+    #14 0x92244b in fuzz_ImageFilter(Fuzz*) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1741:16
+    #15 0x93ce66 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAPIImageFilter.cpp:14:5
+    #16 0x8b8e88 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:570:15
+    #17 0x88f35a in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #18 0x89abd3 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #19 0x88e9dc in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #20 0x7ffff45c082f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #21 0x788348 in _start (/out/api_image_filter+0x788348)
+
+DEDUP_TOKEN: SkPath::Iter::doNext(SkPoint*)--is_degenerate(SkPath const&)--SkAutoPathBoundsUpdate::init(SkPath*)
+[1m[32m0x611000000cb8 is located 8 bytes to the left of 256-byte region [0x611000000cc0,0x611000000dc0)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x855eee in realloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:165
+    #1 0xcd31b8 in sk_realloc_throw(void*, unsigned long) /src/skia/out/Fuzz/../../src/ports/SkMemory_malloc.cpp:55:35
+    #2 0xba6ec4 in SkPathRef::makeSpace(unsigned long, bool) /src/skia/out/Fuzz/../../include/core/../private/SkPathRef.h:471:46
+    #3 0xba731b in SkPathRef::growForVerb(int, float) /src/skia/out/Fuzz/../../src/core/SkPathRef.cpp:675:11
+    #4 0xb8b410 in SkPath::conicTo(float, float, float, float, float) /src/skia/out/Fuzz/../../src/core/SkPath.cpp:856:27
+    #5 0x93a966 in FuzzPath(Fuzz*, SkPath*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCommon.cpp:59:23
+    #6 0x93a387 in FuzzPath(Fuzz*, SkPath*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCommon.cpp:138:17
+    #7 0x93a387 in FuzzPath(Fuzz*, SkPath*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCommon.cpp:138:17
+    #8 0x92fed7 in make_fuzz_patheffect(Fuzz*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:469:13
+    #9 0x927f81 in fuzz_paint(Fuzz*, SkPaint*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:931:29
+    #10 0x91d548 in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1284:17
+    #11 0x92c7cd in make_fuzz_picture(Fuzz*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1708:5
+    #12 0x923476 in make_fuzz_imageFilter(Fuzz*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:842:40
+    #13 0x92244b in fuzz_ImageFilter(Fuzz*) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1741:16
+    #14 0x93ce66 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAPIImageFilter.cpp:14:5
+    #15 0x8b8e88 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:570:15
+    #16 0x88f35a in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #17 0x89abd3 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #18 0x88e9dc in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #19 0x7ffff45c082f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: realloc--sk_realloc_throw(void*, unsigned long)--SkPathRef::makeSpace(unsigned long, bool)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/skia/out/Fuzz/../../src/core/SkPath.cpp:2094:20 in SkPath::Iter::doNext(SkPoint*)
+Shadow bytes around the buggy address:
+  0x0c227fff8140: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c227fff8150: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c227fff8160: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c227fff8170: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c227fff8180: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+=>0x0c227fff8190: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[31mfa[1m[0m][1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c227fff81a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c227fff81b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c227fff81c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c227fff81d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c227fff81e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42470357

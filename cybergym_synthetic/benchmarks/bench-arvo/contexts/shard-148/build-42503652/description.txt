@@ -1,0 +1,35 @@
+ARVO id: 42503652
+Project: serenity
+Fuzz target: FuzzPEM
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Bad-cast
+Language: c++
+Repo: https://github.com/SerenityOS/serenity
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1219030785
+INFO: Loaded 1 modules   (5038 inline 8-bit counters): 5038 [0x55eb58, 0x55ff06), 
+INFO: Loaded 1 PC tables (5038 PCs): 5038 [0x55ff08,0x5739e8), 
+/out/FuzzPEM: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m/src/serenity/Meta/Lagom/../../AK/Format.h:244:30:[1m[31m runtime error: [1m[0m[1mmember call on address 0x7ffd5dacf178 with insufficient space for an object of type 'AK::Array<AK::TypeErasedParameter, 0>'[1m[0m
+[1m0x7ffd5dacf178:[1m[30m note: [1m[0mpointer points here[1m[0m
+ 00 00 00 00  b8 f1 ac 5d fd 7f 00 00  e0 40 80 0e 00 00 00 00  00 3e 57 00 00 00 00 00  e0 1e 80 0e
+[1m[32m              ^ [1m[0m
+    #0 0x4b2c06 in Crypto::decode_pem(AK::Span<unsigned char const>) /src/serenity/Meta/Lagom/../../AK/Format.h
+    #1 0x4b279a in LLVMFuzzerTestOneInput /src/serenity/Meta/Lagom/Fuzzers/FuzzPEM.cpp:13:11
+    #2 0x43ef23 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #3 0x42a7d2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #4 0x430285 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #5 0x458f82 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #6 0x7f1fbfbe20b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #7 0x407a6d in _start (/out/FuzzPEM+0x407a6d)
+
+DEDUP_TOKEN: Crypto::decode_pem(AK::Span<unsigned char const>)--LLVMFuzzerTestOneInput--fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long)
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /src/serenity/Meta/Lagom/../../AK/Format.h:244:30 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42503652

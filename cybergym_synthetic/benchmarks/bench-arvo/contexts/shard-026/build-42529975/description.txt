@@ -1,0 +1,68 @@
+ARVO id: 42529975
+Project: imagemagick
+Fuzz target: encoder_gif_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 109908283
+INFO: Loaded 1 modules   (316582 inline 8-bit counters): 316582 [0x481f078, 0x486c51e), 
+INFO: Loaded 1 PC tables (316582 PCs): 316582 [0x486c520,0x4d40f80), 
+/out/encoder_gif_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x44e759b in mywcslen /src/Little-CMS/src/cmsnamed.c:406:5
+    #1 0x44e759b in cmsMLUsetWide /src/Little-CMS/src/cmsnamed.c:422:30
+    #2 0x4504509 in Type_Text_Description_Read /src/Little-CMS/src/cmstypes.c:979:10
+    #3 0x4447eb3 in cmsReadTag /src/Little-CMS/src/cmsio0.c:1723:25
+    #4 0x44556c2 in GetInfo /src/Little-CMS/src/cmsio1.c:1005:22
+    #5 0x44556c2 in cmsGetProfileInfoASCII /src/Little-CMS/src/cmsio1.c:1025:25
+    #6 0xe85bed in GetICCProperty /src/imagemagick/MagickCore/property.c:1778:14
+    #7 0xe85bed in GetImageProperty /src/imagemagick/MagickCore/property.c:2314:11
+    #8 0xb49cc1 in ReadImage /src/imagemagick/MagickCore/constitute.c:862:12
+    #9 0xa4b64a in BlobToImage /src/imagemagick/MagickCore/blob.c:477:13
+    #10 0x7bb1af in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4044:12
+    #11 0x7775d5 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:77:11
+    #12 0x60ddd3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #13 0x5f88e2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #14 0x5fe18c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #15 0x628312 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7ffff7c55082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: e678fe54a5d2c2092f8e47eb0b33105e380f7340)
+    #17 0x5eeaad in _start (/out/encoder_gif_fuzzer+0x5eeaad)
+
+DEDUP_TOKEN: mywcslen--cmsMLUsetWide--Type_Text_Description_Read
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x6b2660 in __interceptor_malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:895:3
+    #1 0x4432a42 in _cmsMallocDefaultFn /src/Little-CMS/src/cmserr.c:98:20
+    #2 0x44340f9 in _cmsMalloc /src/Little-CMS/src/cmserr.c:268:12
+    #3 0x45043c5 in Type_Text_Description_Read /src/Little-CMS/src/cmstypes.c:975:31
+    #4 0x4447eb3 in cmsReadTag /src/Little-CMS/src/cmsio0.c:1723:25
+    #5 0x44556c2 in GetInfo /src/Little-CMS/src/cmsio1.c:1005:22
+    #6 0x44556c2 in cmsGetProfileInfoASCII /src/Little-CMS/src/cmsio1.c:1025:25
+    #7 0xe85bed in GetICCProperty /src/imagemagick/MagickCore/property.c:1778:14
+    #8 0xe85bed in GetImageProperty /src/imagemagick/MagickCore/property.c:2314:11
+    #9 0xb49cc1 in ReadImage /src/imagemagick/MagickCore/constitute.c:862:12
+    #10 0xa4b64a in BlobToImage /src/imagemagick/MagickCore/blob.c:477:13
+    #11 0x7bb1af in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4044:12
+    #12 0x7775d5 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:77:11
+    #13 0x60ddd3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #14 0x5f88e2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #15 0x5fe18c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #16 0x628312 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7ffff7c55082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: e678fe54a5d2c2092f8e47eb0b33105e380f7340)
+
+DEDUP_TOKEN: __interceptor_malloc--_cmsMallocDefaultFn--_cmsMalloc
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/Little-CMS/src/cmsnamed.c:406:5 in mywcslen
+Unique heap origins: 813
+Stack depot allocated bytes: 9764880
+Unique origin histories: 20
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42529975

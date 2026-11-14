@@ -1,0 +1,60 @@
+ARVO id: 42499970
+Project: imagemagick
+Fuzz target: ping_dcm_fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-double-free
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/ping_dcm_fuzzer[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: attempting double-free on 0x7f67de832800 in thread T0:
+[1m[0mSCARINESS: 42 (double-free)
+    #0 0x49b912 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:127:3
+    #1 0x70ec06 in RelinquishMagickMemory /src/imagemagick/MagickCore/memory.c:1127:3
+    #2 0x8b686c in ReadDCMImage /src/imagemagick/coders/dcm.c:3351:19
+    #3 0x61193e in ReadImage /src/imagemagick/MagickCore/constitute.c:553:15
+    #4 0x8108a1 in ReadStream /src/imagemagick/MagickCore/stream.c:1043:9
+    #5 0x5b5305 in PingBlob /src/imagemagick/MagickCore/blob.c:3647:13
+    #6 0x4f6b74 in Magick::Image::ping(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:3860:12
+    #7 0x4ce3d2 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/ping_fuzzer.cc:43:11
+    #8 0x4cf7bb in main (/out/ping_dcm_fuzzer+0x4cf7bb)
+    #9 0x7f67dd8d883f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #10 0x420668 in _start (/out/ping_dcm_fuzzer+0x420668)
+
+DEDUP_TOKEN: free--RelinquishMagickMemory--ReadDCMImage
+[1m[32m0x7f67de832800 is located 0 bytes inside of 262144-byte region [0x7f67de832800,0x7f67de872800)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x49b912 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:127:3
+    #1 0x70ec06 in RelinquishMagickMemory /src/imagemagick/MagickCore/memory.c:1127:3
+    #2 0x8b2392 in ReadDCMImage /src/imagemagick/coders/dcm.c:3994:34
+    #3 0x61193e in ReadImage /src/imagemagick/MagickCore/constitute.c:553:15
+    #4 0x8108a1 in ReadStream /src/imagemagick/MagickCore/stream.c:1043:9
+    #5 0x5b5305 in PingBlob /src/imagemagick/MagickCore/blob.c:3647:13
+    #6 0x4f6b74 in Magick::Image::ping(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:3860:12
+    #7 0x4ce3d2 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/ping_fuzzer.cc:43:11
+    #8 0x4cf7bb in main (/out/ping_dcm_fuzzer+0x4cf7bb)
+
+DEDUP_TOKEN: free--RelinquishMagickMemory--ReadDCMImage
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x49bb7d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x70d70e in AcquireMagickMemory /src/imagemagick/MagickCore/memory.c:527:10
+    #2 0x70d8ec in AcquireQuantumMemory /src/imagemagick/MagickCore/memory.c:641:10
+    #3 0x8b2413 in ReadDCMImage /src/imagemagick/coders/dcm.c:3995:32
+    #4 0x61193e in ReadImage /src/imagemagick/MagickCore/constitute.c:553:15
+    #5 0x8108a1 in ReadStream /src/imagemagick/MagickCore/stream.c:1043:9
+    #6 0x5b5305 in PingBlob /src/imagemagick/MagickCore/blob.c:3647:13
+    #7 0x4f6b74 in Magick::Image::ping(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:3860:12
+    #8 0x4ce3d2 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/ping_fuzzer.cc:43:11
+    #9 0x4cf7bb in main (/out/ping_dcm_fuzzer+0x4cf7bb)
+
+DEDUP_TOKEN: malloc--AcquireMagickMemory--AcquireQuantumMemory
+SUMMARY: AddressSanitizer: double-free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:127:3 in free
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42499970

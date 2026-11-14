@@ -1,0 +1,82 @@
+ARVO id: 42525603
+Project: ndpi
+Fuzz target: fuzz_ndpi_reader_alloc_fail
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-buffer-overflow WRITE {*}
+Language: c++
+Repo: https://github.com/ntop/nDPI.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/fuzz_ndpi_reader_alloc_fail[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x619000002c18 at pc 0x00000048af8d bp 0x7ffcdb9c4330 sp 0x7ffcdb9c3af0
+[1m[0m[1m[34mWRITE of size 320 at 0x619000002c18 thread T0[1m[0m
+SCARINESS: 45 (multi-byte-write-heap-buffer-overflow)
+    #0 0x48af8c in __interceptor_strncpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors.cpp:471:5
+    #1 0x621eee in thrift_set_method /src/ndpi/src/lib/protocols/thrift.c:123:5
+    #2 0x621eee in ndpi_dissect_strict_hdr /src/ndpi/src/lib/protocols/thrift.c:170:3
+    #3 0x621eee in ndpi_search_thrift_tcp_udp /src/ndpi/src/lib/protocols/thrift.c:244:7
+    #4 0x573ef9 in check_ndpi_detection_func /src/ndpi/src/lib/ndpi_main.c:5943:6
+    #5 0x57530c in ndpi_check_flow_func /src/ndpi/src/lib/ndpi_main.c
+    #6 0x57e594 in ndpi_internal_detection_process_packet /src/ndpi/src/lib/ndpi_main.c:7008:15
+    #7 0x57e594 in ndpi_detection_process_packet /src/ndpi/src/lib/ndpi_main.c:7175:22
+    #8 0x4f434d in packet_processing /src/ndpi/fuzz/../example/reader_util.c:1714:31
+    #9 0x4f434d in ndpi_workflow_process_packet /src/ndpi/fuzz/../example/reader_util.c:2431:10
+    #10 0x4dd6f5 in LLVMFuzzerTestOneInput /src/ndpi/fuzz/fuzz_ndpi_reader.c:141:7
+    #11 0x4f814b in main (/out/fuzz_ndpi_reader_alloc_fail+0x4f814b)
+    #12 0x7f06662a7082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #13 0x41e7ed in _start (/out/fuzz_ndpi_reader_alloc_fail+0x41e7ed)
+
+DEDUP_TOKEN: __interceptor_strncpy--thrift_set_method--ndpi_dissect_strict_hdr
+[1m[32m0x619000002c18 is located 0 bytes to the right of 920-byte region [0x619000002880,0x619000002c18)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x49fc26 in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0x4e90b9 in ndpi_malloc_wrapper /src/ndpi/fuzz/../example/reader_util.c:366:10
+    #2 0x545952 in ndpi_malloc /src/ndpi/src/lib/ndpi_memory.c:60:25
+    #3 0x545d30 in ndpi_flow_malloc /src/ndpi/src/lib/ndpi_main.c:243:56
+    #4 0x4f6c4d in get_ndpi_flow_info /src/ndpi/fuzz/../example/reader_util.c:950:32
+    #5 0x4f1e0d in packet_processing /src/ndpi/fuzz/../example/reader_util.c:1507:12
+    #6 0x4f1e0d in ndpi_workflow_process_packet /src/ndpi/fuzz/../example/reader_util.c:2431:10
+    #7 0x4dd6f5 in LLVMFuzzerTestOneInput /src/ndpi/fuzz/fuzz_ndpi_reader.c:141:7
+    #8 0x4f814b in main (/out/fuzz_ndpi_reader_alloc_fail+0x4f814b)
+
+DEDUP_TOKEN: __interceptor_malloc--ndpi_malloc_wrapper--ndpi_malloc
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/asan_interceptors.cpp:471:5 in __interceptor_strncpy
+Shadow bytes around the buggy address:
+  0x0c327fff8530: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c327fff8540: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c327fff8550: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c327fff8560: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c327fff8570: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c327fff8580: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c327fff8590: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c327fff85a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c327fff85b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c327fff85c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c327fff85d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42525603

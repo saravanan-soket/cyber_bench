@@ -1,0 +1,41 @@
+ARVO id: 42481249
+Project: arrow
+Fuzz target: arrow-ipc-stream-fuzz
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/apache/arrow.git
+
+=== Crash report ===
+INFO: Seed: 3876907627
+INFO: Loaded 1 modules   (270778 inline 8-bit counters): 270778 [0x1500960, 0x1542b1a), 
+INFO: Loaded 1 PC tables (270778 PCs): 270778 [0x1542b20,0x19646c0), 
+/out/arrow-ipc-stream-fuzz: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==8==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x0001022b05e4 (pc 0x000000b33b0b bp 0x7fffffffdac0 sp 0x7fffffffda90 T8)
+[1m[0m==8==The signal is caused by a READ memory access.
+    #0 0xb33b0b in GetBit /src/arrow/cpp/src/arrow/util/bit_util.h:428:11
+    #1 0xb33b0b in arrow::Array::IsNull(long) const /src/arrow/cpp/src/arrow/array.h:307:13
+    #2 0xb6051a in Visit /src/arrow/cpp/src/arrow/array/validate.cc:355:17
+    #3 0xb6051a in arrow::Status arrow::VisitArrayInline<arrow::internal::(anonymous namespace)::ValidateArrayDataVisitor>(arrow::Array const&, arrow::internal::(anonymous namespace)::ValidateArrayDataVisitor*) /src/arrow/cpp/src/arrow/visitor_inline.h:110:5
+    #4 0xb5f674 in arrow::internal::ValidateArrayData(arrow::Array const&) /src/arrow/cpp/src/arrow/array/validate.cc:467:10
+    #5 0x6eaf07 in arrow::RecordBatch::ValidateFull() const /src/arrow/cpp/src/arrow/record_batch.cc:272:5
+    #6 0x69122b in arrow::ipc::internal::FuzzIpcStream(unsigned char const*, long) /src/arrow/cpp/src/arrow/ipc/reader.cc:1167:5
+    #7 0x67e3e6 in LLVMFuzzerTestOneInput /src/arrow/cpp/src/arrow/ipc/stream_fuzz.cc:25:17
+    #8 0x60d751 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #9 0x5f8271 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #10 0x5fdf2e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #11 0x627e52 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #12 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #13 0x5d16e8 in _start (/out/arrow-ipc-stream-fuzz+0x5d16e8)
+
+DEDUP_TOKEN: GetBit--arrow::Array::IsNull(long) const--Visit
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/arrow/cpp/src/arrow/util/bit_util.h:428:11 in GetBit
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42481249

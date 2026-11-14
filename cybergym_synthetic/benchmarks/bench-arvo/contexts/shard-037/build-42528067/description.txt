@@ -1,0 +1,38 @@
+ARVO id: 42528067
+Project: libavc
+Fuzz target: svc_dec_fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Null-dereference READ
+Language: c++
+Repo: https://github.com/ittiam-systems/libavc.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/svc_dec_fuzzer[0m
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==8==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000000 (pc 0x000000000000 bp 0x7ffc8113c590 sp 0x7ffc8113c2f8 T0)
+[1m[0m==8==Hint: pc points to the zero page.
+==8==The signal is caused by a READ memory access.
+==8==Hint: address points to the zero page.
+SCARINESS: 10 (null-deref)
+    #0 0x0  (<unknown module>)
+    #1 0x5224dc in isvcd_parse_inter_slice_data_cavlc_enh_lyr /src/libavc/decoder/svc/isvcd_parse_epslice.c:1908:19
+    #2 0x51bab4 in isvcd_parse_epslice /src/libavc/decoder/svc/isvcd_parse_epslice.c:475:11
+    #3 0x53e3d6 in isvcd_parse_decode_slice_ext_nal /src/libavc/decoder/svc/isvcd_parse_slice.c:1496:15
+    #4 0x532219 in isvcd_parse_nal_unit /src/libavc/decoder/svc/isvcd_parse_headers.c:1063:44
+    #5 0x4fc5f1 in isvcd_video_decode /src/libavc/decoder/svc/isvcd_api.c:5292:27
+    #6 0x509435 in isvcd_api_function /src/libavc/decoder/svc/isvcd_api.c:7267:26
+    #7 0x4e88ae in Codec::decodeFrame(unsigned char const*, unsigned long, unsigned long*) /src/libavc/fuzzer/svc_dec_fuzzer.cpp:375:11
+    #8 0x4e9932 in LLVMFuzzerTestOneInput /src/libavc/fuzzer/svc_dec_fuzzer.cpp:437:22
+    #9 0x4dc3cb in main (/out/svc_dec_fuzzer+0x4dc3cb)
+
+DEDUP_TOKEN: isvcd_parse_inter_slice_data_cavlc_enh_lyr--isvcd_parse_epslice
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (<unknown module>) 
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42528067

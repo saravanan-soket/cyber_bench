@@ -1,0 +1,81 @@
+ARVO id: 42475136
+Project: harfbuzz
+Fuzz target: hb-subset-fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/harfbuzz/harfbuzz.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/hb-subset-fuzzer < INPUT_FILE
+or
+  /out/hb-subset-fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/hb-subset-fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 34 bytes from /tmp/poc
+=================================================================
+[1m[31m==8==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x604000002040 at pc 0x0000004dfd62 bp 0x7fffffffdb30 sp 0x7fffffffdb28
+[1m[0m[1m[34mREAD of size 1 at 0x604000002040 thread T0[1m[0m
+SCARINESS: 22 (1-byte-read-heap-buffer-overflow-far-from-bounds)
+    #0 0x4dfd61 in OT::UnsizedArrayOf<OT::IntType<unsigned char, 1u> >::copy(hb_serialize_context_t*, unsigned int) const /src/harfbuzz/src/./hb-open-type.hh:441:22
+    #1 0x4df46e in bool OT::OffsetTo<OT::UnsizedArrayOf<OT::IntType<unsigned char, 1u> >, OT::IntType<unsigned short, 2u>, false>::serialize_copy<OT::IntType<unsigned short, 2u> const&>(hb_serialize_context_t*, OT::UnsizedArrayOf<OT::IntType<unsigned char, 1u> > const&, void const*, OT::IntType<unsigned short, 2u> const&) /src/harfbuzz/src/./hb-open-type.hh:318:19
+    #2 0x4df249 in OT::NameRecord::copy(hb_serialize_context_t*, void const*, void const*) const /src/harfbuzz/src/./hb-ot-name-table.hh:105:17
+    #3 0x4dee1c in void hb_apply_t<bool OT::name::serialize<hb_filter_iter_t<hb_array_t<OT::NameRecord const>, hb_set_t*&, OT::IntType<unsigned short, 2u> OT::NameRecord::*, (void*)0>, (void*)0>(hb_serialize_context_t*, hb_filter_iter_t<hb_array_t<OT::NameRecord const>, hb_set_t*&, OT::IntType<unsigned short, 2u> OT::NameRecord::*, (void*)0>, void const*)::'lambda'(OT::NameRecord const&)>::operator()<hb_filter_iter_t<hb_array_t<OT::NameRecord const>, hb_set_t*&, OT::IntType<unsigned short, 2u> OT::NameRecord::*, (void*)0>, (void*)0>(hb_filter_iter_t<hb_array_t<OT::NameRecord const>, hb_set_t*&, OT::IntType<unsigned short, 2u> OT::NameRecord::*, (void*)0>) const /src/harfbuzz/src/./hb-iter.hh:550:14
+    #4 0x4ddd60 in decltype(fp0(fp)) operator|<hb_filter_iter_t<hb_array_t<OT::NameRecord const>, hb_set_t*&, OT::IntType<unsigned short, 2u> OT::NameRecord::*, (void*)0>, hb_apply_t<bool OT::name::serialize<hb_filter_iter_t<hb_array_t<OT::NameRecord const>, hb_set_t*&, OT::IntType<unsigned short, 2u> OT::NameRecord::*, (void*)0>, (void*)0>(hb_serialize_context_t*, hb_filter_iter_t<hb_array_t<OT::NameRecord const>, hb_set_t*&, OT::IntType<unsigned short, 2u> OT::NameRecord::*, (void*)0>, void const*)::'lambda'(OT::NameRecord const&)>, (void*)0>(hb_filter_iter_t<hb_array_t<OT::NameRecord const>, hb_set_t*&, OT::IntType<unsigned short, 2u> OT::NameRecord::*, (void*)0>, hb_apply_t<bool OT::name::serialize<hb_filter_iter_t<hb_array_t<OT::NameRecord const>, hb_set_t*&, OT::IntType<unsigned short, 2u> OT::NameRecord::*, (void*)0>, (void*)0>(hb_serialize_context_t*, hb_filter_iter_t<hb_array_t<OT::NameRecord const>, hb_set_t*&, OT::IntType<unsigned short, 2u> OT::NameRecord::*, (void*)0>, void const*)::'lambda'(OT::NameRecord const&)> const&) /src/harfbuzz/src/./hb-iter.hh:313:38
+    #5 0x4dbc8f in bool OT::name::serialize<hb_filter_iter_t<hb_array_t<OT::NameRecord const>, hb_set_t*&, OT::IntType<unsigned short, 2u> OT::NameRecord::*, (void*)0>, (void*)0>(hb_serialize_context_t*, hb_filter_iter_t<hb_array_t<OT::NameRecord const>, hb_set_t*&, OT::IntType<unsigned short, 2u> OT::NameRecord::*, (void*)0>, void const*) /src/harfbuzz/src/./hb-ot-name-table.hh:193:5
+    #6 0x4da711 in OT::name::subset(hb_subset_context_t*) const /src/harfbuzz/src/./hb-ot-name-table.hh:215:17
+    #7 0x4cacb0 in bool _subset2<OT::name const>(hb_subset_plan_t*) /src/harfbuzz/src/hb-subset.cc:92:26
+    #8 0x4c9d75 in hb_subset /src/harfbuzz/src/hb-subset.cc:309:28
+    #9 0x4c6aed in trySubset(hb_face_t*, unsigned int const*, int, bool, bool, bool) /src/harfbuzz/./test/fuzzing/hb-subset-fuzzer.cc:28:23
+    #10 0x4c6815 in LLVMFuzzerTestOneInput /src/harfbuzz/./test/fuzzing/hb-subset-fuzzer.cc:65:3
+    #11 0x4c6f7a in ExecuteFilesOnyByOne /src/libfuzzer/afl/afl_driver.cpp:216:5
+    #12 0x4c6f7a in main /src/libfuzzer/afl/afl_driver.cpp:253
+    #13 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #14 0x41de48 in _start (/out/hb-subset-fuzzer+0x41de48)
+
+DEDUP_TOKEN: OT::UnsizedArrayOf<OT::IntType<unsigned char, 1u> >::copy(hb_serialize_context_t*, unsigned int) const--bool OT::OffsetTo<OT::UnsizedArrayOf<OT::IntType<unsigned char, 1u> >, OT::IntType<unsigned short, 2u>, false>::serialize_copy<OT::IntType<unsigned short, 2u> const&>(hb_serialize_context_t*, OT::UnsizedArrayOf<OT::IntType<unsigned char, 1u> > const&, void const*, OT::IntType<unsigned short, 2u> const&)--OT::NameRecord::copy(hb_serialize_context_t*, void const*, void const*) const
+Address 0x604000002040 is a wild pointer.
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/harfbuzz/src/./hb-open-type.hh:441:22 in OT::UnsizedArrayOf<OT::IntType<unsigned char, 1u> >::copy(hb_serialize_context_t*, unsigned int) const
+Shadow bytes around the buggy address:
+  0x0c087fff83b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c087fff83c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c087fff83d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c087fff83e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c087fff83f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x0c087fff8400: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c087fff8410: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c087fff8420: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c087fff8430: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c087fff8440: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c087fff8450: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42475136

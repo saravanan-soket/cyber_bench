@@ -1,0 +1,44 @@
+ARVO id: 42507055
+Project: wolfmqtt
+Fuzz target: wolfmqtt-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c
+Repo: https://github.com/wolfSSL/wolfMQTT.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4058216111
+INFO: Loaded 1 modules   (21645 inline 8-bit counters): 21645 [0x7f2830, 0x7f7cbd), 
+INFO: Loaded 1 PC tables (21645 PCs): 21645 [0x731508,0x785dd8), 
+/out/wolfmqtt-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x000484038405 (pc 0x00000057271b bp 0x7fffffffd6b0 sp 0x7fffffffd6b0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x57271b in MqttProps_Free /src/wolfmqtt/src/mqtt_packet.c:1860:20
+    #1 0x5700d4 in Handle_Props /src/wolfmqtt/src/mqtt_client.c:314:9
+    #2 0x5700d4 in MqttClient_DecodePacket /src/wolfmqtt/src/mqtt_client.c:435:31
+    #3 0x56b370 in MqttClient_HandlePacket /src/wolfmqtt/src/mqtt_client.c:655:18
+    #4 0x56b370 in MqttClient_WaitType /src/wolfmqtt/src/mqtt_client.c:931:18
+    #5 0x56a38c in MqttClient_Connect /src/wolfmqtt/src/mqtt_client.c:1377:10
+    #6 0x565c1d in wolfMQTTFuzzer::Initialize() /src/wolfmqtt-fuzzers/fuzzer.cpp:456:9
+    #7 0x567732 in LLVMFuzzerTestOneInput /src/wolfmqtt-fuzzers/fuzzer.cpp:539:5
+    #8 0x455353 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #9 0x440f92 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x4467ec in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #11 0x46f5f2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7ffff7c580b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #13 0x41f74d in _start (/out/wolfmqtt-fuzzer+0x41f74d)
+
+DEDUP_TOKEN: MqttProps_Free--Handle_Props--MqttClient_DecodePacket
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/wolfmqtt/src/mqtt_packet.c:1860:20 in MqttProps_Free
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42507055

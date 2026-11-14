@@ -1,0 +1,150 @@
+ARVO id: 42532053
+Project: serenity
+Fuzz target: FuzzWAVLoader
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Stack-use-after-scope READ 4
+Language: c++
+Repo: https://github.com/SerenityOS/serenity
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2867448912
+INFO: Loaded 1 modules   (15646 inline 8-bit counters): 15646 [0x9c5460, 0x9c917e), 
+INFO: Loaded 1 PC tables (15646 PCs): 15646 [0x9c9180,0xa06360), 
+/out/FuzzWAVLoader: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-use-after-scope on address 0x7f4823a76c20 at pc 0x00000075c776 bp 0x7ffd5d84a540 sp 0x7ffd5d849cf0
+[1m[0m[1m[34mREAD of size 4 at 0x7f4823a76c20 thread T0[1m[0m
+SCARINESS: 17 (4-byte-read-stack-use-after-scope)
+    #0 0x75c775 in MemcmpInterceptorCommon(void*, int (*)(void const*, void const*, unsigned long), void const*, void const*, unsigned long) /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:860:7
+    #1 0x75cc6b in __interceptor_memcmp /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:892:10
+    #2 0x82e3fd in compare /src/serenity/Meta/Lagom/../../AK/StringView.h:278:17
+    #3 0x82e3fd in operator== /src/serenity/Meta/Lagom/../../AK/StringView.h:291:46
+    #4 0x82e3fd in Audio::WavLoaderPlugin::load_wav_info_block(AK::Vector<RIFF::Detail::OwnedChunk<RIFF::Detail::ChunkHeader<AK::LittleEndian<unsigned int> > >, 0ul>) /src/serenity/Userland/Libraries/LibAudio/WavLoader.cpp:306:27
+    #5 0x8233c4 in Audio::WavLoaderPlugin::parse_header() /src/serenity/Userland/Libraries/LibAudio/WavLoader.cpp:269:40
+    #6 0x81fdc0 in Audio::WavLoaderPlugin::create(AK::NonnullOwnPtr<AK::SeekableStream>) /src/serenity/Userland/Libraries/LibAudio/WavLoader.cpp:45:5
+    #7 0x8025e7 in int fuzz_audio_loader<Audio::WavLoaderPlugin>(unsigned char const*, unsigned long) /src/serenity/Meta/Lagom/Fuzzers/AudioFuzzerCommon.h:23:27
+    #8 0x6d2403 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #9 0x6bcf12 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x6c27bc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #11 0x6ec942 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f4823f9b082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+    #13 0x6b30dd in _start (/out/FuzzWAVLoader+0x6b30dd)
+
+DEDUP_TOKEN: MemcmpInterceptorCommon(void*, int (*)(void const*, void const*, unsigned long), void const*, void const*, unsigned long)--__interceptor_memcmp--compare
+[1m[32mAddress 0x7f4823a76c20 is located in stack of thread T0 at offset 1056 in frame[1m[0m
+[1m[0m    #0 0x82d82f in Audio::WavLoaderPlugin::load_wav_info_block(AK::Vector<RIFF::Detail::OwnedChunk<RIFF::Detail::ChunkHeader<AK::LittleEndian<unsigned int> > >, 0ul>) /src/serenity/Userland/Libraries/LibAudio/WavLoader.cpp:299
+
+DEDUP_TOKEN: Audio::WavLoaderPlugin::load_wav_info_block(AK::Vector<RIFF::Detail::OwnedChunk<RIFF::Detail::ChunkHeader<AK::LittleEndian<unsigned int> > >, 0ul>)
+  This frame has 70 object(s):
+    [32, 56) 'ref.tmp.i.i1096'
+    [96, 120) 'ref.tmp.i.i1083'
+    [160, 184) 'ref.tmp.i.i1070'
+    [224, 248) 'ref.tmp.i.i1057'
+    [288, 312) 'ref.tmp.i.i1044'
+    [352, 376) 'ref.tmp.i.i1005'
+    [416, 440) 'ref.tmp.i.i966'
+    [480, 504) 'ref.tmp.i.i927'
+    [544, 568) 'ref.tmp.i.i888'
+    [608, 632) 'ref.tmp.i.i853'
+    [672, 696) 'ref.tmp.i.i836'
+    [736, 760) 'ref.tmp.i.i797'
+    [800, 824) 'ref.tmp.i.i758'
+    [864, 888) 'ref.tmp.i.i719'
+    [928, 952) 'ref.tmp.i.i678'
+    [992, 1016) 'ref.tmp.i.i'
+    [1056, 1060) 'ref.tmp' (line 301)[1m[32m <== Memory access at offset 1056 is inside this variable[1m[0m
+    [1072, 1088) 'metadata_text' (line 303)
+    [1104, 1128) 'artists' (line 308)
+    [1168, 1200) 'ref.tmp28' (line 310)
+    [1232, 1240) 'agg.tmp29'
+    [1264, 1296) 'ref.tmp31' (line 310)
+    [1328, 1352) 'ref.tmp35' (line 310)
+    [1392, 1416) 'ref.tmp40' (line 310)
+    [1456, 1472) 'ref.tmp63' (line 312)
+    [1488, 1496) 'ref.tmp64' (line 312)
+    [1520, 1552) 'ref.tmp66' (line 312)
+    [1584, 1608) 'ref.tmp70' (line 312)
+    [1648, 1664) 'ref.tmp88' (line 314)
+    [1680, 1688) 'ref.tmp89' (line 314)
+    [1712, 1744) 'ref.tmp91' (line 314)
+    [1776, 1800) 'ref.tmp95' (line 314)
+    [1840, 1856) 'ref.tmp114' (line 316)
+    [1872, 1880) 'ref.tmp115' (line 316)
+    [1904, 1936) 'ref.tmp117' (line 316)
+    [1968, 1992) 'ref.tmp121' (line 316)
+    [2032, 2064) 'ref.tmp141' (line 318)
+    [2096, 2104) 'agg.tmp143'
+    [2128, 2160) 'ref.tmp145' (line 318)
+    [2192, 2216) 'ref.tmp149' (line 318)
+    [2256, 2280) 'ref.tmp158' (line 318)
+    [2320, 2336) 'ref.tmp171' (line 320)
+    [2352, 2360) 'ref.tmp172' (line 320)
+    [2384, 2416) 'ref.tmp174' (line 320)
+    [2448, 2472) 'ref.tmp178' (line 320)
+    [2512, 2528) 'ref.tmp197' (line 322)
+    [2544, 2552) 'ref.tmp198' (line 322)
+    [2576, 2608) 'ref.tmp200' (line 322)
+    [2640, 2664) 'ref.tmp204' (line 322)
+    [2704, 2720) 'ref.tmp223' (line 324)
+    [2736, 2744) 'ref.tmp224' (line 324)
+    [2768, 2800) 'ref.tmp226' (line 324)
+    [2832, 2856) 'ref.tmp230' (line 324)
+    [2896, 2912) 'ref.tmp249' (line 326)
+    [2928, 2936) 'ref.tmp250' (line 326)
+    [2960, 2992) 'ref.tmp252' (line 326)
+    [3024, 3048) 'ref.tmp256' (line 326)
+    [3088, 3120) 'ref.tmp276' (line 328)
+    [3152, 3160) 'agg.tmp278'
+    [3184, 3216) 'ref.tmp280' (line 328)
+    [3248, 3272) 'ref.tmp284' (line 328)
+    [3312, 3336) 'ref.tmp293' (line 328)
+    [3376, 3408) 'ref.tmp303' (line 330)
+    [3440, 3448) 'ref.tmp305' (line 330)
+    [3472, 3504) 'ref.tmp307' (line 330)
+    [3536, 3560) 'ref.tmp311' (line 330)
+    [3600, 3608) 'agg.tmp318'
+    [3632, 3664) 'ref.tmp320' (line 330)
+    [3696, 3720) 'ref.tmp324' (line 330)
+    [3760, 3784) 'ref.tmp337' (line 330)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-use-after-scope /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:860:7 in MemcmpInterceptorCommon(void*, int (*)(void const*, void const*, unsigned long), void const*, void const*, unsigned long)
+Shadow bytes around the buggy address:
+  0x0fe984746d30: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m
+  0x0fe984746d40: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m
+  0x0fe984746d50: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m
+  0x0fe984746d60: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m
+  0x0fe984746d70: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m
+=>0x0fe984746d80: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m[[1m[35mf8[1m[0m][1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x0fe984746d90: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x0fe984746da0: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x0fe984746db0: [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x0fe984746dc0: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x0fe984746dd0: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42532053

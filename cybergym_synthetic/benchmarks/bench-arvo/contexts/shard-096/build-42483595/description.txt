@@ -1,0 +1,59 @@
+ARVO id: 42483595
+Project: open62541
+Fuzz target: fuzz_tcp_message
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/open62541/open62541.git
+
+=== Crash report ===
+INFO: Seed: 3244823765
+INFO: Loaded 1 modules   (11182 inline 8-bit counters): 11182 [0xa654b0, 0xa6805e), 
+INFO: Loaded 1 PC tables (11182 PCs): 11182 [0xa68060,0xa93b40), 
+/out/fuzz_tcp_message: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x5505dd in UA_Array_copy /src/open62541/src/ua_types.c:1246:8
+    #1 0x55763b in String_copy /src/open62541/src/ua_types.c:135:28
+    #2 0x558775 in UA_copy /src/open62541/src/ua_types.c:1121:28
+    #3 0x558775 in UA_String_copy /work/open62541/src_generated/open62541/types_generated_handling.h:372:12
+    #4 0x558775 in LocalizedText_copy /src/open62541/src/ua_types.c:910:28
+    #5 0x55a6ea in copyStructure /src/open62541/src/ua_types.c:1018:27
+    #6 0x54fe62 in UA_copy /src/open62541/src/ua_types.c:1121:28
+    #7 0x54fe62 in UA_Array_copy /src/open62541/src/ua_types.c:1271:19
+    #8 0x55983b in Variant_copy /src/open62541/src/ua_types.c:535:28
+    #9 0x54f5b2 in UA_copy /src/open62541/src/ua_types.c:1121:28
+    #10 0x5a26ae in UA_Node_setAttributes /src/open62541/src/server/ua_nodes.c
+    #11 0x617245 in AddNode_raw /src/open62541/src/server/ua_services_nodemanagement.c:906:14
+    #12 0x620976 in Operation_addNode_begin /src/open62541/src/server/ua_services_nodemanagement.c:1009:14
+    #13 0x620574 in UA_Server_addNode_begin /src/open62541/src/server/ua_services_nodemanagement.c:1384:28
+    #14 0x6a6688 in function_namespace0_generated_133_begin /work/open62541/src_generated/open62541/namespace0_generated.c:3477:11
+    #15 0x6a6688 in namespace0_generated /work/open62541/src_generated/open62541/namespace0_generated.c:5934:12
+    #16 0x5b7c23 in UA_Server_initNS0 /src/open62541/src/server/ua_server_ns0.c:763:14
+    #17 0x5a890d in UA_Server_init /src/open62541/src/server/ua_server.c:316:11
+    #18 0x5a890d in UA_Server_newWithConfig /src/open62541/src/server/ua_server.c:340:12
+    #19 0x74bcfe in UA_Server_new /src/open62541/plugins/ua_config_default.c:50:12
+    #20 0x522116 in LLVMFuzzerTestOneInput /src/open62541/tests/fuzz/fuzz_tcp_message.cc:42:25
+    #21 0x4599f1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #22 0x444d52 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #23 0x44ade7 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:776:9
+    #24 0x473432 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #25 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #26 0x41f368 in _start (/out/fuzz_tcp_message+0x41f368)
+
+DEDUP_TOKEN: UA_Array_copy--String_copy--UA_copy
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mvariablenode_ns_0_i_11494_variant_DataContents.i[1m[35m' in the stack frame of function '[1m[32mnamespace0_generated[1m[35m'[1m[0m
+    #0 0x66c030 in namespace0_generated /work/open62541/src_generated/open62541/namespace0_generated.c:5795
+
+DEDUP_TOKEN: namespace0_generated
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/open62541/src/ua_types.c:1246:8 in UA_Array_copy
+Unique heap origins: 4539
+Stack depot allocated bytes: 742264
+Unique origin histories: 2170
+History depot allocated bytes: 52080
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42483595

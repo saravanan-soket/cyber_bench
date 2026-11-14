@@ -1,0 +1,89 @@
+ARVO id: 429112760
+Project: imagemagick
+Fuzz target: encoder_mvg_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 3615039355
+INFO: Loaded 1 modules   (173435 inline 8-bit counters): 173435 [0x2ba13c8, 0x2bcb943), 
+INFO: Loaded 1 PC tables (173435 PCs): 173435 [0x2bcb948,0x2e710f8), 
+/out/encoder_mvg_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x7f13b4 in PerceptibleReciprocal /src/imagemagick/./MagickCore/pixel-accessor.h:233:7
+    #1 0x7e42b2 in CompositeImage /src/imagemagick/MagickCore/composite.c:1669:18
+    #2 0x8819fa in DrawPrimitive /src/imagemagick/MagickCore/draw.c:5457:16
+    #3 0x8716d9 in RenderMVGContent /src/imagemagick/MagickCore/draw.c:4344:17
+    #4 0xe961ea in ReadMVGImage /src/imagemagick/coders/mvg.c:239:10
+    #5 0x7fdfa7 in ReadImage /src/imagemagick/MagickCore/constitute.c:547:15
+    #6 0x7296fc in BlobToImage /src/imagemagick/MagickCore/blob.c:474:13
+    #7 0x5a05a7 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4028:12
+    #8 0x4a9aed in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #9 0x515902 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:529:15
+    #10 0x4ac452 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:286:6
+    #11 0x4bd1fb in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:715:9
+    #12 0x4ab581 in main /src/libfuzzer/FuzzerMain.cpp:19:10
+    #13 0x7f330eee782f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #14 0x422898 in _start (/out/encoder_mvg_fuzzer+0x422898)
+
+DEDUP_TOKEN: PerceptibleReciprocal--CompositeImage--DrawPrimitive
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x771029 in ClonePixelCacheRepository /src/imagemagick/MagickCore/cache.c:782:17
+    #1 0x76e468 in OpenPixelCache /src/imagemagick/MagickCore/cache.c:3762:26
+    #2 0x7734cd in GetImagePixelCache /src/imagemagick/MagickCore/cache.c:1757:18
+    #3 0x755ba7 in QueueAuthenticPixelCacheNexus /src/imagemagick/MagickCore/cache.c:4140:28
+    #4 0x7554a2 in GetAuthenticPixelCacheNexus /src/imagemagick/MagickCore/cache.c:1327:10
+    #5 0x781b8d in GetCacheViewAuthenticPixels /src/imagemagick/MagickCore/cache-view.c:312:10
+    #6 0x9c458d in SetImageAlpha /src/imagemagick/MagickCore/image.c:2370:7
+    #7 0x790ebf in SetImageAlphaChannel /src/imagemagick/MagickCore/channel.c
+    #8 0x8813da in DrawPrimitive /src/imagemagick/MagickCore/draw.c:5437:16
+    #9 0x8716d9 in RenderMVGContent /src/imagemagick/MagickCore/draw.c:4344:17
+    #10 0xe961ea in ReadMVGImage /src/imagemagick/coders/mvg.c:239:10
+    #11 0x7fdfa7 in ReadImage /src/imagemagick/MagickCore/constitute.c:547:15
+    #12 0x7296fc in BlobToImage /src/imagemagick/MagickCore/blob.c:474:13
+    #13 0x5a05a7 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4028:12
+    #14 0x4a9aed in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #15 0x515902 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:529:15
+    #16 0x4ac452 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:286:6
+    #17 0x4bd1fb in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:715:9
+    #18 0x4ab581 in main /src/libfuzzer/FuzzerMain.cpp:19:10
+    #19 0x7f330eee782f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: ClonePixelCacheRepository--OpenPixelCache--GetImagePixelCache
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x471688 in posix_memalign /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:170
+    #1 0xa189df in AcquireAlignedMemory /src/imagemagick/MagickCore/memory.c:265:7
+    #2 0x76c7da in OpenPixelCache /src/imagemagick/MagickCore/cache.c:3735:46
+    #3 0x7734cd in GetImagePixelCache /src/imagemagick/MagickCore/cache.c:1757:18
+    #4 0x76fbfb in SyncImagePixelCache /src/imagemagick/MagickCore/cache.c:5477:28
+    #5 0x9bb002 in SetImageExtent /src/imagemagick/MagickCore/image.c:2666:10
+    #6 0xd7cb2c in ReadDIBImage /src/imagemagick/coders/dib.c:624:10
+    #7 0x7fdfa7 in ReadImage /src/imagemagick/MagickCore/constitute.c:547:15
+    #8 0x7296fc in BlobToImage /src/imagemagick/MagickCore/blob.c:474:13
+    #9 0x8039a0 in ReadInlineImage /src/imagemagick/MagickCore/constitute.c:990:9
+    #10 0x87f7df in DrawPrimitive /src/imagemagick/MagickCore/draw.c:5404:26
+    #11 0x8716d9 in RenderMVGContent /src/imagemagick/MagickCore/draw.c:4344:17
+    #12 0xe961ea in ReadMVGImage /src/imagemagick/coders/mvg.c:239:10
+    #13 0x7fdfa7 in ReadImage /src/imagemagick/MagickCore/constitute.c:547:15
+    #14 0x7296fc in BlobToImage /src/imagemagick/MagickCore/blob.c:474:13
+    #15 0x5a05a7 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4028:12
+    #16 0x4a9aed in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #17 0x515902 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:529:15
+    #18 0x4ac452 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:286:6
+    #19 0x4bd1fb in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:715:9
+
+DEDUP_TOKEN: posix_memalign--AcquireAlignedMemory--OpenPixelCache
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/imagemagick/./MagickCore/pixel-accessor.h:233:7 in PerceptibleReciprocal
+Unique heap origins: 989
+Stack depot allocated bytes: 143352
+Unique origin histories: 12
+History depot allocated bytes: 288
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/429112760

@@ -1,0 +1,44 @@
+ARVO id: 42483351
+Project: curl
+Fuzz target: curl_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/curl/curl.git
+
+=== Crash report ===
+INFO: Seed: 2850359283
+INFO: Loaded 1 modules   (62421 inline 8-bit counters): 62421 [0x89d2e10, 0x89e21e5), 
+INFO: Loaded 1 PC tables (62421 PCs): 62421 [0x89e21e8,0x8a5c090), 
+/out/curl_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x52602ed4 (pc 0x082208e6 bp 0xffec1c08 sp 0xffec1bd0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x82208e6 in http2_handle_stream_close /src/curl/lib/http2.c:1429:7
+    #1 0x82189f5 in http2_recv /src/curl/lib/http2.c:1640:18
+    #2 0x82735af in Curl_read /src/curl/lib/sendf.c:723:11
+    #3 0x82aa266 in readwrite_data /src/curl/lib/transfer.c:595:16
+    #4 0x82a8dbc in Curl_readwrite /src/curl/lib/transfer.c:1248:14
+    #5 0x824c1c7 in multi_runsingle /src/curl/lib/multi.c:2091:16
+    #6 0x8249b38 in curl_multi_perform /src/curl/lib/multi.c:2361:14
+    #7 0x81d3666 in fuzz_handle_transfer(fuzz_data*) /src/curl_fuzzer/curl_fuzzer.cc:305:3
+    #8 0x81d2c0c in LLVMFuzzerTestOneInput /src/curl_fuzzer/curl_fuzzer.cc:93:3
+    #9 0x80d7166 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #10 0x80c3613 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #11 0x80c8d18 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #12 0x80edb27 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #13 0xed104636 in __libc_start_main (/lib32/libc.so.6+0x18636)
+    #14 0x809e5e8 in _start (/out/curl_fuzzer+0x809e5e8)
+
+DEDUP_TOKEN: http2_handle_stream_close--http2_recv--Curl_read
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/curl/lib/http2.c:1429:7 in http2_handle_stream_close
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42483351

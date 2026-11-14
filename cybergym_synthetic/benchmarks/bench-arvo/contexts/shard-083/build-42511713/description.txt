@@ -1,0 +1,45 @@
+ARVO id: 42511713
+Project: njs
+Fuzz target: njs_process_script_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: http://hg.nginx.org/njs
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1037122745
+INFO: Loaded 1 modules   (28246 inline 8-bit counters): 28246 [0xa11029, 0xa17e7f), 
+INFO: Loaded 1 PC tables (28246 PCs): 28246 [0xa17e80,0xa863e0), 
+/out/njs_process_script_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x54856b in njs_is_data_descriptor /src/njs/src/njs_object.h:91:39
+    #1 0x54856b in njs_value_property_set /src/njs/src/njs_value.c:1193:13
+    #2 0x561557 in njs_vmcode_interpreter /src/njs/src/njs_vmcode.c:671:23
+    #3 0x550934 in njs_vm_start /src/njs/src/njs_vm.c:541:11
+    #4 0x527a40 in njs_process_script /src/njs/src/njs_shell.c:890:19
+    #5 0x527a40 in LLVMFuzzerTestOneInput /src/njs/src/njs_shell.c:676:16
+    #6 0x4551c3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #7 0x440e52 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #8 0x44669c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #9 0x46f292 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7fada90d2082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #11 0x41f67d in _start (/out/njs_process_script_fuzzer+0x41f67d)
+
+DEDUP_TOKEN: njs_is_data_descriptor--njs_value_property_set--njs_vmcode_interpreter
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mpq[1m[35m' in the stack frame of function '[1m[32mnjs_value_property_set[1m[35m'[1m[0m
+    #0 0x545e10 in njs_value_property_set /src/njs/src/njs_value.c:1127
+
+DEDUP_TOKEN: njs_value_property_set
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/njs/src/njs_object.h:91:39 in njs_is_data_descriptor
+Unique heap origins: 54
+Stack depot allocated bytes: 1638400
+Unique origin histories: 17
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42511713

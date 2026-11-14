@@ -1,0 +1,88 @@
+ARVO id: 42536117
+Project: PcapPlusPlus
+Fuzz target: FuzzTarget
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/seladb/PcapPlusPlus
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4147009357
+INFO: Loaded 1 modules   (33530 inline 8-bit counters): 33530 [0x556bdca03458, 0x556bdca0b752), 
+INFO: Loaded 1 PC tables (33530 PCs): 33530 [0x556bdca0b758,0x556bdca8e6f8), 
+/out/FuzzTarget: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Read 0 packets successfully and 0 packets could not be read
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x50f0000000ff at pc 0x556bdc76550e bp 0x7ffd29d5b980 sp 0x7ffd29d5b978
+[1m[0m[1m[34mREAD of size 1 at 0x50f0000000ff thread T0[1m[0m
+SCARINESS: 22 (1-byte-read-heap-buffer-overflow-far-from-bounds)
+    #0 0x556bdc76550d in pcpp::Asn1Record::decodeTagAndCreateRecord(unsigned char const*, unsigned long, int&) /src/PcapPlusPlus/Packet++/src/Asn1Codec.cpp:235:23
+    #1 0x556bdc763af5 in pcpp::Asn1Record::decodeInternal(unsigned char const*, unsigned long, bool) /src/PcapPlusPlus/Packet++/src/Asn1Codec.cpp:171:24
+    #2 0x556bdc768e5d in pcpp::Asn1ConstructedRecord::decodeValue(unsigned char*, bool) /src/PcapPlusPlus/Packet++/src/Asn1Codec.cpp:497:21
+    #3 0x556bdc765b5a in pcpp::Asn1Record::decodeValueIfNeeded() /src/PcapPlusPlus/Packet++/src/Asn1Codec.cpp:395:4
+    #4 0x556bdc70f6ab in getSubRecords /src/PcapPlusPlus/Packet++/header/Asn1Codec.h:302:48
+    #5 0x556bdc70f6ab in pcpp::LdapLayer::parseLdapMessage(unsigned char*, unsigned long, pcpp::Layer*, pcpp::Packet*) /src/PcapPlusPlus/Packet++/src/LdapLayer.cpp:141:100
+    #6 0x556bdc6a4915 in pcpp::TcpLayer::parseNextLayer() /src/PcapPlusPlus/Packet++/src/TcpLayer.cpp:410:17
+    #7 0x556bdc62774c in pcpp::Packet::setRawPacket(pcpp::RawPacket*, bool, unsigned int, pcpp::OsiModelLayer) /src/PcapPlusPlus/Packet++/src/Packet.cpp:79:13
+    #8 0x556bdc56cda3 in LLVMFuzzerTestOneInput /src/PcapPlusPlus/Tests/Fuzzers/FuzzTarget.cpp:60:17
+    #9 0x556bdc41e4f0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #10 0x556bdc408c84 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #11 0x556bdc40e71a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #12 0x556bdc43ab12 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7fa6921a4082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #14 0x556bdc3ff75d in _start (/out/FuzzTarget+0x1b875d)
+
+DEDUP_TOKEN: pcpp::Asn1Record::decodeTagAndCreateRecord(unsigned char const*, unsigned long, int&)--pcpp::Asn1Record::decodeInternal(unsigned char const*, unsigned long, bool)--pcpp::Asn1ConstructedRecord::decodeValue(unsigned char*, bool)
+[1m[32m0x50f0000000ff is located 20 bytes after 171-byte region [0x50f000000040,0x50f0000000eb)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x556bdc56992d in operator new[](unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:98:3
+    #1 0x556bdc587259 in pcpp::PcapFileReaderDevice::getNextPacket(pcpp::RawPacket&) /src/PcapPlusPlus/Pcap++/src/PcapFileDevice.cpp:331:27
+    #2 0x556bdc581f2c in pcpp::IFileReaderDevice::getNextPackets(pcpp::PointerVector<pcpp::RawPacket>&, int) /src/PcapPlusPlus/Pcap++/src/PcapFileDevice.cpp:119:21
+    #3 0x556bdc56cc3b in LLVMFuzzerTestOneInput /src/PcapPlusPlus/Tests/Fuzzers/FuzzTarget.cpp:47:14
+    #4 0x556bdc41e4f0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #5 0x556bdc408c84 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #6 0x556bdc40e71a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #7 0x556bdc43ab12 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #8 0x7fa6921a4082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+
+DEDUP_TOKEN: operator new[](unsigned long)--pcpp::PcapFileReaderDevice::getNextPacket(pcpp::RawPacket&)--pcpp::IFileReaderDevice::getNextPackets(pcpp::PointerVector<pcpp::RawPacket>&, int)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/PcapPlusPlus/Packet++/src/Asn1Codec.cpp:235:23 in pcpp::Asn1Record::decodeTagAndCreateRecord(unsigned char const*, unsigned long, int&)
+Shadow bytes around the buggy address:
+  0x50effffffe00: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x50effffffe80: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x50efffffff00: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x50efffffff80: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x50f000000000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x50f000000080: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m03[1m[0m [1m[31mfa[1m[0m[[1m[31mfa[1m[0m]
+  0x50f000000100: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x50f000000180: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x50f000000200: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x50f000000280: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x50f000000300: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42536117

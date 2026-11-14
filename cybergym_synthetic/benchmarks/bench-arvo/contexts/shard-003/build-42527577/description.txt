@@ -1,0 +1,104 @@
+ARVO id: 42527577
+Project: gdal
+Fuzz target: gdal_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Stack-buffer-overflow READ 4
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/gdal_fuzzer < INPUT_FILE
+or
+  /out/gdal_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/gdal_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 295 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7f099dffb994 at pc 0x00000089d526 bp 0x7ffedb946050 sp 0x7ffedb946048
+[1m[0m[1m[34mREAD of size 4 at 0x7f099dffb994 thread T0[1m[0m
+SCARINESS: 42 (4-byte-read-stack-buffer-overflow-far-from-bounds)
+    #0 0x89d525 in SENTINEL2Dataset::OpenL1C_L2A(char const*, SENTINEL2Level) /src/gdal/gdal/frmts/sentinel2/sentinel2dataset.cpp:2225:37
+    #1 0x89117c in SENTINEL2Dataset::Open(GDALOpenInfo*) /src/gdal/gdal/frmts/sentinel2/sentinel2dataset.cpp
+    #2 0xa8d727 in GDALOpenEx /src/gdal/gdal/gcore/gdaldataset.cpp:2821:20
+    #3 0x521640 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_fuzzer.cpp:99:24
+    #4 0x521c7e in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:265:5
+    #5 0x52220c in main /src/libfuzzer/afl/afl_driver.cpp:302:12
+    #6 0x7f099e0d282f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #7 0x4265b8 in _start (/out/gdal_fuzzer+0x4265b8)
+
+DEDUP_TOKEN: SENTINEL2Dataset::OpenL1C_L2A(char const*, SENTINEL2Level)--SENTINEL2Dataset::Open(GDALOpenInfo*)--GDALOpenEx
+[1m[32mAddress 0x7f099dffb994 is located in stack of thread T0 at offset 404 in frame[1m[0m
+[1m[0m    #0 0x89c8df in SENTINEL2Dataset::OpenL1C_L2A(char const*, SENTINEL2Level) /src/gdal/gdal/frmts/sentinel2/sentinel2dataset.cpp:2142
+
+DEDUP_TOKEN: SENTINEL2Dataset::OpenL1C_L2A(char const*, SENTINEL2Level)
+  This frame has 25 object(s):
+    [32, 33) 'ref.tmp.i300'
+    [48, 72) '__annotator.i'
+    [112, 120) 'ref.tmp.i.i295'
+    [144, 152) 'ref.tmp.i.i'
+    [176, 177) 'ref.tmp.i289'
+    [192, 193) 'ref.tmp.i'
+    [208, 232) 'osOriginalXML' (line 2148)
+    [272, 296) 'ref.tmp' (line 2150)
+    [336, 344) 'oXMLHolder' (line 2153)
+    [368, 392) 'oSetResolutions' (line 2170)[1m[32m <== Memory access at offset 404 overflows this variable[1m[0m
+    [432, 456) 'oMapResolutionsToBands' (line 2171)
+    [496, 520) 'osName' (line 2178)
+    [560, 584) 'ref.tmp16' (line 2180)
+    [624, 648) 'ref.tmp17' (line 2180)
+    [688, 712) 'aosGranuleList' (line 2192)
+    [752, 776) 'aoL1CSafeCompactGranuleList' (line 2195)
+    [816, 840) 'oSetEPSGCodes' (line 2219)
+    [880, 884) 'nEPSGCode' (line 2222)
+    [896, 912) 'apszXMLMD' (line 2240)
+    [928, 932) 'nResolution67' (line 2255)
+    [944, 968) 'osBandNames' (line 2268)
+    [1008, 1032) 'osDesc' (line 2271)
+    [1072, 1096) 'osDesc113' (line 2302)
+    [1136, 1160) 'osDesc143' (line 2330)
+    [1200, 1224) 'osPolygon' (line 2354)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism or swapcontext
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/gdal/gdal/frmts/sentinel2/sentinel2dataset.cpp:2225:37 in SENTINEL2Dataset::OpenL1C_L2A(char const*, SENTINEL2Level)
+Shadow bytes around the buggy address:
+  0x0fe1b3bf76e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe1b3bf76f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe1b3bf7700: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m
+  0x0fe1b3bf7710: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x0fe1b3bf7720: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0fe1b3bf7730: [1m[0m00[1m[0m [1m[31mf2[1m[0m[[1m[31mf2[1m[0m][1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x0fe1b3bf7740: [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x0fe1b3bf7750: [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x0fe1b3bf7760: [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m
+  0x0fe1b3bf7770: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x0fe1b3bf7780: [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42527577

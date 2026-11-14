@@ -1,0 +1,86 @@
+ARVO id: 42537608
+Project: ffmpeg
+Fuzz target: ffmpeg_BSF_H264_METADATA_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 75678761
+INFO: Loaded 1 modules   (60554 inline 8-bit counters): 60554 [0x55f54df8eec8, 0x55f54df9db52), 
+INFO: Loaded 1 PC tables (60554 PCs): 60554 [0x55f54df9db58,0x55f54e08a3f8), 
+/out/ffmpeg_BSF_H264_METADATA_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x55f54d8a7134 in cbs_h264_write_sei_pic_timing /src/ffmpeg/libavcodec/cbs_h264_syntax_template.c:653:9
+    #1 0x55f54d8a7134 in cbs_h264_write_sei_pic_timing_internal /src/ffmpeg/libavcodec/cbs_h264_syntax_template.c:607:1
+    #2 0x55f54d80be88 in cbs_sei_write_message /src/ffmpeg/libavcodec/cbs_sei_syntax_template.c:248:9
+    #3 0x55f54d80be88 in cbs_sei_write_message_list /src/ffmpeg/libavcodec/cbs_sei_syntax_template.c:398:19
+    #4 0x55f54d77b36f in cbs_h264_write_sei /src/ffmpeg/libavcodec/cbs_h264_syntax_template.c:868:5
+    #5 0x55f54d77b36f in cbs_h264_write_nal_unit /src/ffmpeg/libavcodec/cbs_h2645.c:1364:19
+    #6 0x55f54d70d9e2 in cbs_write_unit_data /src/ffmpeg/libavcodec/cbs.c:377:11
+    #7 0x55f54d70d9e2 in ff_cbs_write_fragment_data /src/ffmpeg/libavcodec/cbs.c:423:15
+    #8 0x55f54d70ec32 in ff_cbs_write_packet /src/ffmpeg/libavcodec/cbs.c:481:11
+    #9 0x55f54d76b030 in ff_cbs_bsf_generic_filter /src/ffmpeg/libavcodec/cbs_bsf.c:93:11
+    #10 0x55f54d702c77 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_bsf_fuzzer.c:155:16
+    #11 0x55f54d5fe4c0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #12 0x55f54d5e8c54 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #13 0x55f54d5ee6ea in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #14 0x55f54d61aae2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0x7f05f6349082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #16 0x55f54d5df72d in _start (/out/ffmpeg_BSF_H264_METADATA_fuzzer+0x1de72d)
+
+DEDUP_TOKEN: cbs_h264_write_sei_pic_timing--cbs_h264_write_sei_pic_timing_internal--cbs_sei_write_message
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x55f54d8a712d in cbs_h264_write_sei_pic_timing /src/ffmpeg/libavcodec/cbs_h264_syntax_template.c:653:9
+    #1 0x55f54d8a712d in cbs_h264_write_sei_pic_timing_internal /src/ffmpeg/libavcodec/cbs_h264_syntax_template.c:607:1
+    #2 0x55f54d80be88 in cbs_sei_write_message /src/ffmpeg/libavcodec/cbs_sei_syntax_template.c:248:9
+    #3 0x55f54d80be88 in cbs_sei_write_message_list /src/ffmpeg/libavcodec/cbs_sei_syntax_template.c:398:19
+    #4 0x55f54d77b36f in cbs_h264_write_sei /src/ffmpeg/libavcodec/cbs_h264_syntax_template.c:868:5
+    #5 0x55f54d77b36f in cbs_h264_write_nal_unit /src/ffmpeg/libavcodec/cbs_h2645.c:1364:19
+    #6 0x55f54d70d9e2 in cbs_write_unit_data /src/ffmpeg/libavcodec/cbs.c:377:11
+    #7 0x55f54d70d9e2 in ff_cbs_write_fragment_data /src/ffmpeg/libavcodec/cbs.c:423:15
+    #8 0x55f54d70ec32 in ff_cbs_write_packet /src/ffmpeg/libavcodec/cbs.c:481:11
+    #9 0x55f54d76b030 in ff_cbs_bsf_generic_filter /src/ffmpeg/libavcodec/cbs_bsf.c:93:11
+    #10 0x55f54d702c77 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_bsf_fuzzer.c:155:16
+    #11 0x55f54d5fe4c0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #12 0x55f54d5e8c54 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #13 0x55f54d5ee6ea in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #14 0x55f54d61aae2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0x7f05f6349082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+
+DEDUP_TOKEN: cbs_h264_write_sei_pic_timing--cbs_h264_write_sei_pic_timing_internal--cbs_sei_write_message
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x55f54d6a10a3 in posix_memalign /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:162:3
+    #1 0x55f54de47348 in av_malloc /src/ffmpeg/libavutil/mem.c:107:9
+    #2 0x55f54d9099b8 in ff_refstruct_alloc_ext_c /src/ffmpeg/libavcodec/refstruct.c:109:11
+    #3 0x55f54d8da0fc in ff_refstruct_alloc_ext /src/ffmpeg/libavcodec/refstruct.h:97:12
+    #4 0x55f54d8da0fc in ff_cbs_sei_alloc_message_payload /src/ffmpeg/libavcodec/cbs_sei.c:59:28
+    #5 0x55f54d7fccc1 in cbs_sei_read_message /src/ffmpeg/libavcodec/cbs_sei_syntax_template.c:243:9
+    #6 0x55f54d7fccc1 in cbs_sei_read_message_list /src/ffmpeg/libavcodec/cbs_sei_syntax_template.c:360:9
+    #7 0x55f54d770267 in cbs_h264_read_sei /src/ffmpeg/libavcodec/cbs_h264_syntax_template.c:868:5
+    #8 0x55f54d770267 in cbs_h264_read_nal_unit /src/ffmpeg/libavcodec/cbs_h2645.c:918:19
+    #9 0x55f54d70cc8b in cbs_read_fragment_content /src/ffmpeg/libavcodec/cbs.c:216:15
+    #10 0x55f54d70cc8b in cbs_read_data /src/ffmpeg/libavcodec/cbs.c:283:12
+    #11 0x55f54d76aedf in ff_cbs_bsf_generic_filter /src/ffmpeg/libavcodec/cbs_bsf.c:75:11
+    #12 0x55f54d702c77 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_bsf_fuzzer.c:155:16
+    #13 0x55f54d5fe4c0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #14 0x55f54d5e8c54 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #15 0x55f54d5ee6ea in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #16 0x55f54d61aae2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7f05f6349082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+
+DEDUP_TOKEN: ___interceptor_posix_memalign--av_malloc--ff_refstruct_alloc_ext_c
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/ffmpeg/libavcodec/cbs_h264_syntax_template.c:653:9 in cbs_h264_write_sei_pic_timing
+Unique heap origins: 79
+Stack depot allocated bytes: 9764880
+Unique origin histories: 6
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42537608

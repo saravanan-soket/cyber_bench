@@ -1,0 +1,83 @@
+ARVO id: 42500776
+Project: draco
+Fuzz target: draco_pc_decoder_fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Stack-buffer-overflow READ {*}
+Language: c++
+Repo: https://github.com/google/draco
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/draco_pc_decoder_fuzzer[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffff7f3eb3c at pc 0x0000004959e7 bp 0x7fffffffdaf0 sp 0x7fffffffd2b8
+[1m[0m[1m[34mREAD of size 113 at 0x7ffff7f3eb3c thread T0[1m[0m
+SCARINESS: 41 (multi-byte-read-stack-buffer-overflow)
+    #0 0x4959e6 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #1 0x5df9d6 in Write /src/draco/src/draco/core/data_buffer.h:54:5
+    #2 0x5df9d6 in SetAttributeValue /src/draco/src/draco/attributes/geometry_attribute.h:126:14
+    #3 0x5df9d6 in operator= /src/draco/src/draco/compression/attributes/kd_tree_attributes_decoder.cc:83:16
+    #4 0x5df9d6 in DequantizePoints3<std::__1::__wrap_iter<draco::VectorD<unsigned int, 3> *>, draco::PointAttributeVectorOutputIterator<float> > /src/draco/src/draco/compression/point_cloud/algorithms/quantize_points_3.h:77:10
+    #5 0x5df9d6 in bool draco::FloatPointsTreeDecoder::DecodePointCloud<draco::PointAttributeVectorOutputIterator<float> >(draco::DecoderBuffer*, draco::PointAttributeVectorOutputIterator<float>&) /src/draco/src/draco/compression/point_cloud/algorithms/float_points_tree_decoder.h:135:3
+    #6 0x5dd021 in draco::KdTreeAttributesDecoder::DecodeDataNeededByPortableTransforms(draco::DecoderBuffer*) /src/draco/src/draco/compression/attributes/kd_tree_attributes_decoder.cc:347:18
+    #7 0x5e6263 in draco::AttributesDecoder::DecodeAttributes(draco::DecoderBuffer*) /src/draco/src/draco/compression/attributes/attributes_decoder.h:59:10
+    #8 0x54b332 in draco::PointCloudDecoder::DecodeAllAttributes() /src/draco/src/draco/compression/point_cloud/point_cloud_decoder.cc:171:19
+    #9 0x54b09c in draco::PointCloudDecoder::DecodePointAttributes() /src/draco/src/draco/compression/point_cloud/point_cloud_decoder.cc:159:8
+    #10 0x549c51 in draco::PointCloudDecoder::Decode(draco::DracoOptions<draco::GeometryAttribute::Type> const&, draco::DecoderBuffer*, draco::PointCloud*) /src/draco/src/draco/compression/point_cloud/point_cloud_decoder.cc:112:8
+    #11 0x4d67a2 in draco::Decoder::DecodeBufferToGeometry(draco::DecoderBuffer*, draco::PointCloud*) /src/draco/src/draco/compression/decode.cc:102:3
+    #12 0x4d540d in draco::Decoder::DecodePointCloudFromBuffer(draco::DecoderBuffer*) /src/draco/src/draco/compression/decode.cc:70:5
+    #13 0x4d2773 in LLVMFuzzerTestOneInput /src/draco/src/draco/tools/fuzz/draco_pc_decoder_fuzzer.cc:26:11
+    #14 0x4c8f6b in main (/out/draco_pc_decoder_fuzzer+0x4c8f6b)
+    #15 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #16 0x41e278 in _start (/out/draco_pc_decoder_fuzzer+0x41e278)
+
+DEDUP_TOKEN: __asan_memcpy--Write--SetAttributeValue
+[1m[32mAddress 0x7ffff7f3eb3c is located in stack of thread T0 at offset 60 in frame[1m[0m
+[1m[0m    #0 0x5df41f in bool draco::FloatPointsTreeDecoder::DecodePointCloud<draco::PointAttributeVectorOutputIterator<float> >(draco::DecoderBuffer*, draco::PointAttributeVectorOutputIterator<float>&) /src/draco/src/draco/compression/point_cloud/algorithms/float_points_tree_decoder.h:102
+
+DEDUP_TOKEN: bool draco::FloatPointsTreeDecoder::DecodePointCloud<draco::PointAttributeVectorOutputIterator<float> >(draco::DecoderBuffer*, draco::PointAttributeVectorOutputIterator<float>&)
+  This frame has 3 object(s):
+    [32, 36) 'dequantize.i'
+    [48, 60) 'ref.tmp.i'
+    [80, 104) 'qpoints' (line 103)[1m[32m <== Memory access at offset 60 partially underflows this variable[1m[0m
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x10007efdfd10: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x10007efdfd20: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x10007efdfd30: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x10007efdfd40: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x10007efdfd50: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+=>0x10007efdfd60: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m[[1m[0m04[1m[0m][1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m
+  0x10007efdfd70: [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efdfd80: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x10007efdfd90: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x10007efdfda0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efdfdb0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42500776

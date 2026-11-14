@@ -1,0 +1,71 @@
+ARVO id: 42509275
+Project: libxslt
+Fuzz target: xslt
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://gitlab.gnome.org/GNOME/libxslt.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4088518010
+INFO: Loaded 1 modules   (41423 inline 8-bit counters): 41423 [0xb4fd8e, 0xb59f5d), 
+INFO: Loaded 1 PC tables (41423 PCs): 41423 [0xa4bb38,0xaed828), 
+/out/xslt: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x99266c in xmlStrQEqual /src/libxml2/xmlstring.c:192:13
+    #1 0x9b34ea in xmlDictQLookup /src/libxml2/dict.c:1140:7
+    #2 0x9c85ee in xmlSAX2StartElementNs /src/libxml2/SAX2.c:2241:17
+    #3 0x71c3d9 in xmlParseStartTag2 /src/libxml2/parser.c:9653:6
+    #4 0x71c3d9 in xmlParseElementStart /src/libxml2/parser.c:10038:16
+    #5 0x70ec30 in xmlParseContentInternal /src/libxml2/parser.c:9903:10
+    #6 0x704ea8 in xmlParseContent /src/libxml2/parser.c:9948:5
+    #7 0x704ea8 in xmlParseBalancedChunkMemoryInternal /src/libxml2/parser.c:13392:5
+    #8 0x7001d1 in xmlParseReference /src/libxml2/parser.c:7304:9
+    #9 0x70ea31 in xmlParseContentInternal /src/libxml2/parser.c:9913:6
+    #10 0x70fce1 in xmlParseElement /src/libxml2/parser.c:9978:5
+    #11 0x72cb77 in xmlParseDocument /src/libxml2/parser.c:10815:2
+    #12 0x73b1e6 in xmlDoRead /src/libxml2/parser.c:15162:5
+    #13 0x73b7b2 in xmlReadMemory /src/libxml2/parser.c:15248:13
+    #14 0x529303 in xsltFuzzXslt /src/libxslt/tests/fuzz/fuzz.c:326:15
+    #15 0x526f8f in LLVMFuzzerTestOneInput /src/libxslt/tests/fuzz/xslt.c:17:23
+    #16 0x455022 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #17 0x440cf2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #18 0x44652b in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #19 0x46f032 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #20 0x7f19742aa0b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x240b2)
+    #21 0x41f61d in _start (/out/xslt+0x41f61d)
+
+DEDUP_TOKEN: xmlStrQEqual--xmlDictQLookup--xmlSAX2StartElementNs
+  [1m[35mUninitialized value was created by a heap deallocation[1m[0m
+    #0 0x4ceec9 in free /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:223:3
+    #1 0x756add in xmlFreeNodeList /src/libxml2/tree.c:3750:3
+    #2 0x7534bf in xmlFreeNode /src/libxml2/tree.c:3805:2
+    #3 0x70613f in xmlParseBalancedChunkMemoryInternal /src/libxml2/parser.c:13435:2
+    #4 0x7001d1 in xmlParseReference /src/libxml2/parser.c:7304:9
+    #5 0x70ea31 in xmlParseContentInternal /src/libxml2/parser.c:9913:6
+    #6 0x70fce1 in xmlParseElement /src/libxml2/parser.c:9978:5
+    #7 0x72cb77 in xmlParseDocument /src/libxml2/parser.c:10815:2
+    #8 0x73b1e6 in xmlDoRead /src/libxml2/parser.c:15162:5
+    #9 0x73b7b2 in xmlReadMemory /src/libxml2/parser.c:15248:13
+    #10 0x529303 in xsltFuzzXslt /src/libxslt/tests/fuzz/fuzz.c:326:15
+    #11 0x526f8f in LLVMFuzzerTestOneInput /src/libxslt/tests/fuzz/xslt.c:17:23
+    #12 0x455022 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #13 0x440cf2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #14 0x44652b in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #15 0x46f032 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7f19742aa0b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x240b2)
+
+DEDUP_TOKEN: free--xmlFreeNodeList--xmlFreeNode
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/libxml2/xmlstring.c:192:13 in xmlStrQEqual
+Unique heap origins: 607
+Stack depot allocated bytes: 1703936
+Unique origin histories: 22
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42509275

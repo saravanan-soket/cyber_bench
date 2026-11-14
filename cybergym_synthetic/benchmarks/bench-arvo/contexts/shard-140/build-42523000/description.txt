@@ -1,0 +1,40 @@
+ARVO id: 42523000
+Project: samba
+Fuzz target: fuzz_ndr_claims_TYPE_STRUCT
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN WRITE
+Language: c
+Repo: https://gitlab.com/samba-team/samba
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3671435614
+INFO: Loaded 1 modules   (60625 inline 8-bit counters): 60625 [0x56033b455c30, 0x56033b464901), 
+INFO: Loaded 1 PC tables (60625 PCs): 60625 [0x56033b464908,0x56033b551618), 
+/out/fuzz_ndr_claims_TYPE_STRUCT: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x560460585b4f (pc 0x7f201ca87df8 bp 0x7ffdd1485250 sp 0x7ffdd1485208 T7)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+    #0 0x7f201ca87df8  /build/glibc-FcRMwW/glibc-2.31/string/../sysdeps/x86_64/multiarch/memset-vec-unaligned-erms.S:202
+    #1 0x56033b149842 in ndr_push_zero /src/samba/bin/default/../../librpc/ndr/ndr_basic.c:772:2
+    #2 0x56033b0f6dc2 in ndr_pull_compression_xpress_huff_raw_chunk /src/samba/bin/default/../../librpc/ndr/ndr_compression.c:734:2
+    #3 0x56033b0f6dc2 in ndr_pull_compression_start /src/samba/bin/default/../../librpc/ndr/ndr_compression.c:857:3
+    #4 0x56033b0e7baa in ndr_pull_CLAIMS_SET_METADATA /src/samba/bin/default/librpc/gen_ndr/ndr_claims.c:1149:6
+    #5 0x56033b05a90b in LLVMFuzzerTestOneInput /src/samba/bin/default/lib/fuzzing/fuzz_ndr_claims_TYPE_STRUCT.c:276:13
+    #6 0x56033af9b8e3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #7 0x56033af87042 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #8 0x56033af8c8ec in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #9 0x56033afb5e22 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7f201c920082 in __libc_start_main /build/glibc-FcRMwW/glibc-2.31/csu/../csu/libc-start.c:308:16
+    #11 0x56033af7d20d in _start (/out/fuzz_ndr_claims_TYPE_STRUCT+0x2a020d)
+
+DEDUP_TOKEN: ndr_push_zero--ndr_pull_compression_xpress_huff_raw_chunk
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /build/glibc-FcRMwW/glibc-2.31/string/../sysdeps/x86_64/multiarch/memset-vec-unaligned-erms.S:202 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42523000

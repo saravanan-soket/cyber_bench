@@ -1,0 +1,49 @@
+ARVO id: 42530470
+Project: mupdf
+Fuzz target: pdf_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: git://git.ghostscript.com/mupdf.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2019368840
+INFO: Loaded 1 modules   (159539 inline 8-bit counters): 159539 [0x3af81c0, 0x3b1f0f3), 
+INFO: Loaded 1 PC tables (159539 PCs): 159539 [0x16fc400,0x196b730), 
+/out/pdf_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+warning: Suspect BMP header; bitcount=32, colors=538976288
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x6191000004be (pc 0x7ff34faa6cd2 bp 0x7ffc950db7e0 sp 0x7ffc950dafa8 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x7ff34faa6cd2  (/lib/x86_64-linux-gnu/libc.so.6+0xbbcd2) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #1 0x52f448 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #2 0x784f1f in fz_new_buffer_from_copied_data /src/mupdf/source/fitz/buffer.c:97:2
+    #3 0x62ba14 in bmp_read_color_profile /src/mupdf/source/fitz/load-bmp.c:815:13
+    #4 0x628bdc in bmp_read_image /src/mupdf/source/fitz/load-bmp.c:1178:14
+    #5 0x62b14f in fz_load_bmp_subimage /src/mupdf/source/fitz/load-bmp.c:1286:11
+    #6 0x778961 in img_load_page /src/mupdf/source/cbz/muimg.c:137:13
+    #7 0x5812e5 in fz_load_chapter_page /src/mupdf/source/fitz/document.c:656:10
+    #8 0x580f14 in fz_load_page /src/mupdf/source/fitz/document.c:518:11
+    #9 0x6d223b in fz_new_pixmap_from_page_number_with_separations /src/mupdf/source/fitz/util.c:254:9
+    #10 0x6d2114 in fz_new_pixmap_from_page_number /src/mupdf/source/fitz/util.c:245:9
+    #11 0x56d9d3 in LLVMFuzzerTestOneInput /src/pdf_fuzzer.cc:146:13
+    #12 0x43f093 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #13 0x42a7f2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #14 0x43009c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #15 0x4595d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7ff34fa0f082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #17 0x4209bd in _start (/out/pdf_fuzzer+0x4209bd)
+
+DEDUP_TOKEN: __asan_memcpy--fz_new_buffer_from_copied_data
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0xbbcd2) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42530470

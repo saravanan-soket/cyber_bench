@@ -1,0 +1,48 @@
+ARVO id: 42500748
+Project: njs
+Fuzz target: njs_process_script_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: http://hg.nginx.org/njs
+
+=== Crash report ===
+INFO: Seed: 851680236
+INFO: Loaded 1 modules   (14755 inline 8-bit counters): 14755 [0x9659e0, 0x969383), 
+INFO: Loaded 1 PC tables (14755 PCs): 14755 [0x969388,0x9a2db8), 
+/out/njs_process_script_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x61e000000c80 (pc 0x7ffff6da2bd0 bp 0x7fffffffd550 sp 0x7fffffffcd08 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x7ffff6da2bd0  (/lib/x86_64-linux-gnu/libc.so.6+0x14dbd0)
+    #1 0x51df71 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #2 0x5a16a4 in njs_object_prop_alloc /src/njs/src/njs_object_prop.c:26:23
+    #3 0x5e0732 in njs_regexp_exec_result /src/njs/src/njs_regexp.c:1051:20
+    #4 0x5de921 in njs_regexp_builtin_exec /src/njs/src/njs_regexp.c:897:18
+    #5 0x5de2ef in njs_regexp_prototype_exec /src/njs/src/njs_regexp.c:1112:12
+    #6 0x5904a2 in njs_string_prototype_match /src/njs/src/njs_string.c:3048:12
+    #7 0x5d9807 in njs_function_native_call /src/njs/src/njs_function.c:730:11
+    #8 0x56b164 in njs_function_frame_invoke /src/njs/src/njs_function.h:172:16
+    #9 0x56b164 in njs_vmcode_interpreter /src/njs/src/njs_vmcode.c:778:23
+    #10 0x567945 in njs_vm_start /src/njs/src/njs_vm.c:500:12
+    #11 0x551683 in njs_process_script /src/njs/src/njs_shell.c:843:19
+    #12 0x550fab in LLVMFuzzerTestOneInput /src/njs/src/njs_shell.c:616:16
+    #13 0x458611 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #14 0x443da2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #15 0x449dbe in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #16 0x4717d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #17 0x7ffff6c7583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #18 0x41ede8 in _start (/out/njs_process_script_fuzzer+0x41ede8)
+
+DEDUP_TOKEN: __asan_memcpy--njs_object_prop_alloc
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x14dbd0) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42500748

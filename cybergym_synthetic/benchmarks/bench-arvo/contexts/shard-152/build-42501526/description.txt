@@ -1,0 +1,45 @@
+ARVO id: 42501526
+Project: file
+Fuzz target: magic_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/file/file.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3672466932
+INFO: Loaded 1 modules   (5231 inline 8-bit counters): 5231 [0x82c6520, 0x82c798f), 
+INFO: Loaded 1 PC tables (5231 PCs): 5231 [0x82c7990,0x82d1d08), 
+/out/magic_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x16805da0 (pc 0x0820ea31 bp 0xffffcc78 sp 0xffffcbf0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x820ea31 in cdf_getuint32 /src/file/src/cdf.c:181:8
+    #1 0x820ea31 in cdf_read_property_info /src/file/src/cdf.c:1021:20
+    #2 0x82103d1 in cdf_unpack_summary_info /src/file/src/cdf.c:1150:6
+    #3 0x81de751 in cdf_file_summary_info /src/file/src/readcdf.c:305:6
+    #4 0x81de751 in cdf_check_summary_info /src/file/src/readcdf.c:401:11
+    #5 0x81ddd46 in file_trycdf /src/file/src/readcdf.c:635:7
+    #6 0x81d931d in file_buffer /src/file/src/funcs.c:408:7
+    #7 0x81b6ff8 in magic_buffer /src/file/src/magic.c:542:6
+    #8 0x81b5ab6 in LLVMFuzzerTestOneInput /src/magic_fuzzer.cc:52:3
+    #9 0x80a3df5 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #10 0x80904be in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #11 0x8096099 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:859:9
+    #12 0x80bc2e7 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0xf7c9fee4 in __libc_start_main (/lib32/libc.so.6+0x1eee4)
+    #14 0x806ca45 in _start (/out/magic_fuzzer+0x806ca45)
+
+DEDUP_TOKEN: cdf_getuint32--cdf_read_property_info--cdf_unpack_summary_info
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/file/src/cdf.c:181:8 in cdf_getuint32
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42501526

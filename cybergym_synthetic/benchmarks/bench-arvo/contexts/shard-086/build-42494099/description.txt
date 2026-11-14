@@ -1,0 +1,49 @@
+ARVO id: 42494099
+Project: c-blosc2
+Fuzz target: decompress_frame_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Invalid-free
+Language: c++
+Repo: https://github.com/Blosc/c-blosc2.git
+
+=== Crash report ===
+Warning: AFL++ tools will need to set AFL_MAP_SIZE to 182592 to be able to run this instrumented program!
+======================= INFO =========================
+This binary is built for afl++.
+To run the target function on individual input(s) execute this:
+  /out/decompress_frame_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] -- /out/decompress_frame_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 138 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: attempting free on address which was not malloc()-ed: 0x7ffff6a7285e in thread T0
+[1m[0mSCARINESS: 40 (bad-free)
+    #0 0x49eac2 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:127:3
+    #1 0x96dfcc in frame_get_lazychunk /src/c-blosc2/blosc/frame.c:2036:7
+    #2 0x9ae965 in frame_decompress_chunk /src/c-blosc2/blosc/frame.c:2761:8
+    #3 0x8bce2d in blosc2_schunk_decompress_chunk /src/c-blosc2/blosc/schunk.c:804:17
+    #4 0x4d3dd6 in LLVMFuzzerTestOneInput /src/c-blosc2/tests/fuzz/fuzz_decompress_frame.c:38:15
+    #5 0x4d6033 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:185:7
+    #6 0x4d6033 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:237:12
+    #7 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #8 0x423e48 in _start (/out/decompress_frame_fuzzer+0x423e48)
+
+DEDUP_TOKEN: free--frame_get_lazychunk--frame_decompress_chunk
+[1m[32m0x7ffff6a7285e is located 94 bytes inside of 1048576-byte region [0x7ffff6a72800,0x7ffff6b72800)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x49ed2d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x4d5fc9 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:176:41
+    #2 0x4d5fc9 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:237:12
+LLVMSymbolizer: error reading file: No such file or directory
+    #3 0x7fffffffe4a8  ([stack]+0x204a8)
+
+DEDUP_TOKEN: malloc--ExecuteFilesOnyByOne--main
+SUMMARY: AddressSanitizer: bad-free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:127:3 in free
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42494099

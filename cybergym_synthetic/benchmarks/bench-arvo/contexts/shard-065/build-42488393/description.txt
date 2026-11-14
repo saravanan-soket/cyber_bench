@@ -1,0 +1,103 @@
+ARVO id: 42488393
+Project: openh264
+Fuzz target: decoder_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow WRITE 8
+Language: c++
+Repo: https://github.com/cisco/openh264.git
+
+=== Crash report ===
+INFO: Seed: 3933721381
+INFO: Loaded 1 modules   (10422 inline 8-bit counters): 10422 [0x928378, 0x92ac2e), 
+INFO: Loaded 1 PC tables (10422 PCs): 10422 [0x92ac30,0x953790), 
+/out/decoder_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x629000004a20 at pc 0x00000052076a bp 0x7ffdd897abe0 sp 0x7ffdd897a3a8
+[1m[0m[1m[34mWRITE of size 8 at 0x629000004a20 thread T0[1m[0m
+SCARINESS: 42 (8-byte-write-heap-buffer-overflow)
+    #0 0x520769 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #1 0x5bb91b in ExpandPictureChroma_c(unsigned char*, int, int, int) /src/openh264/codec/common/src/expand_pic.cpp:329:5
+    #2 0x5bbceb in ExpandReferencingPicture /src/openh264/codec/common/src/expand_pic.cpp:410:5
+    #3 0x59f77f in WelsDec::WelsCheckAndRecoverForFutureDecoding(WelsDec::TagWelsDecoderContext*) /src/openh264/codec/decoder/core/src/manage_dec_ref.cpp:197:9
+    #4 0x59d93d in WelsDec::WelsInitBSliceRefList(WelsDec::TagWelsDecoderContext*, int) /src/openh264/codec/decoder/core/src/manage_dec_ref.cpp:232:17
+    #5 0x5834bc in WelsDec::InitRefPicList(WelsDec::TagWelsDecoderContext*, unsigned char, int) /src/openh264/codec/decoder/core/src/decoder_core.cpp:2430:12
+    #6 0x580f71 in WelsDec::DecodeCurrentAccessUnit(WelsDec::TagWelsDecoderContext*, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/core/src/decoder_core.cpp:2700:18
+    #7 0x57eeb3 in WelsDec::ConstructAccessUnit(WelsDec::TagWelsDecoderContext*, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/core/src/decoder_core.cpp:2358:10
+    #8 0x568d99 in WelsDecodeBs /src/openh264/codec/decoder/core/src/decoder.cpp:918:7
+    #9 0x55b7c8 in WelsDec::CWelsDecoder::DecodeFrame2WithCtx(WelsDec::TagWelsDecoderContext*, unsigned char const*, int, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:794:3
+    #10 0x55e32b in WelsDec::CWelsDecoder::DecodeFrame2(unsigned char const*, int, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:913:10
+    #11 0x558f12 in WelsDec::CWelsDecoder::DecodeFrameNoDelay(unsigned char const*, int, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:712:11
+    #12 0x553f76 in LLVMFuzzerTestOneInput /src/decoder_fuzzer.cpp:75:15
+    #13 0x458571 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:595:15
+    #14 0x443642 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #15 0x4496fe in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:852:9
+    #16 0x4716e2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7f079c14083f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #18 0x41e918 in _start (/out/decoder_fuzzer+0x41e918)
+
+DEDUP_TOKEN: __asan_memcpy--ExpandPictureChroma_c(unsigned char*, int, int, int)--ExpandReferencingPicture
+[1m[32m0x629000004a20 is located 5 bytes to the right of 18459-byte region [0x629000000200,0x629000004a1b)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x52130d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x561963 in WelsCommon::WelsMalloc(unsigned int, char const*, unsigned int) /src/openh264/codec/common/src/memory_align.cpp:72:30
+    #2 0x561b64 in WelsCommon::CMemoryAlign::WelsMalloc(unsigned int, char const*) /src/openh264/codec/common/src/memory_align.cpp:129:20
+    #3 0x561aba in WelsCommon::CMemoryAlign::WelsMallocz(unsigned int, char const*) /src/openh264/codec/common/src/memory_align.cpp:118:20
+    #4 0x5a5934 in WelsDec::AllocPicture(WelsDec::TagWelsDecoderContext*, int, int) /src/openh264/codec/decoder/core/src/pic_queue.cpp:92:52
+    #5 0x56730e in WelsDec::CreatePicBuff(WelsDec::TagWelsDecoderContext*, WelsDec::TagPicBuff**, int, int, int) /src/openh264/codec/decoder/core/src/decoder.cpp:89:21
+    #6 0x565423 in WelsRequestMem /src/openh264/codec/decoder/core/src/decoder.cpp:523:12
+    #7 0x56a7d9 in SyncPictureResolutionExt /src/openh264/codec/decoder/core/src/decoder.cpp:955:10
+    #8 0x57eb8a in WelsDec::AllocPicBuffOnNewSeqBegin(WelsDec::TagWelsDecoderContext*) /src/openh264/codec/decoder/core/src/decoder_core.cpp:2296:18
+    #9 0x57ed54 in WelsDec::InitConstructAccessUnit(WelsDec::TagWelsDecoderContext*, TagBufferInfo*) /src/openh264/codec/decoder/core/src/decoder_core.cpp:2323:12
+    #10 0x57ee01 in WelsDec::ConstructAccessUnit(WelsDec::TagWelsDecoderContext*, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/core/src/decoder_core.cpp:2347:12
+    #11 0x568d99 in WelsDecodeBs /src/openh264/codec/decoder/core/src/decoder.cpp:918:7
+    #12 0x55b7c8 in WelsDec::CWelsDecoder::DecodeFrame2WithCtx(WelsDec::TagWelsDecoderContext*, unsigned char const*, int, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:794:3
+    #13 0x55e32b in WelsDec::CWelsDecoder::DecodeFrame2(unsigned char const*, int, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:913:10
+    #14 0x558f12 in WelsDec::CWelsDecoder::DecodeFrameNoDelay(unsigned char const*, int, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:712:11
+    #15 0x553f76 in LLVMFuzzerTestOneInput /src/decoder_fuzzer.cpp:75:15
+    #16 0x458571 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:595:15
+    #17 0x443642 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #18 0x4496fe in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:852:9
+    #19 0x4716e2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #20 0x7f079c14083f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: malloc--WelsCommon::WelsMalloc(unsigned int, char const*, unsigned int)--WelsCommon::CMemoryAlign::WelsMalloc(unsigned int, char const*)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x0c527fff88f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c527fff8900: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c527fff8910: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c527fff8920: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c527fff8930: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c527fff8940: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m03[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c527fff8950: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c527fff8960: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c527fff8970: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c527fff8980: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c527fff8990: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42488393

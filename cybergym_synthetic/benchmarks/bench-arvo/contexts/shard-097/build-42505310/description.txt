@@ -1,0 +1,98 @@
+ARVO id: 42505310
+Project: gdal
+Fuzz target: gtiff_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 8
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 3355751608
+INFO: Loaded 1 modules   (313454 guards): 313454 [0x57c1ae0, 0x58f3c98), 
+/out/gtiff_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x7f048fd78800 at pc 0x00000071b76b bp 0x7ffdaccaee90 sp 0x7ffdaccaee88
+[1m[0m[1m[34mREAD of size 8 at 0x7f048fd78800 thread T0[1m[0m
+SCARINESS: 23 (8-byte-read-heap-buffer-overflow)
+    #0 0x71b76a in OJPEGReadBufferFill /src/gdal/gdal/frmts/gtiff/libtiff/tif_ojpeg.c:2003:29
+    #1 0x715e98 in OJPEGReadBytePeek /src/gdal/gdal/frmts/gtiff/libtiff/tif_ojpeg.c:2053:7
+    #2 0x715000 in OJPEGReadHeaderInfoSec /src/gdal/gdal/frmts/gtiff/libtiff/tif_ojpeg.c:1288:7
+    #3 0x71c0c8 in OJPEGReadHeaderInfo /src/gdal/gdal/frmts/gtiff/libtiff/tif_ojpeg.c:1094:6
+    #4 0x71025c in OJPEGPreDecode /src/gdal/gdal/frmts/gtiff/libtiff/tif_ojpeg.c:675:7
+    #5 0x73d41f in _TIFFReadEncodedTileAndAllocBuffer /src/gdal/gdal/frmts/gtiff/libtiff/tif_read.c:1068:10
+    #6 0x6c3c06 in gtTileContig /src/gdal/gdal/frmts/gtiff/libtiff/tif_getimage.c:675:10
+    #7 0x6c324b in TIFFReadRGBATileExt /src/gdal/gdal/frmts/gtiff/libtiff/tif_getimage.c:3010:10
+    #8 0x5c79f4 in GTiffRGBABand::IReadBlock(int, int, void*) /src/gdal/gdal/frmts/gtiff/geotiff.cpp:5852:17
+    #9 0x841fd3 in GDALRasterBand::GetLockedBlockRef(int, int, int) /src/gdal/gdal/gcore/gdalrasterband.cpp:1333:20
+    #10 0x883866 in GDALRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/rasterio.cpp:357:27
+    #11 0x5bb44e in GTiffRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/frmts/gtiff/geotiff.cpp:4187:28
+    #12 0x83f214 in GDALRasterBand::RasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdalrasterband.cpp:387:16
+    #13 0x83f8d4 in GDALRasterIO /src/gdal/gdal/gcore/gdalrasterband.cpp:421:21
+    #14 0xa68fe4 in GDALChecksumImage /src/gdal/gdal/alg/gdalchecksum.cpp:155:17
+    #15 0x526561 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_fuzzer.cpp:219:17
+    #16 0x548d80 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:512:13
+    #17 0x527475 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #18 0x532c71 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:692:9
+    #19 0x526b18 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #20 0x7f049497f82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #21 0x427938 in _start (/out/gtiff_fuzzer+0x427938)
+
+DEDUP_TOKEN: OJPEGReadBufferFill--OJPEGReadBytePeek--OJPEGReadHeaderInfoSec
+[1m[32m0x7f048fd78800 is located 0 bytes to the right of 8388608-byte region [0x7f048f578800,0x7f048fd78800)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4ea8e0 in realloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:107
+    #1 0x5aa5ad in GTiffDataset::IsBlockAvailable(int, unsigned long long*, unsigned long long*, bool*) /src/gdal/gdal/frmts/gtiff/geotiff.cpp:9477:17
+    #2 0x5c7772 in GTiffRGBABand::IReadBlock(int, int, void*) /src/gdal/gdal/frmts/gtiff/geotiff.cpp:5826:21
+    #3 0x841fd3 in GDALRasterBand::GetLockedBlockRef(int, int, int) /src/gdal/gdal/gcore/gdalrasterband.cpp:1333:20
+    #4 0x883866 in GDALRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/rasterio.cpp:357:27
+    #5 0x5bb44e in GTiffRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/frmts/gtiff/geotiff.cpp:4187:28
+    #6 0x83f214 in GDALRasterBand::RasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdalrasterband.cpp:387:16
+    #7 0x83f8d4 in GDALRasterIO /src/gdal/gdal/gcore/gdalrasterband.cpp:421:21
+    #8 0xa68fe4 in GDALChecksumImage /src/gdal/gdal/alg/gdalchecksum.cpp:155:17
+    #9 0x526561 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_fuzzer.cpp:219:17
+    #10 0x548d80 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:512:13
+    #11 0x527475 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #12 0x532c71 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:692:9
+    #13 0x526b18 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #14 0x7f049497f82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: realloc--GTiffDataset::IsBlockAvailable(int, unsigned long long*, unsigned long long*, bool*)--GTiffRGBABand::IReadBlock(int, int, void*)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/gdal/gdal/frmts/gtiff/libtiff/tif_ojpeg.c:2003:29 in OJPEGReadBufferFill
+Shadow bytes around the buggy address:
+  0x0fe111fa70b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe111fa70c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe111fa70d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe111fa70e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe111fa70f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0fe111fa7100:[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0fe111fa7110: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0fe111fa7120: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0fe111fa7130: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0fe111fa7140: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0fe111fa7150: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42505310

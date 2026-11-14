@@ -1,0 +1,37 @@
+ARVO id: 42529482
+Project: libxaac
+Fuzz target: xaac_dec_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Index-out-of-bounds
+Language: c++
+Repo: https://github.com/ittiam-systems/libxaac.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 666530607
+INFO: Loaded 1 modules   (73785 inline 8-bit counters): 73785 [0xac5230, 0xad7269), 
+INFO: Loaded 1 PC tables (73785 PCs): 73785 [0x8b7a20,0x9d7db0), 
+/out/xaac_dec_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m/src/libxaac/decoder/ixheaacd_mps_smoothing.c:678:24:[1m[31m runtime error: [1m[0m[1mindex 31 out of bounds for type 'WORD32[28]' (aka 'int[28]')[1m[0m
+    #0 0x58049b in ixheaacd_smooth_m1m2 /src/libxaac/decoder/ixheaacd_mps_smoothing.c:678:24
+    #1 0x5069f6 in ixheaacd_apply_frame /src/libxaac/decoder/ixheaacd_mps_dec.c:1951:3
+    #2 0x5069f6 in ixheaacd_heaac_mps_apply /src/libxaac/decoder/ixheaacd_mps_dec.c:2094:20
+    #3 0x4d2687 in ixheaacd_dec_execute /src/libxaac/decoder/ixheaacd_api.c:3674:7
+    #4 0x4c40bd in ixheaacd_dec_api /src/libxaac/decoder/ixheaacd_api.c:982:24
+    #5 0x4c19f0 in Codec::decodeXAACStream(unsigned char*, unsigned int, int*, int*) /src/libxaac/fuzzer/xaac_dec_fuzzer.cpp:656:14
+    #6 0x4c1fe7 in LLVMFuzzerTestOneInput /src/libxaac/fuzzer/xaac_dec_fuzzer.cpp:864:23
+    #7 0x4262a3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #8 0x411a02 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #9 0x4172ac in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #10 0x4407e2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7f51f5174082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #12 0x407bcd in _start (/out/xaac_dec_fuzzer+0x407bcd)
+
+DEDUP_TOKEN: ixheaacd_smooth_m1m2--ixheaacd_apply_frame--ixheaacd_heaac_mps_apply
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /src/libxaac/decoder/ixheaacd_mps_smoothing.c:678:24 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42529482

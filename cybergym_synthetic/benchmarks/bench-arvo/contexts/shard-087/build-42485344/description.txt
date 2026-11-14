@@ -1,0 +1,48 @@
+ARVO id: 42485344
+Project: c-blosc2
+Fuzz target: decompress_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/Blosc/c-blosc2.git
+
+=== Crash report ===
+INFO: Seed: 3621628800
+INFO: Loaded 1 modules   (45031 inline 8-bit counters): 45031 [0xf8efec, 0xf99fd3), 
+INFO: Loaded 1 PC tables (45031 PCs): 45031 [0xc8b360,0xd3b1d0), 
+/out/decompress_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x5b3a96 in initialize_context_decompression /src/c-blosc2/blosc/blosc2.c:1480:11
+    #1 0x5b3a96 in blosc_run_decompression_with_context /src/c-blosc2/blosc/blosc2.c:1988:11
+    #2 0x5b444d in blosc_decompress /src/c-blosc2/blosc/blosc2.c:2078:12
+    #3 0x52dd3d in LLVMFuzzerTestOneInput /src/c-blosc2/tests/fuzz/fuzz_decompress.c:33:5
+    #4 0x465701 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #5 0x450e72 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #6 0x456e9e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #7 0x47e8d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #8 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #9 0x42b358 in _start (/out/decompress_fuzzer+0x42b358)
+
+DEDUP_TOKEN: initialize_context_decompression--blosc_run_decompression_with_context--blosc_decompress
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x4de65d in malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:901:3
+    #1 0x52dccb in LLVMFuzzerTestOneInput /src/c-blosc2/tests/fuzz/fuzz_decompress.c:31:12
+    #2 0x465701 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #3 0x450e72 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #4 0x456e9e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #5 0x47e8d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #6 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: malloc--LLVMFuzzerTestOneInput--fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/c-blosc2/blosc/blosc2.c:1480:11 in initialize_context_decompression
+Unique heap origins: 23
+Stack depot allocated bytes: 1440
+Unique origin histories: 3
+History depot allocated bytes: 72
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42485344

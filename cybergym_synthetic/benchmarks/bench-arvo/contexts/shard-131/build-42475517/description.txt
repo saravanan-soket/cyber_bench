@@ -1,0 +1,99 @@
+ARVO id: 42475517
+Project: karchive
+Fuzz target: karchive_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow WRITE {*}
+Language: c++
+Repo: https://invent.kde.org/frameworks/karchive.git
+
+=== Crash report ===
+INFO: Seed: 126850304
+INFO: Loaded 1 modules   (116679 inline 8-bit counters): 116679 [0x1802e70, 0x181f637), 
+INFO: Loaded 1 PC tables (116679 PCs): 116679 [0x181f638,0x19e72a8), 
+/out/karchive_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+kf5.karchive: bzDecompress returned -5
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x62b000006219 at pc 0x00000053a0e0 bp 0x7fffffffd170 sp 0x7fffffffc938
+[1m[0m[1m[34mWRITE of size 44 at 0x62b000006219 thread T0[1m[0m
+SCARINESS: 45 (multi-byte-write-heap-buffer-overflow)
+    #0 0x53a0df in __asan_memcpy /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cc:22:3
+    #1 0xedef20 in decode_buffer /src/xz/src/liblzma/lz/lz_decoder.c:102:4
+    #2 0xede922 in lz_decode /src/xz/src/liblzma/lz/lz_decoder.c:144:10
+    #3 0xedfe06 in copy_or_code /src/xz/src/liblzma/simple/simple_coder.c:38:24
+    #4 0xedf821 in simple_code /src/xz/src/liblzma/simple/simple_coder.c:134:25
+    #5 0xed3469 in block_decode /src/xz/src/liblzma/common/block_decoder.c:89:24
+    #6 0xea5c5a in stream_decode /src/xz/src/liblzma/common/stream_decoder.c:254:24
+    #7 0xea41f9 in auto_decode /src/xz/src/liblzma/common/auto_decoder.c:75:24
+    #8 0xea04de in lzma_code /src/xz/src/liblzma/common/common.c:286:17
+    #9 0xe2cfbc in KXzFilter::uncompress() /src/karchive/src/kxzfilter.cpp:244:14
+    #10 0xe0e150 in KCompressionDevice::readData(char*, long long) /src/karchive/src/kcompressiondevice.cpp:303:29
+    #11 0x8270eb in QIODevicePrivate::read(char*, long long, bool) /src/qtbase/src/corelib/io/qiodevice.cpp:1108:41
+    #12 0xe0d9a6 in KCompressionDevice::seek(long long) /src/karchive/src/kcompressiondevice.cpp:250:26
+    #13 0xe1628e in KTar::openArchive(QFlags<QIODevice::OpenModeFlag>) /src/karchive/src/ktar.cpp:508:28
+    #14 0xe5a115 in KArchive::open(QFlags<QIODevice::OpenModeFlag>) /src/karchive/src/karchive.cpp:178:12
+    #15 0x56c620 in LLVMFuzzerTestOneInput /src/karchive_fuzzer.cc:61:12
+    #16 0x475441 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #17 0x460721 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:286:6
+    #18 0x4660ea in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:767:9
+    #19 0x48ecd2 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #20 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #21 0x4200f8 in _start (/out/karchive_fuzzer+0x4200f8)
+
+DEDUP_TOKEN: __asan_memcpy--decode_buffer--lz_decode
+[1m[32m0x62b000006219 is located 0 bytes to the right of 24601-byte region [0x62b000000200,0x62b000006219)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x53ac0d in malloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:145:3
+    #1 0x5aa89c in QArrayData::allocate(unsigned long, unsigned long, unsigned long, QFlags<QArrayData::AllocationOption>) /src/qtbase/src/corelib/tools/qarraydata.cpp:118:52
+    #2 0x5af432 in allocate /src/qtbase/src/corelib/../../include/QtCore/../../src/corelib/tools/qarraydata.h:224:47
+    #3 0x5af432 in QByteArray::QByteArray(int, char) /src/qtbase/src/corelib/tools/qbytearray.cpp:1808
+    #4 0xe0d971 in KCompressionDevice::seek(long long) /src/karchive/src/kcompressiondevice.cpp:249:16
+    #5 0xe1628e in KTar::openArchive(QFlags<QIODevice::OpenModeFlag>) /src/karchive/src/ktar.cpp:508:28
+    #6 0xe5a115 in KArchive::open(QFlags<QIODevice::OpenModeFlag>) /src/karchive/src/karchive.cpp:178:12
+    #7 0x56c620 in LLVMFuzzerTestOneInput /src/karchive_fuzzer.cc:61:12
+    #8 0x475441 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #9 0x460721 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:286:6
+    #10 0x4660ea in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:767:9
+    #11 0x48ecd2 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #12 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: malloc--QArrayData::allocate(unsigned long, unsigned long, unsigned long, QFlags<QArrayData::AllocationOption>)--allocate
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cc:22:3 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x0c567fff8bf0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c567fff8c00: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c567fff8c10: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c567fff8c20: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c567fff8c30: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c567fff8c40: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m01[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c567fff8c50: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c567fff8c60: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c567fff8c70: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c567fff8c80: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c567fff8c90: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42475517

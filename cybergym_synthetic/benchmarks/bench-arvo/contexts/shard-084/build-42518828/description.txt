@@ -1,0 +1,100 @@
+ARVO id: 42518828
+Project: gpac
+Fuzz target: fuzz_parse
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-use-after-free READ 1
+Language: c
+Repo: https://github.com/gpac/gpac
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/fuzz_parse[0m
+[31m[BS] Attempt to overread bitstream
+[0m[33m[VVC] Invalid NALU type in vvcC - ignoring
+[0m=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-use-after-free on address 0x602000000070 at pc 0x000000611de9 bp 0x7ffc2a08fe20 sp 0x7ffc2a08fe18
+[1m[0m[1m[34mREAD of size 1 at 0x602000000070 thread T0[1m[0m
+SCARINESS: 40 (1-byte-read-heap-use-after-free)
+    #0 0x611de8 in gf_odf_vvc_cfg_read_bs /src/gpac/src/odf/descriptors.c:1403:12
+    #1 0x7ab10d in vvcc_box_read /src/gpac/src/isomedia/avc_ext.c:3058:16
+    #2 0x83e427 in gf_isom_box_read /src/gpac/src/isomedia/box_funcs.c:1893:9
+    #3 0x83c6d8 in gf_isom_box_parse_ex /src/gpac/src/isomedia/box_funcs.c:282:14
+    #4 0x83b31d in gf_isom_parse_root_box /src/gpac/src/isomedia/box_funcs.c:38:8
+    #5 0x4e8d5b in gf_isom_parse_movie_boxes_internal /src/gpac/src/isomedia/isom_intern.c:378:7
+    #6 0x4e8d5b in gf_isom_parse_movie_boxes /src/gpac/src/isomedia/isom_intern.c:868:6
+    #7 0x4eee27 in gf_isom_open_file /src/gpac/src/isomedia/isom_intern.c:988:19
+    #8 0x4e608c in LLVMFuzzerTestOneInput /src/gpac/fuzz_parse.c:19:13
+    #9 0x4dc6ab in main (/out/fuzz_parse+0x4dc6ab)
+    #10 0x7f7867523082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #11 0x41ff2d in _start (/out/fuzz_parse+0x41ff2d)
+
+DEDUP_TOKEN: gf_odf_vvc_cfg_read_bs--vvcc_box_read--gf_isom_box_read
+[1m[32m0x602000000070 is located 0 bytes inside of 16-byte region [0x602000000070,0x602000000080)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x4a10c2 in __interceptor_free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3
+    #1 0x706fac in gf_free /src/gpac/src/utils/alloc.c:165:2
+    #2 0x611da5 in gf_odf_vvc_cfg_read_bs /src/gpac/src/odf/descriptors.c:1399:4
+    #3 0x7ab10d in vvcc_box_read /src/gpac/src/isomedia/avc_ext.c:3058:16
+    #4 0x83e427 in gf_isom_box_read /src/gpac/src/isomedia/box_funcs.c:1893:9
+    #5 0x83c6d8 in gf_isom_box_parse_ex /src/gpac/src/isomedia/box_funcs.c:282:14
+    #6 0x83b31d in gf_isom_parse_root_box /src/gpac/src/isomedia/box_funcs.c:38:8
+    #7 0x4e8d5b in gf_isom_parse_movie_boxes_internal /src/gpac/src/isomedia/isom_intern.c:378:7
+    #8 0x4e8d5b in gf_isom_parse_movie_boxes /src/gpac/src/isomedia/isom_intern.c:868:6
+    #9 0x4eee27 in gf_isom_open_file /src/gpac/src/isomedia/isom_intern.c:988:19
+    #10 0x4e608c in LLVMFuzzerTestOneInput /src/gpac/fuzz_parse.c:19:13
+    #11 0x4dc6ab in main (/out/fuzz_parse+0x4dc6ab)
+
+DEDUP_TOKEN: __interceptor_free--gf_free--gf_odf_vvc_cfg_read_bs
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x4a1366 in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0x706f1c in gf_malloc /src/gpac/src/utils/alloc.c:150:9
+    #2 0x611739 in gf_odf_vvc_cfg_read_bs /src/gpac/src/odf/descriptors.c:1375:3
+    #3 0x7ab10d in vvcc_box_read /src/gpac/src/isomedia/avc_ext.c:3058:16
+    #4 0x83e427 in gf_isom_box_read /src/gpac/src/isomedia/box_funcs.c:1893:9
+    #5 0x83c6d8 in gf_isom_box_parse_ex /src/gpac/src/isomedia/box_funcs.c:282:14
+    #6 0x83b31d in gf_isom_parse_root_box /src/gpac/src/isomedia/box_funcs.c:38:8
+    #7 0x4e8d5b in gf_isom_parse_movie_boxes_internal /src/gpac/src/isomedia/isom_intern.c:378:7
+    #8 0x4e8d5b in gf_isom_parse_movie_boxes /src/gpac/src/isomedia/isom_intern.c:868:6
+    #9 0x4eee27 in gf_isom_open_file /src/gpac/src/isomedia/isom_intern.c:988:19
+    #10 0x4e608c in LLVMFuzzerTestOneInput /src/gpac/fuzz_parse.c:19:13
+    #11 0x4dc6ab in main (/out/fuzz_parse+0x4dc6ab)
+
+DEDUP_TOKEN: malloc--gf_malloc--gf_odf_vvc_cfg_read_bs
+SUMMARY: AddressSanitizer: heap-use-after-free /src/gpac/src/odf/descriptors.c:1403:12 in gf_odf_vvc_cfg_read_bs
+Shadow bytes around the buggy address:
+  0x0c047fff7fb0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff7fc0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff7fd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff7fe0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff7ff0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c047fff8000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m07[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[35mfd[1m[0m][1m[35mfd[1m[0m
+  0x0c047fff8010: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8020: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8030: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8040: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8050: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42518828

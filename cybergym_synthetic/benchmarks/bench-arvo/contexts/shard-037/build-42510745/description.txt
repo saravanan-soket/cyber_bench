@@ -1,0 +1,79 @@
+ARVO id: 42510745
+Project: imagemagick
+Fuzz target: ping_ttf_fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-double-free
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/ping_ttf_fuzzer[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: attempting double-free on 0x607000000330 in thread T0:
+[1m[0mSCARINESS: 42 (double-free)
+    #0 0x726532 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:111:3
+    #1 0xa362f6 in RelinquishMagickMemory /src/imagemagick/MagickCore/memory.c:1167:3
+    #2 0x8561b7 in RenderFreetype /src/imagemagick/MagickCore/annotate.c:1979:27
+    #3 0x84a437 in RenderType /src/imagemagick/MagickCore/annotate.c:999:18
+    #4 0x849aef in GetTypeMetrics /src/imagemagick/MagickCore/annotate.c:919:10
+    #5 0x935c16 in RenderMVGContent /src/imagemagick/MagickCore/draw.c:4378:17
+    #6 0x92d3bc in DrawImage /src/imagemagick/MagickCore/draw.c:4499:10
+    #7 0xe7bceb in ReadTTFImage /src/imagemagick/coders/ttf.c:289:10
+    #8 0x8eced5 in ReadImage /src/imagemagick/MagickCore/constitute.c:728:15
+    #9 0xc0fd2e in ReadStream /src/imagemagick/MagickCore/stream.c:1083:9
+    #10 0x876dda in PingBlob /src/imagemagick/MagickCore/blob.c:3642:13
+    #11 0x79e381 in Magick::Image::ping(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:3875:12
+    #12 0x75f915 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/ping_fuzzer.cc:60:11
+    #13 0x76038b in main (/out/ping_ttf_fuzzer+0x76038b)
+    #14 0x7ffff7c54082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #15 0x6a61cd in _start (/out/ping_ttf_fuzzer+0x6a61cd)
+
+DEDUP_TOKEN: free--RelinquishMagickMemory--RenderFreetype
+[1m[32m0x607000000330 is located 0 bytes inside of 80-byte region [0x607000000330,0x607000000380)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x726532 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:111:3
+    #1 0x172fe6a in ft_free /src/freetype2/builds/unix/ftsystem.c:175:5
+    #2 0x1743706 in ft_mem_free /src/freetype2/src/base/ftutil.c:173:7
+    #3 0x1743706 in FT_Stream_Free /src/freetype2/src/base/ftobjs.c:282:9
+    #4 0x1743706 in destroy_face /src/freetype2/src/base/ftobjs.c:1323:5
+    #5 0x1742af3 in FT_Done_Face /src/freetype2/src/base/ftobjs.c:2941:11
+    #6 0x856188 in RenderFreetype /src/imagemagick/MagickCore/annotate.c:1977:10
+    #7 0x84a437 in RenderType /src/imagemagick/MagickCore/annotate.c:999:18
+    #8 0x849aef in GetTypeMetrics /src/imagemagick/MagickCore/annotate.c:919:10
+    #9 0x935c16 in RenderMVGContent /src/imagemagick/MagickCore/draw.c:4378:17
+    #10 0x92d3bc in DrawImage /src/imagemagick/MagickCore/draw.c:4499:10
+    #11 0xe7bceb in ReadTTFImage /src/imagemagick/coders/ttf.c:289:10
+    #12 0x8eced5 in ReadImage /src/imagemagick/MagickCore/constitute.c:728:15
+    #13 0xc0fd2e in ReadStream /src/imagemagick/MagickCore/stream.c:1083:9
+    #14 0x876dda in PingBlob /src/imagemagick/MagickCore/blob.c:3642:13
+    #15 0x79e381 in Magick::Image::ping(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:3875:12
+    #16 0x75f915 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/ping_fuzzer.cc:60:11
+    #17 0x76038b in main (/out/ping_ttf_fuzzer+0x76038b)
+
+DEDUP_TOKEN: free--ft_free--ft_mem_free
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x72679d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:129:3
+    #1 0xa34991 in AcquireMagickMemory /src/imagemagick/MagickCore/memory.c:558:10
+    #2 0xa34991 in AcquireCriticalMemory /src/imagemagick/MagickCore/memory.c:634:10
+    #3 0x850bdd in RenderFreetype /src/imagemagick/MagickCore/annotate.c:1524:27
+    #4 0x84a437 in RenderType /src/imagemagick/MagickCore/annotate.c:999:18
+    #5 0x849aef in GetTypeMetrics /src/imagemagick/MagickCore/annotate.c:919:10
+    #6 0x935c16 in RenderMVGContent /src/imagemagick/MagickCore/draw.c:4378:17
+    #7 0x92d3bc in DrawImage /src/imagemagick/MagickCore/draw.c:4499:10
+    #8 0xe7bceb in ReadTTFImage /src/imagemagick/coders/ttf.c:289:10
+    #9 0x8eced5 in ReadImage /src/imagemagick/MagickCore/constitute.c:728:15
+    #10 0xc0fd2e in ReadStream /src/imagemagick/MagickCore/stream.c:1083:9
+    #11 0x876dda in PingBlob /src/imagemagick/MagickCore/blob.c:3642:13
+    #12 0x79e381 in Magick::Image::ping(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:3875:12
+    #13 0x75f915 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/ping_fuzzer.cc:60:11
+    #14 0x76038b in main (/out/ping_ttf_fuzzer+0x76038b)
+
+DEDUP_TOKEN: malloc--AcquireMagickMemory--AcquireCriticalMemory
+SUMMARY: AddressSanitizer: double-free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:111:3 in free
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42510745

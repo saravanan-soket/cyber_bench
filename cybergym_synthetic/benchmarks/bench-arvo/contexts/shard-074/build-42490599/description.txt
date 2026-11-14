@@ -1,0 +1,80 @@
+ARVO id: 42490599
+Project: openthread
+Fuzz target: cli-uart-received-fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Stack-buffer-overflow READ 4
+Language: c++
+Repo: https://github.com/openthread/openthread
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/cli-uart-received-fuzzer[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffff7f5dd2d at pc 0x00000054df6b bp 0x7fffffffdd50 sp 0x7fffffffdd48
+[1m[0m[1m[34mREAD of size 4 at 0x7ffff7f5dd2d thread T0[1m[0m
+SCARINESS: 32 (4-byte-read-stack-buffer-overflow)
+    #0 0x54df6a in ot::MeshCoP::ChannelMaskEntry::GetMask() const /src/openthread/src/core/./meshcop/meshcop_tlvs.hpp:1396:74
+    #1 0x54de11 in ot::MeshCoP::ChannelMaskTlv::GetChannelMask() const /src/openthread/src/core/meshcop/meshcop_tlvs.cpp:254:26
+    #2 0x534cbf in ot::MeshCoP::Dataset::ConvertTo(ot::MeshCoP::Dataset::Info&) const /src/openthread/src/core/meshcop/dataset.cpp:206:71
+    #3 0x4ecc49 in ot::Cli::Dataset::ProcessSet(unsigned char, char**) /src/openthread/src/cli/cli_dataset.cpp:896:17
+    #4 0x4edb3a in ot::Cli::Dataset::Process(unsigned char, char**) /src/openthread/src/cli/cli_dataset.cpp:174:13
+    #5 0x4d0521 in ot::Cli::Interpreter::ProcessDataset(unsigned char, char**) /src/openthread/src/cli/cli.cpp:3848:21
+    #6 0x4e068a in ot::Cli::Interpreter::ProcessLine(char*, unsigned short) /src/openthread/src/cli/cli.cpp:4399:22
+    #7 0x4cba47 in ot::Cli::Uart::ProcessCommand() /src/openthread/src/cli/cli_uart.cpp:230:9
+    #8 0x4cb442 in ot::Cli::Uart::ReceiveTask(unsigned char const*, unsigned short) /src/openthread/src/cli/cli_uart.cpp:147:29
+    #9 0x4cbd89 in otPlatUartReceived /src/openthread/src/cli/cli_uart.cpp:336:56
+    #10 0x4caedd in LLVMFuzzerTestOneInput /src/openthread/tests/fuzz/cli_uart_received.cpp:68:5
+    #11 0x64c42b in main (/out/cli-uart-received-fuzzer+0x64c42b)
+    #12 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #13 0x41c768 in _start (/out/cli-uart-received-fuzzer+0x41c768)
+
+DEDUP_TOKEN: ot::MeshCoP::ChannelMaskEntry::GetMask() const--ot::MeshCoP::ChannelMaskTlv::GetChannelMask() const--ot::MeshCoP::Dataset::ConvertTo(ot::MeshCoP::Dataset::Info&) const
+[1m[32mAddress 0x7ffff7f5dd2d is located in stack of thread T0 at offset 301 in frame[1m[0m
+[1m[0m    #0 0x4ec90f in ot::Cli::Dataset::ProcessSet(unsigned char, char**) /src/openthread/src/cli/cli_dataset.cpp:869
+
+DEDUP_TOKEN: ot::Cli::Dataset::ProcessSet(unsigned char, char**)
+  This frame has 3 object(s):
+    [32, 300) 'dataset' (line 889)[1m[32m <== Memory access at offset 301 overflows this variable[1m[0m
+    [368, 472) 'datasetInfo' (line 890)
+    [512, 514) 'tlvsLength' (line 891)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/openthread/src/core/./meshcop/meshcop_tlvs.hpp:1396:74 in ot::MeshCoP::ChannelMaskEntry::GetMask() const
+Shadow bytes around the buggy address:
+  0x10007efe3b50: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x10007efe3b60: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x10007efe3b70: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x10007efe3b80: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe3b90: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x10007efe3ba0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m04[1m[0m][1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe3bb0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x10007efe3bc0: [1m[0m02[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe3bd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe3be0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe3bf0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42490599

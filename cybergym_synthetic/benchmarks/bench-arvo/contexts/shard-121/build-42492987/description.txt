@@ -1,0 +1,35 @@
+ARVO id: 42492987
+Project: unicorn
+Fuzz target: fuzz_emu_arm64_armbe
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/unicorn-engine/unicorn.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4175922303
+INFO: Loaded 1 modules   (224277 inline 8-bit counters): 224277 [0x4133b3d, 0x416a752), 
+INFO: Loaded 1 PC tables (224277 PCs): 224277 [0x416a758,0x44d68a8), 
+/out/fuzz_emu_arm64_armbe: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x392be57 in float64_squash_input_denormal_aarch64eb /src/unicorn/qemu/fpu/softfloat.c:485:39
+    #1 0x393fe14 in float64_to_float32_aarch64eb /src/unicorn/qemu/fpu/softfloat.c:3163:9
+    #2 0x175827d in helper_vfp_fcvtsd_aarch64eb /src/unicorn/qemu/target-arm/helper.c:5058:18
+    #3 0x7ffff2a0025f  (<unknown module>)
+
+DEDUP_TOKEN: float64_squash_input_denormal_aarch64eb--float64_to_float32_aarch64eb--helper_vfp_fcvtsd_aarch64eb
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/unicorn/qemu/fpu/softfloat.c:485:39 in float64_squash_input_denormal_aarch64eb
+  ORIGIN: invalid (0). Might be a bug in MemorySanitizer origin tracking.
+    This could still be a bug in your code, too!
+Unique heap origins: 205
+Stack depot allocated bytes: 31024
+Unique origin histories: 29
+History depot allocated bytes: 696
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42492987

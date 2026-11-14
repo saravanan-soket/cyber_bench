@@ -1,0 +1,73 @@
+ARVO id: 370193280
+Project: libultrahdr
+Fuzz target: ultrahdr_dec_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/google/libultrahdr.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3268012651
+INFO: Loaded 1 modules   (20874 inline 8-bit counters): 20874 [0x55977f3b3d60, 0x55977f3b8eea), 
+INFO: Loaded 1 PC tables (20874 PCs): 20874 [0x55977f3b8ef0,0x55977f40a790), 
+/out/ultrahdr_dec_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x55977eed62cc in format_message /src/libultrahdr/third_party/turbojpeg/jerror.c:194:5
+    #1 0x55977ee23675 in ultrahdr::output_message(jpeg_common_struct*) /src/libultrahdr/lib/src/jpegdecoderhelper.cpp:103:3
+    #2 0x55977eed58e2 in emit_message /src/libultrahdr/third_party/turbojpeg/jerror.c:137:7
+    #3 0x55977eeb50c1 in next_marker /src/libultrahdr/third_party/turbojpeg/jdmarker.c:927:5
+    #4 0x55977eeb5a00 in read_markers /src/libultrahdr/third_party/turbojpeg/jdmarker.c:981:14
+    #5 0x55977eeb0fb6 in consume_markers /src/libultrahdr/third_party/turbojpeg/jdinput.c:334:9
+    #6 0x55977eeaf63a in jpeg_consume_input /src/libultrahdr/third_party/turbojpeg/jdapimin.c:320:15
+    #7 0x55977eeaf2f3 in jpeg_read_header /src/libultrahdr/third_party/turbojpeg/jdapimin.c:268:13
+    #8 0x55977ee20c0d in ultrahdr::JpegDecoderHelper::decode(void const*, int, ultrahdr::decode_mode_t) /src/libultrahdr/lib/src/jpegdecoderhelper.cpp:211:7
+    #9 0x55977edd6615 in ultrahdr::JpegR::parseJpegInfo(ultrahdr::jpegr_compressed_struct*, ultrahdr::jpeg_info_struct*, unsigned long*, unsigned long*) /src/libultrahdr/lib/src/jpegr.cpp:1238:21
+    #10 0x55977edd5120 in ultrahdr::JpegR::getJPEGRInfo(ultrahdr::jpegr_compressed_struct*, ultrahdr::jpegr_info_struct*) /src/libultrahdr/lib/src/jpegr.cpp:618:12
+    #11 0x55977edc6108 in UltraHdrDecFuzzer::process() /src/libultrahdr/fuzzer/ultrahdr_dec_fuzzer.cpp:47:17
+    #12 0x55977edc6f1c in LLVMFuzzerTestOneInput /src/libultrahdr/fuzzer/ultrahdr_dec_fuzzer.cpp:66:14
+    #13 0x55977ecc2a90 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #14 0x55977ecad224 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #15 0x55977ecb2cba in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #16 0x55977ecdf0b2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7fe93292c082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 87b331c034a6458c64ce09c03939e947212e18ce)
+    #18 0x55977eca3cfd in _start (/out/ultrahdr_dec_fuzzer+0xd9cfd)
+
+DEDUP_TOKEN: format_message--ultrahdr::output_message(jpeg_common_struct*)--emit_message
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x55977eed62c5 in format_message /src/libultrahdr/third_party/turbojpeg/jerror.c:196:14
+    #1 0x55977ee23675 in ultrahdr::output_message(jpeg_common_struct*) /src/libultrahdr/lib/src/jpegdecoderhelper.cpp:103:3
+    #2 0x55977eed58e2 in emit_message /src/libultrahdr/third_party/turbojpeg/jerror.c:137:7
+    #3 0x55977eeb50c1 in next_marker /src/libultrahdr/third_party/turbojpeg/jdmarker.c:927:5
+    #4 0x55977eeb5a00 in read_markers /src/libultrahdr/third_party/turbojpeg/jdmarker.c:981:14
+    #5 0x55977eeb0fb6 in consume_markers /src/libultrahdr/third_party/turbojpeg/jdinput.c:334:9
+    #6 0x55977eeaf63a in jpeg_consume_input /src/libultrahdr/third_party/turbojpeg/jdapimin.c:320:15
+    #7 0x55977eeaf2f3 in jpeg_read_header /src/libultrahdr/third_party/turbojpeg/jdapimin.c:268:13
+    #8 0x55977ee20c0d in ultrahdr::JpegDecoderHelper::decode(void const*, int, ultrahdr::decode_mode_t) /src/libultrahdr/lib/src/jpegdecoderhelper.cpp:211:7
+    #9 0x55977edd6615 in ultrahdr::JpegR::parseJpegInfo(ultrahdr::jpegr_compressed_struct*, ultrahdr::jpeg_info_struct*, unsigned long*, unsigned long*) /src/libultrahdr/lib/src/jpegr.cpp:1238:21
+    #10 0x55977edd5120 in ultrahdr::JpegR::getJPEGRInfo(ultrahdr::jpegr_compressed_struct*, ultrahdr::jpegr_info_struct*) /src/libultrahdr/lib/src/jpegr.cpp:618:12
+    #11 0x55977edc6108 in UltraHdrDecFuzzer::process() /src/libultrahdr/fuzzer/ultrahdr_dec_fuzzer.cpp:47:17
+    #12 0x55977edc6f1c in LLVMFuzzerTestOneInput /src/libultrahdr/fuzzer/ultrahdr_dec_fuzzer.cpp:66:14
+    #13 0x55977ecc2a90 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #14 0x55977ecad224 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #15 0x55977ecb2cba in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #16 0x55977ecdf0b2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7fe93292c082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 87b331c034a6458c64ce09c03939e947212e18ce)
+
+DEDUP_TOKEN: format_message--ultrahdr::output_message(jpeg_common_struct*)--emit_message
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mmyerr[1m[35m' in the stack frame[1m[0m
+    #0 0x55977ee209e5 in ultrahdr::JpegDecoderHelper::decode(void const*, int, ultrahdr::decode_mode_t) /src/libultrahdr/lib/src/jpegdecoderhelper.cpp:193:3
+
+DEDUP_TOKEN: ultrahdr::JpegDecoderHelper::decode(void const*, int, ultrahdr::decode_mode_t)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/libultrahdr/third_party/turbojpeg/jerror.c:194:5 in format_message
+Unique heap origins: 489
+Stack depot allocated bytes: 9764880
+Unique origin histories: 16
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/370193280

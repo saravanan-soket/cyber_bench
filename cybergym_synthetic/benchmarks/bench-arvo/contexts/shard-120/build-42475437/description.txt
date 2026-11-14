@@ -1,0 +1,45 @@
+ARVO id: 42475437
+Project: gdal
+Fuzz target: gtiff_mmap
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 1191955344
+INFO: Loaded 1 modules   (762283 inline 8-bit counters): 762283 [0x6227590, 0x62e173b), 
+INFO: Loaded 1 PC tables (762283 PCs): 762283 [0x62e1740,0x6e831f0), 
+/out/gtiff_mmap: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x0001178c275f (pc 0x7f202a348ec2 bp 0x7ffdb6db7760 sp 0x7ffdb6db7738 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7f202a348ec1  (/lib/x86_64-linux-gnu/libc.so.6+0x14dec1)
+    #1 0x5bdfb9 in DumpModeDecode /src/gdal/gdal/frmts/gtiff/libtiff/tif_dumpmode.c:101:3
+    #2 0x60c529 in TIFFReadEncodedStrip /src/gdal/gdal/frmts/gtiff/libtiff/tif_read.c:544:6
+    #3 0x4c23b3 in GTiffDataset::LoadBlockBuf(int, bool) /src/gdal/gdal/frmts/gtiff/geotiff.cpp:9042:13
+    #4 0x4eaf5e in GTiffOddBitsBand::IReadBlock(int, int, void*) /src/gdal/gdal/frmts/gtiff/geotiff.cpp:6699:38
+    #5 0x78268c in GDALRasterBand::GetLockedBlockRef(int, int, int) /src/gdal/gdal/gcore/gdalrasterband.cpp:1318:20
+    #6 0x7cc697 in GDALRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/rasterio.cpp:153:27
+    #7 0x4ba8f4 in GTiffRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/frmts/gtiff/geotiff.cpp:4212:28
+    #8 0x77af1b in GDALRasterBand::RasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdalrasterband.cpp:371:16
+    #9 0x77bd17 in GDALRasterIO /src/gdal/gdal/gcore/gdalrasterband.cpp:405:21
+    #10 0x996645 in GDALChecksumImage /src/gdal/gdal/alg/gdalchecksum.cpp:155:17
+    #11 0x43dc8b in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_fuzzer.cpp:238:17
+    #12 0x45837e in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:556:15
+    #13 0x43f162 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:286:6
+    #14 0x44336e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:765:9
+    #15 0x43eeca in main /src/libfuzzer/FuzzerMain.cpp:19:10
+    #16 0x7f202a21b82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #17 0x41c0c8 in _start (/out/gtiff_mmap+0x41c0c8)
+
+DEDUP_TOKEN: DumpModeDecode--TIFFReadEncodedStrip
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x14dec1) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42475437

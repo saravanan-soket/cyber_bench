@@ -1,0 +1,35 @@
+ARVO id: 416832167
+Project: libarchive
+Fuzz target: libarchive_fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/libarchive/libarchive.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/libarchive_fuzzer[0m
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x7f1f55558013 (pc 0x55df8c3bc79b bp 0x7ffe1fab3990 sp 0x7ffe1fab3980 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x55df8c3bc79b in archive_le32dec /src/libarchive/libarchive/archive_endian.h:119:20
+    #1 0x55df8c3bc4c1 in find_elf_data_sec /src/libarchive/libarchive/archive_read_support_format_7zip.c:804:20
+    #2 0x55df8c3b5291 in archive_read_format_7zip_bid /src/libarchive/libarchive/archive_read_support_format_7zip.c:557:14
+    #3 0x55df8c295b38 in choose_format /src/libarchive/libarchive/archive_read.c:703:10
+    #4 0x55df8c295b38 in archive_read_open1 /src/libarchive/libarchive/archive_read.c:516:10
+    #5 0x55df8c27f32e in LLVMFuzzerTestOneInput /src/libarchive_fuzzer.cc:38:21
+    #6 0x55df8c28038f in main (/out/libarchive_fuzzer+0x13438f)
+    #7 0x7f1f535bc082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+    #8 0x55df8c1a6b2d in _start (/out/libarchive_fuzzer+0x5ab2d)
+
+DEDUP_TOKEN: archive_le32dec--find_elf_data_sec--archive_read_format_7zip_bid
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/libarchive/libarchive/archive_endian.h:119:20 in archive_le32dec
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/416832167

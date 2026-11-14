@@ -1,0 +1,45 @@
+ARVO id: 42526535
+Project: imagemagick
+Fuzz target: encoder_label_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 1535649958
+INFO: Loaded 1 modules   (52529 inline 8-bit counters): 52529 [0x16d8f98, 0x16e5cc9), 
+INFO: Loaded 1 PC tables (52529 PCs): 52529 [0x133d700,0x140aa10), 
+/out/encoder_label_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m[1m[31mUninitialized bytes in [1m[32m__interceptor_strlen[1m[31m at offset 0 inside [0x7ffffffee004, 1)[1m[0m
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x90e71d in FxGetSymbol /src/imagemagick/MagickCore/fx.c:1409:8
+    #1 0x8e9ac8 in FxEvaluateSubexpression /src/imagemagick/MagickCore/fx.c
+    #2 0x8e0455 in FxEvaluateSubexpression /src/imagemagick/MagickCore/fx.c:2124:13
+    #3 0x8dfbef in FxEvaluateChannelExpression /src/imagemagick/MagickCore/fx.c:2975:10
+    #4 0xa971b7 in InterpretImageProperties /src/imagemagick/MagickCore/property.c:3629:18
+    #5 0xdc8ae3 in ReadLABELImage /src/imagemagick/coders/label.c:127:12
+    #6 0x7aaaa0 in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #7 0x57f49b in Magick::Image::read(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4081:12
+    #8 0x49e92f in fuzzEncoderWithStringFilename(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, unsigned char const*, unsigned long) /src/imagemagick/Magick++/fuzz/encoder_utils.cc:10:11
+    #9 0x49e515 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_label_fuzzer.cc:10:10
+    #10 0x4e5696 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #11 0x4a00c1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #12 0x4b4316 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #13 0x49f201 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #14 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #15 0x420138 in _start (/out/encoder_label_fuzzer+0x420138)
+
+DEDUP_TOKEN: FxGetSymbol--FxEvaluateSubexpression--FxEvaluateSubexpression
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32msubexpression[1m[35m' in the stack frame of function '[1m[32mFxEvaluateSubexpression[1m[35m'[1m[0m
+    #0 0x8dfea0 in FxEvaluateSubexpression /src/imagemagick/MagickCore/fx.c:2097
+
+DEDUP_TOKEN: FxEvaluateSubexpression
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/imagemagick/MagickCore/fx.c:1409:8 in FxGetSymbol
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42526535

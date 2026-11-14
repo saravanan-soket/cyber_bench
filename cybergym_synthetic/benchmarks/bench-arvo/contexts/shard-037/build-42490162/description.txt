@@ -1,0 +1,50 @@
+ARVO id: 42490162
+Project: uWebSockets
+Fuzz target: HttpWithProxy
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/uNetworking/uWebSockets.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4243449277
+INFO: Loaded 1 modules   (1493 inline 8-bit counters): 1493 [0x745f40, 0x746515), 
+INFO: Loaded 1 PC tables (1493 PCs): 1493 [0x504390,0x50a0e0), 
+/out/HttpWithProxy: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==8==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address (pc 0x0000004bd36f bp 0x7fffffffd160 sp 0x7fffffffd130 T8)
+[1m[0m==8==The signal is caused by a READ memory access.
+==8==Hint: this fault was caused by a dereference of a high value address (see register values below).  Dissassemble the provided pc to learn which register was used.
+    #0 0x4bd36f in hash1 /src/uWebSockets/fuzzing/./../src/BloomFilter.h:34:31
+    #1 0x4bd36f in uWS::BloomFilter::mightHave(std::__1::basic_string_view<char, std::__1::char_traits<char> >) /src/uWebSockets/fuzzing/./../src/BloomFilter.h:47:28
+    #2 0x4bcebe in uWS::HttpRequest::getHeader(std::__1::basic_string_view<char, std::__1::char_traits<char> >) /src/uWebSockets/fuzzing/./../src/HttpParser.h:94:16
+    #3 0x4bdaa4 in operator() /src/uWebSockets/fuzzing/Http.cpp:102:36
+    #4 0x4bdaa4 in decltype(std::forward<LLVMFuzzerTestOneInput::$_0::operator()(unsigned char const*, unsigned long) const::'lambda'(void*, uWS::HttpRequest*)&>(fp)(std::forward<void*>(fp0), std::forward<uWS::HttpRequest*>(fp0))) fu2::abi_400::detail::invocation::invoke<LLVMFuzzerTestOneInput::$_0::operator()(unsigned char const*, unsigned long) const::'lambda'(void*, uWS::HttpRequest*)&, void*, uWS::HttpRequest*>(LLVMFuzzerTestOneInput::$_0::operator()(unsigned char const*, unsigned long) const::'lambda'(void*, uWS::HttpRequest*)&, void*&&, uWS::HttpRequest*&&) /src/uWebSockets/fuzzing/./../src/f2/function2.hpp:184:10
+    #5 0x4bda12 in fu2::abi_400::detail::type_erasure::invocation_table::function_trait<void* (void*, uWS::HttpRequest*)>::internal_invoker<fu2::abi_400::detail::type_erasure::box<false, LLVMFuzzerTestOneInput::$_0::operator()(unsigned char const*, unsigned long) const::'lambda'(void*, uWS::HttpRequest*), std::__1::allocator<LLVMFuzzerTestOneInput::$_0::operator()(unsigned char const*, unsigned long) const::'lambda'(void*, uWS::HttpRequest*)> >, true>::invoke(fu2::abi_400::detail::type_erasure::data_accessor*, unsigned long, void*, uWS::HttpRequest*) /src/uWebSockets/fuzzing/./../src/f2/function2.hpp:587:1
+    #6 0x4bc2e3 in invoke<0, fu2::detail::type_erasure::erasure<true, fu2::detail::config<true, false, fu2::capacity_default>, fu2::detail::property<true, false, void *(void *, uWS::HttpRequest *)> > &, void *, uWS::HttpRequest *> /src/uWebSockets/fuzzing/./../src/f2/function2.hpp:1213:37
+    #7 0x4bc2e3 in operator() /src/uWebSockets/fuzzing/./../src/f2/function2.hpp:775:1
+    #8 0x4bc2e3 in std::__1::pair<int, void*> uWS::HttpParser::fenceAndConsumePostPadded<0>(char*, unsigned int, void*, void*, uWS::HttpRequest*, fu2::abi_400::detail::function<fu2::abi_400::detail::config<true, false, fu2::capacity_default>, fu2::abi_400::detail::property<true, false, void* (void*, uWS::HttpRequest*)> >&, fu2::abi_400::detail::function<fu2::abi_400::detail::config<true, false, fu2::capacity_default>, fu2::abi_400::detail::property<true, false, void* (void*, std::__1::basic_string_view<char, std::__1::char_traits<char> >, bool)> >&) /src/uWebSockets/fuzzing/./../src/HttpParser.h:236:34
+    #9 0x4bb75d in uWS::HttpParser::consumePostPadded(char*, unsigned int, void*, void*, fu2::abi_400::detail::function<fu2::abi_400::detail::config<true, false, fu2::capacity_default>, fu2::abi_400::detail::property<true, false, void* (void*, uWS::HttpRequest*)> >&&, fu2::abi_400::detail::function<fu2::abi_400::detail::config<true, false, fu2::capacity_default>, fu2::abi_400::detail::property<true, false, void* (void*, std::__1::basic_string_view<char, std::__1::char_traits<char> >, bool)> >&&, fu2::abi_400::detail::function<fu2::abi_400::detail::config<true, false, fu2::capacity_default>, fu2::abi_400::detail::property<true, false, void* (void*)> >&&) /src/uWebSockets/fuzzing/./../src/HttpParser.h:349:43
+    #10 0x4baf8f in operator() /src/uWebSockets/fuzzing/Http.cpp:100:20
+    #11 0x4baf8f in decltype(std::__1::forward<LLVMFuzzerTestOneInput::$_0&>(fp)(std::__1::forward<unsigned char const*>(fp0), std::__1::forward<unsigned long>(fp0))) std::__1::__invoke<LLVMFuzzerTestOneInput::$_0&, unsigned char const*, unsigned long>(LLVMFuzzerTestOneInput::$_0&, unsigned char const*&&, unsigned long&&) /usr/local/bin/../include/c++/v1/type_traits:3750:1
+    #12 0x4b3498 in operator() /usr/local/bin/../include/c++/v1/functional:2555:12
+    #13 0x4b3498 in makeChunked(unsigned char const*, unsigned long, std::__1::function<void (unsigned char const*, unsigned long)>) /src/uWebSockets/fuzzing/./helpers.h:38:9
+    #14 0x4b32d5 in LLVMFuzzerTestOneInput /src/uWebSockets/fuzzing/Http.cpp:90:5
+    #15 0x441fb1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #16 0x42bd42 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #17 0x432085 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #18 0x45bf32 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #19 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #20 0x406c58 in _start (/out/HttpWithProxy+0x406c58)
+
+DEDUP_TOKEN: hash1--uWS::BloomFilter::mightHave(std::__1::basic_string_view<char, std::__1::char_traits<char> >)--uWS::HttpRequest::getHeader(std::__1::basic_string_view<char, std::__1::char_traits<char> >)
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/uWebSockets/fuzzing/./../src/BloomFilter.h:34:31 in hash1
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42490162

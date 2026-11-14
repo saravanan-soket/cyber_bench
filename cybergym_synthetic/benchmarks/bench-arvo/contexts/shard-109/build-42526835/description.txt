@@ -1,0 +1,43 @@
+ARVO id: 42526835
+Project: PcapPlusPlus
+Fuzz target: FuzzTarget
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/seladb/PcapPlusPlus
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4189857657
+INFO: Loaded 1 modules   (35450 inline 8-bit counters): 35450 [0xaa5c48, 0xaae6c2), 
+INFO: Loaded 1 PC tables (35450 PCs): 35450 [0xaae6c8,0xb38e68), 
+/out/FuzzTarget: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x608000010000 (pc 0x7fcca79a4650 bp 0x7ffecbe6bd50 sp 0x7ffecbe6b518 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x7fcca79a4650  (/lib/x86_64-linux-gnu/libc.so.6+0x184650) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #1 0x4f9dbd in memchr /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc
+    #2 0x6dddcc in pcpp::SipRequestFirstLine::SipRequestFirstLine(pcpp::SipRequestLayer*) /src/PcapPlusPlus/Packet++/src/SipLayer.cpp:138:32
+    #3 0x6e392d in pcpp::SipRequestLayer::SipRequestLayer(unsigned char*, unsigned long, pcpp::Layer*, pcpp::Packet*) /src/PcapPlusPlus/Packet++/src/SipLayer.cpp:368:20
+    #4 0x617cc4 in pcpp::UdpLayer::parseNextLayer() /src/PcapPlusPlus/Packet++/src/UdpLayer.cpp:123:22
+    #5 0x5f017b in pcpp::Packet::setRawPacket(pcpp::RawPacket*, bool, unsigned long, pcpp::OsiModelLayer) /src/PcapPlusPlus/Packet++/src/Packet.cpp:81:13
+    #6 0x59e1a9 in LLVMFuzzerTestOneInput /src/PcapPlusPlus/Tests/Fuzzers/FuzzTarget.cpp:68:16
+    #7 0x46f693 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #8 0x45adf2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #9 0x46069c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #10 0x489bd2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7fcca7844082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #12 0x450fbd in _start (/out/FuzzTarget+0x450fbd)
+
+DEDUP_TOKEN: memchr--pcpp::SipRequestFirstLine::SipRequestFirstLine(pcpp::SipRequestLayer*)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x184650) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42526835

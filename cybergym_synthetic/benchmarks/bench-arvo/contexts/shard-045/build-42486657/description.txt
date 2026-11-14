@@ -1,0 +1,93 @@
+ARVO id: 42486657
+Project: wireshark
+Fuzz target: fuzzshark_ip_proto-udp
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://github.com/wireshark/wireshark.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/fuzzshark_ip_proto-udp < INPUT_FILE
+or
+  /out/fuzzshark_ip_proto-udp INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/fuzzshark_ip_proto-udp [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+oss-fuzzshark: disabling: ip
+oss-fuzzshark: disabling: udplite
+oss-fuzzshark: disabling: ospf
+oss-fuzzshark: disabling: bgp
+oss-fuzzshark: disabling: dhcp
+oss-fuzzshark: disabling: json
+oss-fuzzshark: disabling: snort
+oss-fuzzshark: configured for dissector: udp in table: ip.proto
+Reading 84 bytes from /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x000000adfa48 bp 0x7fffffffc210 sp 0x7fffffffbf60 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Dissassemble the provided pc to learn which register was used.
+SCARINESS: 20 (wild-addr-read)
+    #0 0xadfa48 in dissect_btavdtp /src/wireshark/epan/dissectors/packet-btavdtp.c:1543:17
+    #1 0x63c100 in call_dissector_through_handle /src/wireshark/epan/packet.c:712:9
+    #2 0x63c100 in call_dissector_work /src/wireshark/epan/packet.c:805:9
+    #3 0x63bc2d in dissector_try_uint_new /src/wireshark/epan/packet.c:1405:8
+    #4 0xb5037f in dissect_btl2cap /src/wireshark/epan/dissectors/packet-btl2cap.c:2654:14
+    #5 0x63c100 in call_dissector_through_handle /src/wireshark/epan/packet.c:712:9
+    #6 0x63c100 in call_dissector_work /src/wireshark/epan/packet.c:805:9
+    #7 0x638aab in call_dissector_only /src/wireshark/epan/packet.c:3222:8
+    #8 0x638aab in call_dissector_with_data /src/wireshark/epan/packet.c:3235:8
+    #9 0xb606fe in dissect_btle /src/wireshark/epan/dissectors/packet-btle.c:1566:21
+    #10 0x63c100 in call_dissector_through_handle /src/wireshark/epan/packet.c:712:9
+    #11 0x63c100 in call_dissector_work /src/wireshark/epan/packet.c:805:9
+    #12 0x638aab in call_dissector_only /src/wireshark/epan/packet.c:3222:8
+    #13 0x638aab in call_dissector_with_data /src/wireshark/epan/packet.c:3235:8
+    #14 0xb64b3b in dissect_btle_rf /src/wireshark/epan/dissectors/packet-btle_rf.c:284:27
+    #15 0x63c100 in call_dissector_through_handle /src/wireshark/epan/packet.c:712:9
+    #16 0x63c100 in call_dissector_work /src/wireshark/epan/packet.c:805:9
+    #17 0x63bc2d in dissector_try_uint_new /src/wireshark/epan/packet.c:1405:8
+    #18 0xa809a5 in dissect_bluetooth /src/wireshark/epan/dissectors/packet-bluetooth.c:3773:10
+    #19 0x63c100 in call_dissector_through_handle /src/wireshark/epan/packet.c:712:9
+    #20 0x63c100 in call_dissector_work /src/wireshark/epan/packet.c:805:9
+    #21 0x63bc2d in dissector_try_uint_new /src/wireshark/epan/packet.c:1405:8
+    #22 0x164f991 in dissect_pcap_pktdata /src/wireshark/epan/dissectors/packet-pcap_pktdata.c:378:14
+    #23 0x63c100 in call_dissector_through_handle /src/wireshark/epan/packet.c:712:9
+    #24 0x63c100 in call_dissector_work /src/wireshark/epan/packet.c:805:9
+    #25 0x638aab in call_dissector_only /src/wireshark/epan/packet.c:3222:8
+    #26 0x638aab in call_dissector_with_data /src/wireshark/epan/packet.c:3235:8
+    #27 0x1758100 in dissect_rftap /src/wireshark/epan/dissectors/packet-rftap.c:321:9
+    #28 0x17582f3 in dissect_rftap_heur /src/wireshark/epan/dissectors/packet-rftap.c:342:12
+    #29 0x642351 in dissector_try_heuristic /src/wireshark/epan/packet.c:2816:9
+    #30 0x1b468c7 in decode_udp_ports /src/wireshark/epan/dissectors/packet-udp.c:709:9
+    #31 0x1b4bd94 in dissect /src/wireshark/epan/dissectors/packet-udp.c:1261:5
+    #32 0x1b48851 in dissect_udp /src/wireshark/epan/dissectors/packet-udp.c:1267:3
+    #33 0x63c100 in call_dissector_through_handle /src/wireshark/epan/packet.c:712:9
+    #34 0x63c100 in call_dissector_work /src/wireshark/epan/packet.c:805:9
+    #35 0x6453b1 in call_dissector_only /src/wireshark/epan/packet.c:3222:8
+    #36 0x6453b1 in call_all_postdissectors /src/wireshark/epan/packet.c:3597:3
+    #37 0xf29b99 in dissect_frame /src/wireshark/epan/dissectors/packet-frame.c:870:5
+    #38 0x63c100 in call_dissector_through_handle /src/wireshark/epan/packet.c:712:9
+    #39 0x63c100 in call_dissector_work /src/wireshark/epan/packet.c:805:9
+    #40 0x638aab in call_dissector_only /src/wireshark/epan/packet.c:3222:8
+    #41 0x638aab in call_dissector_with_data /src/wireshark/epan/packet.c:3235:8
+    #42 0x638240 in dissect_record /src/wireshark/epan/packet.c:586:3
+    #43 0x62bed7 in epan_dissect_run /src/wireshark/epan/epan.c:585:2
+    #44 0x4cdba9 in LLVMFuzzerTestOneInput /src/wireshark/fuzz/fuzzshark.c:381:2
+    #45 0x27f826e in ExecuteFilesOnyByOne /src/libfuzzer/afl/afl_driver.cpp:217:5
+    #46 0x27f826e in main /src/libfuzzer/afl/afl_driver.cpp:254:12
+    #47 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #48 0x4207a8 in _start (/out/fuzzshark_ip_proto-udp+0x4207a8)
+
+DEDUP_TOKEN: dissect_btavdtp--call_dissector_through_handle--call_dissector_work
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/wireshark/epan/dissectors/packet-btavdtp.c:1543:17 in dissect_btavdtp
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42486657

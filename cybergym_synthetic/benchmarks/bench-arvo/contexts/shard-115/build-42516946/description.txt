@@ -1,0 +1,82 @@
+ARVO id: 42516946
+Project: fluent-bit
+Fuzz target: flb-it-fuzz-config_random_fuzzer_OSSFUZZ
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 3
+Language: c++
+Repo: https://github.com/fluent/fluent-bit/
+
+=== Crash report ===
+Reading 105 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6060000061d8 at pc 0x00000046781e bp 0x7fff630b3f90 sp 0x7fff630b3750
+[1m[0m[1m[34mREAD of size 3 at 0x6060000061d8 thread T0[1m[0m
+SCARINESS: 15 (3-byte-read-heap-buffer-overflow)
+    #0 0x46781d in __interceptor_memcpy /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:827:5
+    #1 0x7b6187 in onig_node_str_cat /src/fluent-bit/lib/onigmo/regparse.c
+    #2 0x7e6eb7 in expand_case_fold_string /src/fluent-bit/lib/onigmo/regcomp.c:3616:11
+    #3 0x7e6eb7 in setup_tree /src/fluent-bit/lib/onigmo/regcomp.c:3902:11
+    #4 0x7e8e53 in setup_tree /src/fluent-bit/lib/onigmo/regcomp.c:3893:11
+    #5 0x7e909a in setup_tree /src/fluent-bit/lib/onigmo/regcomp.c:4051:8
+    #6 0x7e7329 in setup_tree /src/fluent-bit/lib/onigmo/regcomp.c:3975:11
+    #7 0x7e7644 in setup_tree /src/fluent-bit/lib/onigmo/regcomp.c:3882:6
+    #8 0x7e1a20 in onig_compile /src/fluent-bit/lib/onigmo/regcomp.c:5796:7
+    #9 0x7f9f85 in onig_new /src/fluent-bit/lib/onigmo/regcomp.c:5982:7
+    #10 0x54428e in str_to_regex /src/fluent-bit/src/flb_regex.c:78:11
+    #11 0x543f5f in flb_regex_create /src/fluent-bit/src/flb_regex.c:108:11
+    #12 0x527ac2 in flb_parser_create /src/fluent-bit/src/flb_parser.c:214:17
+    #13 0x52a6fe in parser_conf_file /src/fluent-bit/src/flb_parser.c:559:14
+    #14 0x529fb8 in flb_parser_conf_file /src/fluent-bit/src/flb_parser.c:870:11
+    #15 0x5052f0 in LLVMFuzzerTestOneInput /src/fluent-bit/tests/internal/fuzzers/config_random_fuzzer.c:45:5
+    #16 0x504fb5 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:191:7
+    #17 0x504e25 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #18 0x7f08237170b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #19 0x44ea0d in _start (/out/flb-it-fuzz-config_random_fuzzer_OSSFUZZ+0x44ea0d)
+
+DEDUP_TOKEN: __interceptor_memcpy--onig_node_str_cat--expand_case_fold_string
+[1m[32m0x6060000061d8 is located 0 bytes to the right of 56-byte region [0x6060000061a0,0x6060000061d8)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4cdd0d in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:129:3
+    #1 0x7c3266 in node_new /src/fluent-bit/lib/onigmo/regparse.c:1125:18
+    #2 0x7c3266 in node_new_str /src/fluent-bit/lib/onigmo/regparse.c:1465:16
+    #3 0x7c3266 in parse_exp /src/fluent-bit/lib/onigmo/regparse.c:6584:13
+
+DEDUP_TOKEN: __interceptor_malloc--node_new--node_new_str
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:827:5 in __interceptor_memcpy
+Shadow bytes around the buggy address:
+  0x0c0c7fff8be0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c0c7fff8bf0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+  0x0c0c7fff8c00: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0c7fff8c10: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c0c7fff8c20: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+=>0x0c0c7fff8c30: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0c7fff8c40: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c0c7fff8c50: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+  0x0c0c7fff8c60: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0c7fff8c70: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c0c7fff8c80: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42516946

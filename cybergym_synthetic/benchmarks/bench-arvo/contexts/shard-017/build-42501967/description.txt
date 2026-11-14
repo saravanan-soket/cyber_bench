@@ -1,0 +1,47 @@
+ARVO id: 42501967
+Project: brunsli
+Fuzz target: fuzz_decode
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/google/brunsli.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1756690581
+INFO: Loaded 1 modules   (6257 inline 8-bit counters): 6257 [0x7b0768, 0x7b1fd9), 
+INFO: Loaded 1 PC tables (6257 PCs): 6257 [0x7b1fe0,0x7ca6f0), 
+/out/fuzz_decode: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x571cc3 in std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::__put_character_sequence<char, std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*, unsigned long) /usr/local/bin/../include/c++/v1/ostream:715:13
+    #1 0x55e442 in operator<<<std::__1::char_traits<char> > /usr/local/bin/../include/c++/v1/ostream:857:12
+    #2 0x55e442 in DecodeJPEGInternalsSection /src/brunsli/c/dec/brunsli_decode.cc:1489:27
+    #3 0x55e442 in brunsli::ProcessSection(brunsli::internal::dec::State*, brunsli::JPEGData*) /src/brunsli/c/dec/brunsli_decode.cc:2115:30
+    #4 0x5476eb in brunsli::internal::dec::DoProcessJpeg(brunsli::internal::dec::State*, brunsli::JPEGData*) /src/brunsli/c/dec/brunsli_decode.cc:2279:24
+    #5 0x567cfd in brunsli::internal::dec::ProcessJpeg(brunsli::internal::dec::State*, brunsli::JPEGData*) /src/brunsli/c/dec/brunsli_decode.cc:2429:14
+    #6 0x568b3f in brunsli::BrunsliDecodeJpeg(unsigned char const*, unsigned long, brunsli::JPEGData*) /src/brunsli/c/dec/brunsli_decode.cc:2455:10
+    #7 0x524b9a in LLVMFuzzerTestOneInput /src/brunsli/c/tests/fuzz_decode.cc:25:12
+    #8 0x4565b3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #9 0x443252 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x448c7b in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #11 0x46eb22 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f51ed88d0b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #13 0x42036d in _start (/out/fuzz_decode+0x42036d)
+
+DEDUP_TOKEN: std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::__put_character_sequence<char, std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*, unsigned long)--operator<<<std::__1::char_traits<char> >--DecodeJPEGInternalsSection
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32m__s[1m[35m' in the stack frame of function '[1m[32m_ZNSt3__124__put_character_sequenceIcNS_11char_traitsIcEEEERNS_13basic_ostreamIT_T0_EES7_PKS4_m[1m[35m'[1m[0m
+    #0 0x571640 in std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::__put_character_sequence<char, std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*, unsigned long) /usr/local/bin/../include/c++/v1/ostream:709
+
+DEDUP_TOKEN: std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::__put_character_sequence<char, std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*, unsigned long)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /usr/local/bin/../include/c++/v1/ostream:715:13 in std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::__put_character_sequence<char, std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*, unsigned long)
+Unique heap origins: 31
+Stack depot allocated bytes: 2408
+Unique origin histories: 5
+History depot allocated bytes: 120
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42501967

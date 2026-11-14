@@ -1,0 +1,102 @@
+ARVO id: 42503895
+Project: imagemagick
+Fuzz target: encoder_heic_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Stack-buffer-overflow READ 4
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1990501099
+INFO: Loaded 1 modules   (191947 inline 8-bit counters): 191947 [0x20d1590, 0x210035b), 
+INFO: Loaded 1 PC tables (191947 PCs): 191947 [0x210035c,0x22771b4), 
+/out/encoder_heic_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0xe6f8170c at pc 0x015f8fe0 bp 0xe1dff088 sp 0xe1dff080
+[1m[0m[1m[34mREAD of size 4 at 0xe6f8170c thread T2[1m[0m
+SCARINESS: 32 (4-byte-read-stack-buffer-overflow)
+    #0 0x15f8fdf in void apply_sao_internal<unsigned short>(de265_image*, int, int, slice_segment_header const*, int, int, int, unsigned short const*, int, unsigned short*, int) /src/libde265/libde265/sao.cc:248:25
+    #1 0x15f5452 in void apply_sao<unsigned char>(de265_image*, int, int, slice_segment_header const*, int, int, int, unsigned char const*, int, unsigned char*, int) /src/libde265/libde265/sao.cc:270:5
+    #2 0x15f6125 in thread_task_sao::work() /src/libde265/libde265/sao.cc:441:9
+    #3 0x1647041 in worker_thread(void*) /src/libde265/libde265/threads.cc:233:11
+    #4 0xb141f2 in __asan::AsanThread::ThreadStart(unsigned long long, __sanitizer::atomic_uintptr_t*) /src/llvm-project/compiler-rt/lib/asan/asan_thread.cpp:273:25
+    #5 0xaf1867 in asan_thread_start(void*) /src/llvm-project/compiler-rt/lib/asan/asan_interceptors.cpp:205:13
+    #6 0xe87dc294 in start_thread (/lib/i386-linux-gnu/libpthread.so.0+0x6294)
+    #7 0xe86da1cd in clone (/lib/i386-linux-gnu/libc.so.6+0xe71cd)
+
+DEDUP_TOKEN: void apply_sao_internal<unsigned short>(de265_image*, int, int, slice_segment_header const*, int, int, int, unsigned short const*, int, unsigned short*, int)--void apply_sao<unsigned char>(de265_image*, int, int, slice_segment_header const*, int, int, int, unsigned char const*, int, unsigned char*, int)--thread_task_sao::work()
+[1m[32mAddress 0xe6f8170c is located in stack of thread T2 at offset 268 in frame[1m[0m
+[1m[0m    #0 0x15f742f in void apply_sao_internal<unsigned short>(de265_image*, int, int, slice_segment_header const*, int, int, int, unsigned short const*, int, unsigned short*, int) /src/libde265/libde265/sao.cc:33
+
+DEDUP_TOKEN: void apply_sao_internal<unsigned short>(de265_image*, int, int, slice_segment_header const*, int, int, int, unsigned short const*, int, unsigned short*, int)
+  This frame has 4 object(s):
+    [16, 24) 'hPos' (line 79)
+    [48, 56) 'vPos' (line 79)
+    [80, 85) 'saoOffsetVal' (line 95)
+    [112, 240) 'bandTable' (line 186)[1m[32m <== Memory access at offset 268 overflows this variable[1m[0m
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+Thread T2 created by T0 here:
+    #0 0xaf175c in pthread_create /src/llvm-project/compiler-rt/lib/asan/asan_interceptors.cpp:214:3
+    #1 0x16466dc in de265_thread_create(unsigned long*, void* (*)(void*), void*) /src/libde265/libde265/threads.cc:41:96
+    #2 0x1646d66 in start_thread_pool(thread_pool*, int) /src/libde265/libde265/threads.cc:271:15
+    #3 0x15811c3 in decoder_context::start_thread_pool(int) /src/libde265/libde265/decctx.cc:346:3
+    #4 0x157cfeb in de265_start_worker_threads /src/libde265/libde265/de265.cc:264:28
+    #5 0x157b65e in libde265_new_decoder(void**) /src/libheif/libheif/heif_decoder_libde265.cc:173:3
+    #6 0x14df0e5 in heif::HeifContext::decode_image_planar(unsigned int, std::__1::shared_ptr<heif::HeifPixelImage>&, heif_colorspace, heif_decoding_options const*, bool) const /src/libheif/libheif/heif_context.cc:1086:29
+    #7 0x14de7aa in heif::HeifContext::decode_image_user(unsigned int, std::__1::shared_ptr<heif::HeifPixelImage>&, heif_colorspace, heif_chroma, heif_decoding_options const*) const /src/libheif/libheif/heif_context.cc:1014:15
+    #8 0x1438bba in heif_decode_image /src/libheif/libheif/heif.cc:917:35
+    #9 0x1253a01 in ReadHEICImageHandle /src/imagemagick/coders/heic.c:320:9
+    #10 0x125191f in ReadHEICImage /src/imagemagick/coders/heic.c:492:10
+    #11 0xd25a97 in ReadImage /src/imagemagick/MagickCore/constitute.c:563:15
+    #12 0xca8970 in BlobToImage /src/imagemagick/MagickCore/blob.c:475:13
+    #13 0xb753db in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4041:12
+    #14 0xb414ba in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:50:11
+    #15 0xa394fe in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #16 0xa2388e in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #17 0xa29705 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #18 0xa54007 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #19 0xe860b646 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x18646)
+
+DEDUP_TOKEN: pthread_create--de265_thread_create(unsigned long*, void* (*)(void*), void*)--start_thread_pool(thread_pool*, int)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/libde265/libde265/sao.cc:248:25 in void apply_sao_internal<unsigned short>(de265_image*, int, int, slice_segment_header const*, int, int, int, unsigned short const*, int, unsigned short*, int)
+Shadow bytes around the buggy address:
+  0x3cdf0290: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x3cdf02a0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x3cdf02b0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x3cdf02c0: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3cdf02d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m
+=>0x3cdf02e0: [1m[31mf3[1m[0m[[1m[31mf3[1m[0m][1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3cdf02f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3cdf0300: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3cdf0310: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3cdf0320: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3cdf0330: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42503895

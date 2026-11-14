@@ -1,0 +1,96 @@
+ARVO id: 42490141
+Project: uWebSockets
+Fuzz target: EpollHelloWorld
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ {*}
+Language: c++
+Repo: https://github.com/uNetworking/uWebSockets.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3499069043
+INFO: Loaded 1 modules   (3398 inline 8-bit counters): 3398 [0x8bc588, 0x8bd2ce), 
+INFO: Loaded 1 PC tables (3398 PCs): 3398 [0x644c38,0x652098), 
+/out/EpollHelloWorld: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==6==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x7ffff6b71840 at pc 0x0000004be9d1 bp 0x7fffffffd5b0 sp 0x7fffffffcd78
+[1m[0m[1m[34mREAD of size 4016780 at 0x7ffff6b71840 thread T0[1m[0m
+SCARINESS: 26 (multi-byte-read-heap-buffer-overflow)
+    #0 0x4be9d0 in memchr /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:914:3
+    #1 0x56cd66 in __libcpp_memchr /usr/local/bin/../include/c++/v1/string.h:94:76
+    #2 0x56cd66 in memchr /usr/local/bin/../include/c++/v1/string.h:96:66
+    #3 0x56cd66 in std::__1::pair<int, void*> uWS::HttpParser::fenceAndConsumePostPadded<0>(char*, unsigned int, void*, void*, uWS::HttpRequest*, fu2::abi_400::detail::function<fu2::abi_400::detail::config<true, false, fu2::capacity_default>, fu2::abi_400::detail::property<true, false, void* (void*, uWS::HttpRequest*)> >&, fu2::abi_400::detail::function<fu2::abi_400::detail::config<true, false, fu2::capacity_default>, fu2::abi_400::detail::property<true, false, void* (void*, std::__1::basic_string_view<char, std::__1::char_traits<char> >, bool)> >&) /src/uWebSockets/fuzzing/../src/HttpParser.h:230:60
+    #4 0x56b5a9 in uWS::HttpParser::consumePostPadded(char*, unsigned int, void*, void*, fu2::abi_400::detail::function<fu2::abi_400::detail::config<true, false, fu2::capacity_default>, fu2::abi_400::detail::property<true, false, void* (void*, uWS::HttpRequest*)> >&&, fu2::abi_400::detail::function<fu2::abi_400::detail::config<true, false, fu2::capacity_default>, fu2::abi_400::detail::property<true, false, void* (void*, std::__1::basic_string_view<char, std::__1::char_traits<char> >, bool)> >&&, fu2::abi_400::detail::function<fu2::abi_400::detail::config<true, false, fu2::capacity_default>, fu2::abi_400::detail::property<true, false, void* (void*)> >&&) /src/uWebSockets/fuzzing/../src/HttpParser.h:349:43
+    #5 0x56aade in uWS::HttpContext<false>::init()::'lambda'(us_socket_t*, char*, int)::operator()(us_socket_t*, char*, int) const /src/uWebSockets/fuzzing/../src/HttpContext.h:136:54
+    #6 0x5ac7f1 in us_internal_dispatch_ready_poll /src/uWebSockets/fuzzing/../uSockets/src/loop.c:238:25
+    #7 0x5a8c03 in us_loop_run /src/uWebSockets/fuzzing/../uSockets/src/eventing/epoll_kqueue.c:147:21
+    #8 0x55acf6 in run /src/uWebSockets/fuzzing/../src/Loop.h:159:9
+    #9 0x55acf6 in run /src/uWebSockets/fuzzing/../src/Loop.h:176:18
+    #10 0x55acf6 in run /src/uWebSockets/fuzzing/../src/App.h:317:9
+    #11 0x55acf6 in test() /src/uWebSockets/fuzzing/EpollHelloWorld.cpp:95:13
+    #12 0x5587cf in LLVMFuzzerTestOneInput /src/uWebSockets/fuzzing/./libEpollFuzzer/epoll_fuzzer.h:740:2
+    #13 0x45a7f1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #14 0x444582 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #15 0x44a8c5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #16 0x474772 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #18 0x41f498 in _start (/out/EpollHelloWorld+0x41f498)
+
+DEDUP_TOKEN: memchr--__libcpp_memchr--memchr
+[1m[32m0x7ffff6b71840 is located 0 bytes to the right of 524352-byte region [0x7ffff6af1800,0x7ffff6b71840)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x522e9d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x5ab2e1 in us_internal_loop_data_init /src/uWebSockets/fuzzing/../uSockets/src/loop.c:26:27
+    #2 0x5a896b in us_create_loop /src/uWebSockets/fuzzing/../uSockets/src/eventing/epoll_kqueue.c:109:5
+    #3 0x55cacb in create /src/uWebSockets/fuzzing/../src/Loop.h:70:26
+    #4 0x55cacb in uWS::Loop::get(void*) /src/uWebSockets/fuzzing/../src/Loop.h:100:38
+    #5 0x55bf82 in uWS::TemplatedApp<false>::TemplatedApp(us_socket_context_options_t) /src/uWebSockets/fuzzing/../src/App.h:111:53
+    #6 0x558b65 in test() /src/uWebSockets/fuzzing/EpollHelloWorld.cpp:20:20
+    #7 0x5587cf in LLVMFuzzerTestOneInput /src/uWebSockets/fuzzing/./libEpollFuzzer/epoll_fuzzer.h:740:2
+    #8 0x45a7f1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #9 0x444582 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #10 0x44a8c5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #11 0x474772 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: malloc--us_internal_loop_data_init--us_create_loop
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:914:3 in memchr
+Shadow bytes around the buggy address:
+  0x10007ed662b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007ed662c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007ed662d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007ed662e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007ed662f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x10007ed66300: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007ed66310: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007ed66320: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007ed66330: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007ed66340: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007ed66350: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==6==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42490141

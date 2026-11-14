@@ -1,0 +1,36 @@
+ARVO id: 42495276
+Project: skcms
+Fuzz target: iccprofile_atf
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Index-out-of-bounds
+Language: c++
+Repo: https://skia.googlesource.com/skcms.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3745830477
+INFO: Loaded 1 modules   (1805 inline 8-bit counters): 1805 [0x757d88, 0x758495), 
+INFO: Loaded 1 PC tables (1805 PCs): 1805 [0x50e9b8,0x515a88), 
+/out/iccprofile_atf: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1mskcms.cc:614:9:[1m[31m runtime error: [1m[0m[1mindex 4 out of bounds for type 'uint8_t [4]'[1m[0m
+    #0 0x4bd47f in read_mft_common(mft_CommonLayout const*, skcms_A2B*) /src/skcms/skcms.cc:614:29
+    #1 0x4bc8e2 in bool read_tag_mft2<skcms_A2B>(skcms_ICCTag const*, skcms_A2B*) /src/skcms/skcms.cc:739:10
+    #2 0x4b6d22 in read_a2b(skcms_ICCTag const*, skcms_A2B*, bool) /src/skcms/skcms.cc:1126:51
+    #3 0x4b67b5 in skcms_ParseWithA2BPriority /src/skcms/skcms.cc:1316:18
+    #4 0x4d56ce in skcms_Parse /src/skcms/fuzz/../skcms.h:228:12
+    #5 0x4d5625 in LLVMFuzzerTestOneInput /src/skcms/fuzz/fuzz_iccprofile_atf.c:17:10
+    #6 0x4426b3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #7 0x42c512 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #8 0x43235a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #9 0x45e092 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #11 0x4071a8 in _start (/out/iccprofile_atf+0x4071a8)
+
+DEDUP_TOKEN: read_mft_common(mft_CommonLayout const*, skcms_A2B*)--bool read_tag_mft2<skcms_A2B>(skcms_ICCTag const*, skcms_A2B*)--read_a2b(skcms_ICCTag const*, skcms_A2B*, bool)
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior skcms.cc:614:9 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42495276

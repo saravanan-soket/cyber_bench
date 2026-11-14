@@ -1,0 +1,57 @@
+ARVO id: 42535653
+Project: ghostpdl
+Fuzz target: gs_device_psdcmyk_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://cgit.ghostscript.com/ghostpdl.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3547746402
+INFO: Loaded 3 modules   (227406 inline 8-bit counters): 14423 [0x7f6452a88d20, 0x7f6452a8c577), 959 [0x7f6452aeaa40, 0x7f6452aeadff), 212024 [0x55dc96598310, 0x55dc965cbf48), 
+INFO: Loaded 3 PC tables (227406 PCs): 14423 [0x7f6452a8c578,0x7f6452ac4ae8), 959 [0x7f6452aeae00,0x7f6452aee9f0), 212024 [0x55dc965cbf48,0x55dc969082c8), 
+/out/gs_device_psdcmyk_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x52a363e9f270 (pc 0x55dc93e591e5 bp 0x7ffe4b7e9ac0 sp 0x7ffe4b7e99c0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x55dc93e591e5 in cmap_cmyk_direct /src/ghostpdl/./base/gxcmap.c:1146:46
+    #1 0x55dc93e4ea9c in gx_remap_concrete_DCMYK /src/ghostpdl/./base/gxcmap.c:870:5
+    #2 0x55dc938e98d2 in gx_remap_ICC_with_link /src/ghostpdl/./base/gsicc.c:437:5
+    #3 0x55dc938e7fd4 in gx_remap_ICC /src/ghostpdl/./base/gsicc.c:491:12
+    #4 0x55dc93caf4a8 in do_fill /src/ghostpdl/./base/gspaint.c:323:12
+    #5 0x55dc93caf4a8 in fill_with_rule /src/ghostpdl/./base/gspaint.c:404:16
+    #6 0x55dc93c4df89 in gs_output_page /src/ghostpdl/./base/gsdevice.c:196:14
+    #7 0x55dc94146df7 in zoutputpage /src/ghostpdl/./psi/zdevice.c:509:12
+    #8 0x55dc94080015 in do_call_operator /src/ghostpdl/./psi/interp.c:91:12
+    #9 0x55dc940749eb in interp /src/ghostpdl/./psi/interp.c:1380:28
+    #10 0x55dc940749eb in gs_call_interp /src/ghostpdl/./psi/interp.c:531:12
+    #11 0x55dc940749eb in gs_interpret /src/ghostpdl/./psi/interp.c:488:12
+    #12 0x55dc93727c5f in gs_main_interpret /src/ghostpdl/./psi/imain.c:257:12
+    #13 0x55dc93727c5f in gs_main_run_string_end /src/ghostpdl/./psi/imain.c:945:12
+    #14 0x55dc93727c5f in gs_main_run_string_with_length /src/ghostpdl/./psi/imain.c:889:12
+    #15 0x55dc943d4d82 in run_string /src/ghostpdl/./psi/imainarg.c:1174:12
+    #16 0x55dc943d0c8b in swproc /src/ghostpdl/./psi/imainarg.c:368:20
+    #17 0x55dc943cdb31 in gs_main_init_with_args01 /src/ghostpdl/./psi/imainarg.c:224:24
+    #18 0x55dc943d4b08 in gs_main_init_with_args /src/ghostpdl/./psi/imainarg.c:290:16
+    #19 0x55dc9371e46c in fuzz_gs_device(unsigned char const*, unsigned long, int, char const*, char const*, int) /src/gs_fuzzlib.h:139:8
+    #20 0x55dc9371e895 in LLVMFuzzerTestOneInput /src/gs_device_psdcmyk_fuzzer.cc:18:2
+    #21 0x55dc935d0860 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #22 0x55dc935baff4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #23 0x55dc935c0a8a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #24 0x55dc935ece82 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #25 0x7f645245a082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 87b331c034a6458c64ce09c03939e947212e18ce)
+    #26 0x55dc935b1acd in _start (/out/gs_device_psdcmyk_fuzzer+0x749acd)
+
+DEDUP_TOKEN: cmap_cmyk_direct--gx_remap_concrete_DCMYK--gx_remap_ICC_with_link
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/ghostpdl/./base/gxcmap.c:1146:46 in cmap_cmyk_direct
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42535653

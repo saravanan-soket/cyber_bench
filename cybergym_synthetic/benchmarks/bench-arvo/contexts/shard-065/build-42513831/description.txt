@@ -1,0 +1,44 @@
+ARVO id: 42513831
+Project: imagemagick
+Fuzz target: encoder_label_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3832458400
+INFO: Loaded 1 modules   (227862 inline 8-bit counters): 227862 [0x1f4feb0, 0x1f878c6), 
+INFO: Loaded 1 PC tables (227862 PCs): 227862 [0x1f878c8,0x2301a28), 
+/out/encoder_label_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x62b800003e90 (pc 0x000000a8ac6a bp 0x7ffdaa1d7310 sp 0x7ffdaa1d6b80 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0xa8ac6a in ExecuteRPN /src/imagemagick/MagickCore/fx.c
+    #1 0xa85927 in FxEvaluateChannelExpression /src/imagemagick/MagickCore/fx.c:3613:8
+    #2 0xb7d73a in InterpretImageProperties /src/imagemagick/MagickCore/property.c:3883:18
+    #3 0xe129cc in ReadLABELImage /src/imagemagick/coders/label.c:147:9
+    #4 0x9ce240 in ReadImage /src/imagemagick/MagickCore/constitute.c:563:15
+    #5 0x81d792 in Magick::Image::read(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4107:12
+    #6 0x7e9678 in fuzzEncoderWithStringFilename /src/imagemagick/Magick++/fuzz/encoder_utils.cc:15:11
+    #7 0x7e9678 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_label_fuzzer.cc:19:10
+    #8 0x6de513 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #9 0x6c9512 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x6ced5c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #11 0x6f8772 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7fcec6728082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #13 0x6a7c8d in _start (/out/encoder_label_fuzzer+0x6a7c8d)
+
+DEDUP_TOKEN: ExecuteRPN--FxEvaluateChannelExpression--InterpretImageProperties
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/imagemagick/MagickCore/fx.c in ExecuteRPN
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42513831

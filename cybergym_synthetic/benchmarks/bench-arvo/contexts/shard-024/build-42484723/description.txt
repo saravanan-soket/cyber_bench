@@ -1,0 +1,56 @@
+ARVO id: 42484723
+Project: libraw
+Fuzz target: libraw_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/libraw/libraw
+
+=== Crash report ===
+INFO: Seed: 1876842904
+INFO: Loaded 1 modules   (17383 inline 8-bit counters): 17383 [0xc7f140, 0xc83527), 
+INFO: Loaded 1 PC tables (17383 PCs): 17383 [0x982bf0,0x9c6a60), 
+/out/libraw_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x6a825e in LibRaw::identify() /src/libraw/src/metadata/identify.cpp:1178:21
+    #1 0x550ce9 in LibRaw::open_datastream(LibRaw_abstract_datastream*) /src/libraw/src/utils/open.cpp:390:4
+    #2 0x54f2d2 in LibRaw::open_buffer(void*, unsigned long) /src/libraw/src/utils/open.cpp:153:13
+    #3 0x522810 in LLVMFuzzerTestOneInput /src/libraw_fuzzer.cc:31:24
+    #4 0x45ab11 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #5 0x446292 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #6 0x44c2ee in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #7 0x473c62 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #8 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #9 0x420928 in _start (/out/libraw_fuzzer+0x420928)
+
+DEDUP_TOKEN: LibRaw::identify()--LibRaw::open_datastream(LibRaw_abstract_datastream*)--LibRaw::open_buffer(void*, unsigned long)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x720ae6 in LibRaw::parse_tiff_ifd(int) /src/libraw/src/metadata/tiff.cpp:908:15
+    #1 0x7257b8 in LibRaw::parse_tiff(int) /src/libraw/src/metadata/tiff.cpp:1489:9
+    #2 0x69b50c in LibRaw::identify() /src/libraw/src/metadata/identify.cpp:494:14
+    #3 0x550ce9 in LibRaw::open_datastream(LibRaw_abstract_datastream*) /src/libraw/src/utils/open.cpp:390:4
+    #4 0x54f2d2 in LibRaw::open_buffer(void*, unsigned long) /src/libraw/src/utils/open.cpp:153:13
+    #5 0x522810 in LLVMFuzzerTestOneInput /src/libraw_fuzzer.cc:31:24
+    #6 0x45ab11 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #7 0x446292 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #8 0x44c2ee in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #9 0x473c62 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #10 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: LibRaw::parse_tiff_ifd(int)--LibRaw::parse_tiff(int)--LibRaw::identify()
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mtab[1m[35m' in the stack frame of function '[1m[32m_ZN6LibRaw14parse_tiff_ifdEi[1m[35m'[1m[0m
+    #0 0x708be0 in LibRaw::parse_tiff_ifd(int) /src/libraw/src/metadata/tiff.cpp:23
+
+DEDUP_TOKEN: LibRaw::parse_tiff_ifd(int)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/libraw/src/metadata/identify.cpp:1178:21 in LibRaw::identify()
+Unique heap origins: 33
+Stack depot allocated bytes: 2808
+Unique origin histories: 10
+History depot allocated bytes: 240
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42484723

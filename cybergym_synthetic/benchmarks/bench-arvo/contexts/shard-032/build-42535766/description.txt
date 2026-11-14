@@ -1,0 +1,80 @@
+ARVO id: 42535766
+Project: gdal
+Fuzz target: gdal_translate_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Global-buffer-overflow WRITE 4
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/gdal_translate_fuzzer < INPUT_FILE
+or
+  /out/gdal_translate_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/gdal_translate_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 97 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: global-buffer-overflow on address 0x00000635a31c at pc 0x0000018bdf1c bp 0x7ffdd9d77b70 sp 0x7ffdd9d77b68
+[1m[0m[1m[34mWRITE of size 4 at 0x00000635a31c thread T0[1m[0m
+SCARINESS: 36 (4-byte-write-global-buffer-overflow)
+    #0 0x18bdf1b in reduce /src/gdal/gdal/frmts/grib/degrib/g2clib/reduce.c:155:23
+    #1 0x18ba4fb in pack_gp /src/gdal/gdal/frmts/grib/degrib/g2clib/pack_gp.c:1420:2
+    #2 0x18b3222 in misspack /src/gdal/gdal/frmts/grib/degrib/g2clib/misspack.c:300:12
+    #3 0x12c778c in GRIB2Section567Writer::WriteComplexPacking(int) /src/gdal/gdal/frmts/grib/gribcreatecopy.cpp:1056:5
+    #4 0x12cde01 in WriteBand(_IO_FILE*, GDALDataset*, int, char**, int (*)(double, char const*, void*), void*) /src/gdal/gdal/frmts/grib/gribcreatecopy.cpp:2398:13
+    #5 0x12cd7fa in GRIBDataset::CreateCopy(char const*, GDALDataset*, int, char**, int (*)(double, char const*, void*), void*) /src/gdal/gdal/frmts/grib/gribcreatecopy.cpp:2498:14
+    #6 0xb6f57b in GDALDriver::CreateCopy(char const*, GDALDataset*, int, char**, int (*)(double, char const*, void*), void*) /src/gdal/gdal/gcore/gdaldriver.cpp:892:19
+    #7 0xb6f995 in GDALCreateCopy /src/gdal/gdal/gcore/gdaldriver.cpp:939:9
+    #8 0xe214cb in GDALTranslate /src/gdal/gdal/apps/gdal_translate_lib.cpp:1815:18
+    #9 0x525d7a in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_translate_fuzzer.cpp:155:47
+    #10 0x5261df in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:271:5
+    #11 0x52677f in main /src/libfuzzer/afl/afl_driver.cpp:308:12
+    #12 0x7f2ce6d9082f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #13 0x4272d8 in _start (/out/gdal_translate_fuzzer+0x4272d8)
+
+DEDUP_TOKEN: reduce--pack_gp--misspack
+[1m[32m0x00000635a31c is located 4 bytes to the left of global variable 'ntotbt' defined in 'degrib/g2clib/reduce.c:37:9' (0x635a320) of size 124
+[1m[0m[1m[32m0x00000635a31c is located 56 bytes to the right of global variable 'lxn' defined in 'degrib/g2clib/reduce.c:32:43' (0x635a2e0) of size 4
+[1m[0mSUMMARY: AddressSanitizer: global-buffer-overflow /src/gdal/gdal/frmts/grib/degrib/g2clib/reduce.c:155:23 in reduce
+Shadow bytes around the buggy address:
+  0x000080c63410: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x000080c63420: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x000080c63430: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x000080c63440: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x000080c63450: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+=>0x000080c63460: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m[[1m[31mf9[1m[0m][1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x000080c63470: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m01[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x000080c63480: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x000080c63490: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x000080c634a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x000080c634b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42535766

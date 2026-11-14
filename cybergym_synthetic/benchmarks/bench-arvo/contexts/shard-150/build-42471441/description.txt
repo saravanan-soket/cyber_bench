@@ -1,0 +1,49 @@
+ARVO id: 42471441
+Project: harfbuzz
+Fuzz target: hb-shape-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/harfbuzz/harfbuzz.git
+
+=== Crash report ===
+INFO: Seed: 1744532987
+INFO: Loaded 1 modules   (18524 inline 8-bit counters): 18524 [0xac1f68, 0xac67c4), 
+INFO: Loaded 1 PC tables (18524 PCs): 18524 [0xac67c8,0xb0ed88), 
+/out/hb-shape-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x608040404118 (pc 0x00000060c4cc bp 0x7fffffffd970 sp 0x7fffffffd970 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x60c4cb in BEInt<short, 2>::operator short() const /src/harfbuzz/src/./hb-machinery.hh:676:13
+    #1 0x6399c2 in AAT::KerxSubTableFormat1<AAT::KerxSubTableHeader>::driver_context_t::transition(AAT::StateTableDriver<AAT::ExtendedTypes, AAT::Format1Entry<true>::EntryData>*, AAT::Entry<AAT::Format1Entry<true>::EntryData> const*) /src/harfbuzz/src/./hb-aat-layout-kerx-table.hh:285:12
+    #2 0x638de6 in void AAT::StateTableDriver<AAT::ExtendedTypes, AAT::Format1Entry<true>::EntryData>::drive<AAT::KerxSubTableFormat1<AAT::KerxSubTableHeader>::driver_context_t>(AAT::KerxSubTableFormat1<AAT::KerxSubTableHeader>::driver_context_t*) /src/harfbuzz/src/./hb-aat-layout-common.hh:702:11
+    #3 0x638553 in AAT::KerxSubTableFormat1<AAT::KerxSubTableHeader>::apply(AAT::hb_aat_apply_context_t*) const /src/harfbuzz/src/./hb-aat-layout-kerx-table.hh:372:12
+    #4 0x6341b1 in AAT::hb_aat_apply_context_t::return_t AAT::KerxSubTable::dispatch<AAT::hb_aat_apply_context_t>(AAT::hb_aat_apply_context_t*) const /src/harfbuzz/src/./hb-aat-layout-kerx-table.hh:803:13
+    #5 0x60a61a in AAT::KerxTable<AAT::kerx>::apply(AAT::hb_aat_apply_context_t*) const /src/harfbuzz/src/./hb-aat-layout-kerx-table.hh:925:18
+    #6 0x609fbe in hb_aat_layout_position(hb_ot_shape_plan_t*, hb_font_t*, hb_buffer_t*) /src/harfbuzz/src/hb-aat-layout.cc:271:8
+    #7 0x6e2206 in hb_ot_position_complex(hb_ot_shape_context_t const*) /src/harfbuzz/src/hb-ot-shape.cc:841:5
+    #8 0x6decb8 in hb_ot_position(hb_ot_shape_context_t const*) /src/harfbuzz/src/hb-ot-shape.cc:888:3
+    #9 0x6dc86d in hb_ot_shape_internal(hb_ot_shape_context_t*) /src/harfbuzz/src/hb-ot-shape.cc:959:3
+    #10 0x6dc36b in _hb_ot_shape /src/harfbuzz/src/hb-ot-shape.cc:982:3
+    #11 0x604525 in hb_shape_plan_execute /src/harfbuzz/src/./hb-shaper-list.hh:42:1
+    #12 0x603074 in hb_shape_full /src/harfbuzz/src/hb-shape.cc:143:19
+    #13 0x530504 in LLVMFuzzerTestOneInput /src/harfbuzz/./test/fuzzing/hb-shape-fuzzer.cc:24:5
+    #14 0x55b6c5 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #15 0x5315cd in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #16 0x53ce16 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #17 0x530c4c in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #18 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #19 0x41d038 in _start (/out/hb-shape-fuzzer+0x41d038)
+
+DEDUP_TOKEN: BEInt<short, 2>::operator short() const--AAT::KerxSubTableFormat1<AAT::KerxSubTableHeader>::driver_context_t::transition(AAT::StateTableDriver<AAT::ExtendedTypes, AAT::Format1Entry<true>::EntryData>*, AAT::Entry<AAT::Format1Entry<true>::EntryData> const*)--void AAT::StateTableDriver<AAT::ExtendedTypes, AAT::Format1Entry<true>::EntryData>::drive<AAT::KerxSubTableFormat1<AAT::KerxSubTableHeader>::driver_context_t>(AAT::KerxSubTableFormat1<AAT::KerxSubTableHeader>::driver_context_t*)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/harfbuzz/src/./hb-machinery.hh:676:13 in BEInt<short, 2>::operator short() const
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42471441

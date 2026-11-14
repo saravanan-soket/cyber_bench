@@ -1,0 +1,74 @@
+ARVO id: 42493524
+Project: mruby
+Fuzz target: mruby_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/mruby/mruby
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2751561913
+INFO: Loaded 1 modules   (13892 inline 8-bit counters): 13892 [0xa322e9, 0xa3592d), 
+INFO: Loaded 1 PC tables (13892 PCs): 13892 [0x792ba0,0x7c8fe0), 
+/out/mruby_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x5282fa in mrb_irep_decref /src/mruby/src/state.c:119:7
+    #1 0x56854b in obj_free /src/mruby/src/gc.c:884:9
+    #2 0x56a3dd in incremental_sweep_phase /src/mruby/src/gc.c:1127:11
+    #3 0x568ae1 in incremental_gc /src/mruby/src/gc.c:1193:20
+    #4 0x5659b6 in incremental_gc_step /src/mruby/src/gc.c:1219:15
+    #5 0x564bed in mrb_incremental_gc /src/mruby/src/gc.c:1263:5
+    #6 0x56283a in mrb_obj_alloc /src/mruby/src/gc.c:567:5
+    #7 0x5b15f0 in mrb_proc_new /src/mruby/src/proc.c:42:22
+    #8 0x545c91 in mrb_vm_exec /src/mruby/src/vm.c:2631:13
+    #9 0x53a6fd in mrb_vm_run /src/mruby/src/vm.c:971:12
+    #10 0x5608a4 in mrb_top_run /src/mruby/src/vm.c
+    #11 0x5f3411 in mrb_load_exec /src/mruby/mrbgems/mruby-compiler/core/parse.y:6804:7
+    #12 0x5f4990 in mrb_load_nstring_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6875:10
+    #13 0x5f4b0c in mrb_load_string_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6887:10
+    #14 0x5f4b7c in mrb_load_string /src/mruby/mrbgems/mruby-compiler/core/parse.y:6893:10
+    #15 0x527418 in LLVMFuzzerTestOneInput /src/mruby/oss-fuzz/mruby_fuzzer.c:14:5
+    #16 0x45b191 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #17 0x444e52 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #18 0x44b1a6 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #19 0x475192 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #20 0x7f86ccfe383f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #21 0x41f818 in _start (/out/mruby_fuzzer+0x41f818)
+
+DEDUP_TOKEN: mrb_irep_decref--obj_free--incremental_sweep_phase
+  [1m[35mUninitialized value was created by a heap deallocation[1m[0m
+    #0 0x4d0649 in free /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:222:3
+    #1 0x527910 in mrb_default_allocf /src/mruby/src/state.c:64:5
+    #2 0x562314 in mrb_free /src/mruby/src/gc.c:290:3
+    #3 0x528a41 in mrb_irep_free /src/mruby/src/state.c:167:3
+    #4 0x5282d3 in mrb_irep_decref /src/mruby/src/state.c:122:5
+    #5 0x56854b in obj_free /src/mruby/src/gc.c:884:9
+    #6 0x56a3dd in incremental_sweep_phase /src/mruby/src/gc.c:1127:11
+    #7 0x568ae1 in incremental_gc /src/mruby/src/gc.c:1193:20
+    #8 0x5659b6 in incremental_gc_step /src/mruby/src/gc.c:1219:15
+    #9 0x564bed in mrb_incremental_gc /src/mruby/src/gc.c:1263:5
+    #10 0x56283a in mrb_obj_alloc /src/mruby/src/gc.c:567:5
+    #11 0x5b15f0 in mrb_proc_new /src/mruby/src/proc.c:42:22
+    #12 0x545c91 in mrb_vm_exec /src/mruby/src/vm.c:2631:13
+    #13 0x53a6fd in mrb_vm_run /src/mruby/src/vm.c:971:12
+    #14 0x5608a4 in mrb_top_run /src/mruby/src/vm.c
+    #15 0x5f3411 in mrb_load_exec /src/mruby/mrbgems/mruby-compiler/core/parse.y:6804:7
+    #16 0x5f4990 in mrb_load_nstring_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6875:10
+    #17 0x5f4b0c in mrb_load_string_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6887:10
+    #18 0x5f4b7c in mrb_load_string /src/mruby/mrbgems/mruby-compiler/core/parse.y:6893:10
+    #19 0x527418 in LLVMFuzzerTestOneInput /src/mruby/oss-fuzz/mruby_fuzzer.c:14:5
+
+DEDUP_TOKEN: free--mrb_default_allocf--mrb_free
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/mruby/src/state.c:119:7 in mrb_irep_decref
+Unique heap origins: 1050
+Stack depot allocated bytes: 189952
+Unique origin histories: 16
+History depot allocated bytes: 384
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42493524

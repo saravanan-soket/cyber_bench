@@ -1,0 +1,115 @@
+ARVO id: 428057580
+Project: selinux
+Fuzz target: secilc-fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-use-after-free READ 8
+Language: c
+Repo: https://github.com/SELinuxProject/selinux
+
+=== Crash report ===
+Reading 3831 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-use-after-free on address 0x5030000092e0 at pc 0x560a2e485cbf bp 0x7ffed0e19cf0 sp 0x7ffed0e19ce8
+[1m[0m[1m[34mREAD of size 8 at 0x5030000092e0 thread T0[1m[0m
+SCARINESS: 51 (8-byte-read-heap-use-after-free)
+    #0 0x560a2e485cbe in cil_symtab_datum_remove_node /src/selinux/libsepol/src/../cil/src/cil_symtab.c:78:22
+    #1 0x560a2e48955d in cil_tree_node_destroy /src/selinux/libsepol/src/../cil/src/cil_tree.c:240:3
+    #2 0x560a2e48955d in cil_tree_children_destroy /src/selinux/libsepol/src/../cil/src/cil_tree.c:208:3
+    #3 0x560a2e4759e7 in cil_resolve_ast /src/selinux/libsepol/src/../cil/src/cil_resolve_ast.c:4183:5
+    #4 0x560a2e3a6d8b in cil_compile /src/selinux/libsepol/src/../cil/src/cil.c:591:7
+    #5 0x560a2e38257e in LLVMFuzzerTestOneInput /src/selinux/libsepol/fuzz/secilc-fuzzer.c:46:6
+    #6 0x560a2e382389 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+    #7 0x560a2e382185 in LLVMFuzzerRunDriver /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #8 0x560a2e381d3d in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:311:10
+    #9 0x7fad23b2e082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 5792732f783158c66fb4f3756458ca24e46e827d)
+    #10 0x560a2e2a953d in _start (/out/secilc-fuzzer+0x5453d)
+
+DEDUP_TOKEN: cil_symtab_datum_remove_node--cil_tree_node_destroy--cil_tree_children_destroy
+[1m[32m0x5030000092e0 is located 0 bytes inside of 32-byte region [0x5030000092e0,0x503000009300)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x560a2e3422b6 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3
+    #1 0x560a2e424de7 in __cil_copy_node_helper /src/selinux/libsepol/src/../cil/src/cil_copy_ast.c:2055:6
+    #2 0x560a2e48a1af in cil_tree_walk_core /src/selinux/libsepol/src/../cil/src/cil_tree.c:314:9
+    #3 0x560a2e48a1af in cil_tree_walk /src/selinux/libsepol/src/../cil/src/cil_tree.c:358:7
+    #4 0x560a2e48a2ca in cil_tree_walk_core /src/selinux/libsepol/src/../cil/src/cil_tree.c:326:9
+    #5 0x560a2e48a2ca in cil_tree_walk /src/selinux/libsepol/src/../cil/src/cil_tree.c:358:7
+    #6 0x560a2e48a2ca in cil_tree_walk_core /src/selinux/libsepol/src/../cil/src/cil_tree.c:326:9
+    #7 0x560a2e48a2ca in cil_tree_walk /src/selinux/libsepol/src/../cil/src/cil_tree.c:358:7
+    #8 0x560a2e422f56 in cil_copy_ast /src/selinux/libsepol/src/../cil/src/cil_copy_ast.c:2137:7
+    #9 0x560a2e47df24 in cil_resolve_call /src/selinux/libsepol/src/../cil/src/cil_resolve_ast.c:2999:7
+    #10 0x560a2e477279 in __cil_resolve_ast_node /src/selinux/libsepol/src/../cil/src/cil_resolve_ast.c:3589:9
+    #11 0x560a2e477279 in __cil_resolve_ast_node_helper /src/selinux/libsepol/src/../cil/src/cil_resolve_ast.c:3917:7
+    #12 0x560a2e48a1af in cil_tree_walk_core /src/selinux/libsepol/src/../cil/src/cil_tree.c:314:9
+    #13 0x560a2e48a1af in cil_tree_walk /src/selinux/libsepol/src/../cil/src/cil_tree.c:358:7
+    #14 0x560a2e48a2ca in cil_tree_walk_core /src/selinux/libsepol/src/../cil/src/cil_tree.c:326:9
+    #15 0x560a2e48a2ca in cil_tree_walk /src/selinux/libsepol/src/../cil/src/cil_tree.c:358:7
+    #16 0x560a2e475be5 in cil_resolve_ast /src/selinux/libsepol/src/../cil/src/cil_resolve_ast.c:4056:8
+    #17 0x560a2e3a6d8b in cil_compile /src/selinux/libsepol/src/../cil/src/cil.c:591:7
+    #18 0x560a2e38257e in LLVMFuzzerTestOneInput /src/selinux/libsepol/fuzz/secilc-fuzzer.c:46:6
+    #19 0x560a2e382389 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+
+DEDUP_TOKEN: __interceptor_free--__cil_copy_node_helper--cil_tree_walk_core
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x560a2e34254f in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:68:3
+    #1 0x560a2e43058c in cil_malloc /src/selinux/libsepol/src/../cil/src/cil_mem.c:40:14
+    #2 0x560a2e3b3970 in cil_policycap_init /src/selinux/libsepol/src/../cil/src/cil.c:2954:15
+    #3 0x560a2e4255e8 in cil_copy_policycap /src/selinux/libsepol/src/../cil/src/cil_copy_ast.c:182:3
+    #4 0x560a2e424352 in __cil_copy_node_helper /src/selinux/libsepol/src/../cil/src/cil_copy_ast.c:2013:7
+    #5 0x560a2e48a1af in cil_tree_walk_core /src/selinux/libsepol/src/../cil/src/cil_tree.c:314:9
+    #6 0x560a2e48a1af in cil_tree_walk /src/selinux/libsepol/src/../cil/src/cil_tree.c:358:7
+    #7 0x560a2e48a2ca in cil_tree_walk_core /src/selinux/libsepol/src/../cil/src/cil_tree.c:326:9
+    #8 0x560a2e48a2ca in cil_tree_walk /src/selinux/libsepol/src/../cil/src/cil_tree.c:358:7
+    #9 0x560a2e48a2ca in cil_tree_walk_core /src/selinux/libsepol/src/../cil/src/cil_tree.c:326:9
+    #10 0x560a2e48a2ca in cil_tree_walk /src/selinux/libsepol/src/../cil/src/cil_tree.c:358:7
+    #11 0x560a2e422f56 in cil_copy_ast /src/selinux/libsepol/src/../cil/src/cil_copy_ast.c:2137:7
+    #12 0x560a2e47df24 in cil_resolve_call /src/selinux/libsepol/src/../cil/src/cil_resolve_ast.c:2999:7
+    #13 0x560a2e477279 in __cil_resolve_ast_node /src/selinux/libsepol/src/../cil/src/cil_resolve_ast.c:3589:9
+    #14 0x560a2e477279 in __cil_resolve_ast_node_helper /src/selinux/libsepol/src/../cil/src/cil_resolve_ast.c:3917:7
+    #15 0x560a2e48a1af in cil_tree_walk_core /src/selinux/libsepol/src/../cil/src/cil_tree.c:314:9
+    #16 0x560a2e48a1af in cil_tree_walk /src/selinux/libsepol/src/../cil/src/cil_tree.c:358:7
+    #17 0x560a2e48a2ca in cil_tree_walk_core /src/selinux/libsepol/src/../cil/src/cil_tree.c:326:9
+    #18 0x560a2e48a2ca in cil_tree_walk /src/selinux/libsepol/src/../cil/src/cil_tree.c:358:7
+    #19 0x560a2e475be5 in cil_resolve_ast /src/selinux/libsepol/src/../cil/src/cil_resolve_ast.c:4056:8
+    #20 0x560a2e3a6d8b in cil_compile /src/selinux/libsepol/src/../cil/src/cil.c:591:7
+    #21 0x560a2e38257e in LLVMFuzzerTestOneInput /src/selinux/libsepol/fuzz/secilc-fuzzer.c:46:6
+    #22 0x560a2e382389 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+
+DEDUP_TOKEN: __interceptor_malloc--cil_malloc--cil_policycap_init
+SUMMARY: AddressSanitizer: heap-use-after-free /src/selinux/libsepol/src/../cil/src/cil_symtab.c:78:22 in cil_symtab_datum_remove_node
+Shadow bytes around the buggy address:
+  0x503000009000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x503000009080: [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x503000009100: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x503000009180: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x503000009200: [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x503000009280: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[35mfd[1m[0m][1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x503000009300: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x503000009380: [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x503000009400: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+  0x503000009480: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x503000009500: [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/428057580

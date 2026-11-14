@@ -1,0 +1,91 @@
+ARVO id: 42510244
+Project: libjxl
+Fuzz target: djxl_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Negative-size-param
+Language: c++
+Repo: https://github.com/libjxl/libjxl.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2188759139
+INFO: Loaded 1 modules   (25653 inline 8-bit counters): 25653 [0x555555cd1338, 0x555555cd776d), 
+INFO: Loaded 1 PC tables (25653 PCs): 25653 [0x555555cd7770,0x555555d3bac0), 
+/out/djxl_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: negative-size-param: (size=-1020)
+[1m[0mSCARINESS: 10 (negative-size-param)
+    #0 0x55555574f169 in __asan_memset /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:26:3
+    #1 0x555555b1e2c1 in jxl::N_SSE4::BlendingStage::ProcessPaddingRow(std::__1::vector<std::__1::vector<float*, std::__1::allocator<float*> >, std::__1::allocator<std::__1::vector<float*, std::__1::allocator<float*> > > > const&, unsigned long, unsigned long, unsigned long) const /src/libjxl/lib/jxl/render_pipeline/stage_blending.cc:172:9
+    #2 0x555555b12f95 in jxl::LowMemoryRenderPipeline::RenderPadding(unsigned long, jxl::RectT<unsigned long>) /src/libjxl/lib/jxl/render_pipeline/low_memory_render_pipeline.cc:701:42
+    #3 0x555555b14418 in jxl::LowMemoryRenderPipeline::ProcessBuffers(unsigned long, unsigned long) /src/libjxl/lib/jxl/render_pipeline/low_memory_render_pipeline.cc:760:7
+    #4 0x55555590143d in jxl::FrameDecoder::ProcessACGroup(unsigned long, jxl::BitReader* restrict*, unsigned long, unsigned long, bool, bool) /src/libjxl/lib/jxl/dec_frame.cc:631:27
+    #5 0x55555590b774 in operator() /src/libjxl/lib/jxl/dec_frame.cc:793:5
+    #6 0x55555590b774 in jxl::ThreadPool::RunCallState<jxl::FrameDecoder::ProcessSections(jxl::FrameDecoder::SectionInfo const*, unsigned long, jxl::FrameDecoder::SectionStatus*)::$_1, jxl::FrameDecoder::ProcessSections(jxl::FrameDecoder::SectionInfo const*, unsigned long, jxl::FrameDecoder::SectionStatus*)::$_2>::CallDataFunc(void*, unsigned int, unsigned long) /src/libjxl/lib/jxl/base/data_parallel.h:81:14
+    #7 0x555555b7f484 in RunRange /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:139:7
+    #8 0x555555b7f484 in jpegxl::ThreadParallelRunner::ThreadFunc(jpegxl::ThreadParallelRunner*, int) /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:169:9
+    #9 0x555555b816c3 in __invoke<void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int> /usr/local/bin/../include/c++/v1/type_traits:3663:23
+    #10 0x555555b816c3 in __thread_execute<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int, 2UL, 3UL> /usr/local/bin/../include/c++/v1/thread:280:5
+    #11 0x555555b816c3 in void* std::__1::__thread_proxy<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(jpegxl::ThreadParallelRunner*, int), jpegxl::ThreadParallelRunner*, unsigned int> >(void*) /usr/local/bin/../include/c++/v1/thread:291:5
+    #12 0x7ffff7e56608 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x8608)
+    #13 0x7ffff7d50162 in __clone (/lib/x86_64-linux-gnu/libc.so.6+0x11f162)
+
+DEDUP_TOKEN: __asan_memset--jxl::N_SSE4::BlendingStage::ProcessPaddingRow(std::__1::vector<std::__1::vector<float*, std::__1::allocator<float*> >, std::__1::allocator<std::__1::vector<float*, std::__1::allocator<float*> > > > const&, unsigned long, unsigned long, unsigned long) const--jxl::LowMemoryRenderPipeline::RenderPadding(unsigned long, jxl::RectT<unsigned long>)
+[1m[32m0x625000012600 is located 3328 bytes inside of 8448-byte region [0x625000011900,0x625000013a00)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x55555574fafd in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:129:3
+    #1 0x5555558b6fc6 in jxl::CacheAligned::Allocate(unsigned long, unsigned long) /src/libjxl/lib/jxl/base/cache_aligned.cc:87:21
+    #2 0x5555557eb517 in Allocate /src/libjxl/lib/jxl/base/cache_aligned.h:43:12
+    #3 0x5555557eb517 in AllocateArray /src/libjxl/lib/jxl/base/cache_aligned.h:61:29
+    #4 0x5555557eb517 in jxl::PlaneBase::PlaneBase(unsigned long, unsigned long, unsigned long) /src/libjxl/lib/jxl/image.cc:93:14
+    #5 0x555555b0b948 in Plane /src/libjxl/lib/jxl/image.h:150:9
+    #6 0x555555b0b948 in jxl::LowMemoryRenderPipeline::PrepareForThreadsInternal(unsigned long, bool) /src/libjxl/lib/jxl/render_pipeline/low_memory_render_pipeline.cc:412:31
+    #7 0x55555590b250 in PrepareStorage /src/libjxl/lib/jxl/dec_frame.h:226:36
+    #8 0x55555590b250 in operator() /src/libjxl/lib/jxl/dec_frame.cc:793:5
+    #9 0x55555590b250 in jxl::ThreadPool::RunCallState<jxl::FrameDecoder::ProcessSections(jxl::FrameDecoder::SectionInfo const*, unsigned long, jxl::FrameDecoder::SectionStatus*)::$_1, jxl::FrameDecoder::ProcessSections(jxl::FrameDecoder::SectionInfo const*, unsigned long, jxl::FrameDecoder::SectionStatus*)::$_2>::CallInitFunc(void*, unsigned long) /src/libjxl/lib/jxl/base/data_parallel.h:73:14
+    #10 0x555555b7e67d in jpegxl::ThreadParallelRunner::Runner(void*, void*, int (*)(void*, unsigned long), void (*)(void*, unsigned int, unsigned long), unsigned int, unsigned int) /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:64:13
+    #11 0x5555558f8d1b in Run<(lambda at /src/libjxl/lib/jxl/dec_frame.cc:793:5), (lambda at /src/libjxl/lib/jxl/dec_frame.cc:793:5)> /src/libjxl/lib/jxl/base/data_parallel.h:50:12
+    #12 0x5555558f8d1b in RunOnPool<(lambda at /src/libjxl/lib/jxl/dec_frame.cc:793:5), (lambda at /src/libjxl/lib/jxl/dec_frame.cc:793:5)> /src/libjxl/lib/jxl/base/data_parallel.h:108:18
+    #13 0x5555558f8d1b in jxl::FrameDecoder::ProcessSections(jxl::FrameDecoder::SectionInfo const*, unsigned long, jxl::FrameDecoder::SectionStatus*) /src/libjxl/lib/jxl/dec_frame.cc:793:5
+    #14 0x5555557a3528 in JxlDecoderProcessCodestream /src/libjxl/lib/jxl/decode.cc:1496:27
+    #15 0x5555557a3528 in HandleBoxes(JxlDecoderStruct*) /src/libjxl/lib/jxl/decode.cc:1978:11
+    #16 0x55555579b6ff in JxlDecoderProcessInput /src/libjxl/lib/jxl/decode.cc:2143:29
+    #17 0x55555578a2ce in DecodeJpegXl /src/libjxl/tools/djxl_fuzzer.cc:178:31
+    #18 0x55555578a2ce in TestOneInput /src/libjxl/tools/djxl_fuzzer.cc:559:3
+    #19 0x55555578a2ce in LLVMFuzzerTestOneInput /src/libjxl/tools/djxl_fuzzer.cc:569:10
+    #20 0x5555556806d2 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #21 0x55555566c282 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #22 0x555555671aec in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #23 0x55555569a482 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #24 0x7ffff7c550b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x240b2)
+
+DEDUP_TOKEN: __interceptor_malloc--jxl::CacheAligned::Allocate(unsigned long, unsigned long)--Allocate
+Thread T2 created by T0 here:
+    #0 0x55555573901c in pthread_create /src/llvm-project/compiler-rt/lib/asan/asan_interceptors.cpp:207:3
+    #1 0x555555b7fbbd in __libcpp_thread_create /usr/local/bin/../include/c++/v1/__threading_support:514:10
+    #2 0x555555b7fbbd in thread<void (&)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int &, void> /usr/local/bin/../include/c++/v1/thread:307:16
+    #3 0x555555b7fbbd in construct<std::__1::thread, void (&)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int &> /usr/local/bin/../include/c++/v1/__memory/allocator.h:151:28
+    #4 0x555555b7fbbd in construct<std::__1::thread, void (&)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int &, void> /usr/local/bin/../include/c++/v1/__memory/allocator_traits.h:290:13
+    #5 0x555555b7fbbd in __construct_one_at_end<void (&)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int &> /usr/local/bin/../include/c++/v1/vector:933:5
+    #6 0x555555b7fbbd in emplace_back<void (&)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int &> /usr/local/bin/../include/c++/v1/vector:1693:9
+    #7 0x555555b7fbbd in jpegxl::ThreadParallelRunner::ThreadParallelRunner(int) /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:196:14
+    #8 0x555555b7e2d8 in JxlThreadParallelRunnerCreate /src/libjxl/lib/threads/thread_parallel_runner.cc:81:19
+    #9 0x5555557894f1 in JxlThreadParallelRunnerMake /src/libjxl/lib/include/jxl/thread_parallel_runner_cxx.h:59:7
+    #10 0x5555557894f1 in DecodeJpegXl /src/libjxl/tools/djxl_fuzzer.cc:76:17
+    #11 0x5555557894f1 in TestOneInput /src/libjxl/tools/djxl_fuzzer.cc:559:3
+    #12 0x5555557894f1 in LLVMFuzzerTestOneInput /src/libjxl/tools/djxl_fuzzer.cc:569:10
+    #13 0x5555556806d2 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #14 0x55555566c282 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #15 0x555555671aec in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #16 0x55555569a482 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7ffff7c550b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x240b2)
+
+DEDUP_TOKEN: pthread_create--__libcpp_thread_create--thread<void (&)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int &, void>
+SUMMARY: AddressSanitizer: negative-size-param /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:26:3 in __asan_memset
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42510244

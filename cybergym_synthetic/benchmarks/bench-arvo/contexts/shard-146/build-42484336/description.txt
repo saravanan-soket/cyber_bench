@@ -1,0 +1,105 @@
+ARVO id: 42484336
+Project: skia
+Fuzz target: image_filter_deserialize_width
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Seed: 228699925
+INFO: Loaded 1 modules   (188375 inline 8-bit counters): 188375 [0x241bbb0, 0x2449b87), 
+INFO: Loaded 1 PC tables (188375 PCs): 188375 [0x2449b88,0x27298f8), 
+/out/image_filter_deserialize_width: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x603000000390 at pc 0x000000a9b91e bp 0x7fff93ceb2b0 sp 0x7fff93ceb2a8
+[1m[0m[1m[34mREAD of size 4 at 0x603000000390 thread T0[1m[0m
+SCARINESS: 17 (4-byte-read-heap-buffer-overflow)
+    #0 0xa9b91d in SkReader32::readInt() /src/skia/out/Fuzz_mem_constraints/../../src/core/SkReader32.h:58:25
+    #1 0xb4dae0 in SkReader32::readString(unsigned long*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkWriter32.cpp:26:24
+    #2 0xb4967d in SkVertices::Decode(void const*, unsigned long) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkVertices.cpp:495:70
+    #3 0x1274013 in create_vertices_from_buffer(SkReadBuffer&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkPictureData.cpp:379:19
+    #4 0x1273ddc in bool new_array_from_buffer<SkVertices const, SkVertices>(SkReadBuffer&, unsigned int, SkTArray<sk_sp<SkVertices const>, false>&, sk_sp<SkVertices> (*)(SkReadBuffer&)) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkPictureData.cpp:398:20
+    #5 0x127370e in SkPictureData::parseBufferTag(SkReadBuffer&, unsigned int, unsigned int) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkPictureData.cpp:443:13
+    #6 0x1274f7a in SkPictureData::parseBuffer(SkReadBuffer&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkPictureData.cpp:525:15
+    #7 0x1274e73 in SkPictureData::CreateFromBuffer(SkReadBuffer&, SkPictInfo const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkPictureData.cpp:494:16
+    #8 0x126d38d in SkPicturePriv::MakeFromBuffer(SkReadBuffer&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkPicture.cpp:213:40
+    #9 0x130b8ec in (anonymous namespace)::SkPictureImageFilterImpl::CreateProc(SkReadBuffer&) /src/skia/out/Fuzz_mem_constraints/../../src/effects/imagefilters/SkPictureImageFilter.cpp:86:19
+    #10 0xa9da5d in SkReadBuffer::readFlattenable(SkFlattenable::Type) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkReadBuffer.cpp:433:15
+    #11 0x976825 in SkFlattenable::Deserialize(SkFlattenable::Type, void const*, unsigned long, SkDeserialProcs const*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkFlattenable.cpp:144:40
+    #12 0x8a9961 in SkImageFilter::Deserialize(void const*, unsigned long, SkDeserialProcs const*) /src/skia/out/Fuzz_mem_constraints/../../include/core/SkImageFilter.h:149:17
+    #13 0x8a9663 in FuzzImageFilterDeserialize(sk_sp<SkData>) /src/skia/out/Fuzz_mem_constraints/../../fuzz/oss_fuzz/FuzzImageFilterDeserialize.cpp:24:24
+    #14 0x8a9c31 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz_mem_constraints/../../fuzz/oss_fuzz/FuzzImageFilterDeserialize.cpp:46:5
+    #15 0x7c61b1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #16 0x7b0ff1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #17 0x7b6cae in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #18 0x7dfe62 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #19 0x7fd21624782f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #20 0x78a858 in _start (/out/image_filter_deserialize_width+0x78a858)
+
+DEDUP_TOKEN: SkReader32::readInt()--SkReader32::readString(unsigned long*)--SkVertices::Decode(void const*, unsigned long)
+[1m[32m0x603000000390 is located 0 bytes to the right of 32-byte region [0x603000000370,0x603000000390)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x877c7d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0xc553a8 in sk_malloc_flags(unsigned long, unsigned int) /src/skia/out/Fuzz_mem_constraints/../../src/ports/SkMemory_malloc.cpp:71:13
+    #2 0xa8f532 in SkAutoMalloc::SkAutoMalloc(unsigned long) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkAutoMalloc.h:26:23
+    #3 0xa9c6c5 in SkReadBuffer::readByteArrayAsData() /src/skia/out/Fuzz_mem_constraints/../../src/core/SkReadBuffer.cpp:270:18
+    #4 0x1273fcc in create_vertices_from_buffer(SkReadBuffer&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkPictureData.cpp:378:24
+    #5 0x1273ddc in bool new_array_from_buffer<SkVertices const, SkVertices>(SkReadBuffer&, unsigned int, SkTArray<sk_sp<SkVertices const>, false>&, sk_sp<SkVertices> (*)(SkReadBuffer&)) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkPictureData.cpp:398:20
+    #6 0x127370e in SkPictureData::parseBufferTag(SkReadBuffer&, unsigned int, unsigned int) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkPictureData.cpp:443:13
+    #7 0x1274f7a in SkPictureData::parseBuffer(SkReadBuffer&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkPictureData.cpp:525:15
+    #8 0x1274e73 in SkPictureData::CreateFromBuffer(SkReadBuffer&, SkPictInfo const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkPictureData.cpp:494:16
+    #9 0x126d38d in SkPicturePriv::MakeFromBuffer(SkReadBuffer&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkPicture.cpp:213:40
+    #10 0x130b8ec in (anonymous namespace)::SkPictureImageFilterImpl::CreateProc(SkReadBuffer&) /src/skia/out/Fuzz_mem_constraints/../../src/effects/imagefilters/SkPictureImageFilter.cpp:86:19
+    #11 0xa9da5d in SkReadBuffer::readFlattenable(SkFlattenable::Type) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkReadBuffer.cpp:433:15
+    #12 0x976825 in SkFlattenable::Deserialize(SkFlattenable::Type, void const*, unsigned long, SkDeserialProcs const*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkFlattenable.cpp:144:40
+    #13 0x8a9961 in SkImageFilter::Deserialize(void const*, unsigned long, SkDeserialProcs const*) /src/skia/out/Fuzz_mem_constraints/../../include/core/SkImageFilter.h:149:17
+    #14 0x8a9663 in FuzzImageFilterDeserialize(sk_sp<SkData>) /src/skia/out/Fuzz_mem_constraints/../../fuzz/oss_fuzz/FuzzImageFilterDeserialize.cpp:24:24
+    #15 0x8a9c31 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz_mem_constraints/../../fuzz/oss_fuzz/FuzzImageFilterDeserialize.cpp:46:5
+    #16 0x7c61b1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #17 0x7b0ff1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #18 0x7b6cae in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #19 0x7dfe62 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #20 0x7fd21624782f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: malloc--sk_malloc_flags(unsigned long, unsigned int)--SkAutoMalloc::SkAutoMalloc(unsigned long)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/skia/out/Fuzz_mem_constraints/../../src/core/SkReader32.h:58:25 in SkReader32::readInt()
+Shadow bytes around the buggy address:
+  0x0c067fff8020: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m06[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m07[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff8030: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m07[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c067fff8040: [1m[0m06[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff8050: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff8060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c067fff8070: [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff8080: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff8090: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff80a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff80b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff80c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42484336

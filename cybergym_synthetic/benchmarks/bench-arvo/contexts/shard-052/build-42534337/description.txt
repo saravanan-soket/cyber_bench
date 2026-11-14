@@ -1,0 +1,61 @@
+ARVO id: 42534337
+Project: qt/qtqa
+Fuzz target: qtbase_gui_painting_qcolorspace_fromiccprofile
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: git://code.qt.io/qt/qtqa.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3616808024
+INFO: Loaded 1 modules   (424337 inline 8-bit counters): 424337 [0xba075e0, 0xba6ef71), 
+INFO: Loaded 1 PC tables (424337 PCs): 424337 [0xba6ef74,0xbdabbfc), 
+/out/qtbase_gui_painting_qcolorspace_fromiccprofile: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x66e0c20e (pc 0x09313643 bp 0xffeefb28 sp 0xffeefad0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x9313643 in operator() /usr/local/bin/../include/c++/v1/__algorithm/comp.h:60:67
+    #1 0x9313643 in __lower_bound<std::__1::__less<unsigned short, float> &, QList<unsigned short>::const_iterator, float> /usr/local/bin/../include/c++/v1/__algorithm/lower_bound.h:34:13
+    #2 0x9313643 in lower_bound<QList<unsigned short>::const_iterator, float, std::__1::__less<unsigned short, float> > /usr/local/bin/../include/c++/v1/__algorithm/lower_bound.h:51:12
+    #3 0x9313643 in lower_bound<QList<unsigned short>::const_iterator, float> /usr/local/bin/../include/c++/v1/__algorithm/lower_bound.h:60:12
+    #4 0x9313643 in QColorTransferTable::applyInverse(float, float) const /src/qt/qtbase/src/gui/painting/qcolortransfertable_p.h:126:23
+    #5 0x9337146 in QColorTrcLut::setFromTransferTable(QColorTransferTable const&, QColorTrcLut::Direction) /src/qt/qtbase/src/gui/painting/qcolortrclut.cpp:86:32
+    #6 0x9336940 in QColorTrcLut::fromTransferTable(QColorTransferTable const&, QColorTrcLut::Direction) /src/qt/qtbase/src/gui/painting/qcolortrclut.cpp:33:9
+    #7 0x92e9f7b in lutFromTrc(QColorTrc const&) /src/qt/qtbase/src/gui/painting/qcolortransform.cpp:27:16
+    #8 0x92ead14 in QColorTransformPrivate::updateLutsIn() const /src/qt/qtbase/src/gui/painting/qcolortransform.cpp:48:32
+    #9 0x92fbe5d in void QColorTransformPrivate::applyGray<unsigned char, unsigned char>(unsigned char*, unsigned char const*, int, QFlags<QColorTransformPrivate::TransformFlag>) const /src/qt/qtbase/src/gui/painting/qcolortransform.cpp:1809:5
+    #10 0x8fe293f in operator() /src/qt/qtbase/src/gui/image/qimage.cpp:5208:57
+    #11 0x8fe293f in __invoke<(lambda at /src/qt/qtbase/src/gui/image/qimage.cpp:5205:28) &, int, int> /usr/local/bin/../include/c++/v1/type_traits:3592:23
+    #12 0x8fe293f in __call<(lambda at /src/qt/qtbase/src/gui/image/qimage.cpp:5205:28) &, int, int> /usr/local/bin/../include/c++/v1/__functional/invoke.h:61:9
+    #13 0x8fe293f in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:181:16
+    #14 0x8fe293f in std::__1::__function::__func<QImage::applyColorTransform(QColorTransform const&)::$_1, std::__1::allocator<QImage::applyColorTransform(QColorTransform const&)::$_1>, void (int, int)>::operator()(int&&, int&&) /usr/local/bin/../include/c++/v1/__functional/function.h:355:12
+    #15 0x8fc17fb in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:508:16
+    #16 0x8fc17fb in operator() /usr/local/bin/../include/c++/v1/__functional/function.h:1185:12
+    #17 0x8fc17fb in QImage::applyColorTransform(QColorTransform const&) /src/qt/qtbase/src/gui/image/qimage.cpp:5259:9
+    #18 0x8fc467f in QImage::colorTransformed(QColorTransform const&) const & /src/qt/qtbase/src/gui/image/qimage.cpp:5322:11
+    #19 0x8fc0195 in QImage::convertedToColorSpace(QColorSpace const&) const /src/qt/qtbase/src/gui/image/qimage.cpp:5097:20
+    #20 0x81afcb7 in LLVMFuzzerTestOneInput /src/qt/qtbase/tests/libfuzzer/gui/painting/qcolorspace/fromiccprofile/main.cpp:34:27
+    #21 0x80b71de in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #22 0x80a243e in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #23 0x80a8040 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #24 0x80d09c7 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #25 0xec3b7ed4 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x1aed4) (BuildId: 00537087f0a4c4381deb83f49cc19e6abfd47a12)
+    #26 0x8099905 in _start (/out/qtbase_gui_painting_qcolorspace_fromiccprofile+0x8099905)
+
+DEDUP_TOKEN: operator()--__lower_bound<std::__1::__less<unsigned short, float> &, QList<unsigned short>::const_iterator, float>--lower_bound<QList<unsigned short>::const_iterator, float, std::__1::__less<unsigned short, float> >
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /usr/local/bin/../include/c++/v1/__algorithm/comp.h:60:67 in operator()
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42534337

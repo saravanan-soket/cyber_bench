@@ -1,0 +1,89 @@
+ARVO id: 42539211
+Project: imagemagick
+Fuzz target: encoder_heic_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Global-buffer-overflow READ 4
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/encoder_heic_fuzzer < INPUT_FILE
+or
+  /out/encoder_heic_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/encoder_heic_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 6962 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: global-buffer-overflow on address 0x0000015388fc at pc 0x000000bba8be bp 0x7ffc19633fd0 sp 0x7ffc19633fc8
+[1m[0m[1m[34mREAD of size 4 at 0x0000015388fc thread T0[1m[0m
+SCARINESS: 17 (4-byte-read-global-buffer-overflow)
+    #0 0xbba8bd in void scale_coefficients_internal<unsigned char>(thread_context*, int, int, int, int, int, int, bool, bool, int) /src/libde265/libde265/transform.cc
+    #1 0xba1a68 in decode_TU(thread_context*, int, int, int, int, int, int, PredMode, bool) /src/libde265/libde265/slice.cc
+    #2 0xba0990 in read_transform_unit(thread_context*, int, int, int, int, int, int, int, int, int, int, int, int) /src/libde265/libde265/slice.cc:3665:3
+    #3 0xba2408 in read_transform_tree(thread_context*, int, int, int, int, int, int, int, int, int, int, int, PredMode, unsigned char, unsigned char) /src/libde265/libde265/slice.cc:3963:5
+    #4 0xba4b45 in read_coding_unit(thread_context*, int, int, int, int) /src/libde265/libde265/slice.cc:4570:9
+    #5 0xba5f23 in decode_substream(thread_context*, bool, bool) /src/libde265/libde265/slice.cc:4736:5
+    #6 0xba7a39 in read_slice_segment_data(thread_context*) /src/libde265/libde265/slice.cc:5049:14
+    #7 0xb4d91e in decoder_context::decode_slice_unit_sequential(image_unit*, slice_unit*) /src/libde265/libde265/decctx.cc:843:7
+    #8 0xb4cd73 in decoder_context::decode_slice_unit_parallel(image_unit*, slice_unit*) /src/libde265/libde265/decctx.cc:945:11
+    #9 0xb4c51f in decoder_context::decode_some(bool*) /src/libde265/libde265/decctx.cc:730:13
+    #10 0xb4aaec in decoder_context::read_slice_NAL(bitreader&, NAL_unit*, nal_header&) /src/libde265/libde265/decctx.cc:688:9
+    #11 0xb4f4b2 in decoder_context::decode_NAL(NAL_unit*) /src/libde265/libde265/decctx.cc:1230:11
+    #12 0xb4f96c in decoder_context::decode(int*) /src/libde265/libde265/decctx.cc:1318:16
+    #13 0xa04509 in decodeH265Image /src/imagemagick/coders/heic.c:933:11
+    #14 0xa026b0 in ReadHEICImage /src/imagemagick/coders/heic.c:1176:9
+    #15 0x63f706 in ReadImage /src/imagemagick/MagickCore/constitute.c:500:13
+    #16 0x5e113f in BlobToImage /src/imagemagick/MagickCore/blob.c:469:13
+    #17 0x534394 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4015:12
+    #18 0x52a89b in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #19 0x52af9f in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:290:5
+    #20 0x52b53f in main /src/libfuzzer/afl/afl_driver.cpp:327:12
+    #21 0x7f6356c9d82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #22 0x41f8b8 in _start (/out/encoder_heic_fuzzer+0x41f8b8)
+
+DEDUP_TOKEN: void scale_coefficients_internal<unsigned char>(thread_context*, int, int, int, int, int, int, bool, bool, int)--decode_TU(thread_context*, int, int, int, int, int, int, PredMode, bool)--read_transform_unit(thread_context*, int, int, int, int, int, int, int, int, int, int, int, int)
+[1m[32m0x0000015388fc is located 4 bytes to the left of global variable 'levelScale' defined in 'transform.cc:349:18' (0x1538900) of size 24
+[1m[0m[1m[32m0x0000015388fc is located 48 bytes to the right of global variable 'g_quantScales' defined in 'transform.cc:652:23' (0x15388c0) of size 12
+[1m[0mSUMMARY: AddressSanitizer: global-buffer-overflow /src/libde265/libde265/transform.cc in void scale_coefficients_internal<unsigned char>(thread_context*, int, int, int, int, int, int, bool, bool, int)
+Shadow bytes around the buggy address:
+  0x00008029f0c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x00008029f0d0: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x00008029f0e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x00008029f0f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m06[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x00008029f100: [1m[0m00[1m[0m [1m[0m05[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x00008029f110: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m02[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m[[1m[31mf9[1m[0m]
+  0x00008029f120: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m05[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x00008029f130: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x00008029f140: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m01[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x00008029f150: [1m[0m06[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m02[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x00008029f160: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m05[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42539211

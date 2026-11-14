@@ -1,0 +1,123 @@
+ARVO id: 42482031
+Project: libvips
+Fuzz target: jpegsave_file_fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-use-after-free READ 2
+Language: c++
+Repo: https://github.com/libvips/libvips
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/jpegsave_file_fuzzer[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-use-after-free on address 0x602000017590 at pc 0x00000043d3ed bp 0x7fffeadf8910 sp 0x7fffeadf8098
+[1m[0m[1m[34mREAD of size 2 at 0x602000017590 thread T3 (worker)[1m[0m
+SCARINESS: 42 (2-byte-read-heap-use-after-free)
+    #0 0x43d3ec in printf_common(void*, char const*, __va_list_tag*) /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors_format.inc:547:9
+    #1 0x778cbf in vips_buf_vappendf /src/libvips/libvips/iofuncs/buf.c:418:9
+    #2 0x4d058d in vips_verror /src/libvips/libvips/iofuncs/error.c:250:3
+    #3 0x4d09ec in vips_error /src/libvips/libvips/iofuncs/error.c:275:2
+    #4 0x6e5866 in vips_foreign_load_matrix_load /src/libvips/libvips/foreign/matrixload.c:240:5
+    #5 0x6d5fb0 in vips_foreign_load_start /src/libvips/libvips/foreign/foreign.c:941:7
+    #6 0x4faf88 in vips__region_start /src/libvips/libvips/iofuncs/region.c:235:31
+    #7 0x503c1f in vips_region_generate /src/libvips/libvips/iofuncs/region.c:1587:13
+    #8 0x4fdf66 in vips_region_fill /src/libvips/libvips/iofuncs/region.c:879:7
+    #9 0x503943 in vips_region_prepare /src/libvips/libvips/iofuncs/region.c:1662:7
+    #10 0x62525a in vips_copy_gen /src/libvips/libvips/conversion/copy.c:139:6
+    #11 0x503d1b in vips_region_generate /src/libvips/libvips/iofuncs/region.c:1593:6
+    #12 0x4fdf66 in vips_region_fill /src/libvips/libvips/iofuncs/region.c:879:7
+    #13 0x503943 in vips_region_prepare /src/libvips/libvips/iofuncs/region.c:1662:7
+    #14 0x619e0e in vips_cast_gen /src/libvips/libvips/conversion/cast.c:347:6
+    #15 0x503d1b in vips_region_generate /src/libvips/libvips/iofuncs/region.c:1593:6
+    #16 0x4fdf66 in vips_region_fill /src/libvips/libvips/iofuncs/region.c:879:7
+    #17 0x503943 in vips_region_prepare /src/libvips/libvips/iofuncs/region.c:1662:7
+    #18 0x62525a in vips_copy_gen /src/libvips/libvips/conversion/copy.c:139:6
+    #19 0x503d1b in vips_region_generate /src/libvips/libvips/iofuncs/region.c:1593:6
+    #20 0x504c3c in vips_region_prepare_to_generate /src/libvips/libvips/iofuncs/region.c:1719:6
+    #21 0x5046fc in vips_region_prepare_to /src/libvips/libvips/iofuncs/region.c:1836:7
+    #22 0x515583 in wbuffer_work_fn /src/libvips/libvips/iofuncs/sinkdisc.c:425:11
+    #23 0x525a41 in vips_thread_work_unit /src/libvips/libvips/iofuncs/threadpool.c:662:6
+    #24 0x525392 in vips_thread_main_loop /src/libvips/libvips/iofuncs/threadpool.c:685:3
+    #25 0x5237be in vips_thread_run /src/libvips/libvips/iofuncs/threadpool.c:210:11
+    #26 0xe5a4ce in g_thread_proxy (/out/jpegsave_file_fuzzer+0xe5a4ce)
+    #27 0x7ffff78b86b9 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x76b9)
+    #28 0x7ffff6fcc41c in clone (/lib/x86_64-linux-gnu/libc.so.6+0x10741c)
+
+DEDUP_TOKEN: printf_common(void*, char const*, __va_list_tag*)--vips_buf_vappendf--vips_verror
+[1m[32m0x602000017590 is located 0 bytes inside of 16-byte region [0x602000017590,0x6020000175a0)
+[1m[0m[1m[35mfreed by thread T3 (worker) here:[1m[0m
+    #0 0x4970ad in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:123:3
+    #1 0x6e582a in vips_foreign_load_matrix_load /src/libvips/libvips/foreign/matrixload.c:239:5
+    #2 0x6d5fb0 in vips_foreign_load_start /src/libvips/libvips/foreign/foreign.c:941:7
+    #3 0x4faf88 in vips__region_start /src/libvips/libvips/iofuncs/region.c:235:31
+    #4 0x503c1f in vips_region_generate /src/libvips/libvips/iofuncs/region.c:1587:13
+    #5 0x4fdf66 in vips_region_fill /src/libvips/libvips/iofuncs/region.c:879:7
+    #6 0x503943 in vips_region_prepare /src/libvips/libvips/iofuncs/region.c:1662:7
+    #7 0x62525a in vips_copy_gen /src/libvips/libvips/conversion/copy.c:139:6
+    #8 0x503d1b in vips_region_generate /src/libvips/libvips/iofuncs/region.c:1593:6
+    #9 0x4fdf66 in vips_region_fill /src/libvips/libvips/iofuncs/region.c:879:7
+    #10 0x503943 in vips_region_prepare /src/libvips/libvips/iofuncs/region.c:1662:7
+    #11 0x619e0e in vips_cast_gen /src/libvips/libvips/conversion/cast.c:347:6
+    #12 0x503d1b in vips_region_generate /src/libvips/libvips/iofuncs/region.c:1593:6
+    #13 0x4fdf66 in vips_region_fill /src/libvips/libvips/iofuncs/region.c:879:7
+    #14 0x503943 in vips_region_prepare /src/libvips/libvips/iofuncs/region.c:1662:7
+    #15 0x62525a in vips_copy_gen /src/libvips/libvips/conversion/copy.c:139:6
+    #16 0x503d1b in vips_region_generate /src/libvips/libvips/iofuncs/region.c:1593:6
+    #17 0x504c3c in vips_region_prepare_to_generate /src/libvips/libvips/iofuncs/region.c:1719:6
+    #18 0x5046fc in vips_region_prepare_to /src/libvips/libvips/iofuncs/region.c:1836:7
+    #19 0x515583 in wbuffer_work_fn /src/libvips/libvips/iofuncs/sinkdisc.c:425:11
+    #20 0x525a41 in vips_thread_work_unit /src/libvips/libvips/iofuncs/threadpool.c:662:6
+    #21 0x525392 in vips_thread_main_loop /src/libvips/libvips/iofuncs/threadpool.c:685:3
+    #22 0x5237be in vips_thread_run /src/libvips/libvips/iofuncs/threadpool.c:210:11
+    #23 0xe5a4ce in g_thread_proxy (/out/jpegsave_file_fuzzer+0xe5a4ce)
+
+DEDUP_TOKEN: free--vips_foreign_load_matrix_load--vips_foreign_load_start
+[1m[35mpreviously allocated by thread T3 (worker) here:[1m[0m
+    #0 0x497649 in realloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:164:3
+    #1 0xe3ec97 in g_realloc (/out/jpegsave_file_fuzzer+0xe3ec97)
+
+DEDUP_TOKEN: realloc--g_realloc
+Thread T3 (worker) created by T0 here:
+    #0 0x4819ea in pthread_create /src/llvm-project/compiler-rt/lib/asan/asan_interceptors.cpp:214:3
+    #1 0xe70f76 in g_system_thread_new (/out/jpegsave_file_fuzzer+0xe70f76)
+
+DEDUP_TOKEN: pthread_create--g_system_thread_new
+SUMMARY: AddressSanitizer: heap-use-after-free /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors_format.inc:547:9 in printf_common(void*, char const*, __va_list_tag*)
+Shadow bytes around the buggy address:
+  0x0c047fffae60: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m03[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fffae70: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m07[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fffae80: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fffae90: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m06[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m
+  0x0c047fffaea0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+=>0x0c047fffaeb0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[35mfd[1m[0m][1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fffaec0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fffaed0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fffaee0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fffaef0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fffaf00: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42482031

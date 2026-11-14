@@ -1,0 +1,65 @@
+ARVO id: 42488761
+Project: imagemagick
+Fuzz target: ping_mvg_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 2142535936
+INFO: Loaded 1 modules   (188990 inline 8-bit counters): 188990 [0x2c89770, 0x2cb79ae), 
+INFO: Loaded 1 PC tables (188990 PCs): 188990 [0x2cb79b0,0x2f99d90), 
+/out/ping_mvg_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m[1m[31mUninitialized bytes in [1m[32m__interceptor_strlen[1m[31m at offset 0 inside [0x724000000000, 1)[1m[0m
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0xfdce85 in sixel_decode /src/imagemagick/coders/sixel.c:253:12
+    #1 0xfe33d5 in ReadSIXELImage /src/imagemagick/coders/sixel.c:1059:7
+    #2 0x7aa025 in ReadImage /src/imagemagick/MagickCore/constitute.c:553:15
+    #3 0x82ceab in DrawPrimitive /src/imagemagick/MagickCore/draw.c:5477:30
+    #4 0x8215fb in RenderMVGContent /src/imagemagick/MagickCore/draw.c:4430:17
+    #5 0x810064 in DrawImage /src/imagemagick/MagickCore/draw.c:4471:10
+    #6 0xe84d3a in ReadMVGImage /src/imagemagick/coders/mvg.c:239:10
+    #7 0x7aa025 in ReadImage /src/imagemagick/MagickCore/constitute.c:553:15
+    #8 0xbd5e42 in ReadStream /src/imagemagick/MagickCore/stream.c:1043:9
+    #9 0x6eb6f1 in PingBlob /src/imagemagick/MagickCore/blob.c:3649:13
+    #10 0x568792 in Magick::Image::ping(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:3860:12
+    #11 0x526779 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/ping_fuzzer.cc:43:11
+    #12 0x45e311 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #13 0x449a82 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #14 0x44faae in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #15 0x4773c2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #16 0x7f588b71883f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #17 0x424088 in _start (/out/ping_mvg_fuzzer+0x424088)
+
+DEDUP_TOKEN: sixel_decode--ReadSIXELImage--ReadImage
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x4d70dd in malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:901:3
+    #1 0x9ae1c1 in AcquireMagickMemory /src/imagemagick/MagickCore/memory.c:527:10
+    #2 0x9ae59e in AcquireQuantumMemory /src/imagemagick/MagickCore/memory.c:641:10
+    #3 0xfe2d11 in ReadSIXELImage /src/imagemagick/coders/sixel.c:1032:25
+    #4 0x7aa025 in ReadImage /src/imagemagick/MagickCore/constitute.c:553:15
+    #5 0x82ceab in DrawPrimitive /src/imagemagick/MagickCore/draw.c:5477:30
+    #6 0x8215fb in RenderMVGContent /src/imagemagick/MagickCore/draw.c:4430:17
+    #7 0x810064 in DrawImage /src/imagemagick/MagickCore/draw.c:4471:10
+    #8 0xe84d3a in ReadMVGImage /src/imagemagick/coders/mvg.c:239:10
+    #9 0x7aa025 in ReadImage /src/imagemagick/MagickCore/constitute.c:553:15
+    #10 0xbd5e42 in ReadStream /src/imagemagick/MagickCore/stream.c:1043:9
+    #11 0x6eb6f1 in PingBlob /src/imagemagick/MagickCore/blob.c:3649:13
+    #12 0x568792 in Magick::Image::ping(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:3860:12
+    #13 0x526779 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/ping_fuzzer.cc:43:11
+    #14 0x45e311 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #15 0x449a82 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #16 0x44faae in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #17 0x4773c2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #18 0x7f588b71883f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: malloc--AcquireMagickMemory--AcquireQuantumMemory
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/imagemagick/coders/sixel.c:253:12 in sixel_decode
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42488761

@@ -1,0 +1,97 @@
+ARVO id: 42483586
+Project: rdkit
+Fuzz target: smiles_string_to_mol_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Container-overflow READ 8
+Language: c++
+Repo: https://github.com/rdkit/rdkit.git
+
+=== Crash report ===
+INFO: Seed: 382906608
+INFO: Loaded 1 modules   (46664 inline 8-bit counters): 46664 [0xd0ec40, 0xd1a288), 
+INFO: Loaded 1 PC tables (46664 PCs): 46664 [0xd1a288,0xdd0708), 
+/out/smiles_string_to_mol_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: container-overflow on address 0x602000000110 at pc 0x000000670184 bp 0x7fffffffd5f0 sp 0x7fffffffd5e8
+[1m[0m[1m[34mREAD of size 8 at 0x602000000110 thread T0[1m[0m
+SCARINESS: 23 (8-byte-read-container-overflow)
+    #0 0x670183 in yysmiles_parse(char const*, std::__1::vector<RDKit::RWMol*, std::__1::allocator<RDKit::RWMol*> >*, RDKit::Atom*&, RDKit::Bond*&, std::__1::list<unsigned int, std::__1::allocator<unsigned int> >*, void*, int&) /src/rdkit/build/Code/GraphMol/SmilesParse/smiles.yy:305:15
+    #1 0x5aef41 in RDKit::(anonymous namespace)::smiles_parse_helper(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::vector<RDKit::RWMol*, std::__1::allocator<RDKit::RWMol*> >&, RDKit::Atom*&, RDKit::Bond*&, int) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.cpp:112:11
+    #2 0x5a2cde in RDKit::(anonymous namespace)::smiles_parse(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::vector<RDKit::RWMol*, std::__1::allocator<RDKit::RWMol*> >&) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.cpp:149:10
+    #3 0x59b38e in RDKit::toMol(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, int (*)(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::vector<RDKit::RWMol*, std::__1::allocator<RDKit::RWMol*> >&), std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.cpp:215:5
+    #4 0x59f838 in RDKit::SmilesToMol(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, RDKit::SmilesParserParams const&) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.cpp:363:9
+    #5 0x59a87e in SmilesToMol /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.h:79:10
+    #6 0x59a87e in LLVMFuzzerTestOneInput /src/rdkit/Code/Fuzz/smiles_string_to_mol_fuzzer.cc:30:9
+    #7 0x4a23d1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #8 0x48d732 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #9 0x4937c7 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:776:9
+    #10 0x4bbe12 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #11 0x7ffff6ccb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x467d48 in _start (/out/smiles_string_to_mol_fuzzer+0x467d48)
+
+DEDUP_TOKEN: yysmiles_parse(char const*, std::__1::vector<RDKit::RWMol*, std::__1::allocator<RDKit::RWMol*> >*, RDKit::Atom*&, RDKit::Bond*&, std::__1::list<unsigned int, std::__1::allocator<unsigned int> >*, void*, int&)--RDKit::(anonymous namespace)::smiles_parse_helper(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::vector<RDKit::RWMol*, std::__1::allocator<RDKit::RWMol*> >&, RDKit::Atom*&, RDKit::Bond*&, int)--RDKit::(anonymous namespace)::smiles_parse(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::vector<RDKit::RWMol*, std::__1::allocator<RDKit::RWMol*> >&)
+[1m[32m0x602000000110 is located 0 bytes inside of 8-byte region [0x602000000110,0x602000000118)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x59765d in operator new(unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:99:3
+    #1 0x666fd5 in __libcpp_allocate /usr/local/bin/../include/c++/v1/new:253:10
+    #2 0x666fd5 in allocate /usr/local/bin/../include/c++/v1/memory:1908:34
+    #3 0x666fd5 in allocate /usr/local/bin/../include/c++/v1/memory:1599:21
+    #4 0x666fd5 in __split_buffer /usr/local/bin/../include/c++/v1/__split_buffer:318:29
+    #5 0x666fd5 in std::__1::vector<RDKit::RWMol*, std::__1::allocator<RDKit::RWMol*> >::__append(unsigned long) /usr/local/bin/../include/c++/v1/vector:1094:53
+    #6 0x66ba84 in resize /usr/local/bin/../include/c++/v1/vector:2024:15
+    #7 0x66ba84 in yysmiles_parse(char const*, std::__1::vector<RDKit::RWMol*, std::__1::allocator<RDKit::RWMol*> >*, RDKit::Atom*&, RDKit::Bond*&, std::__1::list<unsigned int, std::__1::allocator<unsigned int> >*, void*, int&) /src/rdkit/build/Code/GraphMol/SmilesParse/smiles.yy:157:12
+    #8 0x5aef41 in RDKit::(anonymous namespace)::smiles_parse_helper(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::vector<RDKit::RWMol*, std::__1::allocator<RDKit::RWMol*> >&, RDKit::Atom*&, RDKit::Bond*&, int) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.cpp:112:11
+    #9 0x5a2cde in RDKit::(anonymous namespace)::smiles_parse(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::vector<RDKit::RWMol*, std::__1::allocator<RDKit::RWMol*> >&) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.cpp:149:10
+    #10 0x59b38e in RDKit::toMol(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, int (*)(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::vector<RDKit::RWMol*, std::__1::allocator<RDKit::RWMol*> >&), std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.cpp:215:5
+    #11 0x59f838 in RDKit::SmilesToMol(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, RDKit::SmilesParserParams const&) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.cpp:363:9
+    #12 0x59a87e in SmilesToMol /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.h:79:10
+    #13 0x59a87e in LLVMFuzzerTestOneInput /src/rdkit/Code/Fuzz/smiles_string_to_mol_fuzzer.cc:30:9
+    #14 0x4a23d1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #15 0x48d732 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #16 0x4937c7 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:776:9
+    #17 0x4bbe12 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #18 0x7ffff6ccb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: operator new(unsigned long)--__libcpp_allocate--allocate
+HINT: if you don't care about these errors you may set ASAN_OPTIONS=detect_container_overflow=0.
+If you suspect a false positive see also: https://github.com/google/sanitizers/wiki/AddressSanitizerContainerOverflow.
+SUMMARY: AddressSanitizer: container-overflow /src/rdkit/build/Code/GraphMol/SmilesParse/smiles.yy:305:15 in yysmiles_parse(char const*, std::__1::vector<RDKit::RWMol*, std::__1::allocator<RDKit::RWMol*> >*, RDKit::Atom*&, RDKit::Bond*&, std::__1::list<unsigned int, std::__1::allocator<unsigned int> >*, void*, int&)
+Shadow bytes around the buggy address:
+  0x0c047fff7fd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff7fe0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff7ff0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff8000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8010: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m03[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m03[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+=>0x0c047fff8020: [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[34mfc[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8030: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8040: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8050: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8070: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42483586

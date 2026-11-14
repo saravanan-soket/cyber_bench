@@ -1,0 +1,48 @@
+ARVO id: 42509565
+Project: elfutils
+Fuzz target: fuzz-libdwfl
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: git://sourceware.org/git/elfutils.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3533708226
+INFO: Loaded 1 modules   (14183 inline 8-bit counters): 14183 [0x7b616b, 0x7b98d2), 
+INFO: Loaded 1 PC tables (14183 PCs): 14183 [0x7228f0,0x759f60), 
+/out/fuzz-libdwfl: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x55eeb6 in zlib_fail /src/elfutils/libdwfl/gzip.c:132:3
+    #1 0x55eeb6 in __libdw_gunzip /src/elfutils/libdwfl/gzip.c:387:11
+    #2 0x540817 in decompress /src/elfutils/libdwfl/open.c:66:11
+    #3 0x5400d7 in what_kind /src/elfutils/libdwfl/open.c:114:12
+    #4 0x5400d7 in libdw_open_elf /src/elfutils/libdwfl/open.c:134:22
+    #5 0x53f505 in __libdw_open_file /src/elfutils/libdwfl/open.c:197:10
+    #6 0x52cea7 in __libdwfl_report_offline /src/elfutils/libdwfl/offline.c:281:22
+    #7 0x52cea7 in dwfl_report_offline /src/elfutils/libdwfl/offline.c:316:10
+    #8 0x52747b in LLVMFuzzerTestOneInput /src/fuzz-libdwfl.c:47:22
+    #9 0x4552f2 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #10 0x440ea2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #11 0x44670c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #12 0x46f0a2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7f1b62e9f082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #14 0x41f5ed in _start (/out/fuzz-libdwfl+0x41f5ed)
+
+DEDUP_TOKEN: zlib_fail--__libdw_gunzip--decompress
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mcode[1m[35m' in the stack frame of function '[1m[32m__libdw_gunzip[1m[35m'[1m[0m
+    #0 0x55cde0 in __libdw_gunzip /src/elfutils/libdwfl/gzip.c:184
+
+DEDUP_TOKEN: __libdw_gunzip
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/elfutils/libdwfl/gzip.c:132:3 in zlib_fail
+Unique heap origins: 39
+Stack depot allocated bytes: 1638400
+Unique origin histories: 5
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42509565

@@ -1,0 +1,52 @@
+ARVO id: 42522677
+Project: libdwarf
+Fuzz target: fuzz_srcfiles
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-double-free
+Language: c
+Repo: https://github.com/davea42/libdwarf-code
+
+=== Crash report ===
+Reading 45848 bytes from /tmp/poc
+
+libdwarf is unable to record error DW_DLE_LINE_NUMBER_HEADER_ERROR (235), a line number program header seems incomplete No error argument or handler available
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: attempting double-free on 0x615000000800 in thread T0:
+[1m[0mSCARINESS: 42 (double-free)
+    #0 0x49e622 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3
+    #1 0x55523e in _dwarf_read_line_table_header /src/libdwarf/src/lib/libdwarf/dwarf_line_table_reader_common.h
+    #2 0x54eb00 in dwarf_srcfiles /src/libdwarf/src/lib/libdwarf/dwarf_line.c:553:16
+    #3 0x4da28f in examplee /src/libdwarf/fuzz/fuzz_srcfiles.c:98:9
+    #4 0x4da28f in LLVMFuzzerTestOneInput /src/libdwarf/fuzz/fuzz_srcfiles.c:77:11
+    #5 0x4d9c9a in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+    #6 0x4d9a6c in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:318:12
+    #7 0x7f9b149fb082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #8 0x41d48d in _start (/out/fuzz_srcfiles+0x41d48d)
+
+DEDUP_TOKEN: free--_dwarf_read_line_table_header--dwarf_srcfiles
+[1m[32m0x615000000800 is located 0 bytes inside of 496-byte region [0x615000000800,0x6150000009f0)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x49e622 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3
+    #1 0x55521c in _dwarf_read_line_table_header /src/libdwarf/src/lib/libdwarf/dwarf_line_table_reader_common.h:990:21
+    #2 0x54eb00 in dwarf_srcfiles /src/libdwarf/src/lib/libdwarf/dwarf_line.c:553:16
+    #3 0x4da28f in examplee /src/libdwarf/fuzz/fuzz_srcfiles.c:98:9
+    #4 0x4da28f in LLVMFuzzerTestOneInput /src/libdwarf/fuzz/fuzz_srcfiles.c:77:11
+    #5 0x4d9c9a in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+
+DEDUP_TOKEN: free--_dwarf_read_line_table_header--dwarf_srcfiles
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x49e8c6 in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0x553db2 in _dwarf_read_line_table_header /src/libdwarf/src/lib/libdwarf/dwarf_line_table_reader_common.h:782:32
+    #2 0x54eb00 in dwarf_srcfiles /src/libdwarf/src/lib/libdwarf/dwarf_line.c:553:16
+    #3 0x4da28f in examplee /src/libdwarf/fuzz/fuzz_srcfiles.c:98:9
+    #4 0x4da28f in LLVMFuzzerTestOneInput /src/libdwarf/fuzz/fuzz_srcfiles.c:77:11
+    #5 0x4d9c9a in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+
+DEDUP_TOKEN: __interceptor_malloc--_dwarf_read_line_table_header--dwarf_srcfiles
+SUMMARY: AddressSanitizer: double-free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3 in free
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42522677

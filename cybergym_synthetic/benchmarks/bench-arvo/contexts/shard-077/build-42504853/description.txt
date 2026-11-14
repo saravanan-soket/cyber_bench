@@ -1,0 +1,82 @@
+ARVO id: 42504853
+Project: wolfssl
+Fuzz target: fuzzer-wolfssh-client-randomize
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/wolfssl/wolfssl
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2998932585
+INFO: Loaded 1 modules   (20506 inline 8-bit counters): 20506 [0xaa5e3f, 0xaaae59), 
+INFO: Loaded 1 PC tables (20506 PCs): 20506 [0x7efa10,0x83fbb0), 
+/out/fuzzer-wolfssh-client-randomize: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x6b6197 in fp_montgomery_setup /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/tfm.c:3263:7
+    #1 0x6b3be3 in _fp_exptmod_nct /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/tfm.c:2103:14
+    #2 0x6b36f6 in fp_exptmod_nct /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/tfm.c:2936:15
+    #3 0x6b96bf in mp_exptmod_nct /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/tfm.c:4283:10
+    #4 0x61936e in wc_RsaFunctionSync /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/rsa.c:2444:17
+    #5 0x618b55 in wc_RsaFunction /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/rsa.c:2849:15
+    #6 0x61b828 in RsaPrivateDecryptEx /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/rsa.c:3108:15
+    #7 0x61c9d8 in wc_RsaSSL_VerifyInline /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/rsa.c:3315:12
+    #8 0x659bdf in wc_SignatureVerifyHash /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/signature.c:225:24
+    #9 0x65a660 in wc_SignatureVerify /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/signature.c:328:19
+    #10 0x580894 in DoKexDhReply /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/internal.c:3311:31
+    #11 0x550640 in DoPacket /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/internal.c
+    #12 0x54abf6 in DoReceive /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/internal.c:6095:23
+    #13 0x53082e in wolfSSH_connect /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/ssh.c:733:21
+    #14 0x527d35 in LLVMFuzzerTestOneInput /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/wolfssh-fuzzers/client.c:35:17
+    #15 0x458393 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #16 0x443ad2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #17 0x4497ae in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #18 0x473292 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #19 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #20 0x41eba8 in _start (/out/fuzzer-wolfssh-client-randomize+0x41eba8)
+
+DEDUP_TOKEN: fp_montgomery_setup--_fp_exptmod_nct--fp_exptmod_nct
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x6b71c0 in fp_read_unsigned_bin /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/tfm.c:3631:14
+    #1 0x6b99b6 in mp_read_unsigned_bin /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/tfm.c:4323:10
+    #2 0x6726a9 in wc_RsaPublicKeyDecodeRaw /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/asn.c:4547:9
+    #3 0x57e34b in DoKexDhReply /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/internal.c:3125:23
+    #4 0x550640 in DoPacket /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/internal.c
+    #5 0x54abf6 in DoReceive /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/internal.c:6095:23
+    #6 0x53082e in wolfSSH_connect /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/ssh.c:733:21
+    #7 0x527d35 in LLVMFuzzerTestOneInput /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/wolfssh-fuzzers/client.c:35:17
+    #8 0x458393 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #9 0x443ad2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #10 0x4497ae in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #11 0x473292 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: fp_read_unsigned_bin--mp_read_unsigned_bin--wc_RsaPublicKeyDecodeRaw
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x4d438d in malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:901:3
+    #1 0x527141 in wolfCrypt_custom_malloc /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/include/fuzzers/shared.h:180:39
+    #2 0x65d849 in wolfSSL_Malloc /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/memory.c:135:15
+    #3 0x547700 in GrowBuffer /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/internal.c:1481:38
+    #4 0x54ba64 in GetInputData /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/internal.c:1728:13
+    #5 0x54a94d in DoReceive /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/internal.c:6027:32
+    #6 0x53082e in wolfSSH_connect /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/src/ssh.c:733:21
+    #7 0x527d35 in LLVMFuzzerTestOneInput /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssh/wolfssh-fuzzers/client.c:35:17
+    #8 0x458393 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #9 0x443ad2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #10 0x4497ae in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #11 0x473292 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: malloc--wolfCrypt_custom_malloc--wolfSSL_Malloc
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/wolf-ssl-ssh-fuzzers/oss-fuzz/projects/wolf-ssl-ssh/fuzzers/wolfssh/wolfssl/wolfcrypt/src/tfm.c:3263:7 in fp_montgomery_setup
+Unique heap origins: 52
+Stack depot allocated bytes: 5312
+Unique origin histories: 15
+History depot allocated bytes: 360
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42504853

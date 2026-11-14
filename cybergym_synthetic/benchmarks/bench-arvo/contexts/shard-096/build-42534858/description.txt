@@ -1,0 +1,78 @@
+ARVO id: 42534858
+Project: wabt
+Fuzz target: read_binary_interp_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/WebAssembly/wabt
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3679755625
+INFO: Loaded 1 modules   (18086 inline 8-bit counters): 18086 [0x562a42f9bb28, 0x562a42fa01ce), 
+INFO: Loaded 1 PC tables (18086 PCs): 18086 [0x562a42fa01d0,0x562a42fe6c30), 
+/out/read_binary_interp_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x562a42de897a in wabt::TypeChecker::PrintStackIfFailedV(wabt::Result, char const*, std::__1::vector<wabt::Type, std::__1::allocator<wabt::Type>> const&, bool) /src/wabt/src/type-checker.cc:402:3
+    #1 0x562a42dececb in void wabt::TypeChecker::PrintStackIfFailed<wabt::Type, wabt::Type>(wabt::Result, char const*, wabt::Type, wabt::Type) /src/wabt/include/wabt/type-checker.h:187:7
+    #2 0x562a42dec943 in wabt::TypeChecker::PopAndCheck2Types(wabt::Type, wabt::Type, char const*) /src/wabt/src/type-checker.cc:302:3
+    #3 0x562a42def140 in wabt::TypeChecker::CheckOpcode2(wabt::Opcode, wabt::Limits const*) /src/wabt/src/type-checker.cc:335:7
+    #4 0x562a42dc4771 in wabt::SharedValidator::OnCompare(wabt::Location const&, wabt::Opcode) /src/wabt/src/shared-validator.cc:752:26
+    #5 0x562a42bff708 in wabt::interp::(anonymous namespace)::BinaryReaderInterp::OnCompareExpr(wabt::Opcode) /src/wabt/src/interp/binary-reader-interp.cc:1193:3
+    #6 0x562a42d75cb1 in wabt::(anonymous namespace)::BinaryReader::ReadInstructions(unsigned long, char const*) /src/wabt/src/binary-reader.cc:1248:9
+    #7 0x562a42d49efa in ReadInitExpr /src/wabt/src/binary-reader.cc:568:3
+    #8 0x562a42d49efa in ReadGlobalSection /src/wabt/src/binary-reader.cc:2658:5
+    #9 0x562a42d49efa in ReadSections /src/wabt/src/binary-reader.cc:2935:26
+    #10 0x562a42d49efa in ReadModule /src/wabt/src/binary-reader.cc:3012:3
+    #11 0x562a42d49efa in wabt::ReadBinary(void const*, unsigned long, wabt::BinaryReaderDelegate*, wabt::ReadBinaryOptions const&) /src/wabt/src/binary-reader.cc:3029:17
+    #12 0x562a42be6c28 in wabt::interp::ReadBinaryInterp(std::__1::basic_string_view<char, std::__1::char_traits<char>>, void const*, unsigned long, wabt::ReadBinaryOptions const&, std::__1::vector<wabt::Error, std::__1::allocator<wabt::Error>>*, wabt::interp::ModuleDesc*) /src/wabt/src/interp/binary-reader-interp.cc:1604:10
+    #13 0x562a42bca1c3 in LLVMFuzzerTestOneInput /src/read_binary_interp_fuzzer.cc:39:3
+    #14 0x562a42ac53f0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #15 0x562a42aafb84 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #16 0x562a42ab561a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #17 0x562a42ae1a12 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7fa462659082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 87b331c034a6458c64ce09c03939e947212e18ce)
+    #19 0x562a42aa665d in _start (/out/read_binary_interp_fuzzer+0xc165d)
+
+DEDUP_TOKEN: wabt::TypeChecker::PrintStackIfFailedV(wabt::Result, char const*, std::__1::vector<wabt::Type, std::__1::allocator<wabt::Type>> const&, bool)--void wabt::TypeChecker::PrintStackIfFailed<wabt::Type, wabt::Type>(wabt::Result, char const*, wabt::Type, wabt::Type)--wabt::TypeChecker::PopAndCheck2Types(wabt::Type, wabt::Type, char const*)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x562a42de8973 in __get_pointer /usr/local/bin/../include/c++/v1/string:1869:17
+    #1 0x562a42de8973 in data /usr/local/bin/../include/c++/v1/string:1559:73
+    #2 0x562a42de8973 in c_str /usr/local/bin/../include/c++/v1/string:1557:55
+    #3 0x562a42de8973 in wabt::TypeChecker::PrintStackIfFailedV(wabt::Result, char const*, std::__1::vector<wabt::Type, std::__1::allocator<wabt::Type>> const&, bool) /src/wabt/src/type-checker.cc:402:28
+    #4 0x562a42dececb in void wabt::TypeChecker::PrintStackIfFailed<wabt::Type, wabt::Type>(wabt::Result, char const*, wabt::Type, wabt::Type) /src/wabt/include/wabt/type-checker.h:187:7
+    #5 0x562a42dec943 in wabt::TypeChecker::PopAndCheck2Types(wabt::Type, wabt::Type, char const*) /src/wabt/src/type-checker.cc:302:3
+    #6 0x562a42def140 in wabt::TypeChecker::CheckOpcode2(wabt::Opcode, wabt::Limits const*) /src/wabt/src/type-checker.cc:335:7
+    #7 0x562a42dc4771 in wabt::SharedValidator::OnCompare(wabt::Location const&, wabt::Opcode) /src/wabt/src/shared-validator.cc:752:26
+    #8 0x562a42bff708 in wabt::interp::(anonymous namespace)::BinaryReaderInterp::OnCompareExpr(wabt::Opcode) /src/wabt/src/interp/binary-reader-interp.cc:1193:3
+    #9 0x562a42d75cb1 in wabt::(anonymous namespace)::BinaryReader::ReadInstructions(unsigned long, char const*) /src/wabt/src/binary-reader.cc:1248:9
+    #10 0x562a42d49efa in ReadInitExpr /src/wabt/src/binary-reader.cc:568:3
+    #11 0x562a42d49efa in ReadGlobalSection /src/wabt/src/binary-reader.cc:2658:5
+    #12 0x562a42d49efa in ReadSections /src/wabt/src/binary-reader.cc:2935:26
+    #13 0x562a42d49efa in ReadModule /src/wabt/src/binary-reader.cc:3012:3
+    #14 0x562a42d49efa in wabt::ReadBinary(void const*, unsigned long, wabt::BinaryReaderDelegate*, wabt::ReadBinaryOptions const&) /src/wabt/src/binary-reader.cc:3029:17
+    #15 0x562a42be6c28 in wabt::interp::ReadBinaryInterp(std::__1::basic_string_view<char, std::__1::char_traits<char>>, void const*, unsigned long, wabt::ReadBinaryOptions const&, std::__1::vector<wabt::Error, std::__1::allocator<wabt::Error>>*, wabt::interp::ModuleDesc*) /src/wabt/src/interp/binary-reader-interp.cc:1604:10
+    #16 0x562a42bca1c3 in LLVMFuzzerTestOneInput /src/read_binary_interp_fuzzer.cc:39:3
+    #17 0x562a42ac53f0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #18 0x562a42aafb84 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #19 0x562a42ab561a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #20 0x562a42ae1a12 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #21 0x7fa462659082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 87b331c034a6458c64ce09c03939e947212e18ce)
+
+DEDUP_TOKEN: __get_pointer--data--c_str
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mmessage[1m[35m' in the stack frame[1m[0m
+    #0 0x562a42de80ec in wabt::TypeChecker::PrintStackIfFailedV(wabt::Result, char const*, std::__1::vector<wabt::Type, std::__1::allocator<wabt::Type>> const&, bool) /src/wabt/src/type-checker.cc:392:3
+
+DEDUP_TOKEN: wabt::TypeChecker::PrintStackIfFailedV(wabt::Result, char const*, std::__1::vector<wabt::Type, std::__1::allocator<wabt::Type>> const&, bool)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/wabt/src/type-checker.cc:402:3 in wabt::TypeChecker::PrintStackIfFailedV(wabt::Result, char const*, std::__1::vector<wabt::Type, std::__1::allocator<wabt::Type>> const&, bool)
+Unique heap origins: 114
+Stack depot allocated bytes: 9764880
+Unique origin histories: 13
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42534858

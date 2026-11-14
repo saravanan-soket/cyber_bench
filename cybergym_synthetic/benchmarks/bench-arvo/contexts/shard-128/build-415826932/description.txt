@@ -1,0 +1,43 @@
+ARVO id: 415826932
+Project: libheif
+Fuzz target: file_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/strukturag/libheif.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2934079106
+INFO: Loaded 1 modules   (57634 inline 8-bit counters): 57634 [0x5563bc921600, 0x5563bc92f722), 
+INFO: Loaded 1 PC tables (57634 PCs): 57634 [0x5563bc92f728,0x5563bca10948), 
+/out/file_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x5563f9caf011 (pc 0x7f98036388bb bp 0x7ffd8489dd90 sp 0x7ffd8489dbf8 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7f98036388bb  (/lib/x86_64-linux-gnu/libc.so.6+0x18b8bb) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #1 0x5563bc6b22dd in HeifPixelImage::overlay(std::__1::shared_ptr<HeifPixelImage>&, int, int) /src/libheif/libheif/pixelimage.cc:1223:9
+    #2 0x5563bc527e1f in ImageItem_Overlay::decode_overlay_image(heif_decoding_options const&) const /src/libheif/libheif/image-items/overlay.cc:352:16
+    #3 0x5563bc526c2c in ImageItem_Overlay::decode_compressed_image(heif_decoding_options const&, bool, unsigned int, unsigned int) const /src/libheif/libheif/image-items/overlay.cc:280:10
+    #4 0x5563bc4f328d in ImageItem::decode_image(heif_decoding_options const&, bool, unsigned int, unsigned int) const /src/libheif/libheif/image-items/image_item.cc:763:60
+    #5 0x5563bc674ff8 in HeifContext::decode_image(unsigned int, heif_colorspace, heif_chroma, heif_decoding_options const&, bool, unsigned int, unsigned int) const /src/libheif/libheif/context.cc:1063:34
+    #6 0x5563bc4bc4ef in heif_decode_image /src/libheif/libheif/api/libheif/heif.cc:1436:80
+    #7 0x5563bc4adef2 in TestDecodeImage(heif_context*, heif_image_handle const*, unsigned long) /src/libheif/fuzzing/file_fuzzer.cc:62:9
+    #8 0x5563bc4adb2b in LLVMFuzzerTestOneInput /src/libheif/fuzzing/file_fuzzer.cc:137:5
+    #9 0x5563bc40fe00 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #10 0x5563bc3fb075 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #11 0x5563bc400b0f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #12 0x5563bc42bdb2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7f98034d1082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #14 0x5563bc3f325d in _start (/out/file_fuzzer+0x29f25d)
+
+DEDUP_TOKEN: HeifPixelImage::overlay(std::__1::shared_ptr<HeifPixelImage>&, int, int)--ImageItem_Overlay::decode_overlay_image(heif_decoding_options const&) const
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x18b8bb) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/415826932

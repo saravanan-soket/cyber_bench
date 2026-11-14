@@ -1,0 +1,86 @@
+ARVO id: 42508563
+Project: gdal
+Fuzz target: gdal_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 341722023
+INFO: Loaded 1 modules   (314446 inline 8-bit counters): 314446 [0x5630b40, 0x567d78e), 
+INFO: Loaded 1 PC tables (314446 PCs): 314446 [0x567d790,0x5b49c70), 
+/out/gdal_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x60300000c86e at pc 0x0000006f8822 bp 0x7ffc250983d0 sp 0x7ffc250983c8
+[1m[0m[1m[34mREAD of size 1 at 0x60300000c86e thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x6f8821 in GRIB2Inventory2to7(signed char, DataSource&, int, unsigned int*, char**, inventoryType*, unsigned char, unsigned short, unsigned short, unsigned char) /src/gdal/gdal/frmts/grib/degrib/degrib/inventory.cpp:575:26
+    #1 0x6f4a80 in GRIB2Inventory /src/gdal/gdal/frmts/grib/degrib/degrib/inventory.cpp:1072:24
+    #2 0x63fcaf in gdal::grib::InventoryWrapper::InventoryWrapper(FileDataSource) /src/gdal/gdal/frmts/grib/./gribdataset.h:154:17
+    #3 0x63d78d in GRIBDataset::Open(GDALOpenInfo*) /src/gdal/gdal/frmts/grib/gribdataset.cpp:617:34
+    #4 0xc2ecbc in GDALOpenEx /src/gdal/gdal/gcore/gdaldataset.cpp:2825:20
+    #5 0x525dd9 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_fuzzer.cpp:114:24
+    #6 0x5490f0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:512:13
+    #7 0x527505 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #8 0x532d01 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:692:9
+    #9 0x526ba8 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #10 0x7fc682a6882f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #11 0x427a58 in _start (/out/gdal_fuzzer+0x427a58)
+
+DEDUP_TOKEN: GRIB2Inventory2to7(signed char, DataSource&, int, unsigned int*, char**, inventoryType*, unsigned char, unsigned short, unsigned short, unsigned char)--GRIB2Inventory--gdal::grib::InventoryWrapper::InventoryWrapper(FileDataSource)
+[1m[32m0x60300000c86e is located 9 bytes to the right of 21-byte region [0x60300000c850,0x60300000c865)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4eaa00 in realloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:107
+    #1 0x6f5d20 in GRIB2SectToBuffer(DataSource&, unsigned int, signed char*, unsigned int*, unsigned int*, char**) /src/gdal/gdal/frmts/grib/degrib/degrib/inventory.cpp:290:32
+    #2 0x6f4871 in GRIB2Inventory /src/gdal/gdal/frmts/grib/degrib/degrib/inventory.cpp:1047:14
+    #3 0x63fcaf in gdal::grib::InventoryWrapper::InventoryWrapper(FileDataSource) /src/gdal/gdal/frmts/grib/./gribdataset.h:154:17
+    #4 0x63d78d in GRIBDataset::Open(GDALOpenInfo*) /src/gdal/gdal/frmts/grib/gribdataset.cpp:617:34
+    #5 0xc2ecbc in GDALOpenEx /src/gdal/gdal/gcore/gdaldataset.cpp:2825:20
+    #6 0x525dd9 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_fuzzer.cpp:114:24
+    #7 0x5490f0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:512:13
+    #8 0x527505 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #9 0x532d01 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:692:9
+    #10 0x526ba8 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7fc682a6882f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: realloc--GRIB2SectToBuffer(DataSource&, unsigned int, signed char*, unsigned int*, unsigned int*, char**)--GRIB2Inventory
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/gdal/gdal/frmts/grib/degrib/degrib/inventory.cpp:575:26 in GRIB2Inventory2to7(signed char, DataSource&, int, unsigned int*, char**, inventoryType*, unsigned char, unsigned short, unsigned short, unsigned char)
+Shadow bytes around the buggy address:
+  0x0c067fff98b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m06[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff98c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m03[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c067fff98d0: [1m[0m00[1m[0m [1m[0m06[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff98e0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m07[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff98f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c067fff9900: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m05[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff9910: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff9920: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff9930: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff9940: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff9950: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42508563

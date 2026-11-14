@@ -1,0 +1,135 @@
+ARVO id: 42476848
+Project: gdal
+Fuzz target: ogr_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-double-free
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 1167032370
+INFO: Loaded 1 modules (288011 guards): [0x3134cd0, 0x324e0fc), 
+/out/ogr_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-use-after-free on address 0x7faaa046e800 at pc 0x000001ca1a72 bp 0x7fffcae4f370 sp 0x7fffcae4f368
+[1m[0m[1m[34mREAD of size 8 at 0x7faaa046e800 thread T0[1m[0m
+SCARINESS: 51 (8-byte-read-heap-use-after-free)
+    #0 0x1ca1a71 in poolDestroy /src/gdal/libexpat/expat/lib/xmlparse.c:6221:21
+    #1 0x1ca1285 in XML_ParserFree /src/gdal/libexpat/expat/lib/xmlparse.c:1219:3
+    #2 0x19195b0 in OGRGeoRSSDataSource::Open(char const*, int) /src/gdal/gdal/ogr/ogrsf_frmts/georss/ogrgeorssdatasource.cpp:296:5
+    #3 0x10b2902 in OGRGeoRSSDriverOpen(GDALOpenInfo*) /src/gdal/gdal/ogr/ogrsf_frmts/georss/ogrgeorssdriver.cpp:51:16
+    #4 0xd5d9f8 in GDALOpenEx /src/gdal/gdal/gcore/gdaldataset.cpp:2817:20
+    #5 0x5f8a25 in OGROpen /src/gdal/gdal/ogr/ogrsf_frmts/generic/ogrsfdriverregistrar.cpp:113:24
+    #6 0x51f734 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/ogr_fuzzer.cpp:45:26
+    #7 0x548bd9 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:458:13
+    #8 0x54940a in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:397:3
+    #9 0x520336 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #10 0x52b89c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #11 0x51f948 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #12 0x7faaa5b9f82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #13 0x423f28 in _start (/out/ogr_fuzzer+0x423f28)
+
+DEDUP_TOKEN: poolDestroy--XML_ParserFree--OGRGeoRSSDataSource::Open(char const*, int)
+[1m[32m0x7faaa046e800 is located 0 bytes inside of 8388620-byte region [0x7faaa046e800,0x7faaa0c6e80c)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x4e3400 in __interceptor_cfree.localalias.0 /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:55
+    #1 0x12d61f7 in OGRExpatRealloc(void*, unsigned long) /src/gdal/gdal/ogr/ogr_expat.cpp:76:5
+    #2 0x1cb1450 in poolGrow /src/gdal/libexpat/expat/lib/xmlparse.c:6366:7
+    #3 0x1cb072e in poolAppend /src/gdal/libexpat/expat/lib/xmlparse.c:6243:10
+    #4 0x1cc0900 in appendAttributeValue /src/gdal/libexpat/expat/lib/xmlparse.c:5071:12
+    #5 0x1cc050e in appendAttributeValue /src/gdal/libexpat/expat/lib/xmlparse.c:5155:20
+    #6 0x1cc050e in appendAttributeValue /src/gdal/libexpat/expat/lib/xmlparse.c:5155:20
+    #7 0x1cc050e in appendAttributeValue /src/gdal/libexpat/expat/lib/xmlparse.c:5155:20
+    #8 0x1cc050e in appendAttributeValue /src/gdal/libexpat/expat/lib/xmlparse.c:5155:20
+    #9 0x1cc050e in appendAttributeValue /src/gdal/libexpat/expat/lib/xmlparse.c:5155:20
+    #10 0x1cc050e in appendAttributeValue /src/gdal/libexpat/expat/lib/xmlparse.c:5155:20
+    #11 0x1cb17c5 in storeAttributeValue /src/gdal/libexpat/expat/lib/xmlparse.c:5013:27
+    #12 0x1cba46f in storeAtts /src/gdal/libexpat/expat/lib/xmlparse.c:2885:16
+    #13 0x1cb5fd3 in doContent /src/gdal/libexpat/expat/lib/xmlparse.c:2507:18
+    #14 0x1caf7cb in contentProcessor /src/gdal/libexpat/expat/lib/xmlparse.c:2173:27
+    #15 0x1cac789 in doProlog /src/gdal/libexpat/expat/lib/xmlparse.c:4103:14
+    #16 0x1ca5b16 in prologProcessor /src/gdal/libexpat/expat/lib/xmlparse.c:3826:10
+    #17 0x1ca3c86 in XML_ParseBuffer /src/gdal/libexpat/expat/lib/xmlparse.c:1704:15
+    #18 0x191937b in OGRGeoRSSDataSource::Open(char const*, int) /src/gdal/gdal/ogr/ogrsf_frmts/georss/ogrgeorssdatasource.cpp:261:13
+    #19 0x10b2902 in OGRGeoRSSDriverOpen(GDALOpenInfo*) /src/gdal/gdal/ogr/ogrsf_frmts/georss/ogrgeorssdriver.cpp:51:16
+    #20 0xd5d9f8 in GDALOpenEx /src/gdal/gdal/gcore/gdaldataset.cpp:2817:20
+    #21 0x5f8a25 in OGROpen /src/gdal/gdal/ogr/ogrsf_frmts/generic/ogrsfdriverregistrar.cpp:113:24
+    #22 0x51f734 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/ogr_fuzzer.cpp:45:26
+    #23 0x548bd9 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:458:13
+    #24 0x54940a in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:397:3
+    #25 0x520336 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #26 0x52b89c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #27 0x51f948 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #28 0x7faaa5b9f82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: __interceptor_cfree.localalias.0--OGRExpatRealloc(void*, unsigned long)--poolGrow
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x4e39c8 in realloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:79
+    #1 0x1cb1450 in poolGrow /src/gdal/libexpat/expat/lib/xmlparse.c:6366:7
+    #2 0x1cb072e in poolAppend /src/gdal/libexpat/expat/lib/xmlparse.c:6243:10
+    #3 0x1cc0900 in appendAttributeValue /src/gdal/libexpat/expat/lib/xmlparse.c:5071:12
+    #4 0x1cc050e in appendAttributeValue /src/gdal/libexpat/expat/lib/xmlparse.c:5155:20
+    #5 0x1cc050e in appendAttributeValue /src/gdal/libexpat/expat/lib/xmlparse.c:5155:20
+    #6 0x1cc050e in appendAttributeValue /src/gdal/libexpat/expat/lib/xmlparse.c:5155:20
+    #7 0x1cc050e in appendAttributeValue /src/gdal/libexpat/expat/lib/xmlparse.c:5155:20
+    #8 0x1cc050e in appendAttributeValue /src/gdal/libexpat/expat/lib/xmlparse.c:5155:20
+    #9 0x1cc050e in appendAttributeValue /src/gdal/libexpat/expat/lib/xmlparse.c:5155:20
+    #10 0x1cb17c5 in storeAttributeValue /src/gdal/libexpat/expat/lib/xmlparse.c:5013:27
+    #11 0x1cba46f in storeAtts /src/gdal/libexpat/expat/lib/xmlparse.c:2885:16
+    #12 0x1cb5fd3 in doContent /src/gdal/libexpat/expat/lib/xmlparse.c:2507:18
+    #13 0x1caf7cb in contentProcessor /src/gdal/libexpat/expat/lib/xmlparse.c:2173:27
+    #14 0x1cac789 in doProlog /src/gdal/libexpat/expat/lib/xmlparse.c:4103:14
+    #15 0x1ca5b16 in prologProcessor /src/gdal/libexpat/expat/lib/xmlparse.c:3826:10
+    #16 0x1ca3c86 in XML_ParseBuffer /src/gdal/libexpat/expat/lib/xmlparse.c:1704:15
+    #17 0x191937b in OGRGeoRSSDataSource::Open(char const*, int) /src/gdal/gdal/ogr/ogrsf_frmts/georss/ogrgeorssdatasource.cpp:261:13
+    #18 0x10b2902 in OGRGeoRSSDriverOpen(GDALOpenInfo*) /src/gdal/gdal/ogr/ogrsf_frmts/georss/ogrgeorssdriver.cpp:51:16
+    #19 0xd5d9f8 in GDALOpenEx /src/gdal/gdal/gcore/gdaldataset.cpp:2817:20
+    #20 0x5f8a25 in OGROpen /src/gdal/gdal/ogr/ogrsf_frmts/generic/ogrsfdriverregistrar.cpp:113:24
+    #21 0x51f734 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/ogr_fuzzer.cpp:45:26
+    #22 0x548bd9 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:458:13
+    #23 0x54940a in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:397:3
+    #24 0x520336 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #25 0x52b89c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #26 0x51f948 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #27 0x7faaa5b9f82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: realloc--poolGrow--poolAppend
+SUMMARY: AddressSanitizer: heap-use-after-free /src/gdal/libexpat/expat/lib/xmlparse.c:6221:21 in poolDestroy
+Shadow bytes around the buggy address:
+  0x0ff5d4085cb0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0ff5d4085cc0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0ff5d4085cd0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0ff5d4085ce0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0ff5d4085cf0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x0ff5d4085d00:[[1m[35mfd[1m[0m][1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0ff5d4085d10: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0ff5d4085d20: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0ff5d4085d30: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0ff5d4085d40: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0ff5d4085d50: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42476848

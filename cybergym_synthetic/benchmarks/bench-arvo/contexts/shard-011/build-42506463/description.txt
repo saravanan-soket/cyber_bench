@@ -1,0 +1,45 @@
+ARVO id: 42506463
+Project: serenity
+Fuzz target: FuzzJs
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Bad-cast
+Language: c++
+Repo: https://github.com/SerenityOS/serenity
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3028685128
+INFO: Loaded 1 modules   (165569 inline 8-bit counters): 165569 [0xececd0, 0xef7391), 
+INFO: Loaded 1 PC tables (165569 PCs): 165569 [0xef7398,0x117dfa8), 
+/out/FuzzJs: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m/src/serenity/Meta/Lagom/../../AK/Format.h:244:30:[1m[31m runtime error: [1m[0m[1mmember call on address 0x7fffffffd008 with insufficient space for an object of type 'AK::Array<AK::TypeErasedParameter, 0>'[1m[0m
+[1m0x7fffffffd008:[1m[30m note: [1m[0mpointer points here[1m[0m
+ 00 00 00 00  00 00 00 00 00 00 00 00  00 d1 ff ff ff 7f 00 00  00 00 00 00 00 00 00 00  38 40 ae 01
+[1m[32m              ^ [1m[0m
+    #0 0x9ecfa6 in AK::VariadicFormatParams<>::VariadicFormatParams() /src/serenity/Meta/Lagom/../../AK/Format.h:244:30
+    #1 0x9ecfa6 in AK::String AK::String::formatted<>(AK::Format::Detail::CheckedFormatString<>&&) /src/serenity/Meta/Lagom/../../AK/String.h:273:30
+    #2 0x9ecfa6 in void JS::VM::throw_exception<JS::ReferenceError>(JS::GlobalObject&, JS::ErrorType) /src/serenity/Meta/Lagom/../../Userland/Libraries/LibJS/Runtime/VM.h:231:72
+    #3 0x9ecfa6 in JS::Reference::throw_reference_error(JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/Runtime/Reference.cpp:82:12
+    #4 0x9ed64a in JS::Reference::get_value(JS::GlobalObject&, bool) const /src/serenity/Userland/Libraries/LibJS/Runtime/Reference.cpp:91:9
+    #5 0x8ffcf1 in JS::OptionalChain::to_reference_and_value(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:2066:36
+    #6 0x9012a1 in JS::OptionalChain::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:2078:23
+    #7 0x8da4e5 in JS::ExpressionStatement::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:125:26
+    #8 0x4bdc03 in JS::Interpreter::execute_statement(JS::GlobalObject&, JS::Statement const&, JS::ScopeType) /src/serenity/Userland/Libraries/LibJS/Interpreter.cpp:192:27
+    #9 0x8d9aff in JS::Program::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:93:24
+    #10 0x4b98e6 in JS::Interpreter::run(JS::GlobalObject&, JS::Program const&) /src/serenity/Userland/Libraries/LibJS/Interpreter.cpp:62:26
+    #11 0x4b45a0 in LLVMFuzzerTestOneInput /src/serenity/Meta/Lagom/Fuzzers/FuzzJs.cpp:24:22
+    #12 0x440ac3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #13 0x42c422 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #14 0x431e9d in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #15 0x45ae12 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7ffff7c1a0b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #17 0x40962d in _start (/out/FuzzJs+0x40962d)
+
+DEDUP_TOKEN: AK::VariadicFormatParams<>::VariadicFormatParams()--AK::String AK::String::formatted<>(AK::Format::Detail::CheckedFormatString<>&&)--void JS::VM::throw_exception<JS::ReferenceError>(JS::GlobalObject&, JS::ErrorType)
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /src/serenity/Meta/Lagom/../../AK/Format.h:244:30 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42506463

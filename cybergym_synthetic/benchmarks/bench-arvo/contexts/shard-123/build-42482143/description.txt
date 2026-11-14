@@ -1,0 +1,77 @@
+ARVO id: 42482143
+Project: harfbuzz
+Fuzz target: hb-draw-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 2
+Language: c++
+Repo: https://github.com/harfbuzz/harfbuzz.git
+
+=== Crash report ===
+INFO: Seed: 1072469440
+INFO: Loaded 1 modules   (28764 inline 8-bit counters): 28764 [0xbd4b30, 0xbdbb8c), 
+INFO: Loaded 1 PC tables (28764 PCs): 28764 [0x875d90,0x8e6350), 
+/out/hb-draw-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x625000005caa at pc 0x00000055d50d bp 0x7fffffffd490 sp 0x7fffffffd488
+[1m[0m[1m[34mREAD of size 2 at 0x625000005caa thread T0[1m[0m
+SCARINESS: 24 (2-byte-read-heap-buffer-overflow-far-from-bounds)
+    #0 0x55d50c in BEInt<unsigned short, 2>::operator unsigned short() const /src/harfbuzz/src/./hb.hh:541:59
+    #1 0x55d4b0 in OT::IntType<unsigned short, 2u>::operator unsigned int() const /src/harfbuzz/src/./hb-open-type.hh:63:40
+    #2 0x57375a in OT::gvar::get_offset(unsigned int) const /src/harfbuzz/src/./hb-ot-var-gvar-table.hh:492:14
+    #3 0x5754b7 in OT::gvar::get_glyph_var_data(unsigned int) const /src/harfbuzz/src/./hb-ot-var-gvar-table.hh:475:33
+    #4 0x566e8b in OT::gvar::accelerator_t::apply_deltas_to_points(unsigned int, int const*, unsigned int, hb_array_t<OT::contour_point_t>) const /src/harfbuzz/src/./hb-ot-var-gvar-table.hh:571:50
+    #5 0x561fe7 in bool OT::glyf::Glyph::get_points<bool OT::glyf::accelerator_t::get_points<OT::glyf::accelerator_t::path_builder_t>(hb_font_t*, unsigned int, OT::glyf::accelerator_t::path_builder_t) const::'lambda'(unsigned int)>(OT::glyf::accelerator_t::path_builder_t, hb_font_t*, OT::contour_point_vector_t&, bool, unsigned int) const /src/harfbuzz/src/./hb-ot-glyf-table.hh:741:11
+    #6 0x56217c in bool OT::glyf::Glyph::get_points<bool OT::glyf::accelerator_t::get_points<OT::glyf::accelerator_t::path_builder_t>(hb_font_t*, unsigned int, OT::glyf::accelerator_t::path_builder_t) const::'lambda'(unsigned int)>(OT::glyf::accelerator_t::path_builder_t, hb_font_t*, OT::contour_point_vector_t&, bool, unsigned int) const /src/harfbuzz/src/./hb-ot-glyf-table.hh:754:8
+    #7 0x560f34 in bool OT::glyf::accelerator_t::get_points<OT::glyf::accelerator_t::path_builder_t>(hb_font_t*, unsigned int, OT::glyf::accelerator_t::path_builder_t) const /src/harfbuzz/src/./hb-ot-glyf-table.hh:869:11
+    #8 0x560cc2 in OT::glyf::accelerator_t::get_path(hb_font_t*, unsigned int, draw_helper_t&) const /src/harfbuzz/src/./hb-ot-glyf-table.hh:1152:14
+    #9 0x560966 in hb_font_draw_glyph /src/harfbuzz/src/hb-draw.cc:250:31
+    #10 0x5545ea in LLVMFuzzerTestOneInput /src/harfbuzz/./test/fuzzing/hb-draw-fuzzer.cc:114:5
+    #11 0x459fa1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #12 0x444ac1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #13 0x44a77e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #14 0x4746a2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #15 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #16 0x41df38 in _start (/out/hb-draw-fuzzer+0x41df38)
+
+DEDUP_TOKEN: BEInt<unsigned short, 2>::operator unsigned short() const--OT::IntType<unsigned short, 2u>::operator unsigned int() const--OT::gvar::get_offset(unsigned int) const
+Address 0x625000005caa is a wild pointer.
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/harfbuzz/src/./hb.hh:541:59 in BEInt<unsigned short, 2>::operator unsigned short() const
+Shadow bytes around the buggy address:
+  0x0c4a7fff8b40: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4a7fff8b50: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4a7fff8b60: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4a7fff8b70: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4a7fff8b80: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x0c4a7fff8b90: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4a7fff8ba0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4a7fff8bb0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4a7fff8bc0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4a7fff8bd0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4a7fff8be0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42482143

@@ -1,0 +1,85 @@
+ARVO id: 42524123
+Project: openthread
+Fuzz target: ip6-send-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Stack-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/openthread/openthread
+
+=== Crash report ===
+INFO: Seed: 3503456694
+INFO: Loaded 1 modules   (12489 inline 8-bit counters): 12489 [0xa199b0, 0xa1ca79), 
+INFO: Loaded 1 PC tables (12489 PCs): 12489 [0x762270,0x792f00), 
+/out/ip6-send-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffff7f1a721 at pc 0x00000055abc8 bp 0x7fffffffda90 sp 0x7fffffffda88
+[1m[0m[1m[34mREAD of size 1 at 0x7ffff7f1a721 thread T0[1m[0m
+SCARINESS: 27 (1-byte-read-stack-buffer-overflow)
+    #0 0x55abc7 in ot::NetworkData::ServiceTlv::IsThreadEnterprise() const /src/openthread/src/core/./thread/network_data_tlvs.hpp:775:17
+    #1 0x55ab04 in ot::NetworkData::ServiceTlv::GetServiceDataLengthLocation() /src/openthread/src/core/./thread/network_data_tlvs.hpp:870:49
+    #2 0x55a8a9 in ot::NetworkData::ServiceTlv::GetSubTlvs() /src/openthread/src/core/./thread/network_data_tlvs.hpp:860:51
+    #3 0x58f384 in ot::NetworkData::Leader::RlocLookup(unsigned short, bool&, bool&, unsigned char*, unsigned char) /src/openthread/src/core/thread/network_data_leader_ftd.cpp:532:31
+    #4 0x590169 in ot::NetworkData::Leader::RegisterNetworkData(unsigned short, unsigned char*, unsigned char) /src/openthread/src/core/thread/network_data_leader_ftd.cpp:759:9
+    #5 0x58fe46 in ot::NetworkData::Leader::HandleServerData(ot::Coap::Header&, ot::Message&, ot::Ip6::MessageInfo const&) /src/openthread/src/core/thread/network_data_leader_ftd.cpp:178:9
+    #6 0x5a3220 in ot::Coap::CoapBase::ProcessReceivedRequest(ot::Coap::Header&, ot::Message&, ot::Ip6::MessageInfo const&) /src/openthread/src/core/coap/coap.cpp:690:23
+    #7 0x5a2b75 in ot::Coap::CoapBase::Receive(ot::Message&, ot::Ip6::MessageInfo const&) /src/openthread/src/core/coap/coap.cpp:535:9
+    #8 0x54d5b2 in ot::Ip6::Udp::HandleMessage(ot::Message&, ot::Ip6::MessageInfo&) /src/openthread/src/core/net/udp6.cpp:278:17
+    #9 0x5428b5 in ot::Ip6::Ip6::HandleDatagram(ot::Message&, ot::Ip6::Netif*, signed char, void const*, bool) /src/openthread/src/core/net/ip6.cpp:818:9
+    #10 0x544872 in ot::Ip6::Ip6::SendRaw(ot::Message&, signed char) /src/openthread/src/core/net/ip6.cpp:715:13
+    #11 0x51c30b in LLVMFuzzerTestOneInput /src/openthread/tests/fuzz/ip6_send.cpp:70:13
+    #12 0x649af0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #13 0x620c19 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #14 0x62c564 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #15 0x6202bc in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #16 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #17 0x41c638 in _start (/out/ip6-send-fuzzer+0x41c638)
+
+DEDUP_TOKEN: ot::NetworkData::ServiceTlv::IsThreadEnterprise() const--ot::NetworkData::ServiceTlv::GetServiceDataLengthLocation()--ot::NetworkData::ServiceTlv::GetSubTlvs()
+[1m[32mAddress 0x7ffff7f1a721 is located in stack of thread T0 at offset 289 in frame[1m[0m
+[1m[0m    #0 0x58fc2f in ot::NetworkData::Leader::HandleServerData(ot::Coap::Header&, ot::Message&, ot::Ip6::MessageInfo const&) /src/openthread/src/core/thread/network_data_leader_ftd.cpp:162
+
+DEDUP_TOKEN: ot::NetworkData::Leader::HandleServerData(ot::Coap::Header&, ot::Message&, ot::Ip6::MessageInfo const&)
+  This frame has 2 object(s):
+    [32, 289) 'networkData' (line 163)[1m[32m <== Memory access at offset 289 overflows this variable[1m[0m
+    [368, 372) 'rloc16' (line 164)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism or swapcontext
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/openthread/src/core/./thread/network_data_tlvs.hpp:775:17 in ot::NetworkData::ServiceTlv::IsThreadEnterprise() const
+Shadow bytes around the buggy address:
+  0x10007efdb490: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x10007efdb4a0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x10007efdb4b0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x10007efdb4c0: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efdb4d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x10007efdb4e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m01[1m[0m][1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf3[1m[0m
+  0x10007efdb4f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efdb500: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[0m01[1m[0m [1m[31mf2[1m[0m [1m[0m01[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efdb510: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efdb520: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m07[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x10007efdb530: [1m[0m01[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42524123

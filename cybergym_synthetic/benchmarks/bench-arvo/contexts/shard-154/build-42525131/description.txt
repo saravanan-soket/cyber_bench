@@ -1,0 +1,44 @@
+ARVO id: 42525131
+Project: ffmpeg
+Fuzz target: ffmpeg_DEMUXER_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3544135723
+INFO: Loaded 1 modules   (152789 inline 8-bit counters): 152789 [0x95f58a0, 0x961ad75), 
+INFO: Loaded 1 PC tables (152789 PCs): 152789 [0x93583f0,0x9482a98), 
+/out/ffmpeg_DEMUXER_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0xe6c052ac (pc 0x083ac89c bp 0xffa665a8 sp 0xffa66520 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x83ac89c in jpegxl_collect_codestream_header /src/ffmpeg/libavformat/jpegxl_anim_dec.c:63:16
+    #1 0x83ac89c in jpegxl_anim_probe /src/ffmpeg/libavformat/jpegxl_anim_dec.c:126:9
+    #2 0x8258612 in av_probe_input_format3 /src/ffmpeg/libavformat/format.c:192:21
+    #3 0x82594d3 in av_probe_input_format2 /src/ffmpeg/libavformat/format.c:236:32
+    #4 0x82594d3 in av_probe_input_buffer2 /src/ffmpeg/libavformat/format.c:308:16
+    #5 0x822d5ef in init_input /src/ffmpeg/libavformat/demux.c
+    #6 0x822d5ef in avformat_open_input /src/ffmpeg/libavformat/demux.c:256:16
+    #7 0x82176b2 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dem_fuzzer.c:201:11
+    #8 0x80d837e in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #9 0x80c32de in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x80c8ee0 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #11 0x80f2ac7 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0xeca37ed4 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x1aed4) (BuildId: 00537087f0a4c4381deb83f49cc19e6abfd47a12)
+    #13 0x80ba425 in _start (/out/ffmpeg_DEMUXER_fuzzer+0x80ba425)
+
+DEDUP_TOKEN: jpegxl_collect_codestream_header--jpegxl_anim_probe--av_probe_input_format3
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/ffmpeg/libavformat/jpegxl_anim_dec.c:63:16 in jpegxl_collect_codestream_header
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42525131

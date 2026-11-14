@@ -1,0 +1,44 @@
+ARVO id: 42472402
+Project: curl
+Fuzz target: curl_fuzzer_ftp
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/curl/curl.git
+
+=== Crash report ===
+INFO: Seed: 6532145
+INFO: Loaded 1 modules   (64063 inline 8-bit counters): 64063 [0x1118720, 0x112815f), 
+INFO: Loaded 1 PC tables (64063 PCs): 64063 [0x1128160,0x1222550), 
+/out/curl_fuzzer_ftp: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x0000000015b0 (pc 0x000000642e19 bp 0x7fffffffd670 sp 0x7fffffffd650 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x642e18 in ftp_disconnect /src/curl/lib/ftp.c:4073:20
+    #1 0x5b3c99 in Curl_disconnect /src/curl/lib/url.c:786:5
+    #2 0x5bed66 in ConnectionExists /src/curl/lib/url.c:1134:15
+    #3 0x5b81d1 in create_conn /src/curl/lib/url.c:3881:13
+    #4 0x5b682f in Curl_connect /src/curl/lib/url.c:4148:12
+    #5 0x549249 in multi_runsingle /src/curl/lib/multi.c:1457:16
+    #6 0x548353 in curl_multi_perform /src/curl/lib/multi.c:2212:14
+    #7 0x5332be in fuzz_handle_transfer(fuzz_data*) /src/curl_fuzzer/curl_fuzzer.cc:383:5
+    #8 0x53248b in LLVMFuzzerTestOneInput /src/curl_fuzzer/curl_fuzzer.cc:93:3
+    #9 0xb24455 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #10 0xaf9d46 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #11 0xb05606 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #12 0xaf93bc in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #13 0x7ffff6ccb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #14 0x41dd28 in _start (/out/curl_fuzzer_ftp+0x41dd28)
+
+DEDUP_TOKEN: ftp_disconnect--Curl_disconnect--ConnectionExists
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/curl/lib/ftp.c:4073:20 in ftp_disconnect
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42472402

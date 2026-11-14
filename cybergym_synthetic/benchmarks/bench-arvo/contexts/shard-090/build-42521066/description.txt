@@ -1,0 +1,46 @@
+ARVO id: 42521066
+Project: serenity
+Fuzz target: FuzzShellPosix
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Bad-cast
+Language: c++
+Repo: https://github.com/SerenityOS/serenity
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3944483925
+INFO: Loaded 1 modules   (85690 inline 8-bit counters): 85690 [0xd12718, 0xd275d2), 
+INFO: Loaded 1 PC tables (85690 PCs): 85690 [0xd275d8,0xe76178), 
+/out/FuzzShellPosix: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m/src/serenity/Meta/Lagom/../../AK/Format.h:297:30:[1m[31m runtime error: [1m[0m[1mmember call on address 0x7ffca19f2c18 with insufficient space for an object of type 'AK::Array<AK::TypeErasedParameter, 0>'[1m[0m
+[1m0x7ffca19f2c18:[1m[30m note: [1m[0mpointer points here[1m[0m
+ 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  00 00 00 00
+[1m[32m              ^ [1m[0m
+    #0 0x59d861 in VariadicFormatParams /src/serenity/Meta/Lagom/../../AK/Format.h:297:30
+    #1 0x59d861 in formatted<> /src/serenity/Meta/Lagom/../../AK/DeprecatedString.h:288:75
+    #2 0x59d861 in error<> /src/serenity/Meta/Lagom/../../Userland/Shell/PosixParser.h:99:13
+    #3 0x59d861 in operator() /src/serenity/Userland/Shell/PosixParser.cpp:500:21
+    #4 0x59d861 in visit<AK::Variant<Shell::Posix::ParameterExpansion, Shell::Posix::CommandExpansion, Shell::Posix::ArithmeticExpansion>, AK::Variant<Shell::Posix::ParameterExpansion, Shell::Posix::CommandExpansion, Shell::Posix::ArithmeticExpansion>::Visitor<(lambda at /src/serenity/Userland/Shell/PosixParser.cpp:334:17), (lambda at /src/serenity/Userland/Shell/PosixParser.cpp:499:17), (lambda at /src/serenity/Userland/Shell/PosixParser.cpp:509:17)>, (unsigned char)'\x02'> /src/serenity/Meta/Lagom/../../AK/Variant.h:112:24
+    #5 0x59d861 in visit<AK::Variant<Shell::Posix::ParameterExpansion, Shell::Posix::CommandExpansion, Shell::Posix::ArithmeticExpansion>, AK::Variant<Shell::Posix::ParameterExpansion, Shell::Posix::CommandExpansion, Shell::Posix::ArithmeticExpansion>::Visitor<(lambda at /src/serenity/Userland/Shell/PosixParser.cpp:334:17), (lambda at /src/serenity/Userland/Shell/PosixParser.cpp:499:17), (lambda at /src/serenity/Userland/Shell/PosixParser.cpp:509:17)>, (unsigned char)'\x01'> /src/serenity/Meta/Lagom/../../AK/Variant.h:118:20
+    #6 0x59d861 in visit<AK::Variant<Shell::Posix::ParameterExpansion, Shell::Posix::CommandExpansion, Shell::Posix::ArithmeticExpansion>, AK::Variant<Shell::Posix::ParameterExpansion, Shell::Posix::CommandExpansion, Shell::Posix::ArithmeticExpansion>::Visitor<(lambda at /src/serenity/Userland/Shell/PosixParser.cpp:334:17), (lambda at /src/serenity/Userland/Shell/PosixParser.cpp:499:17), (lambda at /src/serenity/Userland/Shell/PosixParser.cpp:509:17)>, (unsigned char)'\x00'> /src/serenity/Meta/Lagom/../../AK/Variant.h:118:20
+    #7 0x59d861 in visit<(lambda at /src/serenity/Userland/Shell/PosixParser.cpp:334:17), (lambda at /src/serenity/Userland/Shell/PosixParser.cpp:499:17), (lambda at /src/serenity/Userland/Shell/PosixParser.cpp:509:17)> /src/serenity/Meta/Lagom/../../AK/Variant.h:425:16
+    #8 0x59d861 in Shell::Posix::Parser::perform_expansions(AK::Vector<Shell::Posix::Token, 0ul>) /src/serenity/Userland/Shell/PosixParser.cpp:333:39
+    #9 0x59969d in Shell::Posix::Parser::next_expanded_token() /src/serenity/Userland/Shell/PosixParser.cpp:133:25
+    #10 0x599538 in Shell::Posix::Parser::fill_token_buffer() /src/serenity/Userland/Shell/PosixParser.cpp:101:22
+    #11 0x4c3067 in Parser /src/serenity/Meta/Lagom/../../Userland/Shell/PosixParser.h:21:9
+    #12 0x4c3067 in LLVMFuzzerTestOneInput /src/serenity/Meta/Lagom/Fuzzers/FuzzShellPosix.cpp:16:26
+    #13 0x428e13 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #14 0x414572 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #15 0x419e1c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #16 0x443352 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7f7db8f64082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #18 0x40a73d in _start (/out/FuzzShellPosix+0x40a73d)
+
+DEDUP_TOKEN: VariadicFormatParams--formatted<>--error<>
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /src/serenity/Meta/Lagom/../../AK/Format.h:297:30 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42521066

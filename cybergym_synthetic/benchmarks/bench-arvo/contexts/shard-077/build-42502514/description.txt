@@ -1,0 +1,36 @@
+ARVO id: 42502514
+Project: php-src
+Fuzz target: php-fuzz-function-jit
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/php/php-src.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/php-fuzz-function-jit[0m
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x1000ce40d103 (pc 0x00000129db44 bp 0x7ffe720a89b0 sp 0x7ffe720a8800 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x129db44 in zend_ssa_remove_nops /src/php-src/Zend/Optimizer/dfa_pass.c:244:20
+    #1 0x12909fb in zend_dfa_optimize_op_array /src/php-src/Zend/Optimizer/dfa_pass.c:1644:4
+    #2 0x122738d in zend_optimize_script /src/php-src/Zend/Optimizer/zend_optimizer.c:1482:5
+    #3 0x7f859e309078 in cache_script_in_shared_memory /src/php-src/ext/opcache/ZendAccelerator.c:1490:2
+    #4 0x7f859e307cc1 in persistent_compile_file /src/php-src/ext/opcache/ZendAccelerator.c:2163:24
+    #5 0x134fc9b in fuzzer_do_request_from_buffer /src/php-src/sapi/fuzzer/fuzzer-sapi.c:272:29
+    #6 0x134e307 in LLVMFuzzerTestOneInput /src/php-src/sapi/fuzzer/fuzzer-function-jit.c:34:2
+    #7 0x13fedeb in main (/out/php-fuzz-function-jit+0x13fedeb)
+    #8 0x7f859f7350b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #9 0x60129d in _start (/out/php-fuzz-function-jit+0x60129d)
+
+DEDUP_TOKEN: zend_ssa_remove_nops--zend_dfa_optimize_op_array--zend_optimize_script
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/php-src/Zend/Optimizer/dfa_pass.c:244:20 in zend_ssa_remove_nops
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42502514

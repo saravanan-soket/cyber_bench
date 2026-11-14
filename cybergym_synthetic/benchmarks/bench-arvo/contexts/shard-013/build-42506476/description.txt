@@ -1,0 +1,72 @@
+ARVO id: 42506476
+Project: unrar
+Fuzz target: unrar_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/aawc/unrar.git
+
+=== Crash report ===
+INFO: Seed: 3478325059
+INFO: Loaded 1 modules   (5293 inline 8-bit counters): 5293 [0xa900a0, 0xa9154d), 
+INFO: Loaded 1 PC tables (5293 PCs): 5293 [0xa91550,0xaa6020), 
+/out/unrar_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x6204cb in CharToWideMap(char const*, wchar_t*, unsigned long, bool&) /src/unrar/unicode.cpp:171:9
+    #1 0x61faca in CharToWide(char const*, wchar_t*, unsigned long) /src/unrar/unicode.cpp:91:5
+    #2 0x601d50 in Archive::GetComment(Array<wchar_t>*) /src/unrar/./arccmt.cpp:116:5
+    #3 0x602fed in Archive::ViewComment() /src/unrar/./arccmt.cpp:155:7
+    #4 0x56d64d in CmdExtract::ExtractArchive() /src/unrar/extract.cpp:190:7
+    #5 0x56bdf0 in CmdExtract::DoExtract() /src/unrar/extract.cpp:45:29
+    #6 0x49c684 in LLVMFuzzerTestOneInput /src/unrar/unrar_fuzzer.cc:22:15
+    #7 0x4d8ba6 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:512:13
+    #8 0x49e87c in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #9 0x4b2c4b in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:692:9
+    #10 0x49d9d1 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x41f3a8 in _start (/out/unrar_fuzzer+0x41f3a8)
+
+DEDUP_TOKEN: CharToWideMap(char const*, wchar_t*, unsigned long, bool&)--CharToWide(char const*, wchar_t*, unsigned long)--Archive::GetComment(Array<wchar_t>*)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x44ffa5 in realloc /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:861
+    #1 0x57c645 in Array<unsigned char>::Add(unsigned long) /src/unrar/./array.hpp:129:22
+    #2 0x5de729 in Array<unsigned char>::Push(unsigned char) /src/unrar/./array.hpp:179:3
+    #3 0x601c6e in Archive::GetComment(Array<wchar_t>*) /src/unrar/./arccmt.cpp:110:12
+    #4 0x602fed in Archive::ViewComment() /src/unrar/./arccmt.cpp:155:7
+    #5 0x56d64d in CmdExtract::ExtractArchive() /src/unrar/extract.cpp:190:7
+    #6 0x56bdf0 in CmdExtract::DoExtract() /src/unrar/extract.cpp:45:29
+    #7 0x49c684 in LLVMFuzzerTestOneInput /src/unrar/unrar_fuzzer.cc:22:15
+    #8 0x4d8ba6 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:512:13
+    #9 0x49e87c in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #10 0x4b2c4b in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:692:9
+    #11 0x49d9d1 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #12 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: realloc--Array<unsigned char>::Add(unsigned long)--Array<unsigned char>::Push(unsigned char)
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x44ffa5 in realloc /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:861
+    #1 0x57c645 in Array<unsigned char>::Add(unsigned long) /src/unrar/./array.hpp:129:22
+    #2 0x601222 in Archive::GetComment(Array<wchar_t>*) /src/unrar/./arccmt.cpp:101:17
+    #3 0x602fed in Archive::ViewComment() /src/unrar/./arccmt.cpp:155:7
+    #4 0x56d64d in CmdExtract::ExtractArchive() /src/unrar/extract.cpp:190:7
+    #5 0x56bdf0 in CmdExtract::DoExtract() /src/unrar/extract.cpp:45:29
+    #6 0x49c684 in LLVMFuzzerTestOneInput /src/unrar/unrar_fuzzer.cc:22:15
+    #7 0x4d8ba6 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:512:13
+    #8 0x49e87c in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #9 0x4b2c4b in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:692:9
+    #10 0x49d9d1 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: realloc--Array<unsigned char>::Add(unsigned long)--Archive::GetComment(Array<wchar_t>*)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/unrar/unicode.cpp:171:9 in CharToWideMap(char const*, wchar_t*, unsigned long, bool&)
+Unique heap origins: 73
+Stack depot allocated bytes: 6312
+Unique origin histories: 7
+History depot allocated bytes: 168
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42506476

@@ -1,0 +1,101 @@
+ARVO id: 42479018
+Project: imagemagick
+Fuzz target: encoder_mvg_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow WRITE 16
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 2377080645
+INFO: Loaded 1 modules   (176251 inline 8-bit counters): 176251 [0x9b71010, 0x9b9c08b), 
+INFO: Loaded 1 PC tables (176251 PCs): 176251 [0x9b9c08c,0x9cf4464), 
+/out/encoder_mvg_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0xf6002070 at pc 0x08205afb bp 0xffffc868 sp 0xffffc448
+[1m[0m[1m[34mWRITE of size 16 at 0xf6002070 thread T0[1m[0m
+SCARINESS: 55 (multi-byte-write-heap-buffer-overflow-far-from-bounds)
+    #0 0x8205afa in __asan_memcpy /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #1 0x834cd50 in GetVirtualPixelCacheNexus /src/imagemagick/MagickCore/cache.c:3044:18
+    #2 0x834db00 in GetOneVirtualPixelInfo /src/imagemagick/MagickCore/cache.c:2111:5
+    #3 0x8403de7 in DrawPrimitive /src/imagemagick/MagickCore/draw.c:5360:18
+    #4 0x83f8088 in RenderMVGContent /src/imagemagick/MagickCore/draw.c:4372:17
+    #5 0x83f026c in DrawImage /src/imagemagick/MagickCore/draw.c:4413:10
+    #6 0x87806a5 in ReadMVGImage /src/imagemagick/coders/mvg.c:239:10
+    #7 0x83a8995 in ReadImage /src/imagemagick/MagickCore/constitute.c:551:15
+    #8 0x832dc79 in BlobToImage /src/imagemagick/MagickCore/blob.c:475:13
+    #9 0x8243f3a in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4028:12
+    #10 0x823b503 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #11 0x81407b6 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #12 0x812cc63 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #13 0x8132368 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #14 0x81571b7 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #15 0xf7d8d646 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x18646)
+    #16 0x8107c81 in _start (/out/encoder_mvg_fuzzer+0x8107c81)
+
+DEDUP_TOKEN: __asan_memcpy--GetVirtualPixelCacheNexus--GetOneVirtualPixelInfo
+[1m[32m0xf6002070 is located 16 bytes to the left of 3712-byte region [0xf6002080,0xf6002f00)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x820709c in posix_memalign /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cpp:226:3
+    #1 0x84fb623 in AcquireAlignedMemory /src/imagemagick/MagickCore/memory.c:265:7
+    #2 0x8354e3b in OpenPixelCache /src/imagemagick/MagickCore/cache.c:3733:46
+    #3 0x83598c9 in GetImagePixelCache /src/imagemagick/MagickCore/cache.c:1757:18
+    #4 0x8347560 in QueueAuthenticPixelCacheNexus /src/imagemagick/MagickCore/cache.c:4161:28
+    #5 0x8347288 in GetAuthenticPixelCacheNexus /src/imagemagick/MagickCore/cache.c:1326:10
+    #6 0x8361e45 in GetCacheViewAuthenticPixels /src/imagemagick/MagickCore/cache-view.c:312:10
+    #7 0x84cbc0f in SetImageAlpha /src/imagemagick/MagickCore/image.c:2370:7
+    #8 0x836abd3 in SetImageAlphaChannel /src/imagemagick/MagickCore/channel.c
+    #9 0x83f0a41 in RenderMVGContent /src/imagemagick/MagickCore/draw.c:2512:14
+    #10 0x83f026c in DrawImage /src/imagemagick/MagickCore/draw.c:4413:10
+    #11 0x87806a5 in ReadMVGImage /src/imagemagick/coders/mvg.c:239:10
+    #12 0x83a8995 in ReadImage /src/imagemagick/MagickCore/constitute.c:551:15
+    #13 0x832dc79 in BlobToImage /src/imagemagick/MagickCore/blob.c:475:13
+    #14 0x8243f3a in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4028:12
+    #15 0x823b503 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #16 0x81407b6 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #17 0x812cc63 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #18 0x8132368 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #19 0x81571b7 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #20 0xf7d8d646 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x18646)
+
+DEDUP_TOKEN: posix_memalign--AcquireAlignedMemory--OpenPixelCache
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x3ec003b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3ec003c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3ec003d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3ec003e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3ec003f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x3ec00400: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m
+  0x3ec00410: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3ec00420: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3ec00430: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3ec00440: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3ec00450: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42479018

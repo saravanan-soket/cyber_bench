@@ -1,0 +1,35 @@
+ARVO id: 42477847
+Project: libmpeg2
+Fuzz target: mpeg2_dec_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://android.googlesource.com/platform/external/libmpeg2
+
+=== Crash report ===
+INFO: Seed: 1373228829
+INFO: Loaded 1 modules   (1915 inline 8-bit counters): 1915 [0x862fb8, 0x863733), 
+INFO: Loaded 1 PC tables (1915 PCs): 1915 [0x611788,0x618f38), 
+/out/mpeg2_dec_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address 0x00000002b500 (pc 0x7fc438e39b3d bp 0x7fc42fde8590 sp 0x7fc42fde7d48 T16)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+MemorySanitizer:DEADLYSIGNAL
+    #0 0x7fc438e39b3c  (/lib/x86_64-linux-gnu/libc.so.6+0x14db3c)
+    #1 0x4cdf0f in __msan_memcpy /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cpp:1559:15
+    #2 0x54f743 in ideint_process /src/libmpeg2/common/ideint.c:408:25
+    #3 0x54d5e8 in impeg2d_deinterlace /src/libmpeg2/decoder/impeg2d_deinterlace.c:256:11
+    #4 0x571ddb in impeg2d_dec_pic_data_thread /src/libmpeg2/decoder/impeg2d_dec_hdr.c:996:25
+    #5 0x7fc4396df6b9 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x76b9)
+    #6 0x7fc438df341c in clone (/lib/x86_64-linux-gnu/libc.so.6+0x10741c)
+
+DEDUP_TOKEN: __msan_memcpy--ideint_process
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x14db3c) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42477847

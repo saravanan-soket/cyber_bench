@@ -1,0 +1,37 @@
+ARVO id: 42483803
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_HCA_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Index-out-of-bounds
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Seed: 265454549
+INFO: Loaded 1 modules   (72486 inline 8-bit counters): 72486 [0xdfaae0, 0xe0c606), 
+INFO: Loaded 1 PC tables (72486 PCs): 72486 [0x8ba158,0x9d53b8), 
+/out/ffmpeg_AV_CODEC_ID_HCA_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1mlibavcodec/hcadec.c:290:73:[1m[31m runtime error: [1m[0m[1mindex -1 out of bounds for type 'int8_t [128]'[1m[0m
+    #0 0x4c4c11 in reconstruct_hfr /src/ffmpeg/libavcodec/hcadec.c:290:73
+    #1 0x4c3457 in decode_frame /src/ffmpeg/libavcodec/hcadec.c:416:13
+    #2 0x4c0c77 in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:432:15
+    #3 0x4c0a84 in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:628:15
+    #4 0x4baec0 in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:646:15
+    #5 0x4bad73 in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:704:15
+    #6 0x4bb9f4 in compat_decode /src/ffmpeg/libavcodec/decode.c:840:15
+    #7 0x4b5d9a in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:322:23
+    #8 0x443ed1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #9 0x42e9f1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #10 0x4346ae in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #11 0x45e5d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #12 0x7f14cb06682f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #13 0x407e68 in _start (/out/ffmpeg_AV_CODEC_ID_HCA_fuzzer+0x407e68)
+
+DEDUP_TOKEN: reconstruct_hfr--decode_frame--decode_simple_internal
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior libavcodec/hcadec.c:290:73 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42483803

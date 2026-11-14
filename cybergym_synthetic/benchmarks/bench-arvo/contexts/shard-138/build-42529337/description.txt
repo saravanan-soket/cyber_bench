@@ -1,0 +1,102 @@
+ARVO id: 42529337
+Project: ffmpeg
+Fuzz target: ffmpeg_DEMUXER_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Stack-buffer-overflow WRITE 1
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 553016892
+INFO: Loaded 1 modules   (161728 inline 8-bit counters): 161728 [0x1adbd60, 0x1b03520), 
+INFO: Loaded 1 PC tables (161728 PCs): 161728 [0x165c330,0x18d3f30), 
+/out/ffmpeg_DEMUXER_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7fb75eb95a60 at pc 0x000000de77de bp 0x7fff3ef67b30 sp 0x7fff3ef67b28
+[1m[0m[1m[34mWRITE of size 1 at 0x7fb75eb95a60 thread T0[1m[0m
+SCARINESS: 46 (1-byte-write-stack-buffer-overflow)
+    #0 0xde77dd in gen_alias_map /src/ffmpeg/libavcodec/jpegxl_parser.c
+    #1 0xde77dd in read_distribution_bundle /src/ffmpeg/libavcodec/jpegxl_parser.c:877:19
+    #2 0xddf0ee in entropy_decoder_init /src/ffmpeg/libavcodec/jpegxl_parser.c:902:11
+    #3 0xdd88f2 in parse_frame_header /src/ffmpeg/libavcodec/jpegxl_parser.c:1261:15
+    #4 0xdd88f2 in try_parse /src/ffmpeg/libavcodec/jpegxl_parser.c:1402:15
+    #5 0xdd88f2 in jpegxl_parse /src/ffmpeg/libavcodec/jpegxl_parser.c:1428:15
+    #6 0x949e20 in av_parser_parse2 /src/ffmpeg/libavcodec/parser.c:163:13
+    #7 0x5c2ea5 in parse_packet /src/ffmpeg/libavformat/demux.c:1154:15
+    #8 0x5b1147 in read_frame_internal /src/ffmpeg/libavformat/demux.c:1273:21
+    #9 0x5b7e51 in avformat_find_stream_info /src/ffmpeg/libavformat/demux.c:2635:15
+    #10 0x599833 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dem_fuzzer.c:206:11
+    #11 0x46aee3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #12 0x456642 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #13 0x45beec in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #14 0x485422 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0x7fb75f0b1082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 5792732f783158c66fb4f3756458ca24e46e827d)
+    #16 0x44c80d in _start (/out/ffmpeg_DEMUXER_fuzzer+0x44c80d)
+
+DEDUP_TOKEN: gen_alias_map--read_distribution_bundle--entropy_decoder_init
+[1m[32mAddress 0x7fb75eb95a60 is located in stack of thread T0 at offset 608 in frame[1m[0m
+[1m[0m    #0 0xddf2cf in read_distribution_bundle /src/ffmpeg/libavcodec/jpegxl_parser.c:804
+
+DEDUP_TOKEN: read_distribution_bundle
+  This frame has 19 object(s):
+    [32, 288) 'overfull.i' (line 558)
+    [352, 608) 'underfull.i' (line 558)[1m[32m <== Memory access at offset 608 overflows this variable[1m[0m
+    [672, 930) 'logcounts.i' (line 388)
+    [1008, 1266) 'same.i' (line 389)
+    [1344, 1348) 'lens.i.i' (line 621)
+    [1360, 1368) 'symbols.i.i' (line 622)
+    [1392, 1410) 'level1_lens.i' (line 677)
+    [1456, 1474) 'level1_lens_s.i' (line 678)
+    [1520, 1556) 'level1_syms.i' (line 679)
+    [1600, 1676) 'level1_codecounts.i' (line 680)
+    [1712, 1720) 'buf.i' (line 681)
+    [1744, 1768) 'level1_vlc.i' (line 689)
+    [1808, 1872) 'nested.i' (line 508)
+    [1904, 1908) 'clust.i' (line 516)
+    [1920, 2176) 'mtf.i' (line 529)
+    [2240, 2256) 'constants.i259' (line 215)
+    [2272, 2288) 'ubits.i260' (line 216)
+    [2304, 2320) 'constants.i' (line 215)
+    [2336, 2352) 'ubits.i' (line 216)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/ffmpeg/libavcodec/jpegxl_parser.c in gen_alias_map
+Shadow bytes around the buggy address:
+  0x0ff76bd6aaf0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0ff76bd6ab00: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0ff76bd6ab10: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0ff76bd6ab20: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0ff76bd6ab30: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0ff76bd6ab40: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mf2[1m[0m][1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x0ff76bd6ab50: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x0ff76bd6ab60: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x0ff76bd6ab70: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x0ff76bd6ab80: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x0ff76bd6ab90: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42529337

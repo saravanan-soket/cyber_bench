@@ -1,0 +1,110 @@
+ARVO id: 42519995
+Project: binutils-gdb
+Fuzz target: fuzz_objdump_safe
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: git://sourceware.org/git/binutils-gdb.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/fuzz_objdump_safe[0m
+
+/tmp/libfuzzer.7:     file format pe-aarch64-little
+/tmp/libfuzzer.7
+
+Characteristics 0x10
+
+Time/Date		Tue Jul 28 08:40:31 2105
+Magic			0000
+MajorLinkerVersion	0
+MinorLinkerVersion	0
+SizeOfCode		0000000000000000
+SizeOfInitializedData	0000000000000000
+SizeOfUninitializedData	0000000000000000
+AddressOfEntryPoint	0000000000000000
+BaseOfCode		0000000000000000
+ImageBase		0000000000000000
+SectionAlignment	00000000
+FileAlignment		00000000
+MajorOSystemVersion	0
+MinorOSystemVersion	0
+MajorImageVersion	0
+MinorImageVersion	0
+MajorSubsystemVersion	0
+MinorSubsystemVersion	0
+Win32Version		00000000
+SizeOfImage		00000000
+SizeOfHeaders		00000000
+CheckSum		00000000
+Subsystem		00000000	(unspecified)
+DllCharacteristics	00000000
+SizeOfStackReserve	0000000000000000
+SizeOfStackCommit	0000000000000000
+SizeOfHeapReserve	0000000000000000
+SizeOfHeapCommit	0000000000000000
+LoaderFlags		00000000
+NumberOfRvaAndSizes	00000000
+
+The Data Directory
+Entry 0 0000000000000000 00000000 Export Directory [.edata (or where ever we found it)]
+Entry 1 0000000000000000 00000000 Import Directory [parts of .idata]
+Entry 2 0000000000000000 00000000 Resource Directory [.rsrc]
+Entry 3 0000000000000000 00000000 Exception Directory [.pdata]
+Entry 4 0000000000000000 00000000 Security Directory
+Entry 5 0000000000000000 00000000 Base Relocation Directory [.reloc]
+Entry 6 0000000000000000 00000000 Debug Directory
+Entry 7 0000000000000000 00000000 Description Directory
+Entry 8 0000000000000000 00000000 Special Directory
+Entry 9 0000000000000000 00000000 Thread Storage Directory [.tls]
+Entry a 0000000000000000 00000000 Load Configuration Directory
+Entry b 0000000000000000 00000000 Bound Import Directory
+Entry c 0000000000000000 00000000 Import Address Table Directory
+Entry d 0000000000000000 00000000 Delay Import Directory
+Entry e 0000000000000000 00000000 CLR Runtime Header
+Entry f 0000000000000000 00000000 Reserved
+
+Sections:
+Idx Name          Size      VMA               LMA               File off  Algn
+  0 .dwframe      0000007f  0000000000520003  0000000000520003  00000080  2**2
+                  CONTENTS, RELOC, READONLY, NOREAD
+  1               000100ff  00000000ff100001  00000000ff100001  00010005  2**2
+                  CONTENTS, SHARED, NOREAD
+  2 D             00000000  0000000000000000  0000000000000000  00000000  2**2
+                  READONLY, NOREAD
+BFD: /tmp/libfuzzer.7: warning: illegal symbol index 1561 in relocs
+BFD: /tmp/libfuzzer.7: warning: illegal symbol index 16776976 in relocs
+BFD: /tmp/libfuzzer.7: warning: illegal symbol index 16776976 in relocs
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x60bfffae003d (pc 0x00000096fc38 bp 0x7ffd5f808ad0 sp 0x7ffd5f808ac0 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x96fc38 in bfd_putl32 /src/binutils-gdb/bfd/libbfd.c:846:11
+    #1 0xe9ec22 in coff_aarch64_addr32_reloc /src/binutils-gdb/bfd/./coff-aarch64.c:75:3
+    #2 0x15bbe80 in bfd_perform_relocation /src/binutils-gdb/bfd/reloc.c:689:14
+    #3 0x15bebeb in bfd_generic_get_relocated_section_contents /src/binutils-gdb/bfd/reloc.c:8606:10
+    #4 0x957b37 in bfd_get_relocated_section_contents /src/binutils-gdb/bfd/bfd.c:2331:10
+    #5 0x979b69 in bfd_simple_get_relocated_section_contents /src/binutils-gdb/bfd/simple.c:276:14
+    #6 0x4e7741 in load_specific_debug_section /src/binutils-gdb/binutils/./fuzz_objdump.h:4247:13
+    #7 0x4f2c54 in dump_dwarf_section /src/binutils-gdb/binutils/./fuzz_objdump.h:4417:6
+    #8 0x978883 in bfd_map_over_sections /src/binutils-gdb/bfd/section.c:1366:5
+    #9 0x4f14a8 in dump_dwarf /src/binutils-gdb/binutils/./fuzz_objdump.h:4458:3
+    #10 0x4ee3cb in dump_bfd /src/binutils-gdb/binutils/./fuzz_objdump.h:5660:5
+    #11 0x4ec33e in display_object_bfd /src/binutils-gdb/binutils/./fuzz_objdump.h
+    #12 0x4ec33e in display_any_bfd /src/binutils-gdb/binutils/./fuzz_objdump.h:5825:5
+    #13 0x4ec091 in display_file /src/binutils-gdb/binutils/./fuzz_objdump.h:5846:3
+    #14 0x4ec091 in LLVMFuzzerTestOneInput /src/binutils-gdb/binutils/fuzz_objdump.c:80:3
+    #15 0x4dd58b in main (/out/fuzz_objdump_safe+0x4dd58b)
+    #16 0x7f3f0bddb082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #17 0x41e79d in _start (/out/fuzz_objdump_safe+0x41e79d)
+
+DEDUP_TOKEN: bfd_putl32--coff_aarch64_addr32_reloc--bfd_perform_relocation
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/binutils-gdb/bfd/libbfd.c:846:11 in bfd_putl32
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42519995

@@ -1,0 +1,41 @@
+ARVO id: 42522622
+Project: serenity
+Fuzz target: FuzzPDF
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Bad-cast
+Language: c++
+Repo: https://github.com/SerenityOS/serenity
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1814139083
+INFO: Loaded 1 modules   (45484 inline 8-bit counters): 45484 [0x82a948, 0x835af4), 
+INFO: Loaded 1 PC tables (45484 PCs): 45484 [0x835af8,0x8e75b8), 
+/out/FuzzPDF: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[31m[[34mparse_header[0m @ /src/serenity/Userland/Libraries/LibPDF/DocumentParser.cpp:81] Parser error at offset 0: Not a PDF document[0m
+Failed to parse PDF file: Not a PDF document
+[1m/src/serenity/Meta/Lagom/../../AK/Format.h:298:30:[1m[31m runtime error: [1m[0m[1mmember call on address 0x7ffff4b321d8 with insufficient space for an object of type 'AK::Array<AK::TypeErasedParameter, 0>'[1m[0m
+[1m0x7ffff4b321d8:[1m[30m note: [1m[0mpointer points here[1m[0m
+ 00 00 00 00  b0 21 b3 f4 ff 7f 00 00  08 00 00 00 00 00 00 00  00 da 4d 00 00 00 00 00  50 36 38 12
+[1m[32m              ^ [1m[0m
+    #0 0x4e6419 in VariadicFormatParams /src/serenity/Meta/Lagom/../../AK/Format.h:298:30
+    #1 0x4e6419 in outln<> /src/serenity/Meta/Lagom/../../AK/Format.h:563:72
+    #2 0x4e6419 in warnln<> /src/serenity/Meta/Lagom/../../AK/Format.h:590:93
+    #3 0x4e6419 in PDF::DocumentParser::initialize() /src/serenity/Userland/Libraries/LibPDF/DocumentParser.cpp:33:9
+    #4 0x4c780c in PDF::Document::create(AK::Span<unsigned char const>) /src/serenity/Userland/Libraries/LibPDF/Document.cpp:42:5
+    #5 0x4c4d4c in LLVMFuzzerTestOneInput /src/serenity/Meta/Lagom/Fuzzers/FuzzPDF.cpp:14:31
+    #6 0x42ac63 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #7 0x4163c2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #8 0x41bc6c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #9 0x4451a2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7f70f626b082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #11 0x40c58d in _start (/out/FuzzPDF+0x40c58d)
+
+DEDUP_TOKEN: VariadicFormatParams--outln<>--warnln<>
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /src/serenity/Meta/Lagom/../../AK/Format.h:298:30 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42522622

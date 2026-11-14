@@ -1,0 +1,38 @@
+ARVO id: 42503480
+Project: duckdb
+Fuzz target: parse_fuzz_test
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/duckdb/duckdb
+
+=== Crash report ===
+Warning: AFL++ tools might need to set AFL_MAP_SIZE to 751268 to be able to run this instrumented program if this crashes!
+Reading 54 bytes from /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x00009fff801c (pc 0x0000014f66e8 bp 0x7fffdd60feb0 sp 0x7fffdd60fd20 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x14f66e8 in duckdb::Transformer::TransformSelectNode(duckdb_libpgquery::PGSelectStmt*) /src/duckdb/src/parser/transform/statement/transform_select_node.cpp
+    #1 0x1500397 in duckdb::Transformer::TransformSelect(duckdb_libpgquery::PGNode*, bool) /src/duckdb/src/parser/transform/statement/transform_select.cpp:21:17
+    #2 0x1500397 in duckdb::Transformer::TransformCreateTableAs(duckdb_libpgquery::PGNode*) /src/duckdb/src/parser/transform/statement/transform_create_table_as.cpp:17:15
+    #3 0x537ce2 in duckdb::Transformer::TransformStatement(duckdb_libpgquery::PGNode*) /src/duckdb/src/parser/transformer.cpp:68:10
+    #4 0x537545 in duckdb::Transformer::TransformStatement(duckdb_libpgquery::PGNode*) /src/duckdb/src/parser/transformer.cpp:24:17
+    #5 0x50fc34 in duckdb::Transformer::TransformParseTree(duckdb_libpgquery::PGList*, std::__1::vector<std::__1::unique_ptr<duckdb::SQLStatement, std::__1::default_delete<duckdb::SQLStatement> >, std::__1::allocator<std::__1::unique_ptr<duckdb::SQLStatement, std::__1::default_delete<duckdb::SQLStatement> > > >&) /src/duckdb/src/parser/transformer.cpp:12:15
+    #6 0x504060 in duckdb::Parser::ParseQuery(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/duckdb/src/parser/parser.cpp:37:15
+    #7 0x4e4e32 in LLVMFuzzerTestOneInput /src/duckdb/./parse_fuzz_test.cpp:19:15
+    #8 0x4e4cb5 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:191:7
+    #9 0x4e4b25 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #10 0x7f12693310b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #11 0x42b08d in _start (/out/parse_fuzz_test+0x42b08d)
+
+DEDUP_TOKEN: duckdb::Transformer::TransformSelectNode(duckdb_libpgquery::PGSelectStmt*)--duckdb::Transformer::TransformSelect(duckdb_libpgquery::PGNode*, bool)--duckdb::Transformer::TransformCreateTableAs(duckdb_libpgquery::PGNode*)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/duckdb/src/parser/transform/statement/transform_select_node.cpp in duckdb::Transformer::TransformSelectNode(duckdb_libpgquery::PGSelectStmt*)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42503480

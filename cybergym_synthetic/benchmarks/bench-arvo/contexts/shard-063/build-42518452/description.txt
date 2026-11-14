@@ -1,0 +1,52 @@
+ARVO id: 42518452
+Project: serenity
+Fuzz target: FuzzMarkdown
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/SerenityOS/serenity
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 539027305
+INFO: Loaded 1 modules   (203742 inline 8-bit counters): 203742 [0x1eb6cc8, 0x1ee88a6), 
+INFO: Loaded 1 PC tables (203742 PCs): 203742 [0x1ee88a8,0x2204688), 
+/out/FuzzMarkdown: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x7f8557200000 (pc 0x000000d27831 bp 0x7ffc8364d7e0 sp 0x7ffc8364d7d0 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0xd27831 in ~NonnullRefPtr /src/serenity/Meta/Lagom/../../AK/NonnullRefPtr.h:96:27
+    #1 0xd27831 in ~COWVector /src/serenity/Userland/Libraries/LibRegex/RegexMatch.h:28:7
+    #2 0xd27831 in regex::MatchState::~MatchState() /src/serenity/Userland/Libraries/LibRegex/RegexMatch.h:635:8
+    #3 0xd3ad04 in ~Node /src/serenity/Userland/Libraries/LibRegex/RegexMatcher.cpp:382:12
+    #4 0xd3ad04 in auto AK::UniformBumpAllocator<regex::BumpAllocatedLinkedList<regex::MatchState>::Node, true, 2097152ul>::destroy_all()::'lambda'(auto)::operator()<unsigned long>(auto) const /src/serenity/Meta/Lagom/../../AK/BumpAllocator.h:190:50
+    #5 0xd3ab64 in void AK::BumpAllocator<true, 2097152ul>::for_each_chunk<AK::UniformBumpAllocator<regex::BumpAllocatedLinkedList<regex::MatchState>::Node, true, 2097152ul>::destroy_all()::'lambda'(auto)>(auto&&) /src/serenity/Meta/Lagom/../../AK/BumpAllocator.h:94:13
+    #6 0xd32ed1 in destroy_all /src/serenity/Meta/Lagom/../../AK/BumpAllocator.h:181:15
+    #7 0xd32ed1 in ~UniformBumpAllocator /src/serenity/Meta/Lagom/../../AK/BumpAllocator.h:161:9
+    #8 0xd32ed1 in ~BumpAllocatedLinkedList /src/serenity/Userland/Libraries/LibRegex/RegexMatcher.cpp:334:7
+    #9 0xd32ed1 in regex::Matcher<regex::ECMA262Parser>::execute(regex::MatchInput const&, regex::MatchState&, unsigned long&) const /src/serenity/Userland/Libraries/LibRegex/RegexMatcher.cpp:515:1
+    #10 0xd319d5 in regex::Matcher<regex::ECMA262Parser>::match(AK::Vector<regex::RegexStringView, 0ul> const&, AK::Optional<regex::RegexOptions<regex::ECMAScriptFlags> >) const /src/serenity/Userland/Libraries/LibRegex/RegexMatcher.cpp:251:28
+    #11 0xd30fa7 in regex::Matcher<regex::ECMA262Parser>::match(regex::RegexStringView, AK::Optional<regex::RegexOptions<regex::ECMAScriptFlags> >) const /src/serenity/Userland/Libraries/LibRegex/RegexMatcher.cpp:114:12
+    #12 0x4da8a4 in regex::Regex<regex::ECMA262Parser>::match(regex::RegexStringView, AK::Optional<regex::RegexOptions<regex::ECMAScriptFlags> >) const /src/serenity/Meta/Lagom/../../Userland/Libraries/LibRegex/RegexMatcher.h:107:25
+    #13 0x4da574 in Markdown::HorizontalRule::parse(Markdown::LineIterator&) /src/serenity/Userland/Libraries/LibMarkdown/HorizontalRule.cpp:47:36
+    #14 0x4d545a in bool Markdown::try_parse_block<Markdown::HorizontalRule>(Markdown::LineIterator&, AK::NonnullOwnPtrVector<Markdown::Block, 0ul>&) /src/serenity/Userland/Libraries/LibMarkdown/ContainerBlock.cpp:82:31
+    #15 0x4d4b00 in Markdown::ContainerBlock::parse(Markdown::LineIterator&) /src/serenity/Userland/Libraries/LibMarkdown/ContainerBlock.cpp:127:16
+    #16 0x4d8c77 in Markdown::Document::parse(AK::StringView) /src/serenity/Userland/Libraries/LibMarkdown/Document.cpp:64:27
+    #17 0x4d364e in LLVMFuzzerTestOneInput /src/serenity/Meta/Lagom/Fuzzers/FuzzMarkdown.cpp:16:11
+    #18 0x4394f3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #19 0x424c52 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #20 0x42a4fc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #21 0x453a32 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #22 0x7f8559702082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #23 0x41ae1d in _start (/out/FuzzMarkdown+0x41ae1d)
+
+DEDUP_TOKEN: ~NonnullRefPtr--~COWVector--regex::MatchState::~MatchState()
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/serenity/Meta/Lagom/../../AK/NonnullRefPtr.h:96:27 in ~NonnullRefPtr
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42518452

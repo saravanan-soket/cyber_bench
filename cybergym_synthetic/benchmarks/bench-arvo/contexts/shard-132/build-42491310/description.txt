@@ -1,0 +1,63 @@
+ARVO id: 42491310
+Project: imagemagick
+Fuzz target: encoder_gradient_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1894554761
+INFO: Loaded 1 modules   (191939 inline 8-bit counters): 191939 [0x28aa7f0, 0x28d95b3), 
+INFO: Loaded 1 PC tables (191939 PCs): 191939 [0x28d95b8,0x2bc71e8), 
+/out/encoder_gradient_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0xe28ad3 in PerceptibleReciprocal /src/imagemagick/./MagickCore/pixel-accessor.h:243:7
+    #1 0xe3b538 in HorizontalFilter /src/imagemagick/MagickCore/resize.c:3462:15
+    #2 0xe39354 in ResizeImage /src/imagemagick/MagickCore/resize.c:3803:15
+    #3 0xa7cbac in ReadImage /src/imagemagick/MagickCore/constitute.c:797:30
+    #4 0x731f86 in Magick::Image::read(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4094:12
+    #5 0x705f8d in fuzzEncoderWithStringFilename(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, unsigned char const*, unsigned long, bool (*)(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)) /src/imagemagick/Magick++/fuzz/encoder_utils.cc:15:11
+    #6 0x705cab in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_gradient_fuzzer.cc:10:10
+    #7 0x5c0b71 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #8 0x5a9cb2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #9 0x5afff5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #10 0x5daaf2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7f85017c983f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #12 0x584bc8 in _start (/out/encoder_gradient_fuzzer+0x584bc8)
+
+DEDUP_TOKEN: PerceptibleReciprocal--HorizontalFilter--ResizeImage
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x6351c5 in posix_memalign /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:170:3
+    #1 0xc8811a in AcquireAlignedMemory_POSIX /src/imagemagick/MagickCore/memory.c:272:7
+    #2 0xc87dc8 in AcquireAlignedMemory /src/imagemagick/MagickCore/memory.c:350:10
+    #3 0x9e5a7c in OpenPixelCache /src/imagemagick/MagickCore/cache.c:3751:46
+    #4 0x9ec3c3 in GetImagePixelCache /src/imagemagick/MagickCore/cache.c:1775:18
+    #5 0x9f5189 in SyncImagePixelCache /src/imagemagick/MagickCore/cache.c:5521:28
+    #6 0xc1ea4c in SetImageExtent /src/imagemagick/MagickCore/image.c:2664:10
+    #7 0xc1671f in CloneImage /src/imagemagick/MagickCore/image.c:898:7
+    #8 0xe38f11 in ResizeImage /src/imagemagick/MagickCore/resize.c
+    #9 0xa7cbac in ReadImage /src/imagemagick/MagickCore/constitute.c:797:30
+    #10 0x731f86 in Magick::Image::read(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4094:12
+    #11 0x705f8d in fuzzEncoderWithStringFilename(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, unsigned char const*, unsigned long, bool (*)(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)) /src/imagemagick/Magick++/fuzz/encoder_utils.cc:15:11
+    #12 0x705cab in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_gradient_fuzzer.cc:10:10
+    #13 0x5c0b71 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #14 0x5a9cb2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #15 0x5afff5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #16 0x5daaf2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7f85017c983f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: posix_memalign--AcquireAlignedMemory_POSIX--AcquireAlignedMemory
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/imagemagick/./MagickCore/pixel-accessor.h:243:7 in PerceptibleReciprocal
+Unique heap origins: 800
+Stack depot allocated bytes: 119448
+Unique origin histories: 26
+History depot allocated bytes: 624
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42491310

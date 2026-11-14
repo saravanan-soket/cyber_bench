@@ -1,0 +1,62 @@
+ARVO id: 42482668
+Project: ghostpdl
+Fuzz target: gstoraster_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://cgit.ghostscript.com/ghostpdl.git
+
+=== Crash report ===
+INFO: Seed: 2257293313
+INFO: Loaded 3 modules   (131157 inline 8-bit counters): 11439 [0x7f8e366a8160, 0x7f8e366aae0f), 846 [0x7f8e368fd920, 0x7f8e368fdc6e), 118872 [0x2753150, 0x27701a8), 
+INFO: Loaded 3 PC tables (131157 PCs): 11439 [0x7f8e366aae10,0x7f8e366d7900), 846 [0x7f8e368fdc70,0x7f8e36901150), 118872 [0x1dbf390,0x1f8f910), 
+/out/gstoraster_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+INFO: Start rendering...
+INFO: Processing page 1...
+   **** Error:  An error occurred while reading an XREF table.
+   **** The file has been damaged.  This may have been caused
+   **** by a problem while converting or transfering the file.
+   **** Ghostscript will attempt to recover the data.
+   **** However, the output may be incorrect.
+   **** Error: stream Length incorrect.
+               Output may be incorrect.
+   **** Error: stream Length incorrect.
+               Output may be incorrect.
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x000000da9a66 bp 0x7ffdb3259a70 sp 0x7ffdb3259920 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Dissassemble the provided pc to learn which register was used.
+SCARINESS: 20 (wild-addr-read)
+    #0 0xda9a66 in s_DCTD_process /src/ghostpdl/./base/sdctd.c:414:1
+    #1 0x66aa74 in sreadbuf /src/ghostpdl/./base/stream.c:823:22
+    #2 0x668727 in s_process_read_buf /src/ghostpdl/./base/stream.c:749:14
+    #3 0xc6a553 in image_file_continue /src/ghostpdl/./psi/zimage.c:523:21
+    #4 0xba95b0 in interp /src/ghostpdl/./psi/interp.c:1300:28
+    #5 0xba68a1 in gs_call_interp /src/ghostpdl/./psi/interp.c:520:12
+    #6 0xba61da in gs_interpret /src/ghostpdl/./psi/interp.c:477:12
+    #7 0x55a2e9 in gs_main_run_string_end /src/ghostpdl/./psi/imain.c:791:12
+    #8 0x559d97 in gs_main_run_string_with_length /src/ghostpdl/./psi/imain.c:735:12
+    #9 0xd0b960 in run_string /src/ghostpdl/./psi/imainarg.c:1119:12
+    #10 0xd08471 in swproc /src/ghostpdl/./psi/imainarg.c:366:20
+    #11 0xd0611e in gs_main_init_with_args01 /src/ghostpdl/./psi/imainarg.c:224:24
+    #12 0xd0b749 in gs_main_init_with_args /src/ghostpdl/./psi/imainarg.c:288:16
+    #13 0x5556ad in gs_to_raster_fuzz(unsigned char const*, unsigned long) /src/ghostpdl/fuzz/gstoraster_fuzzer.cc:79:8
+    #14 0x5554c0 in LLVMFuzzerTestOneInput /src/ghostpdl/fuzz/gstoraster_fuzzer.cc:96:2
+    #15 0x45b1b1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #16 0x445cd1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #17 0x44b98e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #18 0x4758b2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #19 0x7f8e3513d82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #20 0x41f148 in _start (/out/gstoraster_fuzzer+0x41f148)
+
+DEDUP_TOKEN: s_DCTD_process--sreadbuf--s_process_read_buf
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/ghostpdl/./base/sdctd.c:414:1 in s_DCTD_process
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42482668

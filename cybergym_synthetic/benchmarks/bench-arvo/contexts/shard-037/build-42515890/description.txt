@@ -1,0 +1,46 @@
+ARVO id: 42515890
+Project: assimp
+Fuzz target: assimp_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/assimp/assimp.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2400642597
+INFO: Loaded 1 modules   (236281 inline 8-bit counters): 236281 [0x2bb84d0, 0x2bf1fc9), 
+INFO: Loaded 1 PC tables (236281 PCs): 236281 [0x2bf1fd0,0x2f8cf60), 
+/out/assimp_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Info,  T0: Load $$$___magic___$$$.
+Info,  T0: Found a matching importer for this file format: LightWave Scene Importer.
+Info,  T0: Import root directory is './'
+Info,  T0: LWS file format version is Channel
+Error, T0: LWS: Unexpected keyword: 'Channel'
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x000000718b38 (pc 0x0000007200e3 bp 0x7fffffffd0e0 sp 0x7fffffffd0c0 T7)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+    #0 0x7200e3 in std::__1::list<Assimp::LWO::Envelope, std::__1::allocator<Assimp::LWO::Envelope> >::__link_nodes_at_back(std::__1::__list_node_base<Assimp::LWO::Envelope, void*>*, std::__1::__list_node_base<Assimp::LWO::Envelope, void*>*) /usr/local/bin/../include/c++/v1/list:1193:27
+    #1 0x7168a6 in std::__1::list<Assimp::LWO::Envelope, std::__1::allocator<Assimp::LWO::Envelope> >::push_back(Assimp::LWO::Envelope&&) /usr/local/bin/../include/c++/v1/list:1645:5
+    #2 0x719abd in Assimp::LWSImporter::InternReadFile(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, aiScene*, Assimp::IOSystem*) /src/assimp/code/AssetLib/LWS/LWSLoader.cpp:644:35
+    #3 0x4d85cb in Assimp::BaseImporter::ReadFile(Assimp::Importer*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, Assimp::IOSystem*) /src/assimp/code/Common/BaseImporter.cpp:111:9
+    #4 0x4fd2fb in Assimp::Importer::ReadFile(char const*, unsigned int) /src/assimp/code/Common/Importer.cpp:675:30
+    #5 0x4fc2d2 in Assimp::Importer::ReadFileFromMemory(void const*, unsigned long, unsigned int, char const*) /src/assimp/code/Common/Importer.cpp:512:5
+    #6 0x4b62f1 in LLVMFuzzerTestOneInput /src/assimp/fuzz/assimp_fuzzer.cc:53:34
+    #7 0x445183 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #8 0x430602 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #9 0x4362d7 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #10 0x45ff42 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #12 0x40b9b8 in _start (/out/assimp_fuzzer+0x40b9b8)
+
+DEDUP_TOKEN: std::__1::list<Assimp::LWO::Envelope, std::__1::allocator<Assimp::LWO::Envelope> >::__link_nodes_at_back(std::__1::__list_node_base<Assimp::LWO::Envelope, void*>*, std::__1::__list_node_base<Assimp::LWO::Envelope, void*>*)--std::__1::list<Assimp::LWO::Envelope, std::__1::allocator<Assimp::LWO::Envelope> >::push_back(Assimp::LWO::Envelope&&)--Assimp::LWSImporter::InternReadFile(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, aiScene*, Assimp::IOSystem*)
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /usr/local/bin/../include/c++/v1/list:1193:27 in std::__1::list<Assimp::LWO::Envelope, std::__1::allocator<Assimp::LWO::Envelope> >::__link_nodes_at_back(std::__1::__list_node_base<Assimp::LWO::Envelope, void*>*, std::__1::__list_node_base<Assimp::LWO::Envelope, void*>*)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42515890

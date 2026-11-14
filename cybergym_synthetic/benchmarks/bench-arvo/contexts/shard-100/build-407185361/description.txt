@@ -1,0 +1,53 @@
+ARVO id: 407185361
+Project: matio
+Fuzz target: matio_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/tbeu/matio.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2281834957
+INFO: Loaded 1 modules   (98516 inline 8-bit counters): 98516 [0x55f545796338, 0x55f5457ae40c), 
+INFO: Loaded 1 PC tables (98516 PCs): 98516 [0x55f5457ae410,0x55f54592f150), 
+/out/matio_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+-E- ossfuzz: InflateData: inflate returned data error
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x55f544a4a5fd in Mat_uint16Swap /src/matio/src/endian.c:181:5
+    #1 0x55f544b2d05b in ReadCompressedDoubleDataUInt16 /src/matio/src/./read_data_impl.h:491:5
+    #2 0x55f544b2d05b in ReadCompressedDoubleData /src/matio/src/./read_data_impl.h:567:13
+    #3 0x55f544a5372f in Mat_VarReadNumeric5 /src/matio/src/mat5.c:3008:26
+    #4 0x55f544a4df14 in Mat_VarRead5 /src/matio/src/mat5.c:3943:23
+    #5 0x55f544b119b9 in ReadNextStructField /src/matio/src/mat5.c:1638:45
+    #6 0x55f544b0c745 in Mat_VarReadNextInfo5 /src/matio/src/mat5.c:5354:27
+    #7 0x55f544a244ad in Mat_VarReadNextInfoPredicate /src/matio/src/mat.c:2634:22
+    #8 0x55f544a244ad in Mat_VarReadNextInfo /src/matio/src/mat.c:2608:12
+    #9 0x55f544a244ad in Mat_GetDir /src/matio/src/mat.c:827:26
+    #10 0x55f544a1d85c in MatioRead(char const*) /src/matio/ossfuzz/./matio_wrap.h:39:24
+    #11 0x55f544a1db01 in LLVMFuzzerTestOneInput /src/matio/ossfuzz/./matio_fuzzer.cpp:30:12
+    #12 0x55f54491a550 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #13 0x55f544904ce4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #14 0x55f54490a77a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #15 0x55f544936b72 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7f740afc7082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 87b331c034a6458c64ce09c03939e947212e18ce)
+    #17 0x55f5448fb7bd in _start (/out/matio_fuzzer+0x2937bd)
+
+DEDUP_TOKEN: Mat_uint16Swap--ReadCompressedDoubleDataUInt16--ReadCompressedDoubleData
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mv.i576[1m[35m' in the stack frame[1m[0m
+    #0 0x55f544b2cf6e in ReadCompressedDoubleDataUInt16 /src/matio/src/./read_data_impl.h:490:5
+    #1 0x55f544b2cf6e in ReadCompressedDoubleData /src/matio/src/./read_data_impl.h:567:13
+
+DEDUP_TOKEN: ReadCompressedDoubleDataUInt16--ReadCompressedDoubleData
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/matio/src/endian.c:181:5 in Mat_uint16Swap
+Unique heap origins: 1686
+Stack depot allocated bytes: 9764880
+Unique origin histories: 157
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/407185361

@@ -1,0 +1,62 @@
+ARVO id: 42493541
+Project: uWebSockets
+Fuzz target: EpollEchoServer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/uNetworking/uWebSockets.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2114682572
+INFO: Loaded 1 modules   (3951 inline 8-bit counters): 3951 [0xa065b8, 0xa07527), 
+INFO: Loaded 1 PC tables (3951 PCs): 3951 [0x76eaf0,0x77e1e0), 
+/out/EpollEchoServer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x545447 in uWS::WebSocket<false, true>::end(int, std::__1::basic_string_view<char, std::__1::char_traits<char> >) /src/uWebSockets/fuzzing/../src/WebSocket.h:140:13
+    #1 0x56228f in invoke<0, fu2::detail::type_erasure::data_accessor *, const unsigned long &> /src/uWebSockets/fuzzing/../src/f2/function2.hpp:995:12
+    #2 0x56228f in invoke<0, fu2::detail::type_erasure::erasure<true, fu2::detail::config<true, false, fu2::capacity_default>, fu2::detail::property<true, false, void ()> > &> /src/uWebSockets/fuzzing/../src/f2/function2.hpp:1213:37
+    #3 0x56228f in operator() /src/uWebSockets/fuzzing/../src/f2/function2.hpp:775:1
+    #4 0x56228f in uWS::Loop::wakeupCb(us_loop_t*) /src/uWebSockets/fuzzing/../src/Loop.h:40:13
+    #5 0x5c4553 in us_loop_run /src/uWebSockets/fuzzing/../uSockets/src/eventing/epoll_kqueue.c:147:21
+    #6 0x535d1c in run /src/uWebSockets/fuzzing/../src/Loop.h:159:9
+    #7 0x535d1c in run /src/uWebSockets/fuzzing/../src/Loop.h:176:18
+    #8 0x535d1c in uWS::TemplatedApp<false>::run() /src/uWebSockets/fuzzing/../src/App.h:360:9
+    #9 0x52fe5d in test() /src/uWebSockets/fuzzing/EpollEchoServer.cpp:136:13
+    #10 0x52df20 in LLVMFuzzerTestOneInput /src/uWebSockets/fuzzing/./libEpollFuzzer/epoll_fuzzer.h:740:2
+    #11 0x45d061 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #12 0x446d22 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #13 0x44d076 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #14 0x477062 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #16 0x4216e8 in _start (/out/EpollEchoServer+0x4216e8)
+
+DEDUP_TOKEN: uWS::WebSocket<false, true>::end(int, std::__1::basic_string_view<char, std::__1::char_traits<char> >)--invoke<0, fu2::detail::type_erasure::data_accessor *, const unsigned long &>--invoke<0, fu2::detail::type_erasure::erasure<true, fu2::detail::config<true, false, fu2::capacity_default>, fu2::detail::property<true, false, void ()> > &>
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x4d83dd in malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:901:3
+    #1 0x5c8c52 in us_internal_dispatch_ready_poll /src/uWebSockets/fuzzing/../uSockets/src/loop.c:212:56
+    #2 0x5c4553 in us_loop_run /src/uWebSockets/fuzzing/../uSockets/src/eventing/epoll_kqueue.c:147:21
+    #3 0x535d1c in run /src/uWebSockets/fuzzing/../src/Loop.h:159:9
+    #4 0x535d1c in run /src/uWebSockets/fuzzing/../src/Loop.h:176:18
+    #5 0x535d1c in uWS::TemplatedApp<false>::run() /src/uWebSockets/fuzzing/../src/App.h:360:9
+    #6 0x52fe5d in test() /src/uWebSockets/fuzzing/EpollEchoServer.cpp:136:13
+    #7 0x52df20 in LLVMFuzzerTestOneInput /src/uWebSockets/fuzzing/./libEpollFuzzer/epoll_fuzzer.h:740:2
+    #8 0x45d061 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #9 0x446d22 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #10 0x44d076 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #11 0x477062 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: malloc--us_internal_dispatch_ready_poll--us_loop_run
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/uWebSockets/fuzzing/../src/WebSocket.h:140:13 in uWS::WebSocket<false, true>::end(int, std::__1::basic_string_view<char, std::__1::char_traits<char> >)
+Unique heap origins: 139
+Stack depot allocated bytes: 14904
+Unique origin histories: 57
+History depot allocated bytes: 1368
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42493541

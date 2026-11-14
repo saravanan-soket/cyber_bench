@@ -1,0 +1,99 @@
+ARVO id: 409093735
+Project: karchive
+Fuzz target: karchive_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://invent.kde.org/frameworks/karchive.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1722205200
+INFO: Loaded 1 modules   (221274 inline 8-bit counters): 221274 [0x5555d2c0cc61, 0x5555d2c42cbb), 
+INFO: Loaded 1 PC tables (221274 PCs): 221274 [0x5555d2c42cc0,0x5555d2fa3260), 
+/out/karchive_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+QIODevice::seek (QBuffer): The device is not open
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x50c0000006c0 at pc 0x5555d1fb8763 bp 0x7fff99bb46f0 sp 0x7fff99bb46e8
+[1m[0m[1m[34mREAD of size 1 at 0x50c0000006c0 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x5555d1fb8762 in GetUi32(char const*) /src/karchive/src/k7zip.cpp:51:43
+    #1 0x5555d1fb8762 in K7Zip::K7ZipPrivate::readHashDigests(int, QList<bool>&, QList<unsigned int>&) /src/karchive/src/k7zip.cpp:741:19
+    #2 0x5555d1fbdb3a in K7Zip::K7ZipPrivate::readPackInfo() /src/karchive/src/k7zip.cpp:902:13
+    #3 0x5555d1fc5949 in K7Zip::K7ZipPrivate::readMainStreamsInfo() /src/karchive/src/k7zip.cpp:1166:18
+    #4 0x5555d1fdb290 in K7Zip::openArchive(QFlags<QIODeviceBase::OpenModeFlag>) /src/karchive/src/k7zip.cpp:2448:17
+    #5 0x5555d1ff9e16 in KArchive::open(QFlags<QIODeviceBase::OpenModeFlag>) /src/karchive/src/karchive.cpp:171:12
+    #6 0x5555d12dbfda in LLVMFuzzerTestOneInput /src/karchive_fuzzer.cc:87:16
+    #7 0x5555d118ebf0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #8 0x5555d1179e65 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #9 0x5555d117f8ff in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #10 0x5555d11aaba2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7f32c6d76082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+    #12 0x5555d117204d in _start (/out/karchive_fuzzer+0x63d04d)
+
+DEDUP_TOKEN: GetUi32(char const*)--K7Zip::K7ZipPrivate::readHashDigests(int, QList<bool>&, QList<unsigned int>&)--K7Zip::K7ZipPrivate::readPackInfo()
+[1m[32m0x50c0000006c0 is located 0 bytes after 128-byte region [0x50c000000640,0x50c0000006c0)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x5555d129a9bf in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:68:3
+    #1 0x5555d170001a in allocateHelper(long long, long long, long long, QArrayData::AllocationOption) /src/qtbase/src/corelib/tools/qarraydata.cpp:171:52
+    #2 0x5555d170001a in QArrayData::allocate1(QArrayData**, long long, QArrayData::AllocationOption) /src/qtbase/src/corelib/tools/qarraydata.cpp:202:14
+    #3 0x5555d1577dbf in QTypedArrayData<char>::allocate(long long, QArrayData::AllocationOption) /src/qtbase/src/corelib/tools/qarraydata.h:136:22
+    #4 0x5555d1577dbf in QArrayDataPointer<char>::allocateGrow(QArrayDataPointer<char> const&, long long, QArrayData::GrowthPosition) /src/qtbase/src/corelib/tools/qarraydatapointer.h:492:34
+    #5 0x5555d158f684 in QArrayDataPointer<char>::reallocateAndGrow(QArrayData::GrowthPosition, long long, QArrayDataPointer<char>*) /src/qtbase/src/corelib/tools/qarraydatapointer.h:228:30
+    #6 0x5555d1579969 in QByteArray::insert(long long, QByteArrayView) /src/qtbase/src/corelib/text/qbytearray.cpp:2296:11
+    #7 0x5555d1fca1d2 in QByteArray::append(QByteArrayView) /usr/include/QtCore/qbytearray.h:310:14
+    #8 0x5555d1fca1d2 in QByteArray::append(char const*, long long) /usr/include/QtCore/qbytearray.h:307:14
+    #9 0x5555d1fca1d2 in K7Zip::K7ZipPrivate::readAndDecodePackedStreams(bool) /src/karchive/src/k7zip.cpp:1681:33
+    #10 0x5555d1fdafd5 in K7Zip::openArchive(QFlags<QIODeviceBase::OpenModeFlag>) /src/karchive/src/k7zip.cpp:2412:26
+    #11 0x5555d1ff9e16 in KArchive::open(QFlags<QIODeviceBase::OpenModeFlag>) /src/karchive/src/karchive.cpp:171:12
+    #12 0x5555d12dbfda in LLVMFuzzerTestOneInput /src/karchive_fuzzer.cc:87:16
+    #13 0x5555d118ebf0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #14 0x5555d1179e65 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #15 0x5555d117f8ff in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #16 0x5555d11aaba2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7f32c6d76082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+
+DEDUP_TOKEN: __interceptor_malloc--allocateHelper(long long, long long, long long, QArrayData::AllocationOption)--QArrayData::allocate1(QArrayData**, long long, QArrayData::AllocationOption)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/karchive/src/k7zip.cpp:51:43 in GetUi32(char const*)
+Shadow bytes around the buggy address:
+  0x50c000000400: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x50c000000480: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x50c000000500: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x50c000000580: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x50c000000600: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x50c000000680: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x50c000000700: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x50c000000780: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x50c000000800: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x50c000000880: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x50c000000900: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/409093735

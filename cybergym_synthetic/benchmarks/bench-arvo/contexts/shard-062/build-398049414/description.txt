@@ -1,0 +1,52 @@
+ARVO id: 398049414
+Project: ndpi
+Fuzz target: fuzz_ndpi_reader_pl7m_64k
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/ntop/nDPI.git
+
+=== Crash report ===
+INFO: found LLVMFuzzerCustomMutator (0x557e595d1960). Disabling -len_control by default.
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1539448366
+INFO: Loaded 1 modules   (24694 inline 8-bit counters): 24694 [0x557e59b3a680, 0x557e59b406f6), 
+INFO: Loaded 1 PC tables (24694 PCs): 24694 [0x557e59b406f8,0x557e59ba0e58), 
+/out/fuzz_ndpi_reader_pl7m_64k: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==8==ERROR: AddressSanitizer: SEGV on unknown address 0x000100000001 (pc 0x557e595a9d80 bp 0x7ffcbf5f9150 sp 0x7ffcbf5f88d8 T0)
+[1m[0m==8==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x557e595a9d80 in __sanitizer::internal_strlen(char const*) /src/llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_libc.cpp:176:10
+    #1 0x557e5951de41 in printf_common(void*, char const*, __va_list_tag*) /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors_format.inc:561:17
+    #2 0x557e5951e484 in vsnprintf /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:1652:1
+    #3 0x557e5951fdfd in snprintf /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:1723:1
+    #4 0x557e5971e016 in processClientServerHello /src/ndpi/src/lib/protocols/tls.c:3276:3
+    #5 0x557e597178b1 in processTLSBlock /src/ndpi/src/lib/protocols/tls.c:1287:5
+    #6 0x557e59721ad8 in ndpi_search_tls_udp /src/ndpi/src/lib/protocols/tls.c:1691:11
+    #7 0x557e59718a99 in ndpi_search_tls_wrapper /src/ndpi/src/lib/protocols/tls.c:3337:12
+    #8 0x557e5975ccdf in stun_search_again /src/ndpi/src/lib/protocols/stun.c:893:9
+    #9 0x557e596b25f8 in ndpi_process_extra_packet /src/ndpi/src/lib/ndpi_main.c:8228:9
+    #10 0x557e596b25f8 in ndpi_internal_detection_process_packet /src/ndpi/src/lib/ndpi_main.c:8877:5
+    #11 0x557e596b25f8 in ndpi_detection_process_packet /src/ndpi/src/lib/ndpi_main.c:9173:22
+    #12 0x557e595eb856 in packet_processing /src/ndpi/fuzz/../example/reader_util.c:1995:31
+    #13 0x557e595eb856 in ndpi_workflow_process_packet /src/ndpi/fuzz/../example/reader_util.c:2740:10
+    #14 0x557e595d2356 in LLVMFuzzerTestOneInput /src/ndpi/fuzz/fuzz_ndpi_reader.c:175:7
+    #15 0x557e594864d0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #16 0x557e59471745 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #17 0x557e594771df in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #18 0x557e594a2482 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #19 0x7f8cf2b46082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+    #20 0x557e5946992d in _start (/out/fuzz_ndpi_reader_pl7m_64k+0x46b92d)
+
+DEDUP_TOKEN: __sanitizer::internal_strlen(char const*)--printf_common(void*, char const*, __va_list_tag*)--__interceptor_vsnprintf
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/ndpi/src/lib/protocols/tls.c:3276:3 in processClientServerHello
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/398049414

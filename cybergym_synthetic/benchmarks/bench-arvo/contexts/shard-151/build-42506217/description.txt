@@ -1,0 +1,59 @@
+ARVO id: 42506217
+Project: ghostpdl
+Fuzz target: gstoraster_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://cgit.ghostscript.com/ghostpdl.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 445914300
+INFO: Loaded 3 modules   (182523 inline 8-bit counters): 13708 [0x7ffff7f619e0, 0x7ffff7f64f6c), 959 [0x7ffff7fc2a40, 0x7ffff7fc2dff), 167856 [0x2d97c90, 0x2dc0c40), 
+INFO: Loaded 3 PC tables (182523 PCs): 13708 [0x7ffff7f64f70,0x7ffff7f9a830), 959 [0x7ffff7fc2e00,0x7ffff7fc69f0), 167856 [0x24c5430,0x2754f30), 
+/out/gstoraster_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x000000001ed0 (pc 0x000000ffc961 bp 0x7fffffffd060 sp 0x7fffffffcec0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0xffc961 in pdfi_deref_compressed /src/ghostpdl/./pdf/pdf_deref.c:593:68
+    #1 0xffc961 in pdfi_dereference /src/ghostpdl/./pdf/pdf_deref.c:805:20
+    #2 0xfff480 in pdfi_deref_loop_detect /src/ghostpdl/./pdf/pdf_deref.c:909:12
+    #3 0xeb3622 in pdfi_dict_get /src/ghostpdl/./pdf/pdf_dict.c:235:28
+    #4 0x100a71e in pdfi_read_Root /src/ghostpdl/./pdf/pdf_doc.c:51:12
+    #5 0xeac234 in pdfi_init_file /src/ghostpdl/./pdf/ghostpdf.c:1079:16
+    #6 0xeac234 in pdfi_set_input_stream /src/ghostpdl/./pdf/ghostpdf.c:1314:12
+    #7 0xe98974 in zPDFstream /src/ghostpdl/./psi/zpdfops.c:521:12
+    #8 0xcffd1b in interp /src/ghostpdl/./psi/interp.c:1725:40
+    #9 0xcffd1b in gs_call_interp /src/ghostpdl/./psi/interp.c:522:12
+    #10 0xcffd1b in gs_interpret /src/ghostpdl/./psi/interp.c:479:12
+    #11 0x56912a in gs_main_interpret /src/ghostpdl/./psi/imain.c:257:12
+    #12 0x56912a in gs_main_run_string_end /src/ghostpdl/./psi/imain.c:945:12
+    #13 0x56912a in gs_main_run_string_with_length /src/ghostpdl/./psi/imain.c:889:12
+    #14 0x5645d2 in gs_main_run_string /src/ghostpdl/./psi/imain.c:870:12
+    #15 0x101dad1 in run_string /src/ghostpdl/./psi/imainarg.c:1166:12
+    #16 0x1019b09 in swproc /src/ghostpdl/./psi/imainarg.c:367:20
+    #17 0x10169ee in gs_main_init_with_args01 /src/ghostpdl/./psi/imainarg.c:224:24
+    #18 0x101d859 in gs_main_init_with_args /src/ghostpdl/./psi/imainarg.c:289:16
+    #19 0xce8394 in psapi_init_with_args /src/ghostpdl/./psi/psapi.c:281:12
+    #20 0x560ae0 in gsapi_init_with_args /src/ghostpdl/./psi/iapi.c:247:12
+    #21 0x55fcb0 in gs_to_raster_fuzz /src/gstoraster_fuzzer.cc:97:8
+    #22 0x55fcb0 in LLVMFuzzerTestOneInput /src/gstoraster_fuzzer.cc:114:2
+    #23 0x457fb3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #24 0x443802 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #25 0x44937c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #26 0x4723b2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #27 0x7ffff795d0b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #28 0x4209fd in _start (/out/gstoraster_fuzzer+0x4209fd)
+
+DEDUP_TOKEN: pdfi_deref_compressed--pdfi_dereference--pdfi_deref_loop_detect
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/ghostpdl/./pdf/pdf_deref.c:593:68 in pdfi_deref_compressed
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42506217

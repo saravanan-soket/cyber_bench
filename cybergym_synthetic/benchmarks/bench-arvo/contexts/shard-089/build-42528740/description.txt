@@ -1,0 +1,48 @@
+ARVO id: 42528740
+Project: mbedtls
+Fuzz target: fuzz_server
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://github.com/Mbed-TLS/mbedtls.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4212002921
+INFO: Loaded 1 modules   (21543 inline 8-bit counters): 21543 [0x8b7590, 0x8bc9b7), 
+INFO: Loaded 1 PC tables (21543 PCs): 21543 [0x7c9130,0x81d3a0), 
+/out/fuzz_server: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x002020202010 (pc 0x000000421a44 bp 0x000000000000 sp 0x7ffdab76fb70 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x421a44 in atomic_compare_exchange_strong<__sanitizer::atomic_uint8_t> /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_atomic_clang.h:81:10
+    #1 0x421a44 in AtomicallySetQuarantineFlagIfAllocated /src/llvm-project/compiler-rt/lib/asan/asan_allocator.cpp:610:10
+    #2 0x421a44 in __asan::Allocator::Deallocate(void*, unsigned long, unsigned long, __sanitizer::BufferedStackTrace*, __asan::AllocType) /src/llvm-project/compiler-rt/lib/asan/asan_allocator.cpp:685:10
+    #3 0x4a0945 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:53:3
+    #4 0x684ec4 in mbedtls_free /src/mbedtls/library/platform.c:66:5
+    #5 0x685290 in mbedtls_zeroize_and_free /src/mbedtls/library/platform_util.c:159:5
+    #6 0x61966d in mbedtls_mpi_free /src/mbedtls/library/bignum.c:208:9
+    #7 0x64cd36 in mbedtls_ecp_group_free /src/mbedtls/library/ecp.c:598:9
+    #8 0x647512 in mbedtls_ecjpake_free /src/mbedtls/library/ecjpake.c:89:5
+    #9 0x50f460 in mbedtls_ssl_handshake_free /src/mbedtls/library/ssl_tls.c:4149:5
+    #10 0x512885 in mbedtls_ssl_free /src/mbedtls/library/ssl_tls.c:4870:9
+    #11 0x4de87e in LLVMFuzzerTestOneInput /src/mbedtls/programs/fuzz/fuzz_server.c:208:5
+    #12 0x58b113 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #13 0x576872 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #14 0x57c11c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #15 0x5a5652 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7f065ca4b082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #17 0x41f74d in _start (/out/fuzz_server+0x41f74d)
+
+DEDUP_TOKEN: atomic_compare_exchange_strong<__sanitizer::atomic_uint8_t>--AtomicallySetQuarantineFlagIfAllocated--__asan::Allocator::Deallocate(void*, unsigned long, unsigned long, __sanitizer::BufferedStackTrace*, __asan::AllocType)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_atomic_clang.h:81:10 in atomic_compare_exchange_strong<__sanitizer::atomic_uint8_t>
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42528740

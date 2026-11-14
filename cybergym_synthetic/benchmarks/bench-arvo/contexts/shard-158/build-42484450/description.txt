@@ -1,0 +1,106 @@
+ARVO id: 42484450
+Project: gdal
+Fuzz target: gdal_filesystem_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Stack-buffer-overflow READ {*}
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 2898930326
+INFO: Loaded 1 modules (286808 guards): [0x5013890, 0x512b9f0), 
+/out/gdal_filesystem_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7f1fdd1b4010 at pc 0x0000004cfb4c bp 0x7ffd438004f0 sp 0x7ffd437ffca0
+[1m[0m[1m[34mREAD of size 24 at 0x7f1fdd1b4010 thread T0[1m[0m
+SCARINESS: 41 (multi-byte-read-stack-buffer-overflow)
+    #0 0x4cfb4b in __asan_memcpy /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors.cc:469
+    #1 0x21e2774 in nc4_get_vara /src/gdal/netcdf-4.4.1.1/libsrc4/nc4hdf.c:911:16
+    #2 0x21ce57f in nc4_get_vara_tc /src/gdal/netcdf-4.4.1.1/libsrc4/nc4var.c:1379:11
+    #3 0x2151318 in NC_get_vara /src/gdal/netcdf-4.4.1.1/libdispatch/dvarget.c:101:15
+    #4 0x2154722 in nc_get_vara_double /src/gdal/netcdf-4.4.1.1/libdispatch/dvarget.c:721:11
+    #5 0x8287f0 in netCDFDataset::SetProjectionFromVar(int, bool) /src/gdal/gdal/frmts/netcdf/netcdfdataset.cpp:2858:18
+    #6 0x846fac in netCDFDataset::Open(GDALOpenInfo*) /src/gdal/gdal/frmts/netcdf/netcdfdataset.cpp:7102:11
+    #7 0xbd4753 in GDALOpenEx /src/gdal/gdal/gcore/gdaldataset.cpp:2822:20
+    #8 0x522b37 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_fuzzer.cpp:100:24
+    #9 0x54c379 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:458:13
+    #10 0x54cbaa in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:397:3
+    #11 0x523ad6 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #12 0x52f040 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #13 0x5230e8 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #14 0x7f1fdd42782f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #15 0x427a88 in _start (/out/gdal_filesystem_fuzzer+0x427a88)
+
+DEDUP_TOKEN: __asan_memcpy--nc4_get_vara--nc4_get_vara_tc
+[1m[32mAddress 0x7f1fdd1b4010 is located in stack of thread T0 at offset 2064 in frame[1m[0m
+[1m[0m    #0 0x826a0f in netCDFDataset::SetProjectionFromVar(int, bool) /src/gdal/gdal/frmts/netcdf/netcdfdataset.cpp:2053
+
+DEDUP_TOKEN: netCDFDataset::SetProjectionFromVar(int, bool)
+  This frame has 26 object(s):
+    [32, 80) 'oSRS' (line 2061)
+    [112, 369) 'szDimNameX' (line 2064)
+    [448, 496) 'adfTempGeoTransform' (line 2080)
+    [528, 536) 'pszTempProjection' (line 2082)
+    [560, 817) 'szGridMappingName' (line 2095)
+    [896, 1153) 'szGridMappingValue' (line 2098)
+    [1232, 1489) 'szVarName' (line 2101)
+    [1568, 1825) 'szTemp' (line 2107)
+    [1904, 1908) 'nVarProjectionID' (line 2121)
+    [1920, 1928) 'pszProj4' (line 2813)
+    [1952, 1976) 'osProj4' (line 2815)
+    [2016, 2020) 'nVarDimXID' (line 2838)
+    [2032, 2036) 'nVarDimYID' (line 2839)
+    [2048, 2064) 'start' (line 2851)
+    [2080, 2096) 'edge' (line 2852)[1m[32m <== Memory access at offset 2064 partially underflows this variable[1m[0m
+    [2112, 2116) 'node_offset' (line 3072)
+    [2128, 2144) 'adfActualRange' (line 3075)
+    [2160, 2168) 'dfCoordOffset' (line 3113)
+    [2192, 2200) 'dfCoordScale' (line 3114)
+    [2224, 2232) 'nAttlen' (line 3142)
+    [2256, 2513) 'szUnits' (line 3143)
+    [2592, 2596) 'nAttype' (line 3145)
+    [2608, 2616) 'pszProjectionGDAL' (line 3226)
+    [2640, 2688) 'oSRSGDAL' (line 3227)
+    [2720, 2768) 'oSRSForComparison' (line 3239)
+    [2800, 2808) 'pszWKTExport' (line 3367)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism or swapcontext
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors.cc:469 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x0fe47ba2e7b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m01[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x0fe47ba2e7c0: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe47ba2e7d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe47ba2e7e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m01[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m
+  0x0fe47ba2e7f0: [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m
+=>0x0fe47ba2e800: [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mf2[1m[0m][1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m
+  0x0fe47ba2e810: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x0fe47ba2e820: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x0fe47ba2e830: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x0fe47ba2e840: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x0fe47ba2e850: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf3[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42484450

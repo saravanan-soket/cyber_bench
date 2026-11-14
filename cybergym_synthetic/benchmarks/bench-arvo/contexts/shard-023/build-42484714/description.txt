@@ -1,0 +1,39 @@
+ARVO id: 42484714
+Project: njs
+Fuzz target: njs_process_script_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Bad-cast
+Language: c++
+Repo: http://hg.nginx.org/njs
+
+=== Crash report ===
+INFO: Seed: 553926167
+INFO: Loaded 1 modules   (21655 inline 8-bit counters): 21655 [0x87f0e8, 0x88457f), 
+INFO: Loaded 1 PC tables (21655 PCs): 21655 [0x884580,0x8d8ef0), 
+/out/njs_process_script_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1msrc/njs_vmcode.c:698:25:[1m[31m runtime error: [1m[0m[1mmember access within address 0x000001228460 with insufficient space for an object of type 'njs_value_t' (aka 'union njs_value_s')[1m[0m
+[1m0x000001228460:[1m[30m note: [1m[0mpointer points here[1m[0m
+ 00 00 00 00  01 00 00 00 00 00 00 00  00 00 00 00 00 00 f8 7f  00 00 00 00 00 00 00 00  00 00 00 00
+[1m[32m              ^ [1m[0m
+    #0 0x4c4ce6 in njs_vmcode_interpreter /src/njs/src/njs_vmcode.c:698:25
+    #1 0x50d74a in njs_function_lambda_call /src/njs/src/njs_function.c:671:12
+    #2 0x4c17fe in njs_function_frame_invoke /src/njs/src/njs_function.h:183:16
+    #3 0x4c17fe in njs_vmcode_interpreter /src/njs/src/njs_vmcode.c:776:23
+    #4 0x4bef80 in njs_vm_start /src/njs/src/njs_vm.c:489:12
+    #5 0x4b107f in njs_process_script /src/njs/src/njs_shell.c:836:19
+    #6 0x4b0d4b in LLVMFuzzerTestOneInput /src/njs/src/njs_shell.c:609:16
+    #7 0x4420b1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #8 0x42d412 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #9 0x4334a7 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:776:9
+    #10 0x45baf2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #11 0x7ffff6c7582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x407a28 in _start (/out/njs_process_script_fuzzer+0x407a28)
+
+DEDUP_TOKEN: njs_vmcode_interpreter--njs_function_lambda_call--njs_function_frame_invoke
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior src/njs_vmcode.c:698:25 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42484714

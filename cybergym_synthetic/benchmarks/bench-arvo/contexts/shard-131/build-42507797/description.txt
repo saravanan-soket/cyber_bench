@@ -1,0 +1,42 @@
+ARVO id: 42507797
+Project: proj.4
+Fuzz target: standard_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/OSGeo/proj.4
+
+=== Crash report ===
+INFO: Seed: 3371497567
+INFO: Loaded 1 modules   (5274 guards): 5274 [0x9696f0, 0x96e958), 
+/out/standard_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x10017efda993 (pc 0x0000005d6dc3 bp 0x7fffffffda50 sp 0x7fffffffd9c0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x5d6dc2 in reverse_obs /src/proj.4/src/PJ_axisswap.c:155:27
+    #1 0x5d4962 in pj_invobs /src/proj.4/src/pj_internal.c:127:17
+    #2 0x5d4437 in proj_trans_obs /src/proj.4/src/pj_internal.c:80:21
+    #3 0x5c4cf4 in pipeline_reverse_obs /src/proj.4/src/PJ_pipeline.c
+    #4 0x5c5341 in pipeline_reverse_3d /src/proj.4/src/PJ_pipeline.c:248:13
+    #5 0x62a42e in pj_inv3d /src/proj.4/src/pj_inv3d.c:41:11
+    #6 0x5a40a5 in pj_transform /src/proj.4/src/pj_transform.c:197:32
+    #7 0x51a855 in LLVMFuzzerTestOneInput /src/proj.4/./test/fuzzers/standard_fuzzer.cpp
+    #8 0x53bfc0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:476:13
+    #9 0x51b4a5 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #10 0x526b75 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:690:9
+    #11 0x51ab48 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #12 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #13 0x41c7b8 in _start (/out/standard_fuzzer+0x41c7b8)
+
+DEDUP_TOKEN: reverse_obs--pj_invobs--proj_trans_obs
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/proj.4/src/PJ_axisswap.c:155:27 in reverse_obs
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42507797

@@ -1,0 +1,46 @@
+ARVO id: 42539244
+Project: imagemagick
+Fuzz target: encoder_png_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 1924044016
+INFO: Loaded 1 modules   (144073 inline 8-bit counters): 144073 [0x272dd28, 0x2750ff1), 
+INFO: Loaded 1 PC tables (144073 PCs): 144073 [0x2750ff8,0x2983c88), 
+/out/encoder_png_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m[1m[31mUninitialized bytes in [1m[32m__interceptor_strlen[1m[31m at offset 0 inside [0x7ffffffee8f0, 1)[1m[0m
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0xc1db60 in ConstantString /src/imagemagick/MagickCore/string.c:705:13
+    #1 0xaa2c10 in SetImageProperty /src/imagemagick/MagickCore/property.c:4537:30
+    #2 0xaadfe6 in GetICCProperty /src/imagemagick/MagickCore/property.c:1693:16
+    #3 0xaa5beb in GetImageProperty /src/imagemagick/MagickCore/property.c:2277:18
+    #4 0xacf003 in SetImageProfileInternal /src/imagemagick/MagickCore/profile.c:1726:10
+    #5 0x10f65e3 in ReadOnePNGImage /src/imagemagick/coders/png.c
+    #6 0x10cad1d in ReadPNGImage /src/imagemagick/coders/png.c:4251:9
+    #7 0x7c90a9 in ReadImage /src/imagemagick/MagickCore/constitute.c:500:13
+    #8 0x6f474a in BlobToImage /src/imagemagick/MagickCore/blob.c:469:13
+    #9 0x58a491 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4015:12
+    #10 0x4a1f8c in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #11 0x4ea233 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:517:13
+    #12 0x4a3456 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #13 0x4b59b2 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #14 0x4a2591 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #15 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #16 0x421bc8 in _start (/out/encoder_png_fuzzer+0x421bc8)
+
+DEDUP_TOKEN: ConstantString--SetImageProperty--GetICCProperty
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32minfo[1m[35m' in the stack frame of function '[1m[32mGetICCProperty[1m[35m'[1m[0m
+    #0 0xaadc30 in GetICCProperty /src/imagemagick/MagickCore/property.c:1658
+
+DEDUP_TOKEN: GetICCProperty
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/imagemagick/MagickCore/string.c:705:13 in ConstantString
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42539244

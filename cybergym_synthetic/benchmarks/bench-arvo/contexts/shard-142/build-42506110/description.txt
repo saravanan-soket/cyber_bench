@@ -1,0 +1,42 @@
+ARVO id: 42506110
+Project: librawspeed
+Fuzz target: SonyArw2DecompressorFuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/darktable-org/rawspeed.git
+
+=== Crash report ===
+INFO: Seed: 3668432165
+INFO: Loaded 1 modules   (1110 inline 8-bit counters): 1110 [0x8ef248, 0x8ef69e), 
+INFO: Loaded 1 PC tables (1110 PCs): 1110 [0x8ef6a0,0x8f3c00), 
+/out/SonyArw2DecompressorFuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x000020202010 (pc 0x00000045d607 bp 0x7ffd3629c050 sp 0x7ffd3629bfe0 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x45d606 in bool __sanitizer::atomic_compare_exchange_strong<__sanitizer::atomic_uint8_t>(__sanitizer::atomic_uint8_t volatile*, __sanitizer::atomic_uint8_t::Type*, __sanitizer::atomic_uint8_t::Type, __sanitizer::memory_order) /src/llvm/projects/compiler-rt/lib/asan/../sanitizer_common/sanitizer_atomic_clang.h:90
+    #1 0x45d606 in __asan::Allocator::AtomicallySetQuarantineFlagIfAllocated(__asan::AsanChunk*, void*, __sanitizer::BufferedStackTrace*) /src/llvm/projects/compiler-rt/lib/asan/asan_allocator.cc:540
+    #2 0x45d606 in __asan::Allocator::Deallocate(void*, unsigned long, unsigned long, __sanitizer::BufferedStackTrace*, __asan::AllocType) /src/llvm/projects/compiler-rt/lib/asan/asan_allocator.cc:617
+    #3 0x45d606 in __asan::asan_delete(void*, unsigned long, unsigned long, __sanitizer::BufferedStackTrace*, __asan::AllocType) /src/llvm/projects/compiler-rt/lib/asan/asan_allocator.cc:852
+    #4 0x54d46b in operator delete(void*) /src/llvm/projects/compiler-rt/lib/asan/asan_new_delete.cc:149
+    #5 0x5518d6 in rawspeed::RawImage::create(rawspeed::iPoint2D const&, rawspeed::RawImageType, unsigned int) /src/librawspeed/src/librawspeed/common/RawImage.h:270:1
+    #6 0x550e55 in LLVMFuzzerTestOneInput /src/librawspeed/fuzz/librawspeed/decompressors/SonyArw2Decompressor.cpp:52:29
+    #7 0x5948c0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:512:13
+    #8 0x572ce5 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #9 0x57e4e1 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:692:9
+    #10 0x572388 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7f39a513882f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x4528d8 in _start (/out/SonyArw2DecompressorFuzzer+0x4528d8)
+
+DEDUP_TOKEN: bool __sanitizer::atomic_compare_exchange_strong<__sanitizer::atomic_uint8_t>(__sanitizer::atomic_uint8_t volatile*, __sanitizer::atomic_uint8_t::Type*, __sanitizer::atomic_uint8_t::Type, __sanitizer::memory_order)--__asan::Allocator::AtomicallySetQuarantineFlagIfAllocated(__asan::AsanChunk*, void*, __sanitizer::BufferedStackTrace*)--__asan::Allocator::Deallocate(void*, unsigned long, unsigned long, __sanitizer::BufferedStackTrace*, __asan::AllocType)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/llvm/projects/compiler-rt/lib/asan/../sanitizer_common/sanitizer_atomic_clang.h:90 in bool __sanitizer::atomic_compare_exchange_strong<__sanitizer::atomic_uint8_t>(__sanitizer::atomic_uint8_t volatile*, __sanitizer::atomic_uint8_t::Type*, __sanitizer::atomic_uint8_t::Type, __sanitizer::memory_order)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42506110

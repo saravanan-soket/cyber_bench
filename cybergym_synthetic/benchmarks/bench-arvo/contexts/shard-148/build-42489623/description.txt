@@ -1,0 +1,56 @@
+ARVO id: 42489623
+Project: skia
+Fuzz target: api_raster_n32_canvas
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 42302402
+INFO: Loaded 1 modules   (246872 inline 8-bit counters): 246872 [0x33d80d0, 0x3414528), 
+INFO: Loaded 1 PC tables (246872 PCs): 246872 [0x3414528,0x37d8aa8), 
+/out/api_raster_n32_canvas: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x631fff7f0a04 (pc 0x00000079979e bp 0x7fffffffcd20 sp 0x7fffffffcc40 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x79979e in Load /src/skia/out/Fuzz/../../include/private/SkVx.h:87:9
+    #1 0x79979e in sse2::blit_row_color32(unsigned int*, unsigned int const*, int, unsigned int) /src/skia/out/Fuzz/../../src/opts/SkBlitRow_opts.h:244:16
+    #2 0x1aa5278 in SkBlitRow::Color32(unsigned int*, unsigned int const*, int, unsigned int) /src/skia/out/Fuzz/../../src/core/SkBlitRow_D32.cpp:313:12
+    #3 0x120f7c2 in SkARGB32_Blitter::blitH(int, int, int) /src/skia/out/Fuzz/../../src/core/SkBlitter_ARGB32.cpp:702:5
+    #4 0x1205d81 in SkRectClipBlitter::blitH(int, int, int) /src/skia/out/Fuzz/../../src/core/SkBlitter.cpp:368:19
+    #5 0x88b0f8 in InverseBlitter::prepost(int, bool) /src/skia/out/Fuzz/../../src/core/SkScan_Path.cpp:322:27
+    #6 0x8867f3 in PrePostInverseBlitterProc(SkBlitter*, int, bool) /src/skia/out/Fuzz/../../src/core/SkScan_Path.cpp:360:33
+    #7 0x887ab3 in walk_edges(SkEdge*, SkPathFillType, SkBlitter*, int, int, void (*)(SkBlitter*, int, bool), int) /src/skia/out/Fuzz/../../src/core/SkScan_Path.cpp:180:13
+    #8 0x885fa5 in sk_fill_path(SkPath const&, SkIRect const&, SkBlitter*, int, int, int, bool) /src/skia/out/Fuzz/../../src/core/SkScan_Path.cpp:473:9
+    #9 0x888ab7 in SkScan::FillPath(SkPath const&, SkRegion const&, SkBlitter*) /src/skia/out/Fuzz/../../src/core/SkScan_Path.cpp:663:9
+    #10 0x12ea362 in SkScan::FillPath(SkPath const&, SkRasterClip const&, SkBlitter*) /src/skia/out/Fuzz/../../src/core/SkScan_AntiPath.cpp:811:9
+    #11 0x1237d87 in SkDraw::drawDevPath(SkPath const&, SkPaint const&, bool, SkBlitter*, bool) const /src/skia/out/Fuzz/../../src/core/SkDraw.cpp:878:5
+    #12 0x123871b in SkDraw::drawPath(SkPath const&, SkPaint const&, SkMatrix const*, bool, bool, SkBlitter*) const /src/skia/out/Fuzz/../../src/core/SkDraw.cpp:965:11
+    #13 0x883bb3 in SkDraw::drawPath(SkPath const&, SkPaint const&, SkMatrix const*, bool) const /src/skia/out/Fuzz/../../src/core/SkDraw.h:57:15
+    #14 0x11fd75a in SkBitmapDevice::drawPath(SkPath const&, SkPaint const&, bool) /src/skia/out/Fuzz/../../src/core/SkBitmapDevice.cpp:396:15
+    #15 0x6bcc20 in SkCanvas::onDrawPath(SkPath const&, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2413:23
+    #16 0x6b727e in SkCanvas::drawPath(SkPath const&, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1972:11
+    #17 0x56b552 in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1273:25
+    #18 0x56e9d3 in fuzz_RasterN32Canvas(Fuzz*) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1624:5
+    #19 0x58ba63 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzRasterN32Canvas.cpp:20:5
+    #20 0x48b241 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #21 0x475262 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #22 0x47b5a5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #23 0x4a4682 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #24 0x7ffff1ba783f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #25 0x450658 in _start (/out/api_raster_n32_canvas+0x450658)
+
+DEDUP_TOKEN: Load--sse2::blit_row_color32(unsigned int*, unsigned int const*, int, unsigned int)--SkBlitRow::Color32(unsigned int*, unsigned int const*, int, unsigned int)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/skia/out/Fuzz/../../include/private/SkVx.h:87:9 in Load
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42489623

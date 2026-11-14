@@ -1,0 +1,43 @@
+ARVO id: 42528161
+Project: WasmEdge
+Fuzz target: wasmedge-fuzztool
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://github.com/WasmEdge/WasmEdge.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 150207777
+INFO: Loaded 2 modules   (57293 inline 8-bit counters): 57292 [0x7fdafed19700, 0x7fdafed276cc), 1 [0x3f44d0, 0x3f44d1), 
+INFO: Loaded 2 PC tables (57293 PCs): 57292 [0x7fdafed276d0,0x7fdafee07390), 1 [0x3f44d8,0x3f44e8), 
+/out/wasmedge-fuzztool: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x7fdafe981296 bp 0x7ffd0af6cb70 sp 0x7ffd0af6cb10 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x7fdafe981296 in (anonymous namespace)::FunctionCompiler::stackPop() /src/WasmEdge/lib/aot/compiler.cpp:4785:18
+    #1 0x7fdafe981296 in (anonymous namespace)::FunctionCompiler::compileReturn() /src/WasmEdge/lib/aot/compiler.cpp:3501:25
+    #2 0x7fdafe968159 in (anonymous namespace)::FunctionCompiler::compile(WasmEdge::AST::CodeSegment const&, std::__1::pair<std::__1::vector<WasmEdge::ValType, std::__1::allocator<WasmEdge::ValType> >, std::__1::vector<WasmEdge::ValType, std::__1::allocator<WasmEdge::ValType> > >) /src/WasmEdge/lib/aot/compiler.cpp:679:5
+    #3 0x7fdafe968159 in WasmEdge::AOT::Compiler::compile(WasmEdge::AST::FunctionSection const&, WasmEdge::AST::CodeSection const&) /src/WasmEdge/lib/aot/compiler.cpp:5684:8
+    #4 0x7fdafe958784 in WasmEdge::AOT::Compiler::compile(cxx20::span<unsigned char const, 18446744073709551615ul>, WasmEdge::AST::Module const&, std::__1::__fs::filesystem::path) /src/WasmEdge/lib/aot/compiler.cpp:5218:3
+    #5 0x7fdafe564945 in WasmEdge::Driver::FuzzTool(unsigned char const*, unsigned long) /src/WasmEdge/lib/driver/fuzzTool.cpp:41:27
+    #6 0x2b6073 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #7 0x2a0b82 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #8 0x2a642c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #9 0x2d05b2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7fdafdc66082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #11 0x296d4d in _start (/out/wasmedge-fuzztool+0x296d4d)
+
+DEDUP_TOKEN: (anonymous namespace)::FunctionCompiler::stackPop()--(anonymous namespace)::FunctionCompiler::compileReturn()--(anonymous namespace)::FunctionCompiler::compile(WasmEdge::AST::CodeSegment const&, std::__1::pair<std::__1::vector<WasmEdge::ValType, std::__1::allocator<WasmEdge::ValType> >, std::__1::vector<WasmEdge::ValType, std::__1::allocator<WasmEdge::ValType> > >)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/WasmEdge/lib/aot/compiler.cpp:4785:18 in (anonymous namespace)::FunctionCompiler::stackPop()
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42528161

@@ -1,0 +1,78 @@
+ARVO id: 42486098
+Project: harfbuzz
+Fuzz target: hb-draw-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Global-buffer-overflow WRITE 4
+Language: c++
+Repo: https://github.com/harfbuzz/harfbuzz.git
+
+=== Crash report ===
+INFO: Seed: 2413070969
+INFO: Loaded 1 modules   (29636 inline 8-bit counters): 29636 [0xb5af30, 0xb622f4), 
+INFO: Loaded 1 PC tables (29636 PCs): 29636 [0xb622f8,0xbd5f38), 
+/out/hb-draw-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==8==ERROR: AddressSanitizer: global-buffer-overflow on address 0x000001531540 at pc 0x00000076daf0 bp 0x7fffffffd730 sp 0x7fffffffd728
+[1m[0m[1m[34mWRITE of size 4 at 0x000001531540 thread T0[1m[0m
+SCARINESS: 36 (4-byte-write-global-buffer-overflow)
+    #0 0x76daef in OT::VarData::get_scalars(int const*, unsigned int, OT::VarRegionList const&, float*, unsigned int) const /work/build/../../src/harfbuzz/src/hb-ot-layout-common.hh:2302:18
+    #1 0x76d6d2 in OT::VariationStore::get_scalars(unsigned int, int const*, unsigned int, float*, unsigned int) const /work/build/../../src/harfbuzz/src/hb-ot-layout-common.hh:2557:26
+    #2 0x76ceba in CFF::cff2_cs_interp_env_t::process_blend() /work/build/../../src/harfbuzz/src/hb-cff2-interp-cs.hh:137:21
+    #3 0x7673f3 in CFF::cff2_cs_opset_t<cff2_cs_opset_extents_t, cff2_extents_param_t, cff2_path_procs_extents_t>::process_blend(CFF::cff2_cs_interp_env_t&, cff2_extents_param_t&) /work/build/../../src/harfbuzz/src/hb-cff2-interp-cs.hh:234:9
+    #4 0x766dcc in CFF::cff2_cs_opset_t<cff2_cs_opset_extents_t, cff2_extents_param_t, cff2_path_procs_extents_t>::process_op(unsigned int, CFF::cff2_cs_interp_env_t&, cff2_extents_param_t&) /work/build/../../src/harfbuzz/src/hb-cff2-interp-cs.hh:213:2
+    #5 0x765254 in CFF::cs_interpreter_t<CFF::cff2_cs_interp_env_t, cff2_cs_opset_extents_t, cff2_extents_param_t>::interpret(cff2_extents_param_t&) /work/build/../../src/harfbuzz/src/hb-cff-interp-cs-common.hh:895:7
+    #6 0x7647d3 in OT::cff2::accelerator_t::get_extents(hb_font_t*, unsigned int, hb_glyph_extents_t*) const /work/build/../../src/harfbuzz/src/hb-ot-cff2-table.cc:120:7
+    #7 0x5af155 in hb_ot_get_glyph_extents(hb_font_t*, void*, unsigned int, hb_glyph_extents_t*, void*) /work/build/../../src/harfbuzz/src/hb-ot-font.cc:193:22
+    #8 0x58b94c in hb_font_t::get_glyph_extents(unsigned int, hb_glyph_extents_t*) /work/build/../../src/harfbuzz/src/hb-font.hh:335:12
+    #9 0x58b880 in hb_font_get_glyph_extents /work/build/../../src/harfbuzz/src/hb-font.cc:1015:16
+    #10 0x5507e8 in LLVMFuzzerTestOneInput /work/build/../../src/harfbuzz/test/fuzzing/hb-draw-fuzzer.cc:159:9
+    #11 0x457d21 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #12 0x458985 in fuzzer::Fuzzer::TryDetectingAMemoryLeak(unsigned char const*, unsigned long, bool) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:634:3
+    #13 0x4434ca in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:297:6
+    #14 0x4494ce in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #15 0x470ee2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #16 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #17 0x41e4f8 in _start (/out/hb-draw-fuzzer+0x41e4f8)
+
+DEDUP_TOKEN: OT::VarData::get_scalars(int const*, unsigned int, OT::VarRegionList const&, float*, unsigned int) const--OT::VariationStore::get_scalars(unsigned int, int const*, unsigned int, float*, unsigned int) const--CFF::cff2_cs_interp_env_t::process_blend()
+[1m[32m0x000001531540 is located 0 bytes to the right of global variable '_hb_CrapPool' defined in '../../src/harfbuzz/src/hb-static.cc:43:27' (0x15313c0) of size 384
+[1m[0mSUMMARY: AddressSanitizer: global-buffer-overflow /work/build/../../src/harfbuzz/src/hb-ot-layout-common.hh:2302:18 in OT::VarData::get_scalars(int const*, unsigned int, OT::VarRegionList const&, float*, unsigned int) const
+Shadow bytes around the buggy address:
+  0x00008029e250: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x00008029e260: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x00008029e270: [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x00008029e280: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x00008029e290: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x00008029e2a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mf9[1m[0m][1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x00008029e2b0: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x00008029e2c0: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x00008029e2d0: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x00008029e2e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x00008029e2f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42486098

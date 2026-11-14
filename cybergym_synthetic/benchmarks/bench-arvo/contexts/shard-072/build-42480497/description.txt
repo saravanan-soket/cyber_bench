@@ -1,0 +1,99 @@
+ARVO id: 42480497
+Project: samba
+Fuzz target: fuzz_ndr_nbt_TYPE_STRUCT
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-use-after-free READ 1
+Language: c
+Repo: https://gitlab.com/samba-team/samba
+
+=== Crash report ===
+INFO: Seed: 2723888388
+INFO: Loaded 1 modules   (11868 inline 8-bit counters): 11868 [0x555555f0e540, 0x555555f1139c), 
+INFO: Loaded 1 PC tables (11868 PCs): 11868 [0x555555f113a0,0x555555f3f960), 
+/out/fuzz_ndr_nbt_TYPE_STRUCT: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-use-after-free on address 0x60b000000150 at pc 0x555555880eb5 bp 0x7fffffffd8f0 sp 0x7fffffffd8e8
+[1m[0m[1m[34mREAD of size 1 at 0x60b000000150 thread T0[1m[0m
+SCARINESS: 40 (1-byte-read-heap-use-after-free)
+    #0 0x555555880eb4 in dump_data_cb /src/samba/bin/default/../../lib/util/util.c:607:44
+    #1 0x5555558d3ac4 in ndr_dump_data /src/samba/bin/default/../../librpc/ndr/ndr_basic.c:1300:2
+    #2 0x55555589fcf5 in ndr_print_NETLOGON_SAM_LOGON_REQUEST /src/samba/bin/default/librpc/gen_ndr/ndr_nbt.c:1859:3
+    #3 0x5555558a68f4 in ndr_print_nbt_netlogon_packet /src/samba/bin/default/librpc/gen_ndr/ndr_nbt.c:3067:3
+    #4 0x5555558e7879 in LLVMFuzzerTestOneInput /src/samba/bin/default/lib/fuzzing/fuzz_ndr_nbt_TYPE_STRUCT.c:311:4
+    #5 0x55555572b701 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #6 0x55555572ccf5 in fuzzer::Fuzzer::TryDetectingAMemoryLeak(unsigned char const*, unsigned long, bool) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:632:3
+    #7 0x555555716239 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:293:6
+    #8 0x55555571bede in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #9 0x555555745e02 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #10 0x7ffff437083f in __libc_start_main (/out/lib/libc.so.6+0x2083f)
+    #11 0x5555556ef668 in _start (/out/fuzz_ndr_nbt_TYPE_STRUCT+0x2ef668)
+
+DEDUP_TOKEN: dump_data_cb--ndr_dump_data--ndr_print_NETLOGON_SAM_LOGON_REQUEST
+[1m[32m0x60b000000150 is located 96 bytes inside of 104-byte region [0x60b0000000f0,0x60b000000158)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x5555557f301d in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:123:3
+    #1 0x55555582b108 in _tc_free_internal /src/samba/bin/default/../../lib/talloc/talloc.c:1221:2
+    #2 0x555555826168 in _tc_free_children_internal /src/samba/bin/default/../../lib/talloc/talloc.c:1666:7
+    #3 0x55555582b07e in _tc_free_internal /src/samba/bin/default/../../lib/talloc/talloc.c:1183:2
+    #4 0x5555558e78b2 in LLVMFuzzerTestOneInput /src/samba/bin/default/lib/fuzzing/fuzz_ndr_nbt_TYPE_STRUCT.c:317:2
+    #5 0x55555572b701 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #6 0x555555716221 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #7 0x55555571bede in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #8 0x555555745e02 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #9 0x7ffff437083f in __libc_start_main (/out/lib/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: free--_tc_free_internal--_tc_free_children_internal
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x5555557f329d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x55555582a8cc in __talloc_with_prefix /src/samba/bin/default/../../lib/talloc/talloc.c:782:9
+    #2 0x555555829562 in _vasprintf_tc /src/samba/bin/default/../../lib/talloc/talloc.c:2614:16
+    #3 0x555555825439 in tc_set_name_v /src/samba/bin/default/../../lib/talloc/talloc.c:1500:33
+    #4 0x555555825b46 in talloc_init /src/samba/bin/default/../../lib/talloc/talloc.c:1639:9
+    #5 0x5555558e74bf in LLVMFuzzerTestOneInput /src/samba/bin/default/lib/fuzzing/fuzz_ndr_nbt_TYPE_STRUCT.c:235:12
+    #6 0x55555572b701 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #7 0x555555716221 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #8 0x55555571bede in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #9 0x555555745e02 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #10 0x7ffff437083f in __libc_start_main (/out/lib/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: malloc--__talloc_with_prefix--_vasprintf_tc
+SUMMARY: AddressSanitizer: heap-use-after-free /src/samba/bin/default/../../lib/util/util.c:607:44 in dump_data_cb
+Shadow bytes around the buggy address:
+  0x0c167fff7fd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c167fff7fe0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c167fff7ff0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c167fff8000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c167fff8010: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+=>0x0c167fff8020: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m[[1m[35mfd[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c167fff8030: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c167fff8040: [1m[0m06[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c167fff8050: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m06[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c167fff8060: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c167fff8070: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42480497

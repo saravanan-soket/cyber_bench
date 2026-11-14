@@ -1,0 +1,42 @@
+ARVO id: 42473768
+Project: openthread
+Fuzz target: radio-receive-done-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/openthread/openthread
+
+=== Crash report ===
+INFO: Seed: 3238952555
+INFO: Loaded 1 modules   (19664 inline 8-bit counters): 19664 [0x8c0288, 0x8c4f58), 
+INFO: Loaded 1 PC tables (19664 PCs): 19664 [0x5ebba8,0x6388a8), 
+/out/radio-receive-done-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x0000001dcdd8 (pc 0x000000464117 bp 0x7ffd4ba2aca0 sp 0x7ffd4ba2ac88 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x464116 in ot::Ip6::UdpSocket::GetNext() /src/openthread/src/core/./net/udp6.hpp:196
+    #1 0x463993 in ot::Ip6::Udp::AddSocket(ot::Ip6::UdpSocket&) /src/openthread/src/core/net/udp6.cpp:264:53
+    #2 0x46392d in ot::Ip6::UdpSocket::Open(void (*)(void*, otMessage*, otMessageInfo const*), void*) /src/openthread/src/core/net/udp6.cpp:90:14
+    #3 0x4ca59d in ot::Dhcp6::Dhcp6Client::Start() /src/openthread/src/core/net/dhcp6_client.cpp:178:13
+    #4 0x4ca533 in ot::Dhcp6::Dhcp6Client::UpdateAddresses() /src/openthread/src/core/net/dhcp6_client.cpp:165:9
+    #5 0x47e667 in ot::Mle::Mle::HandleStateChanged(unsigned int) /src/openthread/src/core/thread/mle.cpp:1518:37
+    #6 0x440b31 in ot::Notifier::HandleStateChanged() /src/openthread/src/core/common/notifier.cpp:158:19
+    #7 0x441a9e in ot::TaskletScheduler::ProcessQueuedTasklets() /src/openthread/src/core/common/tasklet.cpp:112:14
+    #8 0x43208e in LLVMFuzzerTestOneInput /src/openthread/tests/fuzz/radio_receive_done.cpp:75:9
+    #9 0x52a1e9 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:529:15
+    #10 0x5127a2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:286:6
+    #11 0x5164ba in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:715:9
+    #12 0x512528 in main /src/libfuzzer/FuzzerMain.cpp:19:10
+    #13 0x7f24bdd4b82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #14 0x405e28 in _start (/out/radio-receive-done-fuzzer+0x405e28)
+
+DEDUP_TOKEN: ot::Ip6::UdpSocket::GetNext()--ot::Ip6::Udp::AddSocket(ot::Ip6::UdpSocket&)--ot::Ip6::UdpSocket::Open(void (*)(void*, otMessage*, otMessageInfo const*), void*)
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/openthread/src/core/./net/udp6.hpp:196 in ot::Ip6::UdpSocket::GetNext()
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42473768

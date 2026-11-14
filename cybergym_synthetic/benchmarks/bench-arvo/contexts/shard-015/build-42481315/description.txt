@@ -1,0 +1,91 @@
+ARVO id: 42481315
+Project: arrow
+Fuzz target: arrow-ipc-stream-fuzz
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 8
+Language: c++
+Repo: https://github.com/apache/arrow.git
+
+=== Crash report ===
+INFO: Seed: 1890824047
+INFO: Loaded 1 modules   (293490 inline 8-bit counters): 293490 [0x1940010, 0x1987a82), 
+INFO: Loaded 1 PC tables (293490 PCs): 293490 [0x1987a88,0x1e021a8), 
+/out/arrow-ipc-stream-fuzz: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x626000005e80 at pc 0x00000120e5c6 bp 0x7fffffffd170 sp 0x7fffffffd168
+[1m[0m[1m[34mREAD of size 8 at 0x626000005e80 thread T0[1m[0m
+SCARINESS: 23 (8-byte-read-heap-buffer-overflow)
+    #0 0x120e5c5 in arrow::internal::CountSetBits(unsigned char const*, long, long) /src/arrow/cpp/src/arrow/util/bit_util.cc:95:37
+    #1 0xf4a893 in GetNullCount /src/arrow/cpp/src/arrow/array.cc:113:21
+    #2 0xf4a893 in arrow::Array::null_count() const /src/arrow/cpp/src/arrow/array.cc:125:51
+    #3 0x10034de in arrow::internal::ValidateArray(arrow::Array const&) /src/arrow/cpp/src/arrow/array/validate.cc:269:13
+    #4 0x1007cfe in Visit /src/arrow/cpp/src/arrow/array/validate.cc:135:34
+    #5 0x1007cfe in arrow::Status arrow::VisitArrayInline<arrow::internal::(anonymous namespace)::ValidateArrayVisitor>(arrow::Array const&, arrow::internal::(anonymous namespace)::ValidateArrayVisitor*) /src/arrow/cpp/src/arrow/visitor_inline.h:110:5
+    #6 0x1003fa4 in arrow::internal::ValidateArray(arrow::Array const&) /src/arrow/cpp/src/arrow/array/validate.cc:297:10
+    #7 0x1024616 in arrow::Status arrow::internal::(anonymous namespace)::ValidateArrayVisitor::ValidateListArray<arrow::ListArray>(arrow::ListArray const&) /src/arrow/cpp/src/arrow/array/validate.cc:223:32
+    #8 0x1006bee in Visit /src/arrow/cpp/src/arrow/array/validate.cc:70:49
+    #9 0x1006bee in arrow::Status arrow::VisitArrayInline<arrow::internal::(anonymous namespace)::ValidateArrayVisitor>(arrow::Array const&, arrow::internal::(anonymous namespace)::ValidateArrayVisitor*) /src/arrow/cpp/src/arrow/visitor_inline.h:110:5
+    #10 0x1003fa4 in arrow::internal::ValidateArray(arrow::Array const&) /src/arrow/cpp/src/arrow/array/validate.cc:297:10
+    #11 0x70af35 in arrow::RecordBatch::Validate() const /src/arrow/cpp/src/arrow/record_batch.cc:263:5
+    #12 0x7152f8 in arrow::SimpleRecordBatch::Validate() const /src/arrow/cpp/src/arrow/record_batch.cc:162:25
+    #13 0x70c30c in arrow::RecordBatch::ValidateFull() const /src/arrow/cpp/src/arrow/record_batch.cc:269:3
+    #14 0x68116f in arrow::ipc::internal::FuzzIpcStream(unsigned char const*, long) /src/arrow/cpp/src/arrow/ipc/reader.cc:1172:5
+    #15 0x63768d in LLVMFuzzerTestOneInput /src/arrow/cpp/src/arrow/ipc/stream_fuzz.cc:25:17
+    #16 0x53d311 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #17 0x527e31 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #18 0x52daee in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #19 0x557a12 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #20 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #21 0x5012a8 in _start (/out/arrow-ipc-stream-fuzz+0x5012a8)
+
+DEDUP_TOKEN: arrow::internal::CountSetBits(unsigned char const*, long, long)--GetNullCount--arrow::Array::null_count() const
+[1m[32m0x626000005e83 is located 0 bytes to the right of 11651-byte region [0x626000003100,0x626000005e83)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x604ead in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x516117 in operator new(unsigned long) (/out/arrow-ipc-stream-fuzz+0x516117)
+    #2 0x527e31 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #3 0x52daee in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #4 0x557a12 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #5 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: malloc--operator new(unsigned long)--fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/arrow/cpp/src/arrow/util/bit_util.cc:95:37 in arrow::internal::CountSetBits(unsigned char const*, long, long)
+Shadow bytes around the buggy address:
+  0x0c4c7fff8b80: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c4c7fff8b90: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c4c7fff8ba0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c4c7fff8bb0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c4c7fff8bc0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c4c7fff8bd0:[[1m[0m03[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4c7fff8be0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4c7fff8bf0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4c7fff8c00: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4c7fff8c10: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4c7fff8c20: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42481315

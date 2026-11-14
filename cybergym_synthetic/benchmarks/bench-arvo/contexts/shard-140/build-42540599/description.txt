@@ -1,0 +1,103 @@
+ARVO id: 42540599
+Project: gdal
+Fuzz target: gdal_vector_translate_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Container-overflow WRITE 8
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 995390871
+INFO: Loaded 1 modules   (349573 inline 8-bit counters): 349573 [0x56287b8, 0x567dd3d), 
+INFO: Loaded 1 PC tables (349573 PCs): 349573 [0x567dd40,0x5bd3590), 
+/out/gdal_vector_translate_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: container-overflow on address 0x611000004088 at pc 0x0000004a1b6e bp 0x7ffd2fdd3850 sp 0x7ffd2fdd3000
+[1m[0m[1m[34mWRITE of size 8 at 0x611000004088 thread T0[1m[0m
+SCARINESS: 42 (8-byte-write-container-overflow)
+    #0 0x4a1b6d in __interceptor_memset.part.37 /src/llvm/projects/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:764
+    #1 0x54cde8 in construct<double> /usr/local/bin/../include/c++/v1/memory:1811:13
+    #2 0x54cde8 in __construct<double> /usr/local/bin/../include/c++/v1/memory:1716
+    #3 0x54cde8 in construct<double> /usr/local/bin/../include/c++/v1/memory:1562
+    #4 0x54cde8 in __construct_at_end /usr/local/bin/../include/c++/v1/vector:1023
+    #5 0x54cde8 in std::__1::vector<double, std::__1::allocator<double> >::__append(unsigned long) /usr/local/bin/../include/c++/v1/vector:1076
+    #6 0x1885c19 in PCIDSK::ProjParmsFromText(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >) /src/gdal/gdal/frmts/pcidsk/sdk/core/pcidsk_utils.cpp:408:12
+    #7 0x167cb35 in PCIDSK::CPCIDSKVectorSegment::GetProjection(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&) /src/gdal/gdal/frmts/pcidsk/sdk/segment/cpcidskvectorsegment.cpp:686:12
+    #8 0x187c8db in OGRPCIDSKLayer::OGRPCIDSKLayer(PCIDSK::PCIDSKSegment*, PCIDSK::PCIDSKVectorSegment*, bool) /src/gdal/gdal/frmts/pcidsk/ogrpcidsklayer.cpp:130:35
+    #9 0xd8c16a in PCIDSK2Dataset::LLOpen(char const*, PCIDSK::PCIDSKFile*, GDALAccess, char**) /src/gdal/gdal/frmts/pcidsk/pcidskdataset2.cpp:1896:48
+    #10 0xd8b1da in PCIDSK2Dataset::Open(GDALOpenInfo*) /src/gdal/gdal/frmts/pcidsk/pcidskdataset2.cpp:1761:16
+    #11 0x570671 in GDALOpenEx /src/gdal/gdal/gcore/gdaldataset.cpp:2792:20
+    #12 0x53950a in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_vector_translate_fuzzer.cpp:119:25
+    #13 0x547318 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:526:13
+    #14 0x53a074 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #15 0x53def7 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:707:9
+    #16 0x539d90 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #17 0x7f0ebbfcb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #18 0x428428 in _start (/out/gdal_vector_translate_fuzzer+0x428428)
+
+DEDUP_TOKEN: __interceptor_memset.part.37--construct<double>--__construct<double>
+[1m[32m0x611000004088 is located 136 bytes inside of 256-byte region [0x611000004000,0x611000004100)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x534b78 in operator new(unsigned long) /src/llvm/projects/compiler-rt/lib/asan/asan_new_delete.cc:93
+    #1 0x7ff5dc in __libcpp_allocate /usr/local/bin/../include/c++/v1/new:259:10
+    #2 0x7ff5dc in allocate /usr/local/bin/../include/c++/v1/memory:1799
+    #3 0x7ff5dc in allocate /usr/local/bin/../include/c++/v1/memory:1548
+    #4 0x7ff5dc in std::__1::__split_buffer<double, std::__1::allocator<double>&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<double>&) /usr/local/bin/../include/c++/v1/__split_buffer:311
+    #5 0x983ae3 in void std::__1::vector<double, std::__1::allocator<double> >::__push_back_slow_path<double>(double&&) /usr/local/bin/../include/c++/v1/vector:1611:49
+    #6 0x1885ac3 in push_back /usr/local/bin/../include/c++/v1/vector:1652:9
+    #7 0x1885ac3 in PCIDSK::ProjParmsFromText(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >) /src/gdal/gdal/frmts/pcidsk/sdk/core/pcidsk_utils.cpp:397
+    #8 0x167cb35 in PCIDSK::CPCIDSKVectorSegment::GetProjection(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&) /src/gdal/gdal/frmts/pcidsk/sdk/segment/cpcidskvectorsegment.cpp:686:12
+    #9 0x187c8db in OGRPCIDSKLayer::OGRPCIDSKLayer(PCIDSK::PCIDSKSegment*, PCIDSK::PCIDSKVectorSegment*, bool) /src/gdal/gdal/frmts/pcidsk/ogrpcidsklayer.cpp:130:35
+    #10 0xd8c16a in PCIDSK2Dataset::LLOpen(char const*, PCIDSK::PCIDSKFile*, GDALAccess, char**) /src/gdal/gdal/frmts/pcidsk/pcidskdataset2.cpp:1896:48
+    #11 0xd8b1da in PCIDSK2Dataset::Open(GDALOpenInfo*) /src/gdal/gdal/frmts/pcidsk/pcidskdataset2.cpp:1761:16
+    #12 0x570671 in GDALOpenEx /src/gdal/gdal/gcore/gdaldataset.cpp:2792:20
+    #13 0x53950a in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_vector_translate_fuzzer.cpp:119:25
+    #14 0x547318 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:526:13
+    #15 0x53a074 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #16 0x53def7 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:707:9
+    #17 0x539d90 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #18 0x7f0ebbfcb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: operator new(unsigned long)--__libcpp_allocate--allocate
+HINT: if you don't care about these errors you may set ASAN_OPTIONS=detect_container_overflow=0.
+If you suspect a false positive see also: https://github.com/google/sanitizers/wiki/AddressSanitizerContainerOverflow.
+SUMMARY: AddressSanitizer: container-overflow /src/llvm/projects/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:764 in __interceptor_memset.part.37
+Shadow bytes around the buggy address:
+  0x0c227fff87c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+  0x0c227fff87d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c227fff87e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c227fff87f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c227fff8800: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c227fff8810: [1m[0m00[1m[0m[[1m[34mfc[1m[0m][1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m
+  0x0c227fff8820: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c227fff8830: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c227fff8840: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c227fff8850: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c227fff8860: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42540599

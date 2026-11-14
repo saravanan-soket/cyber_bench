@@ -1,0 +1,52 @@
+ARVO id: 42475688
+Project: open62541
+Fuzz target: fuzz_binary_message
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/open62541/open62541.git
+
+=== Crash report ===
+INFO: Seed: 1419309736
+INFO: Loaded 1 modules   (9961 inline 8-bit counters): 9961 [0xa32f10, 0xa355f9), 
+INFO: Loaded 1 PC tables (9961 PCs): 9961 [0xa35600,0xa5c490), 
+/out/fuzz_binary_message: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x5d99c3 in cmpTarget /src/open62541/src/server/ua_services_view.c:54:29
+    #1 0x5d99c3 in __RefHead_ZIP_INSERT /src/open62541/src/server/ua_services_view.c:64
+    #2 0x5d9717 in __RefHead_ZIP_INSERT /src/open62541/src/server/ua_services_view.c:64:1
+    #3 0x5dd6cc in RefHead_ZIP_INSERT /src/open62541/src/server/ua_services_view.c:64:1
+    #4 0x5dd6cc in RefTree_add /src/open62541/src/server/ua_services_view.c:140
+    #5 0x5db3fd in Operation_Browse /src/open62541/src/server/ua_services_view.c:480:26
+    #6 0x619cc1 in recursiveCallConstructors /src/open62541/src/server/ua_services_nodemanagement.c:1029:5
+    #7 0x618d15 in AddNode_finish /src/open62541/src/server/ua_services_nodemanagement.c:1169:14
+    #8 0x61ec7e in Operation_addNode /src/open62541/src/server/ua_services_nodemanagement.c:1198:26
+    #9 0x61ec7e in __UA_Server_addNode /src/open62541/src/server/ua_services_nodemanagement.c:1250
+    #10 0x5bb861 in UA_Server_addReferenceTypeNode /src/open62541/include/open62541/server.h:1092:12
+    #11 0x5bb861 in addReferenceTypeNode /src/open62541/src/server/ua_server_ns0.c:68
+    #12 0x5bb861 in UA_Server_createNS0_base /src/open62541/src/server/ua_server_ns0.c:144
+    #13 0x5bb861 in UA_Server_initNS0 /src/open62541/src/server/ua_server_ns0.c:644
+    #14 0x5b387e in UA_Server_new /src/open62541/src/server/ua_server.c:262:14
+    #15 0x53b2e0 in LLVMFuzzerTestOneInput /src/open62541/tests/fuzz/fuzz_binary_message.cc:29:25
+    #16 0x472ee1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #17 0x45eda1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:286:6
+    #18 0x46476a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:765:9
+    #19 0x48c742 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #20 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #21 0x41e748 in _start (/out/fuzz_binary_message+0x41e748)
+
+DEDUP_TOKEN: cmpTarget--__RefHead_ZIP_INSERT--__RefHead_ZIP_INSERT
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/open62541/src/server/ua_services_view.c:54:29 in cmpTarget
+  ORIGIN: invalid (0). Might be a bug in MemorySanitizer origin tracking.
+    This could still be a bug in your code, too!
+Unique heap origins: 661
+Stack depot allocated bytes: 87464
+Unique origin histories: 319
+History depot allocated bytes: 7656
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42475688

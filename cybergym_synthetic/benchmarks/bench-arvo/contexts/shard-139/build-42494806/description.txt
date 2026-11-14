@@ -1,0 +1,48 @@
+ARVO id: 42494806
+Project: php-src
+Fuzz target: php-fuzz-mbstring
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/php/php-src.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3844886733
+INFO: Loaded 1 modules   (132572 inline 8-bit counters): 132572 [0x96d6720, 0x96f6cfc), 
+INFO: Loaded 1 PC tables (132572 PCs): 132572 [0x96f6cfc,0x97f9bdc), 
+/out/php-fuzz-mbstring: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x05522c3b (pc 0x08d71275 bp 0xffffba08 sp 0xffffb9f0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x8d71275 in onigenc_is_mbc_newline_0x0a /src/php-src/oniguruma/src/regenc.c:704:9
+    #1 0x8d5015f in match_at /src/php-src/oniguruma/src/regexec.c:3705:16
+    #2 0x8d65146 in search_in_range /src/php-src/oniguruma/src/regexec.c:5632:7
+    #3 0x8d65c29 in onig_search_with_param /src/php-src/oniguruma/src/regexec.c:5754:10
+    #4 0x846bf4a in _php_mb_onig_search /src/php-src/ext/mbstring/php_mbregex.c:879:8
+    #5 0x846869f in _php_mb_regex_ereg_exec /src/php-src/ext/mbstring/php_mbregex.c:936:6
+    #6 0x8468251 in zif_mb_ereg /src/php-src/ext/mbstring/php_mbregex.c:970:2
+    #7 0x88e608e in zend_call_function /src/php-src/Zend/zend_execute_API.c:931:4
+    #8 0x88e4055 in _call_user_function_impl /src/php-src/Zend/zend_execute_API.c:679:9
+    #9 0x8ce5ac2 in fuzzer_call_php_func_zval /src/php-src/sapi/fuzzer/fuzzer-sapi.c:280:2
+    #10 0x8ce5e06 in fuzzer_call_php_func /src/php-src/sapi/fuzzer/fuzzer-sapi.c:300:2
+    #11 0x8ce4ada in LLVMFuzzerTestOneInput /src/php-src/sapi/fuzzer/fuzzer-mbstring.c:46:2
+    #12 0x80c11be in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #13 0x80ab00e in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #14 0x80b0f79 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #15 0x80dc9a7 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0xf7d75646 in __libc_start_main (/lib32/libc.so.6+0x18646)
+    #17 0x8085714 in _start (/out/php-fuzz-mbstring+0x8085714)
+
+DEDUP_TOKEN: onigenc_is_mbc_newline_0x0a--match_at--search_in_range
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/php-src/oniguruma/src/regenc.c:704:9 in onigenc_is_mbc_newline_0x0a
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42494806

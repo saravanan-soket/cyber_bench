@@ -1,0 +1,49 @@
+ARVO id: 400793793
+Project: qpid-proton
+Fuzz target: fuzz-connection-driver
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/apache/qpid-proton.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1575222602
+INFO: Loaded 1 modules   (16177 inline 8-bit counters): 16177 [0x560996021430, 0x560996025361), 
+INFO: Loaded 1 PC tables (16177 PCs): 16177 [0x560996025368,0x560996064678), 
+/out/fuzz-connection-driver: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address 0xffffaffffffffff3 (pc 0x560995dfce67 bp 0x7ffc1388df20 sp 0x7ffc1388ded0 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x560995dfce67 in pn_free /src/qpid-proton/c/src/core/object/object.c:314:14
+    #1 0x560995e6b589 in pn_disposition_finalize /src/qpid-proton/c/src/core/engine.c:1598:7
+    #2 0x560995e69eee in pn_delivery_finalize /src/qpid-proton/c/src/core/engine.c:1670:5
+    #3 0x560995dfb8bf in pn_class_decref /src/qpid-proton/c/src/core/object/object.c:206:9
+    #4 0x560995f898b1 in pn_list_finalize /src/qpid-proton/c/src/core/object/list.c:200:5
+    #5 0x560995dfd0c7 in pn_free /src/qpid-proton/c/src/core/object/object.c:320:9
+    #6 0x560995dfb8bf in pn_class_decref /src/qpid-proton/c/src/core/object/object.c:206:9
+    #7 0x560995e6f53e in pn_event_finalize /src/qpid-proton/c/src/core/event.c:245:5
+    #8 0x560995dfcb76 in pn_decref /src/qpid-proton/c/src/core/object/object.c:287:9
+    #9 0x560995e6e116 in pn_collector_next /src/qpid-proton/c/src/core/event.c:214:5
+    #10 0x560995e6e116 in pn_collector_drain /src/qpid-proton/c/src/core/event.c:69:10
+    #11 0x560995e6e116 in pn_collector_release /src/qpid-proton/c/src/core/event.c:130:5
+    #12 0x560995e6e116 in pn_collector_free /src/qpid-proton/c/src/core/event.c:121:3
+    #13 0x560995e405c0 in pn_connection_driver_destroy /src/qpid-proton/c/src/core/connection_driver.c:86:21
+    #14 0x560995d6b191 in LLVMFuzzerTestOneInput /src/qpid-proton/c/tests/fuzz/fuzz-connection-driver.c:100:3
+    #15 0x560995d88250 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #16 0x560995d734c5 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #17 0x560995d78f5f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #18 0x560995da4202 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #19 0x7f3627c0b082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+    #20 0x560995cd3b0d in _start (/out/fuzz-connection-driver+0xa5b0d)
+
+DEDUP_TOKEN: pn_free--pn_disposition_finalize--pn_delivery_finalize
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV /src/qpid-proton/c/src/core/object/object.c:314:14 in pn_free
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/400793793

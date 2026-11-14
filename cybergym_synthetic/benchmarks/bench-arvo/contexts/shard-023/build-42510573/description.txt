@@ -1,0 +1,41 @@
+ARVO id: 42510573
+Project: gdal
+Fuzz target: dxf_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 1329563341
+INFO: Loaded 1 modules   (537673 inline 8-bit counters): 537673 [0x546f240, 0x54f2689), 
+INFO: Loaded 1 PC tables (537673 PCs): 537673 [0x54f2690,0x5d26b20), 
+/out/dxf_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x000000001011 (pc 0x00000291ba63 bp 0x000000000000 sp 0x7ffdc876e610 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x291ba62 in __dynamic_cast (/out/dxf_fuzzer+0x291ba62)
+    #1 0x43a0d2 in __ubsan::checkDynamicType(void*, void*, unsigned long) /src/llvm/projects/compiler-rt/lib/ubsan/ubsan_type_hash_itanium.cc:233
+    #2 0x4380e2 in HandleDynamicTypeCacheMiss(__ubsan::DynamicTypeCacheMissData*, unsigned long, unsigned long, __ubsan::ReportOptions) /src/llvm/projects/compiler-rt/lib/ubsan/ubsan_handlers_cxx.cc:37
+    #3 0x4389a2 in __ubsan_handle_dynamic_type_cache_miss_abort /src/llvm/projects/compiler-rt/lib/ubsan/ubsan_handlers_cxx.cc:93
+    #4 0x93d0a1 in OGRDXFLayer::GetNextUnfilteredFeature() /src/gdal/gdal/ogr/ogrsf_frmts/dxf/ogrdxflayer.cpp:3369:24
+    #5 0x93d1cd in OGRDXFLayer::GetNextFeature() /src/gdal/gdal/ogr/ogrsf_frmts/dxf/ogrdxflayer.cpp:3392:33
+    #6 0x52bbf0 in OGR_L_GetNextFeature /src/gdal/gdal/ogr/ogrsf_frmts/generic/ogrlayer.cpp:549:48
+    #7 0x43a471 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/ogr_fuzzer.cpp:114:33
+    #8 0x44894c in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #9 0x43a84c in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #10 0x43e457 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #11 0x43a558 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #12 0x7fc26849282f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #13 0x412fb8 in _start (/out/dxf_fuzzer+0x412fb8)
+
+DEDUP_TOKEN: __dynamic_cast--__ubsan::checkDynamicType(void*, void*, unsigned long)--HandleDynamicTypeCacheMiss(__ubsan::DynamicTypeCacheMissData*, unsigned long, unsigned long, __ubsan::ReportOptions)
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV (/out/dxf_fuzzer+0x291ba62) in __dynamic_cast
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42510573

@@ -1,0 +1,47 @@
+ARVO id: 42512004
+Project: binutils-gdb
+Fuzz target: fuzz_as
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: git://sourceware.org/git/binutils-gdb.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 373089977
+INFO: Loaded 1 modules   (189149 inline 8-bit counters): 189149 [0x1ce1840, 0x1d0fb1d), 
+INFO: Loaded 1 PC tables (189149 PCs): 189149 [0x175e950,0x1a41720), 
+/out/fuzz_as: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+/tmp/libfuzzer-7.s: Assembler messages:
+/tmp/libfuzzer-7.s: Warning: end of file in string; '"' inserted
+/tmp/libfuzzer-7.s:1: Error: file number 327697297 is too big
+/tmp/libfuzzer-7.s: Warning: end of file in string; '"' inserted
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x0000ce208e44 (pc 0x000000574064 bp 0x7fffffffd920 sp 0x7fffffffd860 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x574064 in allocate_filename_to_slot /src/binutils-gdb/gas/dwarf2dbg.c:843:43
+    #1 0x574064 in dwarf2_directive_filename /src/binutils-gdb/gas/dwarf2dbg.c:1219:9
+    #2 0x574c80 in dwarf2_directive_file /src/binutils-gdb/gas/dwarf2dbg.c:1232:10
+    #3 0x5a3b58 in read_a_source_file /src/binutils-gdb/gas/read.c:1181:9
+    #4 0x56034d in perform_an_assembly_pass /src/binutils-gdb/gas/./fuzz_as.h:1256:4
+    #5 0x56066a in LLVMFuzzerTestOneInput /src/fuzz_as.c:57:3
+    #6 0x455373 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #7 0x455e95 in fuzzer::Fuzzer::TryDetectingAMemoryLeak(unsigned char const*, unsigned long, bool) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:687:3
+    #8 0x44104e in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:329:8
+    #9 0x44684c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #10 0x46f442 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff7c56082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #12 0x41f82d in _start (/out/fuzz_as+0x41f82d)
+
+DEDUP_TOKEN: allocate_filename_to_slot--dwarf2_directive_filename--dwarf2_directive_file
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/binutils-gdb/gas/dwarf2dbg.c:843:43 in allocate_filename_to_slot
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42512004

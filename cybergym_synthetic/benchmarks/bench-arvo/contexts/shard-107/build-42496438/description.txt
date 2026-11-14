@@ -1,0 +1,41 @@
+ARVO id: 42496438
+Project: wasm3
+Fuzz target: fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Segv on unknown address
+Language: c
+Repo: https://github.com/wasm3/wasm3
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3806565936
+INFO: Loaded 1 modules   (3361 inline 8-bit counters): 3361 [0x83b6e8, 0x83c409), 
+INFO: Loaded 1 PC tables (3361 PCs): 3361 [0x5e1ba8,0x5eedb8), 
+/out/fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==8==ERROR: MemorySanitizer: SEGV on unknown address (pc 0x00000052ca67 bp 0x7fffffffd668 sp 0x7fffffffd568 T8)
+[1m[0m==8==The signal is caused by a READ memory access.
+==8==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+    #0 0x52ca67 in InitElements /src/wasm3/source/m3_env.c:476:32
+    #1 0x52e971 in m3_LoadModule /src/wasm3/source/m3_env.c:559:1
+    #2 0x5b1a0b in CompileBlockStatements /src/wasm3/source/m3_compile.c:2477:1
+    #3 0x5b5469 in CompileFunction /src/wasm3/source/m3_compile.c:2767:1
+    #4 0x53070c in m3_FindFunction /src/wasm3/source/m3_env.c:686:1
+    #5 0x527045 in LLVMFuzzerTestOneInput /src/wasm3/platforms/app_fuzz/fuzzer.c:33:30
+    #6 0x459dc3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #7 0x443bd2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #8 0x449a1a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #9 0x475702 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #11 0x41e8b8 in _start (/out/fuzzer+0x41e8b8)
+
+DEDUP_TOKEN: InitElements--m3_LoadModule--CompileBlockStatements
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV /src/wasm3/source/m3_env.c:476:32 in InitElements
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42496438

@@ -1,0 +1,70 @@
+ARVO id: 42497239
+Project: perfetto
+Fuzz target: trace_processor_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://android.googlesource.com/platform/external/perfetto/
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3383348521
+INFO: Loaded 1 modules   (85818 inline 8-bit counters): 85818 [0x12aaec0, 0x12bfdfa), 
+INFO: Loaded 1 PC tables (85818 PCs): 85818 [0x12bfe00,0x140f1a0), 
+/out/trace_processor_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[90m[967.680] _event_tokenizer.cc:200[0m [31mTrackEvent packet without trusted_packet_sequence_id[0m
+[90m[967.680] _event_tokenizer.cc:200[0m [31mTrackEvent packet without trusted_packet_sequence_id[0m
+[90m[967.681] _event_tokenizer.cc:200[0m [31mTrackEvent packet without trusted_packet_sequence_id[0m
+[90m[967.682] _event_tokenizer.cc:200[0m [31mTrackEvent packet without trusted_packet_sequence_id[0m
+[90m[967.683] _event_tokenizer.cc:200[0m [31mTrackEvent packet without trusted_packet_sequence_id[0m
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x00009fff5780 (pc 0x000000eae09f bp 0x7fffffffcb70 sp 0x7fffffffcb00 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0xeae09f in std::__1::__tree<std::__1::__value_type<Json::Value::CZString, Json::Value>, std::__1::__map_value_compare<Json::Value::CZString, std::__1::__value_type<Json::Value::CZString, Json::Value>, std::__1::less<Json::Value::CZString>, true>, std::__1::allocator<std::__1::__value_type<Json::Value::CZString, Json::Value> > >::begin() /usr/local/bin/../include/c++/v1/__tree:1113:62
+    #1 0xea59eb in std::__1::map<Json::Value::CZString, Json::Value, std::__1::less<Json::Value::CZString>, std::__1::allocator<std::__1::pair<Json::Value::CZString const, Json::Value> > >::begin() /usr/local/bin/../include/c++/v1/map:1095:54
+    #2 0xea723c in Json::Value::begin() const /work/build/../../src/perfetto/buildtools/jsoncpp/src/lib_json/json_value.cpp:1451:42
+    #3 0x7ed77b in perfetto::trace_processor::json::AddJsonValueToArgs(Json::Value const&, perfetto::base::StringView, perfetto::base::StringView, perfetto::trace_processor::TraceStorage*, perfetto::trace_processor::ArgsTracker::BoundInserter*) /work/build/../../src/perfetto/src/trace_processor/importers/json/json_utils.cc:157:21
+    #4 0x90c497 in perfetto::trace_processor::(anonymous namespace)::TrackEventArgsParser::AddJson(perfetto::trace_processor::util::ProtoToArgsParser::Key const&, protozero::ConstChars const&) /work/build/../../src/perfetto/src/trace_processor/importers/proto/track_event_parser.cc:113:12
+    #5 0xe57642 in perfetto::trace_processor::util::DebugAnnotationParser::ParseDebugAnnotationValue(perfetto::protos::pbzero::DebugAnnotation_Decoder&, perfetto::trace_processor::util::ProtoToArgsParser::Delegate&, perfetto::trace_processor::util::ProtoToArgsParser::Key const&) /work/build/../../src/perfetto/src/trace_processor/util/debug_annotation_parser.cc:131:18
+    #6 0xe58eb7 in perfetto::trace_processor::util::DebugAnnotationParser::Parse(protozero::ConstBytes, perfetto::trace_processor::util::ProtoToArgsParser::Delegate&) /work/build/../../src/perfetto/src/trace_processor/util/debug_annotation_parser.cc:157:10
+    #7 0x90030b in perfetto::trace_processor::TrackEventParser::EventImporter::ParseTrackEventArgs(perfetto::trace_processor::ArgsTracker::BoundInserter*) /work/build/../../src/perfetto/src/trace_processor/importers/proto/track_event_parser.cc:1124:27
+    #8 0x927163 in perfetto::trace_processor::TrackEventParser::EventImporter::ParseAsyncInstantEvent()::'lambda'(perfetto::trace_processor::ArgsTracker::BoundInserter*)::operator()(perfetto::trace_processor::ArgsTracker::BoundInserter*) const /work/build/../../src/perfetto/src/trace_processor/importers/proto/track_event_parser.cc:932:43
+    #9 0x92710c in decltype(std::__1::forward<perfetto::trace_processor::TrackEventParser::EventImporter::ParseAsyncInstantEvent()::'lambda'(perfetto::trace_processor::ArgsTracker::BoundInserter*)&>(fp)(std::__1::forward<perfetto::trace_processor::ArgsTracker::BoundInserter*>(fp0))) std::__1::__invoke<perfetto::trace_processor::TrackEventParser::EventImporter::ParseAsyncInstantEvent()::'lambda'(perfetto::trace_processor::ArgsTracker::BoundInserter*)&, perfetto::trace_processor::ArgsTracker::BoundInserter*>(perfetto::trace_processor::TrackEventParser::EventImporter::ParseAsyncInstantEvent()::'lambda'(perfetto::trace_processor::ArgsTracker::BoundInserter*)&, perfetto::trace_processor::ArgsTracker::BoundInserter*&&) /usr/local/bin/../include/c++/v1/type_traits:3679:1
+    #10 0x92707c in void std::__1::__invoke_void_return_wrapper<void>::__call<perfetto::trace_processor::TrackEventParser::EventImporter::ParseAsyncInstantEvent()::'lambda'(perfetto::trace_processor::ArgsTracker::BoundInserter*)&, perfetto::trace_processor::ArgsTracker::BoundInserter*>(perfetto::trace_processor::TrackEventParser::EventImporter::ParseAsyncInstantEvent()::'lambda'(perfetto::trace_processor::ArgsTracker::BoundInserter*)&, perfetto::trace_processor::ArgsTracker::BoundInserter*&&) /usr/local/bin/../include/c++/v1/__functional_base:348:9
+    #11 0x92702c in std::__1::__function::__alloc_func<perfetto::trace_processor::TrackEventParser::EventImporter::ParseAsyncInstantEvent()::'lambda'(perfetto::trace_processor::ArgsTracker::BoundInserter*), std::__1::allocator<perfetto::trace_processor::TrackEventParser::EventImporter::ParseAsyncInstantEvent()::'lambda'(perfetto::trace_processor::ArgsTracker::BoundInserter*)>, void (perfetto::trace_processor::ArgsTracker::BoundInserter*)>::operator()(perfetto::trace_processor::ArgsTracker::BoundInserter*&&) /usr/local/bin/../include/c++/v1/functional:1558:16
+    #12 0x925117 in std::__1::__function::__func<perfetto::trace_processor::TrackEventParser::EventImporter::ParseAsyncInstantEvent()::'lambda'(perfetto::trace_processor::ArgsTracker::BoundInserter*), std::__1::allocator<perfetto::trace_processor::TrackEventParser::EventImporter::ParseAsyncInstantEvent()::'lambda'(perfetto::trace_processor::ArgsTracker::BoundInserter*)>, void (perfetto::trace_processor::ArgsTracker::BoundInserter*)>::operator()(perfetto::trace_processor::ArgsTracker::BoundInserter*&&) /usr/local/bin/../include/c++/v1/functional:1732:12
+    #13 0x9b05b9 in std::__1::__function::__value_func<void (perfetto::trace_processor::ArgsTracker::BoundInserter*)>::operator()(perfetto::trace_processor::ArgsTracker::BoundInserter*&&) const /usr/local/bin/../include/c++/v1/functional:1885:16
+    #14 0x9ac87a in std::__1::function<void (perfetto::trace_processor::ArgsTracker::BoundInserter*)>::operator()(perfetto::trace_processor::ArgsTracker::BoundInserter*) const /usr/local/bin/../include/c++/v1/functional:2560:12
+    #15 0x9df560 in perfetto::trace_processor::SliceTracker::StartSlice(long, perfetto::trace_processor::tables::TrackTable::DefinedId, std::__1::function<void (perfetto::trace_processor::ArgsTracker::BoundInserter*)>, std::__1::function<perfetto::trace_processor::tables::SliceTable::DefinedId ()>) /work/build/../../src/perfetto/src/trace_processor/importers/common/slice_tracker.cc:180:5
+    #16 0x9dd27b in perfetto::trace_processor::SliceTracker::Scoped(long, perfetto::trace_processor::tables::TrackTable::DefinedId, perfetto::trace_processor::StringPool::Id, perfetto::trace_processor::StringPool::Id, long, std::__1::function<void (perfetto::trace_processor::ArgsTracker::BoundInserter*)>) /work/build/../../src/perfetto/src/trace_processor/importers/common/slice_tracker.cc:81:10
+    #17 0x8edabf in perfetto::trace_processor::TrackEventParser::EventImporter::ParseAsyncInstantEvent() /work/build/../../src/perfetto/src/trace_processor/importers/proto/track_event_parser.cc:930:50
+    #18 0x8e0e08 in perfetto::trace_processor::TrackEventParser::EventImporter::Import() /work/build/../../src/perfetto/src/trace_processor/importers/proto/track_event_parser.cc:236:16
+    #19 0x8e06d0 in perfetto::trace_processor::TrackEventParser::ParseTrackEvent(long, perfetto::trace_processor::TrackEventData*, protozero::ConstBytes) /work/build/../../src/perfetto/src/trace_processor/importers/proto/track_event_parser.cc:1547:60
+    #20 0x8d89ed in perfetto::trace_processor::TrackEventModule::ParsePacket(perfetto::protos::pbzero::TracePacket_Decoder const&, perfetto::trace_processor::TimestampedTracePiece const&, unsigned int) /work/build/../../src/perfetto/src/trace_processor/importers/proto/track_event_module.cc:77:15
+    #21 0x875599 in perfetto::trace_processor::ProtoTraceParser::ParseTracePacketImpl(long, perfetto::trace_processor::TimestampedTracePiece const&, perfetto::trace_processor::PacketSequenceStateGeneration*, perfetto::protos::pbzero::TracePacket_Decoder const&) /work/build/../../src/perfetto/src/trace_processor/importers/proto/proto_trace_parser.cc:138:17
+    #22 0x87510f in perfetto::trace_processor::ProtoTraceParser::ParseTracePacket(long, perfetto::trace_processor::TimestampedTracePiece) /work/build/../../src/perfetto/src/trace_processor/importers/proto/proto_trace_parser.cc:102:3
+    #23 0x958b18 in MaybePushEvent /work/build/../../src/perfetto/src/trace_processor/trace_sorter.cc:190:14
+    #24 0x958b18 in perfetto::trace_processor::TraceSorter::SortAndExtractEventsBeyondWindow(long) /work/build/../../src/perfetto/src/trace_processor/trace_sorter.cc:134:7
+    #25 0x95485a in perfetto::trace_processor::TraceSorter::ExtractEventsForced() /work/build/../../src/perfetto/src/trace_processor/trace_sorter.h:148:5
+    #26 0x954565 in perfetto::trace_processor::TraceProcessorStorageImpl::NotifyEndOfFile() /work/build/../../src/perfetto/src/trace_processor/trace_processor_storage_impl.cc:108:22
+    #27 0x52db9c in perfetto::trace_processor::FuzzTraceProcessor(unsigned char const*, unsigned long) /work/build/../../src/perfetto/src/trace_processor/trace_parsing_fuzzer.cc:33:14
+    #28 0x52e170 in LLVMFuzzerTestOneInput /work/build/../../src/perfetto/src/trace_processor/trace_parsing_fuzzer.cc:42:3
+    #29 0x4f8613 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #30 0x4e5592 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #31 0x4eac97 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #32 0x511a52 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #33 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #34 0x421738 in _start (/out/trace_processor_fuzzer+0x421738)
+
+DEDUP_TOKEN: std::__1::__tree<std::__1::__value_type<Json::Value::CZString, Json::Value>, std::__1::__map_value_compare<Json::Value::CZString, std::__1::__value_type<Json::Value::CZString, Json::Value>, std::__1::less<Json::Value::CZString>, true>, std::__1::allocator<std::__1::__value_type<Json::Value::CZString, Json::Value> > >::begin()--std::__1::map<Json::Value::CZString, Json::Value, std::__1::less<Json::Value::CZString>, std::__1::allocator<std::__1::pair<Json::Value::CZString const, Json::Value> > >::begin()--Json::Value::begin() const
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /usr/local/bin/../include/c++/v1/__tree:1113:62 in std::__1::__tree<std::__1::__value_type<Json::Value::CZString, Json::Value>, std::__1::__map_value_compare<Json::Value::CZString, std::__1::__value_type<Json::Value::CZString, Json::Value>, std::__1::less<Json::Value::CZString>, true>, std::__1::allocator<std::__1::__value_type<Json::Value::CZString, Json::Value> > >::begin()
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42497239

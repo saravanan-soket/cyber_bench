@@ -1,0 +1,40 @@
+ARVO id: 42498434
+Project: ffmpeg
+Fuzz target: ffmpeg_dem_MXF_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Seed: 364011222
+INFO: Loaded 1 modules   (68055 inline 8-bit counters): 68055 [0xd05238, 0xd15c0f), 
+INFO: Loaded 1 PC tables (68055 PCs): 68055 [0x8092b8,0x913028), 
+/out/ffmpeg_dem_MXF_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x7f554c4c17f7 (pc 0x00000066a915 bp 0x7ffc171923e0 sp 0x7ffc171923c0 T7)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+    #0 0x66a915 in av_shrink_packet /src/ffmpeg/libavcodec/avpacket.c:108:5
+    #1 0x5b9481 in mxf_decrypt_triplet /src/ffmpeg/libavformat/mxfdec.c:639:5
+    #2 0x5ab637 in mxf_read_packet /src/ffmpeg/libavformat/mxfdec.c:3574:23
+    #3 0x618bf4 in ff_read_packet /src/ffmpeg/libavformat/utils.c:818:15
+    #4 0x61b5aa in read_frame_internal /src/ffmpeg/libavformat/utils.c:1520:15
+    #5 0x61b1d5 in av_read_frame /src/ffmpeg/libavformat/utils.c:1722:17
+    #6 0x4b13fb in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dem_fuzzer.c:191:15
+    #7 0x441f61 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:595:15
+    #8 0x42d032 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #9 0x4330ee in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:852:9
+    #10 0x45b0d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7f55c376e83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #12 0x408308 in _start (/out/ffmpeg_dem_MXF_fuzzer+0x408308)
+
+DEDUP_TOKEN: av_shrink_packet--mxf_decrypt_triplet--mxf_read_packet
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/ffmpeg/libavcodec/avpacket.c:108:5 in av_shrink_packet
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42498434

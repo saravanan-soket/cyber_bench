@@ -1,0 +1,95 @@
+ARVO id: 42512124
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_MPEG4_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+Reading 1040 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x7f5083433800 at pc 0x00000067ccc7 bp 0x7ffd7267f610 sp 0x7ffd7267f608
+[1m[0m[1m[34mREAD of size 1 at 0x7f5083433800 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x67ccc6 in copy_block17 /src/ffmpeg/libavcodec/copy_block.h:83:19
+    #1 0x67ccc6 in avg_qpel16_mc01_c /src/ffmpeg/libavcodec/qpeldsp.c:698:1
+    #2 0x5c7d6a in qpel_motion /src/ffmpeg/libavcodec/mpegvideo_motion.c:567:9
+    #3 0x5c41f9 in mpv_motion_internal /src/ffmpeg/libavcodec/mpegvideo_motion.c
+    #4 0x5c41f9 in ff_mpv_motion /src/ffmpeg/libavcodec/mpegvideo_motion.c:989:9
+    #5 0x5a36ba in mpv_reconstruct_mb_internal /src/ffmpeg/libavcodec/mpegvideo.c:1515:25
+    #6 0x5a36ba in ff_mpv_reconstruct_mb /src/ffmpeg/libavcodec/mpegvideo.c:1668:27
+    #7 0x9a33e2 in mpeg_er_decode_mb /src/ffmpeg/libavcodec/mpeg_er.c:97:5
+    #8 0x84637f in ff_er_frame_end /src/ffmpeg/libavcodec/error_resilience.c:1221:17
+    #9 0x86f0da in ff_h263_decode_frame /src/ffmpeg/libavcodec/h263dec.c:675:9
+    #10 0x51992a in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:307:15
+    #11 0x51992a in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:515:15
+    #12 0x51992a in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:536:15
+    #13 0x518f17 in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:604:15
+    #14 0x4ff985 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:482:25
+    #15 0xdad18a in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+    #16 0xdacf5d in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:318:12
+    #17 0x7f5084ef2082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #18 0x443afd in _start (/out/ffmpeg_AV_CODEC_ID_MPEG4_fuzzer+0x443afd)
+
+DEDUP_TOKEN: copy_block17--avg_qpel16_mc01_c--qpel_motion
+[1m[32m0x7f5083433800 is located 0 bytes to the right of 212992-byte region [0x7f50833ff800,0x7f5083433800)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4c3827 in posix_memalign /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:210:3
+    #1 0xd00aec in av_malloc /src/ffmpeg/libavutil/mem.c:105:9
+    #2 0xcb4599 in av_buffer_alloc /src/ffmpeg/libavutil/buffer.c:82:12
+    #3 0x50216c in fuzz_video_get_buffer /src/ffmpeg/tools/target_dec_fuzzer.c:131:25
+    #4 0x50216c in fuzz_get_buffer2 /src/ffmpeg/tools/target_dec_fuzzer.c:152:18
+    #5 0x524944 in ff_get_buffer /src/ffmpeg/libavcodec/decode.c:1458:11
+    #6 0x5d8b40 in ff_thread_get_ext_buffer /src/ffmpeg/libavcodec/pthread_frame.c:1054:16
+    #7 0x9a5ebd in alloc_frame_buffer /src/ffmpeg/libavcodec/mpegpicture.c:136:13
+    #8 0x9a5ebd in ff_alloc_picture /src/ffmpeg/libavcodec/mpegpicture.c:271:13
+    #9 0x5b8c65 in alloc_picture /src/ffmpeg/libavcodec/mpegvideo_dec.c:250:12
+    #10 0x5b8c65 in ff_mpv_frame_start /src/ffmpeg/libavcodec/mpegvideo_dec.c:336:9
+    #11 0x86e5a7 in ff_h263_decode_frame /src/ffmpeg/libavcodec/h263dec.c:615:16
+    #12 0x51992a in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:307:15
+    #13 0x51992a in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:515:15
+    #14 0x51992a in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:536:15
+    #15 0x518f17 in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:604:15
+    #16 0x4ff985 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:482:25
+    #17 0xdad18a in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+
+DEDUP_TOKEN: posix_memalign--av_malloc--av_buffer_alloc
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/ffmpeg/libavcodec/copy_block.h:83:19 in copy_block17
+Shadow bytes around the buggy address:
+  0x0fea9067e6b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fea9067e6c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fea9067e6d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fea9067e6e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fea9067e6f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0fea9067e700:[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0fea9067e710: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0fea9067e720: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0fea9067e730: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0fea9067e740: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0fea9067e750: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42512124

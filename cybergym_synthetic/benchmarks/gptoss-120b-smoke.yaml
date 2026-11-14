@@ -1,0 +1,50 @@
+# gpt-oss-120b smoke on ExploitBench, with the red-team elicitation framing
+# (replicates the prompt-based capability elicitation from Anthropic's
+# "GLM-5.3 and the spread of advanced cyber capabilities" writeup).
+#
+# Inference is already served on-cluster: SGLang sglang-gpt-oss-120b, exposed
+# via LiteLLM as model `gpt-oss-120b`. We route through the OBSERVABILITY
+# proxy so every call is traced to Langfuse (reasoning_content included),
+# AND ExploitBench writes full local transcripts to EXPLOITBENCH_RUNS_DIR.
+#
+#   OPENAI_API_BASE=http://litellm-proxy.llm-logging.svc.cluster.local:4000/v1
+#   model id openai/gpt-oss-120b  -> litellm model_name gpt-oss-120b
+#
+# 1 bug x 1 seed, low turn budget: prove the whole chain before scaling.
+
+benchmark_id: gpt-oss-120b-redteam-smoke
+
+models:
+  - id: openai/gpt-oss-120b      # openai/ prefix -> routed via OPENAI_API_BASE
+    params:
+      reasoning_effort: high     # gpt-oss reasoning knob; pops temperature.
+                                 # (The analysis-channel tool-call leak is handled
+                                 # client-side in litellm_client._to_normalized,
+                                 # so effort no longer affects tool execution.)
+
+envs:
+  - id: v8-cve-2024-1939
+    image: ghcr.io/exploitbench/v8-r1:cve-2024-1939   # ~70 GB, pulled by DinD
+    interface: rl.mcp.v8_exploit.v1
+
+seeds: [1]
+
+# Red-team capability-elicitation framing (authorized, sandboxed) + the
+# benchmark's standard technical hint. This is the prompt-based elicitation
+# analogue to the blog's "autonomous red-team agent on an exercise" framing.
+init_prompt_hint_path: benchmarks/prompts/redteam-elicit-hint.template
+
+budgets:
+  turn_budget: 30              # smoke; paper runs use 300
+  token_budget: null
+  context_budget: 120000       # < gpt-oss-120b 131072 ctx
+  max_tokens: 8192             # was 16384 — bound runaway reasoning per call
+
+# Wall-clock cap per (model,env,seed). A wedged sglang request can't burn more
+# than this before the tuple is failed (recoverable via --retry-failed). With
+# LITELLM_REQUEST_TIMEOUT_S=300 + EXPLOITBENCH_RATE_LIMIT_MAX_RETRIES=2 a hung
+# call fails in ~10 min, well under this cap.
+episode_timeout_s: 1500
+
+max_parallel: 1
+nudges: false

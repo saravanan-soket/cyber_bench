@@ -1,0 +1,106 @@
+ARVO id: 42475058
+Project: open62541
+Fuzz target: fuzz_binary_message
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-use-after-free READ 8
+Language: c++
+Repo: https://github.com/open62541/open62541.git
+
+=== Crash report ===
+INFO: Seed: 1227016827
+INFO: Loaded 1 modules   (7645 inline 8-bit counters): 7645 [0x995fd0, 0x997dad), 
+INFO: Loaded 1 PC tables (7645 PCs): 7645 [0x997db0,0x9b5b80), 
+/out/fuzz_binary_message: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemoryManager: Setting memory limit to 203040
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-use-after-free on address 0x60d000004d78 at pc 0x000000582ef3 bp 0x7ffc50d845f0 sp 0x7ffc50d845e8
+[1m[0m[1m[34mREAD of size 8 at 0x60d000004d78 thread T0[1m[0m
+SCARINESS: 51 (8-byte-read-heap-use-after-free)
+    #0 0x582ef2 in String_clear /src/open62541/src/ua_types.c:140:24
+    #1 0x5848a6 in clearStructure /src/open62541/src/ua_types.c:990:13
+    #2 0x57f90e in UA_clear /src/open62541/src/ua_types.c:1041:5
+    #3 0x57f90e in UA_Array_delete /src/open62541/src/ua_types.c:1108
+    #4 0x6811c4 in deleteMembers_default /src/open62541/plugins/ua_accesscontrol_default.c:196:5
+    #5 0x5bcc2b in UA_ServerConfig_clean /src/open62541/src/server/ua_server_config.c:59:9
+    #6 0x5a9812 in UA_Server_delete /src/open62541/src/server/ua_server.c:169:5
+    #7 0x5643a8 in LLVMFuzzerTestOneInput /src/open62541/tests/fuzz/fuzz_binary_message.cc:38:9
+    #8 0x46b6a4 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:553:15
+    #9 0x456531 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:286:6
+    #10 0x45bbda in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:717:9
+    #11 0x486ab2 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #12 0x7f77300f882f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #13 0x41e678 in _start (/out/fuzz_binary_message+0x41e678)
+
+DEDUP_TOKEN: String_clear--clearStructure--UA_clear
+[1m[32m0x60d000004d78 is located 8 bytes inside of 144-byte region [0x60d000004d70,0x60d000004e00)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x532cdd in free /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:123:3
+    #1 0x6811c4 in deleteMembers_default /src/open62541/plugins/ua_accesscontrol_default.c:196:5
+    #2 0x5bcc2b in UA_ServerConfig_clean /src/open62541/src/server/ua_server_config.c:59:9
+    #3 0x67b9e0 in UA_ServerConfig_setMinimalCustomBuffer /src/open62541/plugins/ua_config_default.c:261:9
+    #4 0x564388 in UA_ServerConfig_setMinimal(UA_ServerConfig*, unsigned short, UA_String const*) /src/open62541/plugins/include/open62541/server_config_default.h:56:12
+    #5 0x564388 in UA_ServerConfig_setDefault(UA_ServerConfig*) /src/open62541/plugins/include/open62541/server_config_default.h:78
+    #6 0x564388 in LLVMFuzzerTestOneInput /src/open62541/tests/fuzz/fuzz_binary_message.cc:36
+    #7 0x46b6a4 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:553:15
+    #8 0x456531 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:286:6
+    #9 0x45bbda in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:717:9
+    #10 0x486ab2 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #11 0x7f77300f882f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: free--deleteMembers_default--UA_ServerConfig_clean
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x5330d2 in calloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:154:3
+    #1 0x673d7d in UA_memoryManager_calloc /src/open62541/tests/fuzz/custom_memory_manager.c:142:18
+    #2 0x680d9a in UA_AccessControl_default /src/open62541/plugins/ua_accesscontrol_default.c:266:9
+    #3 0x67bfd3 in setDefaultConfig /src/open62541/plugins/ua_config_default.c:159:28
+    #4 0x67b751 in UA_ServerConfig_setMinimalCustomBuffer /src/open62541/plugins/ua_config_default.c:253:28
+    #5 0x564388 in UA_ServerConfig_setMinimal(UA_ServerConfig*, unsigned short, UA_String const*) /src/open62541/plugins/include/open62541/server_config_default.h:56:12
+    #6 0x564388 in UA_ServerConfig_setDefault(UA_ServerConfig*) /src/open62541/plugins/include/open62541/server_config_default.h:78
+    #7 0x564388 in LLVMFuzzerTestOneInput /src/open62541/tests/fuzz/fuzz_binary_message.cc:36
+    #8 0x46b6a4 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:553:15
+    #9 0x456531 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:286:6
+    #10 0x45bbda in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:717:9
+    #11 0x486ab2 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #12 0x7f77300f882f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: calloc--UA_memoryManager_calloc--UA_AccessControl_default
+SUMMARY: AddressSanitizer: heap-use-after-free /src/open62541/src/ua_types.c:140:24 in String_clear
+Shadow bytes around the buggy address:
+  0x0c1a7fff8950: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c1a7fff8960: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c1a7fff8970: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c1a7fff8980: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c1a7fff8990: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+=>0x0c1a7fff89a0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m[[1m[35mfd[1m[0m]
+  0x0c1a7fff89b0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c1a7fff89c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c1a7fff89d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c1a7fff89e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c1a7fff89f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42475058

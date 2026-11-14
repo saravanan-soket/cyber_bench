@@ -1,0 +1,67 @@
+ARVO id: 42530977
+Project: imagemagick
+Fuzz target: encoder_hdr_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 359888887
+INFO: Loaded 1 modules   (52418 inline 8-bit counters): 52418 [0x16d3fc8, 0x16e0c8a), 
+INFO: Loaded 1 PC tables (52418 PCs): 52418 [0x1339340,0x1405f60), 
+/out/encoder_hdr_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0xd82710 in ReadHDRImage /src/imagemagick/coders/hdr.c:485:11
+    #1 0x7aab80 in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #2 0x6d8678 in BlobToImage /src/imagemagick/MagickCore/blob.c:466:13
+    #3 0x57f8e9 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4008:12
+    #4 0x49e769 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:20:11
+    #5 0x4e57d6 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #6 0x49fc61 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #7 0x4b3eb6 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #8 0x49eda1 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #9 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #10 0x420138 in _start (/out/encoder_hdr_fuzzer+0x420138)
+
+DEDUP_TOKEN: ReadHDRImage--ReadImage--BlobToImage
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0xd81bc1 in ReadHDRImage /src/imagemagick/coders/hdr.c
+    #1 0x7aab80 in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #2 0x6d8678 in BlobToImage /src/imagemagick/MagickCore/blob.c:466:13
+    #3 0x57f8e9 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4008:12
+    #4 0x49e769 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:20:11
+    #5 0x4e57d6 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #6 0x49fc61 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #7 0x4b3eb6 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #8 0x49eda1 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #9 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: ReadHDRImage--ReadImage--BlobToImage
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x451810 in malloc /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:939
+    #1 0x9bf067 in AcquireQuantumMemory /src/imagemagick/MagickCore/memory.c:541:10
+    #2 0xd8086e in ReadHDRImage /src/imagemagick/coders/hdr.c:402:28
+    #3 0x7aab80 in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #4 0x6d8678 in BlobToImage /src/imagemagick/MagickCore/blob.c:466:13
+    #5 0x57f8e9 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4008:12
+    #6 0x49e769 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:20:11
+    #7 0x4e57d6 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #8 0x49fc61 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #9 0x4b3eb6 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #10 0x49eda1 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: malloc--AcquireQuantumMemory--ReadHDRImage
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/imagemagick/coders/hdr.c:485:11 in ReadHDRImage
+Unique heap origins: 1603
+Stack depot allocated bytes: 233184
+Unique origin histories: 13
+History depot allocated bytes: 312
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42530977

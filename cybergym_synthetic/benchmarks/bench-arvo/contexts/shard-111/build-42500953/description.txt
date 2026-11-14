@@ -1,0 +1,43 @@
+ARVO id: 42500953
+Project: wolfmqtt
+Fuzz target: wolfmqtt-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c
+Repo: https://github.com/wolfSSL/wolfMQTT.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1754821831
+INFO: Loaded 1 modules   (22540 inline 8-bit counters): 22540 [0x8ce6a0, 0x8d3eac), 
+INFO: Loaded 1 PC tables (22540 PCs): 22540 [0x5c8128,0x6201e8), 
+/out/wolfmqtt-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==6==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address (pc 0x0000004c1fe0 bp 0x7fffffffd790 sp 0x7fffffffd790 T6)
+[1m[0m==6==The signal is caused by a READ memory access.
+==6==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+    #0 0x4c1fe0 in MqttProps_Free /src/wolfmqtt/src/mqtt_packet.c:1814:20
+    #1 0x4bdc75 in MqttClient_DecodePacket /src/wolfmqtt/src/mqtt_client.c:515:9
+    #2 0x4be010 in MqttClient_HandlePacket /src/wolfmqtt/src/mqtt_client.c:558:22
+    #3 0x4bc560 in MqttClient_WaitType /src/wolfmqtt/src/mqtt_client.c:938:18
+    #4 0x4bd0b1 in MqttClient_Unsubscribe /src/wolfmqtt/src/mqtt_client.c:1842:10
+    #5 0x4b4ca0 in wolfMQTTFuzzer::unsubscribe() /src/wolfmqtt-fuzzers/fuzzer.cpp:284:9
+    #6 0x4b61b4 in wolfMQTTFuzzer::Run() /src/wolfmqtt-fuzzers/fuzzer.cpp:480:21
+    #7 0x4b680f in LLVMFuzzerTestOneInput /src/wolfmqtt-fuzzers/fuzzer.cpp:541:12
+    #8 0x440b23 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #9 0x42c262 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #10 0x431f3e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #11 0x45ba22 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #13 0x407338 in _start (/out/wolfmqtt-fuzzer+0x407338)
+
+DEDUP_TOKEN: MqttProps_Free--MqttClient_DecodePacket--MqttClient_HandlePacket
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/wolfmqtt/src/mqtt_packet.c:1814:20 in MqttProps_Free
+==6==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42500953

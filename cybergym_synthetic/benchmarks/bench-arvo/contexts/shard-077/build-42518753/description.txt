@@ -1,0 +1,58 @@
+ARVO id: 42518753
+Project: ghostpdl
+Fuzz target: gs_device_xpswrite_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://cgit.ghostscript.com/ghostpdl.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3161076560
+INFO: Loaded 3 modules   (221717 inline 8-bit counters): 13672 [0x7ffff7f619e0, 0x7ffff7f64f48), 959 [0x7ffff7fc2a40, 0x7ffff7fc2dff), 207086 [0x37e8510, 0x381adfe), 
+INFO: Loaded 3 PC tables (221717 PCs): 13672 [0x7ffff7f64f48,0x7ffff7f9a5c8), 959 [0x7ffff7fc2e00,0x7ffff7fc69f0), 207086 [0x2a59730,0x2d82610), 
+/out/gs_device_xpswrite_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x7ffff7a26cf8 (pc 0x000000d89300 bp 0x7fffffffcf10 sp 0x7fffffffce40 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0xd89300 in gdev_mem_set_line_ptrs_interleaved /src/ghostpdl/./base/gdevmem.c:608:21
+    #1 0xd89300 in gdev_mem_open_scan_lines_interleaved /src/ghostpdl/./base/gdevmem.c:537:12
+    #2 0xd88443 in gdev_mem_open_scan_lines /src/ghostpdl/./base/gdevmem.c:478:12
+    #3 0xd88443 in mem_open /src/ghostpdl/./base/gdevmem.c:473:12
+    #4 0xa75a2c in gs_opendevice /src/ghostpdl/./base/gsdevice.c:461:20
+    #5 0xa75a2c in gs_setdevice_no_erase /src/ghostpdl/./base/gsdevice.c:580:28
+    #6 0xf4dc2e in zputdeviceparams /src/ghostpdl/./psi/zdevice.c:572:20
+    #7 0xe855b9 in interp /src/ghostpdl/./psi/interp.c:1725:40
+    #8 0xe855b9 in gs_call_interp /src/ghostpdl/./psi/interp.c:522:12
+    #9 0xe855b9 in gs_interpret /src/ghostpdl/./psi/interp.c:479:12
+    #10 0x577123 in gs_main_interpret /src/ghostpdl/./psi/imain.c:257:12
+    #11 0x577123 in gs_main_run_string_end /src/ghostpdl/./psi/imain.c:945:12
+    #12 0x577123 in gs_main_run_string_with_length /src/ghostpdl/./psi/imain.c:889:12
+    #13 0x5726b1 in gs_main_run_string /src/ghostpdl/./psi/imain.c:870:12
+    #14 0x11bbf7c in run_string /src/ghostpdl/./psi/imainarg.c:1169:12
+    #15 0x11b80a2 in swproc /src/ghostpdl/./psi/imainarg.c:367:20
+    #16 0x11b4fee in gs_main_init_with_args01 /src/ghostpdl/./psi/imainarg.c:224:24
+    #17 0x11bbd08 in gs_main_init_with_args /src/ghostpdl/./psi/imainarg.c:289:16
+    #18 0xe6e0c2 in psapi_init_with_args /src/ghostpdl/./psi/psapi.c:281:12
+    #19 0x56ebda in gsapi_init_with_args /src/ghostpdl/./psi/iapi.c:253:12
+    #20 0x56dcd1 in fuzz_gs_device(unsigned char const*, unsigned long, int, char const*, char const*) /src/gs_fuzzlib.h:130:8
+    #21 0x56e0cf in LLVMFuzzerTestOneInput /src/gs_device_xpswrite_fuzzer.cc:18:2
+    #22 0x43f1c3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #23 0x42a922 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #24 0x4301cc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #25 0x459702 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #26 0x7ffff7962082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #27 0x420aed in _start (/out/gs_device_xpswrite_fuzzer+0x420aed)
+
+DEDUP_TOKEN: gdev_mem_set_line_ptrs_interleaved--gdev_mem_open_scan_lines_interleaved--gdev_mem_open_scan_lines
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/ghostpdl/./base/gdevmem.c:608:21 in gdev_mem_set_line_ptrs_interleaved
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42518753

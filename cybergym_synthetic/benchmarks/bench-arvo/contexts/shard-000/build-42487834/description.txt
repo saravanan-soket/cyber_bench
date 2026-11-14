@@ -1,0 +1,53 @@
+ARVO id: 42487834
+Project: arrow
+Fuzz target: parquet-arrow-fuzz
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Negative-size-param
+Language: c++
+Repo: https://github.com/apache/arrow.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/parquet-arrow-fuzz[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: negative-size-param: (size=-6)
+[1m[0mSCARINESS: 10 (negative-size-param)
+    #0 0x659f44 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #1 0x1b6f8f0 in BrotliCopyBytes /work/brotli_ep-prefix/src/brotli_ep/c/dec/./bit_reader.h:300:3
+    #2 0x1b6f8f0 in CopyUncompressedBlockToOutput /work/brotli_ep-prefix/src/brotli_ep/c/dec/decode.c:1365:9
+    #3 0x1b66ea9 in BrotliDecoderDecompressStream /work/brotli_ep-prefix/src/brotli_ep/c/dec/decode.c:2175:18
+    #4 0x1b6632a in BrotliDecoderDecompress /work/brotli_ep-prefix/src/brotli_ep/c/dec/decode.c:1966:12
+    #5 0x17a1144 in arrow::util::internal::(anonymous namespace)::BrotliCodec::Decompress(long, unsigned char const*, long, unsigned char*) /src/arrow/cpp/src/arrow/util/compression_brotli.cc:189:9
+    #6 0x7f07e9 in parquet::SerializedPageReader::DecompressPage(int, int, unsigned char const*) /src/arrow/cpp/src/parquet/column_reader.cc:464:5
+    #7 0x7e8275 in parquet::SerializedPageReader::NextPage() /src/arrow/cpp/src/parquet/column_reader.cc:379:21
+    #8 0x845cbd in parquet::ColumnReaderImplBase<parquet::PhysicalType<(parquet::Type::type)3> >::ReadNewPage() /src/arrow/cpp/src/parquet/column_reader.cc:563:31
+    #9 0x8c2add in HasNextInternal /src/arrow/cpp/src/parquet/column_reader.cc:543:12
+    #10 0x8c2add in parquet::internal::TypedRecordReader<parquet::PhysicalType<(parquet::Type::type)3> >::ReadRecords(long) /src/arrow/cpp/src/parquet/column_reader.cc:1105:18
+    #11 0x6be199 in parquet::arrow::(anonymous namespace)::LeafReader::LoadBatch(long) /src/arrow/cpp/src/parquet/arrow/reader.cc:444:46
+    #12 0x6bd07c in parquet::arrow::ColumnReaderImpl::NextBatch(long, std::__1::shared_ptr<arrow::ChunkedArray>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:103:5
+    #13 0x6e4025 in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadColumn(int, std::__1::vector<int, std::__1::allocator<int> > const&, parquet::arrow::ColumnReader*, std::__1::shared_ptr<arrow::ChunkedArray>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:268:20
+    #14 0x6ad63c in operator() /src/arrow/cpp/src/parquet/arrow/reader.cc:923:12
+    #15 0x6ad63c in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadRowGroups(std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::shared_ptr<arrow::Table>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:940:7
+    #16 0x6aa40e in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadRowGroup(int, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::shared_ptr<arrow::Table>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:298:12
+    #17 0x6aab50 in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadRowGroup(int, std::__1::shared_ptr<arrow::Table>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:302:12
+    #18 0x69cb00 in parquet::arrow::internal::FuzzReader(std::__1::unique_ptr<parquet::arrow::FileReader, std::__1::default_delete<parquet::arrow::FileReader> >) /src/arrow/cpp/src/parquet/arrow/reader.cc:1035:37
+    #19 0x69e69b in parquet::arrow::internal::FuzzReader(unsigned char const*, long) /src/arrow/cpp/src/parquet/arrow/reader.cc:1052:10
+    #20 0x697399 in LLVMFuzzerTestOneInput /src/arrow/cpp/src/parquet/arrow/fuzz.cc:22:17
+    #21 0x68d7bb in main (/out/parquet-arrow-fuzz+0x68d7bb)
+    #22 0x7f023ea1a83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #23 0x5df6e8 in _start (/out/parquet-arrow-fuzz+0x5df6e8)
+
+DEDUP_TOKEN: __asan_memcpy--BrotliCopyBytes--CopyUncompressedBlockToOutput
+[1m[32m0x7f023b8ff84c is located 76 bytes inside of 1048576-byte region [0x7f023b8ff800,0x7f023b9ff800)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x65abfd in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x68f498 in util_Calloc (/out/parquet-arrow-fuzz+0x68f498)
+
+DEDUP_TOKEN: malloc--util_Calloc
+SUMMARY: AddressSanitizer: negative-size-param /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3 in __asan_memcpy
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42487834

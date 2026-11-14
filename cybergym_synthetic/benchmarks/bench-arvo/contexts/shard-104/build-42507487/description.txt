@@ -1,0 +1,38 @@
+ARVO id: 42507487
+Project: file
+Fuzz target: magic_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/file/file.git
+
+=== Crash report ===
+INFO: Seed: 2223647898
+INFO: Loaded 1 modules   (3509 inline 8-bit counters): 3509 [0xa21210, 0xa21fc5), 
+INFO: Loaded 1 PC tables (3509 PCs): 3509 [0xa21fc8,0xa2fb18), 
+/out/magic_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==8==ERROR: MemorySanitizer: SEGV on unknown address 0x70210000000a (pc 0x7ffff7012c48 bp 0x7fffffffc850 sp 0x7fffffffbfe8 T8)
+[1m[0m==8==The signal is caused by a READ memory access.
+    #0 0x7ffff7012c47  (/lib/x86_64-linux-gnu/libc.so.6+0x14dc47)
+    #1 0x450230 in __msan_memcpy.part.49 /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:1458
+    #2 0x5a87af in file_getbuffer /src/file/src/funcs.c:408:11
+    #3 0x56bcd5 in magic_buffer /src/file/src/magic.c:550:9
+    #4 0x49c400 in LLVMFuzzerTestOneInput /src/magic_fuzzer.cc:52:3
+    #5 0x4d7ce6 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:512:13
+    #6 0x49df2c in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #7 0x4b22fb in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:692:9
+    #8 0x49d081 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #9 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #10 0x41f0b8 in _start (/out/magic_fuzzer+0x41f0b8)
+
+DEDUP_TOKEN: __msan_memcpy.part.49--file_getbuffer
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x14dc47) 
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42507487

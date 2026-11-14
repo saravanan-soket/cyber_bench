@@ -1,0 +1,52 @@
+ARVO id: 42503057
+Project: arrow
+Fuzz target: arrow-ipc-file-fuzz
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/apache/arrow.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 121780680
+INFO: Loaded 1 modules   (247081 inline 8-bit counters): 247081 [0x11aa630, 0x11e6b59), 
+INFO: Loaded 1 PC tables (247081 PCs): 247081 [0x11e6b60,0x15abdf0), 
+/out/arrow-ipc-file-fuzz: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x00004d8a2ffc (pc 0x0000009c037b bp 0x7ffea2ab30e0 sp 0x7ffea2ab30d0 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x9c037b in void arrow::internal::detail::FormatTwoDigits<long>(long, char**) /src/arrow/cpp/src/arrow/util/formatting.h:110:17
+    #1 0x9c1721 in operator()<std::__1::chrono::duration<long long, std::__1::ratio<1, 1000000> >, (lambda at /src/arrow/cpp/src/arrow/pretty_print.cc:171:21) &> /src/arrow/cpp/src/arrow/util/formatting.h:494:5
+    #2 0x9c1721 in decltype(std::declval<arrow::NumericArray<arrow::Time64Type> >()(std::__1::chrono::duration<long long, std::__1::ratio<1l, 1l> >{}, std::declval<long&>(), std::declval<arrow::Status arrow::(anonymous namespace)::ArrayPrinter::WritePrimitiveValues<arrow::NumericArray<arrow::Time64Type>, arrow::internal::StringFormatter<arrow::Time64Type, void> >(arrow::NumericArray<arrow::Time64Type> const&, arrow::internal::StringFormatter<arrow::Time64Type, void>*)::'lambda'(nonstd::sv_lite::basic_string_view<char, std::__1::char_traits<char> >)&>())) arrow::util::VisitDuration<arrow::internal::StringFormatter<arrow::Time64Type, void>&, long&, arrow::Status arrow::(anonymous namespace)::ArrayPrinter::WritePrimitiveValues<arrow::NumericArray<arrow::Time64Type>, arrow::internal::StringFormatter<arrow::Time64Type, void> >(arrow::NumericArray<arrow::Time64Type> const&, arrow::internal::StringFormatter<arrow::Time64Type, void>*)::'lambda'(nonstd::sv_lite::basic_string_view<char, std::__1::char_traits<char> >)&>(arrow::TimeUnit::type, arrow::NumericArray<arrow::Time64Type>&&, long&, arrow::Status arrow::(anonymous namespace)::ArrayPrinter::WritePrimitiveValues<arrow::NumericArray<arrow::Time64Type>, arrow::internal::StringFormatter<arrow::Time64Type, void> >(arrow::NumericArray<arrow::Time64Type> const&, arrow::internal::StringFormatter<arrow::Time64Type, void>*)::'lambda'(nonstd::sv_lite::basic_string_view<char, std::__1::char_traits<char> >)&) /src/arrow/cpp/src/arrow/util/time.h:62:14
+    #3 0x9aea67 in operator()<(lambda at /src/arrow/cpp/src/arrow/pretty_print.cc:171:21) &> /src/arrow/cpp/src/arrow/util/formatting.h:500:12
+    #4 0x9aea67 in operator() /src/arrow/cpp/src/arrow/pretty_print.cc:173:7
+    #5 0x9aea67 in WriteValues<(lambda at /src/arrow/cpp/src/arrow/pretty_print.cc:172:24)> /src/arrow/cpp/src/arrow/pretty_print.cc:159:9
+    #6 0x9aea67 in WritePrimitiveValues<arrow::NumericArray<arrow::Time64Type>, arrow::internal::StringFormatter<arrow::Time64Type, void> > /src/arrow/cpp/src/arrow/pretty_print.cc:176:12
+    #7 0x9aea67 in WritePrimitiveValues<arrow::NumericArray<arrow::Time64Type>, arrow::Time64Type> /src/arrow/cpp/src/arrow/pretty_print.cc:182:12
+    #8 0x9aea67 in WriteDataValues<arrow::NumericArray<arrow::Time64Type>, arrow::Time64Type> /src/arrow/cpp/src/arrow/pretty_print.cc:211:12
+    #9 0x9aea67 in Visit<arrow::NumericArray<arrow::Time64Type> > /src/arrow/cpp/src/arrow/pretty_print.cc:307:7
+    #10 0x9aea67 in arrow::Status arrow::VisitArrayInline<arrow::(anonymous namespace)::ArrayPrinter>(arrow::Array const&, arrow::(anonymous namespace)::ArrayPrinter*) /src/arrow/cpp/src/arrow/visitor_inline.h:127:5
+    #11 0x99d185 in Print /src/arrow/cpp/src/arrow/pretty_print.cc:372:5
+    #12 0x99d185 in PrettyPrint /src/arrow/cpp/src/arrow/pretty_print.cc:400:18
+    #13 0x99d185 in arrow::PrettyPrint(arrow::RecordBatch const&, int, std::__1::basic_ostream<char, std::__1::char_traits<char> >*) /src/arrow/cpp/src/arrow/pretty_print.cc:481:5
+    #14 0x5df9e2 in arrow::RecordBatch::ToString() const /src/arrow/cpp/src/arrow/record_batch.cc:281:3
+    #15 0x4d0c3f in arrow::ipc::internal::(anonymous namespace)::ValidateFuzzBatch(arrow::RecordBatch const&) /src/arrow/cpp/src/arrow/ipc/reader.cc:2032:11
+    #16 0x4d11fa in arrow::ipc::internal::FuzzIpcFile(unsigned char const*, long) /src/arrow/cpp/src/arrow/ipc/reader.cc:2070:11
+    #17 0x4b4e76 in LLVMFuzzerTestOneInput /src/arrow/cpp/src/arrow/ipc/file_fuzz.cc:25:17
+    #18 0x441463 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #19 0x42cd32 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #20 0x4327e5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #21 0x45b532 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #22 0x7f6f34bbf0b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #23 0x409fed in _start (/out/arrow-ipc-file-fuzz+0x409fed)
+
+DEDUP_TOKEN: void arrow::internal::detail::FormatTwoDigits<long>(long, char**)--operator()<std::__1::chrono::duration<long long, std::__1::ratio<1, 1000000> >, (lambda at /src/arrow/cpp/src/arrow/pretty_print.cc:171:21) &>--decltype(std::declval<arrow::NumericArray<arrow::Time64Type> >()(std::__1::chrono::duration<long long, std::__1::ratio<1l, 1l> >{}, std::declval<long&>(), std::declval<arrow::Status arrow::(anonymous namespace)::ArrayPrinter::WritePrimitiveValues<arrow::NumericArray<arrow::Time64Type>, arrow::internal::StringFormatter<arrow::Time64Type, void> >(arrow::NumericArray<arrow::Time64Type> const&, arrow::internal::StringFormatter<arrow::Time64Type, void>*)::'lambda'(nonstd::sv_lite::basic_string_view<char, std::__1::char_traits<char> >)&>())) arrow::util::VisitDuration<arrow::internal::StringFormatter<arrow::Time64Type, void>&, long&, arrow::Status arrow::(anonymous namespace)::ArrayPrinter::WritePrimitiveValues<arrow::NumericArray<arrow::Time64Type>, arrow::internal::StringFormatter<arrow::Time64Type, void> >(arrow::NumericArray<arrow::Time64Type> const&, arrow::internal::StringFormatter<arrow::Time64Type, void>*)::'lambda'(nonstd::sv_lite::basic_string_view<char, std::__1::char_traits<char> >)&>(arrow::TimeUnit::type, arrow::NumericArray<arrow::Time64Type>&&, long&, arrow::Status arrow::(anonymous namespace)::ArrayPrinter::WritePrimitiveValues<arrow::NumericArray<arrow::Time64Type>, arrow::internal::StringFormatter<arrow::Time64Type, void> >(arrow::NumericArray<arrow::Time64Type> const&, arrow::internal::StringFormatter<arrow::Time64Type, void>*)::'lambda'(nonstd::sv_lite::basic_string_view<char, std::__1::char_traits<char> >)&)
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/arrow/cpp/src/arrow/util/formatting.h:110:17 in void arrow::internal::detail::FormatTwoDigits<long>(long, char**)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42503057

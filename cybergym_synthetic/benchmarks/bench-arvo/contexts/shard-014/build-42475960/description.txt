@@ -1,0 +1,39 @@
+ARVO id: 42475960
+Project: c-ares
+Fuzz target: ares_parse_reply_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/c-ares/c-ares.git
+
+=== Crash report ===
+INFO: Seed: 2503601107
+INFO: Loaded 1 modules   (1590 inline 8-bit counters): 1590 [0x7dcd0b, 0x7dd341), 
+INFO: Loaded 1 PC tables (1590 PCs): 1590 [0x7dd348,0x7e36a8), 
+/out/ares_parse_reply_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x549306 in ares__parse_into_addrinfo2 /src/c-ares/ares__parse_into_addrinfo.c:67:7
+    #1 0x53da1b in ares_parse_aaaa_reply /src/c-ares/ares_parse_aaaa_reply.c:69:12
+    #2 0x53a2e5 in LLVMFuzzerTestOneInput /src/c-ares/test/ares-test-fuzz.c:18:3
+    #3 0x472211 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:553:15
+    #4 0x45d221 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #5 0x462bea in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:773:9
+    #6 0x48b8b2 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #7 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #8 0x41e018 in _start (/out/ares_parse_reply_fuzzer+0x41e018)
+
+DEDUP_TOKEN: ares__parse_into_addrinfo2--ares_parse_aaaa_reply--LLVMFuzzerTestOneInput
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/c-ares/ares__parse_into_addrinfo.c:67:7 in ares__parse_into_addrinfo2
+  ORIGIN: invalid (0). Might be a bug in MemorySanitizer origin tracking.
+    This could still be a bug in your code, too!
+Unique heap origins: 37
+Stack depot allocated bytes: 2744
+Unique origin histories: 3
+History depot allocated bytes: 72
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42475960

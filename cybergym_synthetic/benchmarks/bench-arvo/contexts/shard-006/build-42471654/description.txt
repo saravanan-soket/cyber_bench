@@ -1,0 +1,96 @@
+ARVO id: 42471654
+Project: skia
+Fuzz target: api_image_filter
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow WRITE {*}
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/api_image_filter < INPUT_FILE
+or
+  /out/api_image_filter INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/api_image_filter [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 22 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x60d0000000c8 at pc 0x0000008f1835 bp 0x7fffffffd790 sp 0x7fffffffcf40
+[1m[0m[1m[34mWRITE of size 120 at 0x60d0000000c8 thread T0[1m[0m
+SCARINESS: 45 (multi-byte-write-heap-buffer-overflow)
+    #0 0x8f1834 in __asan_memcpy /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cc:23
+    #1 0x93ceff in make_fuzz_textblob(Fuzz*) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1000:17
+    #2 0x931007 in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1549:42
+    #3 0x93d349 in make_fuzz_picture(Fuzz*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1618:5
+    #4 0x935ce1 in make_fuzz_imageFilter(Fuzz*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:777:40
+    #5 0x934cec in fuzz_ImageFilter(Fuzz*) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1651:16
+    #6 0x94ff4a in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAPIImageFilter.cpp:14:5
+    #7 0x92c1aa in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:301:5
+    #8 0x92c70e in main /src/libfuzzer/afl/afl_driver.cpp:339:12
+    #9 0x7ffff52fb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #10 0x8251a8 in _start (/out/api_image_filter+0x8251a8)
+
+DEDUP_TOKEN: __asan_memcpy--make_fuzz_textblob(Fuzz*)--fuzz_canvas(Fuzz*, SkCanvas*, int)
+[1m[32m0x60d0000000c8 is located 0 bytes to the right of 136-byte region [0x60d000000040,0x60d0000000c8)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x8f2dee in realloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:165
+    #1 0xdb16d3 in sk_realloc_throw(void*, unsigned long) /src/skia/out/Fuzz/../../src/ports/SkMemory_malloc.cpp:57:35
+    #2 0xc8b93c in SkAutoTMalloc<unsigned char>::realloc(unsigned long) /src/skia/out/Fuzz/../../include/android/../private/SkTemplates.h:234:32
+    #3 0xc8b869 in SkTextBlobBuilder::reserve(unsigned long) /src/skia/out/Fuzz/../../src/core/SkTextBlob.cpp:414:14
+    #4 0xc8c0a2 in SkTextBlobBuilder::allocInternal(SkPaint const&, SkTextBlob::GlyphPositioning, int, int, SkPoint, SkRect const*) /src/skia/out/Fuzz/../../src/core/SkTextBlob.cpp:496:15
+    #5 0xc8c787 in SkTextBlobBuilder::allocRunText(SkPaint const&, int, float, float, int, SkString, SkRect const*) /src/skia/out/Fuzz/../../src/core/SkTextBlob.cpp:564:11
+    #6 0xc8c677 in SkTextBlobBuilder::allocRun(SkFont const&, int, float, float, SkRect const*) /src/skia/out/Fuzz/../../src/core/SkTextBlob.cpp:535:18
+    #7 0x93cebc in make_fuzz_textblob(Fuzz*) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:999:43
+    #8 0x931007 in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1549:42
+    #9 0x93d349 in make_fuzz_picture(Fuzz*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1618:5
+    #10 0x935ce1 in make_fuzz_imageFilter(Fuzz*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:777:40
+    #11 0x934cec in fuzz_ImageFilter(Fuzz*) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1651:16
+    #12 0x94ff4a in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAPIImageFilter.cpp:14:5
+    #13 0x92c1aa in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:301:5
+    #14 0x92c70e in main /src/libfuzzer/afl/afl_driver.cpp:339:12
+    #15 0x7ffff52fb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: realloc--sk_realloc_throw(void*, unsigned long)--SkAutoTMalloc<unsigned char>::realloc(unsigned long)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cc:23 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x0c1a7fff7fc0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c1a7fff7fd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c1a7fff7fe0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c1a7fff7ff0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c1a7fff8000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c1a7fff8010: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c1a7fff8020: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c1a7fff8030: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c1a7fff8040: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c1a7fff8050: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c1a7fff8060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42471654

@@ -1,0 +1,103 @@
+ARVO id: 42519827
+Project: zeek
+Fuzz target: zeek-smb-fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/zeek/zeek
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/zeek-smb-fuzzer[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6070004a7498 at pc 0x7f29f364cba3 bp 0x7fff76a96650 sp 0x7fff76a96648
+[1m[0m[1m[34mREAD of size 1 at 0x6070004a7498 thread T0[1m[0m
+SCARINESS: 22 (1-byte-read-heap-buffer-overflow-far-from-bounds)
+    #0 0x7f29f364cba2 in std::__1::__optional_storage_base<zeek::ZVal, false>::has_value() const /usr/local/bin/../include/c++/v1/optional:325:22
+    #1 0x7f29f364cba2 in std::__1::optional<zeek::ZVal>& std::__1::optional<zeek::ZVal>::operator=<zeek::ZVal, void>(zeek::ZVal&&) /usr/local/bin/../include/c++/v1/optional:837:19
+    #2 0x7f29f364cba2 in zeek::RecordVal::Assign(int, unsigned int) /src/zeek/src/include/zeek/Val.h:1147:24
+    #3 0x7f29f364cba2 in binpac::SMB::SMB_Conn::proc_smb2_set_info_request_file_fscontrol(binpac::SMB::SMB2_file_fscontrol_info*) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:1567:7
+    #4 0x7f29f369d9e2 in binpac::SMB::SMB2_file_fscontrol_info::Parse(unsigned char const*, unsigned char const*, binpac::SMB::ContextSMB*, int) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:12540:35
+    #5 0x7f29f369f93a in binpac::SMB::SMB2_set_info_filesystem_class::Parse(unsigned char const*, unsigned char const*, binpac::SMB::ContextSMB*, int) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:12881:21
+    #6 0x7f29f36a0121 in binpac::SMB::SMB2_set_info_request::Parse(unsigned char const*, unsigned char const*, binpac::SMB::ContextSMB*, int) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:13029:48
+    #7 0x7f29f36ae723 in binpac::SMB::SMB2_Message_Request::Parse(unsigned char const*, unsigned char const*, binpac::SMB::ContextSMB*) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:15731:34
+    #8 0x7f29f36ad658 in binpac::SMB::SMB2_Message::Parse(unsigned char const*, unsigned char const*, binpac::SMB::ContextSMB*) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:15379:32
+    #9 0x7f29f36a5663 in binpac::SMB::SMB2_PDU::Parse(unsigned char const*, unsigned char const*, binpac::SMB::ContextSMB*) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:15317:24
+    #10 0x7f29f36a477e in binpac::SMB::SMB_Protocol_Identifier::Parse(unsigned char const*, unsigned char const*, binpac::SMB::ContextSMB*) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:13801:26
+    #11 0x7f29f36a4049 in binpac::SMB::SMB_TCP::ParseBuffer(binpac::FlowBuffer*, binpac::SMB::ContextSMB*) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:13684:29
+    #12 0x7f29f36b7da9 in binpac::SMB::SMB_Flow::NewData(unsigned char const*, unsigned char const*) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:17470:46
+    #13 0x7f29f35fd68b in binpac::SMB::SMB_Conn::NewData(bool, unsigned char const*, unsigned char const*) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc
+    #14 0x7f29f35ba03e in zeek::analyzer::smb::SMB_Analyzer::DeliverStream(int, unsigned char const*, bool) /src/zeek/src/analyzer/protocol/smb/SMB.cc:73:11
+    #15 0x7f29f30a0a7d in zeek::analyzer::Analyzer::NextStream(int, unsigned char const*, bool) /src/zeek/src/analyzer/Analyzer.cc:249:4
+    #16 0x4e2520 in LLVMFuzzerTestOneInput /src/zeek/src/fuzzers/generic-analyzer-fuzzer.cc:74:7
+    #17 0x4e9fab in main (/out/zeek-smb-fuzzer+0x4e9fab)
+    #18 0x7f29ef03d082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #19 0x41fc7d in _start (/out/zeek-smb-fuzzer+0x41fc7d)
+
+DEDUP_TOKEN: std::__1::__optional_storage_base<zeek::ZVal, false>::has_value() const--std::__1::optional<zeek::ZVal>& std::__1::optional<zeek::ZVal>::operator=<zeek::ZVal, void>(zeek::ZVal&&)--zeek::RecordVal::Assign(int, unsigned int)
+[1m[32m0x6070004a7498 is located 8 bytes to the right of 80-byte region [0x6070004a7440,0x6070004a7490)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4dbefd in operator new(unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:95:3
+    #1 0x7f29f26def0b in void* std::__1::__libcpp_operator_new<unsigned long>(unsigned long) /usr/local/bin/../include/c++/v1/new:245:10
+    #2 0x7f29f26def0b in std::__1::__libcpp_allocate(unsigned long, unsigned long) /usr/local/bin/../include/c++/v1/new:271:10
+    #3 0x7f29f26def0b in std::__1::allocator<std::__1::optional<zeek::ZVal> >::allocate(unsigned long) /usr/local/bin/../include/c++/v1/__memory/allocator.h:105:38
+    #4 0x7f29f26def0b in std::__1::allocator_traits<std::__1::allocator<std::__1::optional<zeek::ZVal> > >::allocate(std::__1::allocator<std::__1::optional<zeek::ZVal> >&, unsigned long) /usr/local/bin/../include/c++/v1/__memory/allocator_traits.h:262:20
+    #5 0x7f29f26def0b in std::__1::__split_buffer<std::__1::optional<zeek::ZVal>, std::__1::allocator<std::__1::optional<zeek::ZVal> >&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<std::__1::optional<zeek::ZVal> >&) /usr/local/bin/../include/c++/v1/__split_buffer:306:29
+    #6 0x7f29f26def0b in std::__1::vector<std::__1::optional<zeek::ZVal>, std::__1::allocator<std::__1::optional<zeek::ZVal> > >::reserve(unsigned long) /usr/local/bin/../include/c++/v1/vector:1489:53
+    #7 0x7f29f26de68c in zeek::RecordVal::RecordVal(zeek::IntrusivePtr<zeek::RecordType>, bool) /src/zeek/src/Val.cc:2748:14
+    #8 0x7f29f2144074 in zeek::IntrusivePtr<zeek::RecordVal> zeek::make_intrusive<zeek::RecordVal, zeek::IntrusivePtr<zeek::RecordType>&>(zeek::IntrusivePtr<zeek::RecordType>&) /src/zeek/src/include/zeek/IntrusivePtr.h:195:26
+    #9 0x7f29f364ba7b in binpac::SMB::SMB_Conn::proc_smb2_set_info_request_file_fscontrol(binpac::SMB::SMB2_file_fscontrol_info*) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:1561:13
+    #10 0x7f29f369d9e2 in binpac::SMB::SMB2_file_fscontrol_info::Parse(unsigned char const*, unsigned char const*, binpac::SMB::ContextSMB*, int) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:12540:35
+    #11 0x7f29f369f93a in binpac::SMB::SMB2_set_info_filesystem_class::Parse(unsigned char const*, unsigned char const*, binpac::SMB::ContextSMB*, int) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:12881:21
+    #12 0x7f29f36a0121 in binpac::SMB::SMB2_set_info_request::Parse(unsigned char const*, unsigned char const*, binpac::SMB::ContextSMB*, int) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:13029:48
+    #13 0x7f29f36ae723 in binpac::SMB::SMB2_Message_Request::Parse(unsigned char const*, unsigned char const*, binpac::SMB::ContextSMB*) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:15731:34
+    #14 0x7f29f36ad658 in binpac::SMB::SMB2_Message::Parse(unsigned char const*, unsigned char const*, binpac::SMB::ContextSMB*) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:15379:32
+    #15 0x7f29f36a5663 in binpac::SMB::SMB2_PDU::Parse(unsigned char const*, unsigned char const*, binpac::SMB::ContextSMB*) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:15317:24
+    #16 0x7f29f36a477e in binpac::SMB::SMB_Protocol_Identifier::Parse(unsigned char const*, unsigned char const*, binpac::SMB::ContextSMB*) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:13801:26
+    #17 0x7f29f36a4049 in binpac::SMB::SMB_TCP::ParseBuffer(binpac::FlowBuffer*, binpac::SMB::ContextSMB*) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:13684:29
+    #18 0x7f29f36b7da9 in binpac::SMB::SMB_Flow::NewData(unsigned char const*, unsigned char const*) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc:17470:46
+    #19 0x7f29f35fd68b in binpac::SMB::SMB_Conn::NewData(bool, unsigned char const*, unsigned char const*) /src/zeek/build/src/analyzer/protocol/smb/smb_pac.cc
+    #20 0x7f29f35ba03e in zeek::analyzer::smb::SMB_Analyzer::DeliverStream(int, unsigned char const*, bool) /src/zeek/src/analyzer/protocol/smb/SMB.cc:73:11
+    #21 0x7f29f30a0a7d in zeek::analyzer::Analyzer::NextStream(int, unsigned char const*, bool) /src/zeek/src/analyzer/Analyzer.cc:249:4
+    #22 0x4e2520 in LLVMFuzzerTestOneInput /src/zeek/src/fuzzers/generic-analyzer-fuzzer.cc:74:7
+    #23 0x4e9fab in main (/out/zeek-smb-fuzzer+0x4e9fab)
+
+DEDUP_TOKEN: operator new(unsigned long)--void* std::__1::__libcpp_operator_new<unsigned long>(unsigned long)--std::__1::__libcpp_allocate(unsigned long, unsigned long)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /usr/local/bin/../include/c++/v1/optional:325:22 in std::__1::__optional_storage_base<zeek::ZVal, false>::has_value() const
+Shadow bytes around the buggy address:
+  0x0c0e8008ce40: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0e8008ce50: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c0e8008ce60: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c0e8008ce70: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c0e8008ce80: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c0e8008ce90: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c0e8008cea0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m03[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0e8008ceb0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0e8008cec0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c0e8008ced0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0e8008cee0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42519827

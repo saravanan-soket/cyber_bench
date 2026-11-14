@@ -1,0 +1,124 @@
+ARVO id: 42498039
+Project: serenity
+Fuzz target: FuzzJs
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Use-after-poison WRITE 8
+Language: c++
+Repo: https://github.com/SerenityOS/serenity
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3530935384
+INFO: Loaded 1 modules   (45594 inline 8-bit counters): 45594 [0xf4dcc8, 0xf58ee2), 
+INFO: Loaded 1 PC tables (45594 PCs): 45594 [0xf58ee8,0x100b088), 
+/out/FuzzJs: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: use-after-poison on address 0x62d0005ae250 at pc 0x000000634bf3 bp 0x7fffffffcd90 sp 0x7fffffffcd88
+[1m[0m[1m[34mWRITE of size 8 at 0x62d0005ae250 thread T0[1m[0m
+SCARINESS: 52 (8-byte-write-use-after-poison)
+    #0 0x634bf2 in AK::Atomic<unsigned long, (AK::MemoryOrder)5>::fetch_or(unsigned long, AK::MemoryOrder) volatile /src/serenity/Meta/Lagom/build/../../../AK/Atomic.h:226:16
+    #1 0x634bf2 in AK::RefPtrTraits<AK::StringImpl>::lock(AK::Atomic<unsigned long, (AK::MemoryOrder)5>&) /src/serenity/Meta/Lagom/build/../../../AK/RefPtr.h:93:31
+    #2 0x634bf2 in AK::RefPtr<AK::StringImpl, AK::RefPtrTraits<AK::StringImpl> >::add_ref_raw() const /src/serenity/Meta/Lagom/build/../../../AK/RefPtr.h:413:24
+    #3 0x634bf2 in AK::RefPtr<AK::StringImpl, AK::RefPtrTraits<AK::StringImpl> >::RefPtr(AK::RefPtr<AK::StringImpl, AK::RefPtrTraits<AK::StringImpl> > const&) /src/serenity/Meta/Lagom/build/../../../AK/RefPtr.h:171:24
+    #4 0x634b60 in AK::String::String(AK::String const&) /src/serenity/Meta/Lagom/build/../../../AK/String.h:52:11
+    #5 0x8d0180 in JS::abstract_relation(JS::GlobalObject&, bool, JS::Value, JS::Value) /src/serenity/Userland/Libraries/LibJS/Runtime/Value.cpp:1292:25
+    #6 0x8d19cd in JS::less_than(JS::GlobalObject&, JS::Value, JS::Value) /src/serenity/Userland/Libraries/LibJS/Runtime/Value.cpp:693:25
+    #7 0x9b342f in JS::BinaryExpression::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:602:16
+    #8 0x9b2fea in JS::BinaryExpression::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:569:30
+    #9 0x9b2fea in JS::BinaryExpression::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:569:30
+    #10 0x9b2fea in JS::BinaryExpression::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:569:30
+    #11 0x9b2fea in JS::BinaryExpression::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:569:30
+    #12 0x9b2fea in JS::BinaryExpression::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:569:30
+    #13 0x9b2fea in JS::BinaryExpression::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:569:30
+    #14 0x9b2fea in JS::BinaryExpression::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:569:30
+    #15 0x9b2fea in JS::BinaryExpression::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:569:30
+    #16 0x9d5097 in JS::SequenceExpression::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:2227:33
+    #17 0x9a5c27 in JS::ExpressionStatement::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:109:26
+    #18 0x63fdf4 in JS::Interpreter::execute_statement(JS::GlobalObject&, JS::Statement const&, JS::ScopeType) /src/serenity/Userland/Libraries/LibJS/Interpreter.cpp:170:27
+    #19 0x9a5486 in JS::Program::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:91:24
+    #20 0x63c0c4 in JS::Interpreter::run(JS::GlobalObject&, JS::Program const&) /src/serenity/Userland/Libraries/LibJS/Interpreter.cpp:58:26
+    #21 0x633542 in LLVMFuzzerTestOneInput /src/serenity/Meta/Lagom/build/../Fuzzers/FuzzJs.cpp:24:22
+    #22 0x535b73 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #23 0x521012 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #24 0x526cbe in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #25 0x550932 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #26 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #27 0x4fc3c8 in _start (/out/FuzzJs+0x4fc3c8)
+
+DEDUP_TOKEN: AK::Atomic<unsigned long, (AK::MemoryOrder)5>::fetch_or(unsigned long, AK::MemoryOrder) volatile--AK::RefPtrTraits<AK::StringImpl>::lock(AK::Atomic<unsigned long, (AK::MemoryOrder)5>&)--AK::RefPtr<AK::StringImpl, AK::RefPtrTraits<AK::StringImpl> >::add_ref_raw() const
+[1m[32m0x62d0005ae250 is located 8784 bytes inside of 16384-byte region [0x62d0005ac000,0x62d0005b0000)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x6003f2 in aligned_alloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:192:3
+    #1 0x9ec70c in JS::BlockAllocator::allocate_block(char const*) /src/serenity/Userland/Libraries/LibJS/Heap/BlockAllocator.cpp:58:31
+    #2 0x77d96d in JS::HeapBlock::create_with_cell_size(JS::Heap&, unsigned long) /src/serenity/Userland/Libraries/LibJS/Heap/HeapBlock.cpp:29:66
+    #3 0x9ed783 in JS::CellAllocator::allocate_cell(JS::Heap&) /src/serenity/Userland/Libraries/LibJS/Heap/CellAllocator.cpp:27:22
+    #4 0x7691f3 in JS::Heap::allocate_cell(unsigned long) /src/serenity/Userland/Libraries/LibJS/Heap/Heap.cpp:67:22
+    #5 0x812d34 in JS::PrimitiveString* JS::Heap::allocate_without_global_object<JS::PrimitiveString, AK::String>(AK::String&&) /src/serenity/Meta/Lagom/build/../../../Userland/Libraries/LibJS/Heap/Heap.h:35:24
+    #6 0x812b06 in JS::js_string(JS::Heap&, AK::String) /src/serenity/Userland/Libraries/LibJS/Runtime/PrimitiveString.cpp:29:17
+    #7 0x812ee1 in JS::js_string(JS::VM&, AK::String) /src/serenity/Userland/Libraries/LibJS/Runtime/PrimitiveString.cpp:34:12
+    #8 0x837b93 in JS::RegExpPrototype::to_string(JS::VM&, JS::GlobalObject&) /src/serenity/Userland/Libraries/LibJS/Runtime/RegExpPrototype.cpp:247:12
+    #9 0x780dd1 in AK::Function<JS::Value (JS::VM&, JS::GlobalObject&)>::CallableWrapper<JS::Value (*)(JS::VM&, JS::GlobalObject&)>::call(JS::VM&, JS::GlobalObject&) /src/serenity/Meta/Lagom/build/../../../AK/Function.h:151:20
+    #10 0x7e5c8a in AK::Function<JS::Value (JS::VM&, JS::GlobalObject&)>::operator()(JS::VM&, JS::GlobalObject&) const /src/serenity/Meta/Lagom/build/../../../AK/Function.h:91:25
+    #11 0x7e5b1c in JS::NativeFunction::call() /src/serenity/Userland/Libraries/LibJS/Runtime/NativeFunction.cpp:42:12
+    #12 0x8c09bd in JS::VM::call_internal(JS::Function&, JS::Value, AK::Optional<JS::MarkedValueList>) /src/serenity/Userland/Libraries/LibJS/Runtime/VM.cpp:527:28
+    #13 0x8029ca in JS::Value JS::VM::call<AK::Optional<JS::MarkedValueList> >(JS::Function&, JS::Value, AK::Optional<JS::MarkedValueList>) /src/serenity/Meta/Lagom/build/../../../Userland/Libraries/LibJS/Runtime/VM.h:293:128
+    #14 0x8029ca in JS::Value JS::VM::call<>(JS::Function&, JS::Value) /src/serenity/Meta/Lagom/build/../../../Userland/Libraries/LibJS/Runtime/VM.h:296:91
+    #15 0x8029ca in JS::Object::ordinary_to_primitive(JS::Value::PreferredType) const /src/serenity/Userland/Libraries/LibJS/Runtime/Object.cpp:1045:30
+    #16 0x8ca86f in JS::Value::to_primitive(JS::GlobalObject&, JS::Value::PreferredType) const /src/serenity/Userland/Libraries/LibJS/Runtime/Value.cpp:424:28
+    #17 0x8cffa5 in JS::abstract_relation(JS::GlobalObject&, bool, JS::Value, JS::Value) /src/serenity/Userland/Libraries/LibJS/Runtime/Value.cpp:1279:27
+    #18 0x8d19cd in JS::less_than(JS::GlobalObject&, JS::Value, JS::Value) /src/serenity/Userland/Libraries/LibJS/Runtime/Value.cpp:693:25
+    #19 0x9b342f in JS::BinaryExpression::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:602:16
+    #20 0x9b2fea in JS::BinaryExpression::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:569:30
+    #21 0x9b2fea in JS::BinaryExpression::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:569:30
+    #22 0x9b2fea in JS::BinaryExpression::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:569:30
+    #23 0x9b2fea in JS::BinaryExpression::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:569:30
+    #24 0x9b2fea in JS::BinaryExpression::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:569:30
+    #25 0x9d5097 in JS::SequenceExpression::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:2227:33
+    #26 0x9a5c27 in JS::ExpressionStatement::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:109:26
+    #27 0x63fdf4 in JS::Interpreter::execute_statement(JS::GlobalObject&, JS::Statement const&, JS::ScopeType) /src/serenity/Userland/Libraries/LibJS/Interpreter.cpp:170:27
+    #28 0x9a5486 in JS::Program::execute(JS::Interpreter&, JS::GlobalObject&) const /src/serenity/Userland/Libraries/LibJS/AST.cpp:91:24
+    #29 0x63c0c4 in JS::Interpreter::run(JS::GlobalObject&, JS::Program const&) /src/serenity/Userland/Libraries/LibJS/Interpreter.cpp:58:26
+    #30 0x633542 in LLVMFuzzerTestOneInput /src/serenity/Meta/Lagom/build/../Fuzzers/FuzzJs.cpp:24:22
+    #31 0x535b73 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+
+DEDUP_TOKEN: aligned_alloc--JS::BlockAllocator::allocate_block(char const*)--JS::HeapBlock::create_with_cell_size(JS::Heap&, unsigned long)
+SUMMARY: AddressSanitizer: use-after-poison /src/serenity/Meta/Lagom/build/../../../AK/Atomic.h:226:16 in AK::Atomic<unsigned long, (AK::MemoryOrder)5>::fetch_or(unsigned long, AK::MemoryOrder) volatile
+Shadow bytes around the buggy address:
+  0x0c5a800adbf0: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x0c5a800adc00: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x0c5a800adc10: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x0c5a800adc20: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x0c5a800adc30: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+=>0x0c5a800adc40: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m[[1m[34mf7[1m[0m][1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x0c5a800adc50: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x0c5a800adc60: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x0c5a800adc70: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x0c5a800adc80: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x0c5a800adc90: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42498039

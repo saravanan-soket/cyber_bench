@@ -1,0 +1,70 @@
+ARVO id: 42473915
+Project: imagemagick
+Fuzz target: encoder_psd_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 3898935729
+INFO: Loaded 1 modules   (166345 inline 8-bit counters): 166345 [0x2be9c08, 0x2c125d1), 
+INFO: Loaded 1 PC tables (166345 PCs): 166345 [0x2c125d8,0x2e9c268), 
+/out/encoder_psd_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x7bc0c8 in ConvertLabToXYZ /src/imagemagick/./MagickCore/gem-private.h:90:7
+    #1 0x7ba40c in ConvertLabToRGB /src/imagemagick/MagickCore/colorspace.c:1446:3
+    #2 0x7a760e in TransformsRGBImage /src/imagemagick/MagickCore/colorspace.c:2024:15
+    #3 0x7a51ec in TransformImageColorspace /src/imagemagick/MagickCore/colorspace.c:1349:12
+    #4 0x71b93f in SetImageType /src/imagemagick/MagickCore/attribute.c:1241:14
+    #5 0xf9db1c in ReadPSDChannel /src/imagemagick/coders/psd.c:1384:18
+    #6 0xf9b486 in ReadPSDLayer /src/imagemagick/coders/psd.c:1507:12
+    #7 0xf8b427 in ReadPSDLayersInternal /src/imagemagick/coders/psd.c:1990:12
+    #8 0xf90987 in ReadPSDImage /src/imagemagick/coders/psd.c:2326:11
+    #9 0x7f4702 in ReadImage /src/imagemagick/MagickCore/constitute.c:547:15
+    #10 0x71e78c in BlobToImage /src/imagemagick/MagickCore/blob.c:473:13
+    #11 0x597667 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4028:12
+    #12 0x4a61dd in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #13 0x4f0a0b in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #14 0x4a8b36 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #15 0x4b995a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #16 0x4a7c61 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #17 0x7fa1d4f4882f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #18 0x422458 in _start (/out/encoder_psd_fuzzer+0x422458)
+
+DEDUP_TOKEN: ConvertLabToXYZ--ConvertLabToRGB--TransformsRGBImage
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x46f8c4 in posix_memalign /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:170
+    #1 0xa14734 in AcquireAlignedMemory /src/imagemagick/MagickCore/memory.c:266:7
+    #2 0x761122 in OpenPixelCache /src/imagemagick/MagickCore/cache.c:3755:46
+    #3 0x768043 in GetImagePixelCache /src/imagemagick/MagickCore/cache.c:1771:18
+    #4 0x7643fb in SyncImagePixelCache /src/imagemagick/MagickCore/cache.c:5517:28
+    #5 0x9b6712 in SetImageExtent /src/imagemagick/MagickCore/image.c:2665:10
+    #6 0x9ade9b in CloneImage /src/imagemagick/MagickCore/image.c:908:7
+    #7 0xf9da93 in ReadPSDChannel /src/imagemagick/coders/psd.c:1380:12
+    #8 0xf9b486 in ReadPSDLayer /src/imagemagick/coders/psd.c:1507:12
+    #9 0xf8b427 in ReadPSDLayersInternal /src/imagemagick/coders/psd.c:1990:12
+    #10 0xf90987 in ReadPSDImage /src/imagemagick/coders/psd.c:2326:11
+    #11 0x7f4702 in ReadImage /src/imagemagick/MagickCore/constitute.c:547:15
+    #12 0x71e78c in BlobToImage /src/imagemagick/MagickCore/blob.c:473:13
+    #13 0x597667 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4028:12
+    #14 0x4a61dd in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #15 0x4f0a0b in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #16 0x4a8b36 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #17 0x4b995a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #18 0x4a7c61 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #19 0x7fa1d4f4882f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: posix_memalign--AcquireAlignedMemory--OpenPixelCache
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/imagemagick/./MagickCore/gem-private.h:90:7 in ConvertLabToXYZ
+Unique heap origins: 758
+Stack depot allocated bytes: 102232
+Unique origin histories: 7
+History depot allocated bytes: 168
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42473915

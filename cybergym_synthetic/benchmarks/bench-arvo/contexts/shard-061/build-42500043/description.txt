@@ -1,0 +1,92 @@
+ARVO id: 42500043
+Project: sudo
+Fuzz target: fuzz_policy
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-double-free
+Language: c
+Repo: https://github.com/sudo-project/sudo
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1239684961
+INFO: Loaded 1 modules   (5121 inline 8-bit counters): 5121 [0x5555558d5530, 0x5555558d6931), 
+INFO: Loaded 1 PC tables (5121 PCs): 5121 [0x5555558d6938,0x5555558ea948), 
+/out/fuzz_policy: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+fuzz_policy: unable to resolve host  
+fuzz_policy: unable to resolve host  
+fuzz_policy: unable to resolve host  
+fuzz_policy: unable to resolve host  
+fuzz_policy: unable to resolve host  
+fuzz_policy: unable to resolve host  
+fuzz_policy: /usr/bin/vi: command not found
+fuzz_policy: unable to resolve host  
+fuzz_policy: /usr/bin/vi: command not found
+fuzz_policy: unable to resolve host  
+fuzz_policy: /usr/bin/vi: command not found
+fuzz_policy: unable to resolve host  
+fuzz_policy: sudoers_policy_list: invalid mode flags from sudo front end: 0x82
+fuzz_policy: sudoers_policy_list: invalid mode flags from sudo front end: 0x82
+fuzz_policy: unable to resolve host  
+fuzz_policy: sudoers_policy_list: invalid mode flags from sudo front end: 0x82
+fuzz_policy: sudoers_policy_list: invalid mode flags from sudo front end: 0x82
+fuzz_policy: unable to resolve host  
+fuzz_policy: sudoers_policy_list: invalid mode flags from sudo front end: 0x102
+fuzz_policy: sudoers_policy_list: invalid mode flags from sudo front end: 0x102
+fuzz_policy: unable to resolve host  
+fuzz_policy: sudoers_policy_validate: invalid mode flags from sudo front end: 0x6
+fuzz_policy: sudoers_policy_validate: invalid mode flags from sudo front end: 0x6
+fuzz_policy: unable to resolve host  
+fuzz_policy: sudoers_policy_invalidate: invalid mode flags from sudo front end: 0xa
+fuzz_policy: sudoers_policy_invalidate: invalid mode flags from sudo front end: 0xa
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: attempting double-free on 0x602000009eb0 in thread T0:
+[1m[0mSCARINESS: 42 (double-free)
+    #0 0x55555557f1f2 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:127:3
+    #1 0x5555555beed4 in sudoers_gc_run /src/sudo/plugins/sudoers/./gc.c:138:6
+    #2 0x5555555bcd42 in LLVMFuzzerTestOneInput /src/sudo/plugins/sudoers/./regress/fuzz/fuzz_policy.c:476:5
+    #3 0x5555554b6933 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) (/out/fuzz_policy+0xb6933)
+    #4 0x5555554a2202 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #5 0x5555554a7e0e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) (/out/fuzz_policy+0xa7e0e)
+    #6 0x5555554d1782 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #7 0x7ffff692b83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #8 0x55555547d468 in _start (/out/fuzz_policy+0x7d468)
+
+DEDUP_TOKEN: free--sudoers_gc_run--LLVMFuzzerTestOneInput
+[1m[32m0x602000009eb0 is located 0 bytes inside of 12-byte region [0x602000009eb0,0x602000009ebc)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x55555557f1f2 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:127:3
+    #1 0x5555555b39ce in resolve_editor /src/sudo/plugins/sudoers/./editor.c:154:2
+    #2 0x5555555b3553 in find_editor /src/sudo/plugins/sudoers/./editor.c:253:20
+    #3 0x5555555cdf66 in sudoers_policy_main /src/sudo/plugins/sudoers/./sudoers.c:771:14
+    #4 0x5555555c8f9c in sudoers_policy_check /src/sudo/plugins/sudoers/./policy.c:1075:11
+    #5 0x5555555bc674 in LLVMFuzzerTestOneInput /src/sudo/plugins/sudoers/./regress/fuzz/fuzz_policy.c:424:3
+    #6 0x5555554b6933 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) (/out/fuzz_policy+0xb6933)
+    #7 0x5555554a2202 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #8 0x5555554a7e0e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) (/out/fuzz_policy+0xa7e0e)
+    #9 0x5555554d1782 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7ffff692b83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: free--resolve_editor--find_editor
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x55555557f45d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x5555555b4606 in copy_arg /src/sudo/plugins/sudoers/./editor.c:103:17
+    #2 0x5555555b3960 in resolve_editor /src/sudo/plugins/sudoers/./editor.c:147:14
+    #3 0x5555555b3553 in find_editor /src/sudo/plugins/sudoers/./editor.c:253:20
+    #4 0x5555555cdf66 in sudoers_policy_main /src/sudo/plugins/sudoers/./sudoers.c:771:14
+    #5 0x5555555c8f9c in sudoers_policy_check /src/sudo/plugins/sudoers/./policy.c:1075:11
+    #6 0x5555555bc674 in LLVMFuzzerTestOneInput /src/sudo/plugins/sudoers/./regress/fuzz/fuzz_policy.c:424:3
+    #7 0x5555554b6933 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) (/out/fuzz_policy+0xb6933)
+    #8 0x5555554a2202 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #9 0x5555554a7e0e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) (/out/fuzz_policy+0xa7e0e)
+    #10 0x5555554d1782 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff692b83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: malloc--copy_arg--resolve_editor
+SUMMARY: AddressSanitizer: double-free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:127:3 in free
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42500043

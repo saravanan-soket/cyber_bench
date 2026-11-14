@@ -1,0 +1,98 @@
+ARVO id: 42519170
+Project: vlc
+Fuzz target: vlc-demux-dec-libfuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow WRITE {*}
+Language: c
+Repo: https://github.com/videolan/vlc
+
+=== Crash report ===
+Running LLVMFuzzerInitialize ...
+continue...
+Reading 4 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x613000000898 at pc 0x0000004a03bc bp 0x7fffffffd640 sp 0x7fffffffce10
+[1m[0m[1m[34mWRITE of size 248 at 0x613000000898 thread T0[1m[0m
+SCARINESS: 45 (multi-byte-write-heap-buffer-overflow)
+    #0 0x4a03bb in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #1 0xa969f1 in es_format_Copy /src/vlc/src/misc/es_format.c:441:12
+    #2 0x9a417b in decoder_Init /src/vlc/src/input/decoder_helpers.c:49:5
+    #3 0x4df161 in decoder_load /src/vlc/test/src/input/decoder.c:95:5
+    #4 0x4df161 in test_decoder_create /src/vlc/test/src/input/decoder.c:187:9
+    #5 0x4ddbb6 in EsOutAdd /src/vlc/test/src/input/demux-run.c:86:19
+    #6 0x569105 in es_out_Add /src/vlc/modules/../include/vlc_es_out.h:150:12
+    #7 0x569105 in Parse /src/vlc/modules/demux/mpeg/es.c:923:31
+    #8 0x554010 in OpenCommon /src/vlc/modules/demux/mpeg/es.c:486:13
+    #9 0x5522a0 in OpenAudio /src/vlc/modules/demux/mpeg/es.c:501:20
+    #10 0x9a7184 in demux_Probe /src/vlc/src/input/demux.c:111:15
+    #11 0x955e1e in vlc_module_load /src/vlc/src/modules/modules.c:243:19
+    #12 0x9a6842 in demux_NewAdvanced /src/vlc/src/input/demux.c:194:20
+    #13 0x9a5ddb in demux_New /src/vlc/src/input/demux.c:76:12
+    #14 0x4dc7fa in demux_process_stream /src/vlc/test/src/input/demux-run.c:297:22
+    #15 0x4dd73c in libvlc_demux_process_memory /src/vlc/test/src/input/demux-run.c:379:12
+    #16 0x4dbdbe in LLVMFuzzerTestOneInput /src/vlc/test/vlc-demux-libfuzzer.c:54:5
+    #17 0x4dc41a in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+    #18 0x4dc1ec in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:318:12
+    #19 0x7ffff7a71082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #20 0x41fb3d in _start (/out/vlc-demux-dec-libfuzzer+0x41fb3d)
+
+DEDUP_TOKEN: __asan_memcpy--es_format_Copy--decoder_Init
+[1m[32m0x613000000898 is located 0 bytes to the right of 344-byte region [0x613000000740,0x613000000898)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4a114e in __interceptor_calloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:77:3
+    #1 0xabd872 in vlc_custom_create /src/vlc/src/misc/objects.c:96:25
+    #2 0xabdbeb in vlc_object_create /src/vlc/src/misc/objects.c:106:12
+    #3 0x4df050 in test_decoder_create /src/vlc/test/src/input/decoder.c:136:18
+    #4 0x4ddbb6 in EsOutAdd /src/vlc/test/src/input/demux-run.c:86:19
+    #5 0x569105 in es_out_Add /src/vlc/modules/../include/vlc_es_out.h:150:12
+    #6 0x569105 in Parse /src/vlc/modules/demux/mpeg/es.c:923:31
+    #7 0x554010 in OpenCommon /src/vlc/modules/demux/mpeg/es.c:486:13
+    #8 0x5522a0 in OpenAudio /src/vlc/modules/demux/mpeg/es.c:501:20
+    #9 0x9a7184 in demux_Probe /src/vlc/src/input/demux.c:111:15
+    #10 0x955e1e in vlc_module_load /src/vlc/src/modules/modules.c:243:19
+    #11 0x9a6842 in demux_NewAdvanced /src/vlc/src/input/demux.c:194:20
+    #12 0x9a5ddb in demux_New /src/vlc/src/input/demux.c:76:12
+    #13 0x4dc7fa in demux_process_stream /src/vlc/test/src/input/demux-run.c:297:22
+    #14 0x4dd73c in libvlc_demux_process_memory /src/vlc/test/src/input/demux-run.c:379:12
+    #15 0x4dbdbe in LLVMFuzzerTestOneInput /src/vlc/test/vlc-demux-libfuzzer.c:54:5
+    #16 0x4dc41a in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+
+DEDUP_TOKEN: __interceptor_calloc--vlc_custom_create--vlc_object_create
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x0c267fff80c0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c267fff80d0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c267fff80e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c267fff80f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c267fff8100: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c267fff8110: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c267fff8120: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c267fff8130: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c267fff8140: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c267fff8150: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c267fff8160: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42519170

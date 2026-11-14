@@ -1,0 +1,34 @@
+ARVO id: 42487272
+Project: libsndfile
+Fuzz target: sndfile_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Index-out-of-bounds
+Language: c
+Repo: https://github.com/libsndfile/libsndfile.git
+
+=== Crash report ===
+INFO: Seed: 3706887965
+INFO: Loaded 1 modules   (16437 inline 8-bit counters): 16437 [0x888558, 0x88c58d), 
+INFO: Loaded 1 PC tables (16437 PCs): 16437 [0x5a50b0,0x5e5400), 
+/out/sndfile_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1msrc/nms_adpcm.c:707:23:[1m[31m runtime error: [1m[0m[1mindex 46 out of bounds for type 'unsigned short [41]'[1m[0m
+    #0 0x51e8fb in psf_nms_adpcm_decode_block /src/libsndfile/src/nms_adpcm.c:707:23
+    #1 0x51e582 in nms_adpcm_read_block /src/libsndfile/src/nms_adpcm.c:734:4
+    #2 0x51d5f0 in nms_adpcm_read_f /src/libsndfile/src/nms_adpcm.c:822:11
+    #3 0x4b8654 in sf_readf_float /src/libsndfile/src/sndfile.c:1968:10
+    #4 0x4afcff in LLVMFuzzerTestOneInput /src/libsndfile/ossfuzz/sndfile_fuzzer.cc:119:10
+    #5 0x440e21 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:562:15
+    #6 0x42c222 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #7 0x4322fe in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:850:9
+    #8 0x45a212 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #9 0x7d767610483f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #10 0x407428 in _start (/out/sndfile_fuzzer+0x407428)
+
+DEDUP_TOKEN: psf_nms_adpcm_decode_block--nms_adpcm_read_block--nms_adpcm_read_f
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior src/nms_adpcm.c:707:23 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42487272

@@ -1,0 +1,113 @@
+ARVO id: 42539553
+Project: imagemagick
+Fuzz target: encoder_heic_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 16
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/encoder_heic_fuzzer < INPUT_FILE
+or
+  /out/encoder_heic_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/encoder_heic_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 6964 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x7ffff6a6b80b at pc 0x000000bd7e56 bp 0x7fffffffcf50 sp 0x7fffffffcf48
+[1m[0m[1m[34mREAD of size 16 at 0x7ffff6a6b80b thread T0[1m[0m
+SCARINESS: 26 (multi-byte-read-heap-buffer-overflow)
+    #0 0xbd7e55 in ff_hevc_put_hevc_qpel_pixels_8_sse(short*, long, unsigned char const*, long, int, int, short*) /src/libde265/libde265/x86/sse-motion.cc:1984:22
+    #1 0xc0bd81 in acceleration_functions::put_hevc_qpel(short*, long, void const*, long, int, int, short*, int, int, int) const /src/libde265/libde265/./acceleration.h
+    #2 0xc091da in void mc_luma<unsigned char>(base_context const*, seq_parameter_set const*, int, int, int, int, short*, int, unsigned char const*, int, int, int, int) /src/libde265/libde265/motion.cc:79:25
+    #3 0xbff76c in generate_inter_prediction_samples(base_context*, slice_segment_header const*, de265_image*, int, int, int, int, int, int, int, PBMotion const*) /src/libde265/libde265/motion.cc:374:11
+    #4 0xc08350 in decode_prediction_unit(base_context*, slice_segment_header const*, de265_image*, PBMotionCoding const&, int, int, int, int, int, int, int, int) /src/libde265/libde265/motion.cc:2161:3
+    #5 0xba3144 in read_prediction_unit(thread_context*, int, int, int, int, int, int, int, int, int) /src/libde265/libde265/slice.cc:4136:3
+    #6 0xba49fb in read_coding_unit(thread_context*, int, int, int, int) /src/libde265/libde265/slice.cc
+    #7 0xba5f23 in decode_substream(thread_context*, bool, bool) /src/libde265/libde265/slice.cc:4736:5
+    #8 0xba7a39 in read_slice_segment_data(thread_context*) /src/libde265/libde265/slice.cc:5049:14
+    #9 0xb4d91e in decoder_context::decode_slice_unit_sequential(image_unit*, slice_unit*) /src/libde265/libde265/decctx.cc:843:7
+    #10 0xb4cd73 in decoder_context::decode_slice_unit_parallel(image_unit*, slice_unit*) /src/libde265/libde265/decctx.cc:945:11
+    #11 0xb4c51f in decoder_context::decode_some(bool*) /src/libde265/libde265/decctx.cc:730:13
+    #12 0xb4aaec in decoder_context::read_slice_NAL(bitreader&, NAL_unit*, nal_header&) /src/libde265/libde265/decctx.cc:688:9
+    #13 0xb4f4b2 in decoder_context::decode_NAL(NAL_unit*) /src/libde265/libde265/decctx.cc:1230:11
+    #14 0xb4f96c in decoder_context::decode(int*) /src/libde265/libde265/decctx.cc:1318:16
+    #15 0xa04509 in decodeH265Image /src/imagemagick/coders/heic.c:933:11
+    #16 0xa026b0 in ReadHEICImage /src/imagemagick/coders/heic.c:1176:9
+    #17 0x63f706 in ReadImage /src/imagemagick/MagickCore/constitute.c:500:13
+    #18 0x5e113f in BlobToImage /src/imagemagick/MagickCore/blob.c:469:13
+    #19 0x534394 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4015:12
+    #20 0x52a89b in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #21 0x52af9f in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:290:5
+    #22 0x52b53f in main /src/libfuzzer/afl/afl_driver.cpp:327:12
+    #23 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #24 0x41f8b8 in _start (/out/encoder_heic_fuzzer+0x41f8b8)
+
+DEDUP_TOKEN: ff_hevc_put_hevc_qpel_pixels_8_sse(short*, long, unsigned char const*, long, int, int, short*)--acceleration_functions::put_hevc_qpel(short*, long, void const*, long, int, int, short*, int, int, int) const--void mc_luma<unsigned char>(base_context const*, seq_parameter_set const*, int, int, int, int, short*, int, unsigned char const*, int, int, int, int)
+[1m[32m0x7ffff6a6b80b is located 3 bytes to the right of 262152-byte region [0x7ffff6a2b800,0x7ffff6a6b808)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4ece80 in __interceptor_posix_memalign /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:157
+    #1 0xb740d4 in ALLOC_ALIGNED(unsigned long, unsigned long) /src/libde265/libde265/image.cc:53:9
+    #2 0xb744cb in de265_image_get_buffer(void*, de265_image_spec*, de265_image*, void*) /src/libde265/libde265/image.cc:127:21
+    #3 0xb759e9 in de265_image::alloc_image(int, int, de265_chroma, std::__1::shared_ptr<seq_parameter_set const>, bool, decoder_context*, encoder_context*, long, void*, bool) /src/libde265/libde265/image.cc:382:25
+    #4 0xb704b4 in decoded_picture_buffer::new_image(std::__1::shared_ptr<seq_parameter_set const>, decoder_context*, long, void*, bool) /src/libde265/libde265/dpb.cc:262:8
+    #5 0xb50626 in decoder_context::generate_unavailable_reference_picture(seq_parameter_set const*, int, bool) /src/libde265/libde265/decctx.cc:1418:17
+    #6 0xb51aac in decoder_context::process_reference_picture_set(slice_segment_header*) /src/libde265/libde265/decctx.cc:1590:30
+    #7 0xb4bc2e in decoder_context::process_slice_segment_header(slice_segment_header*, de265_error*, long, nal_header*, void*) /src/libde265/libde265/decctx.cc:2064:7
+    #8 0xb4a3dd in decoder_context::read_slice_NAL(bitreader&, NAL_unit*, nal_header&) /src/libde265/libde265/decctx.cc:639:7
+    #9 0xb4f4b2 in decoder_context::decode_NAL(NAL_unit*) /src/libde265/libde265/decctx.cc:1230:11
+    #10 0xb4f96c in decoder_context::decode(int*) /src/libde265/libde265/decctx.cc:1318:16
+    #11 0xa04509 in decodeH265Image /src/imagemagick/coders/heic.c:933:11
+    #12 0xa026b0 in ReadHEICImage /src/imagemagick/coders/heic.c:1176:9
+    #13 0x63f706 in ReadImage /src/imagemagick/MagickCore/constitute.c:500:13
+    #14 0x5e113f in BlobToImage /src/imagemagick/MagickCore/blob.c:469:13
+    #15 0x534394 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4015:12
+    #16 0x52a89b in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #17 0x52af9f in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:290:5
+    #18 0x52b53f in main /src/libfuzzer/afl/afl_driver.cpp:327:12
+    #19 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: __interceptor_posix_memalign--ALLOC_ALIGNED(unsigned long, unsigned long)--de265_image_get_buffer(void*, de265_image_spec*, de265_image*, void*)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/libde265/libde265/x86/sse-motion.cc:1984:22 in ff_hevc_put_hevc_qpel_pixels_8_sse(short*, long, unsigned char const*, long, int, int, short*)
+Shadow bytes around the buggy address:
+  0x10007ed456b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007ed456c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007ed456d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007ed456e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007ed456f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x10007ed45700: [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007ed45710: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007ed45720: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007ed45730: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007ed45740: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007ed45750: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42539553

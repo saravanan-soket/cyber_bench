@@ -1,0 +1,43 @@
+ARVO id: 42479489
+Project: skia
+Fuzz target: skdescriptor_deserialize
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Seed: 4079898918
+INFO: Loaded 1 modules   (171813 inline 8-bit counters): 171813 [0x3273018, 0x329cf3d), 
+INFO: Loaded 1 PC tables (171813 PCs): 171813 [0x329cf40,0x353c190), 
+/out/skdescriptor_deserialize: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x854680 in SkDescriptor::isValid() const /src/skia/out/Fuzz/../../src/core/SkDescriptor.cpp:95:13
+    #1 0x9867d4 in Deserializer::readDescriptor(SkAutoDescriptor*) /src/skia/out/Fuzz/../../src/core/SkRemoteGlyphCache.cpp:146:31
+    #2 0x986277 in SkFuzzDeserializeSkDescriptor(sk_sp<SkData>, SkAutoDescriptor*) /src/skia/out/Fuzz/../../src/core/SkRemoteGlyphCache.cpp:176:14
+    #3 0x8447d9 in FuzzSkDescriptorDeserialize(sk_sp<SkData>) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSkDescriptorDeserialize.cpp:13:15
+    #4 0x844c69 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSkDescriptorDeserialize.cpp:33:5
+    #5 0x7913d1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #6 0x77c311 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #7 0x781fce in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #8 0x7ab2e2 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #9 0x7ffff561f82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #10 0x755ab8 in _start (/out/skdescriptor_deserialize+0x755ab8)
+
+DEDUP_TOKEN: SkDescriptor::isValid() const--Deserializer::readDescriptor(SkAutoDescriptor*)--SkFuzzDeserializeSkDescriptor(sk_sp<SkData>, SkAutoDescriptor*)
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32maDesc[1m[35m' in the stack frame of function '[1m[32m_Z27FuzzSkDescriptorDeserialize5sk_spI6SkDataE[1m[35m'[1m[0m
+    #0 0x8446b0 in FuzzSkDescriptorDeserialize(sk_sp<SkData>) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSkDescriptorDeserialize.cpp:11
+
+DEDUP_TOKEN: FuzzSkDescriptorDeserialize(sk_sp<SkData>)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/skia/out/Fuzz/../../src/core/SkDescriptor.cpp:95:13 in SkDescriptor::isValid() const
+Unique heap origins: 41
+Stack depot allocated bytes: 2400
+Unique origin histories: 3
+History depot allocated bytes: 72
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42479489

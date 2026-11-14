@@ -1,0 +1,37 @@
+ARVO id: 42503260
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_SPEEX_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow WRITE {*}
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+Reading 1162 bytes from /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x62d000808400 (pc 0x0000006473b8 bp 0x7fff84af4990 sp 0x7fff84af48b0 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x6473b8 in iir_mem /src/ffmpeg/libavcodec/speexdec.c:593:14
+    #1 0x638740 in nb_decode /src/ffmpeg/libavcodec/speexdec.c:948:9
+    #2 0x634d3d in speex_decode_frame /src/ffmpeg/libavcodec/speexdec.c:1557:15
+    #3 0x5884eb in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:326:15
+    #4 0x5871e1 in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:521:15
+    #5 0x5646d7 in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:541:15
+    #6 0x56362c in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:608:15
+    #7 0x52863f in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:390:25
+    #8 0x12b0805 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:191:7
+    #9 0x12b0675 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #10 0x7f034d5b70b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #11 0x4699dd in _start (/out/ffmpeg_AV_CODEC_ID_SPEEX_fuzzer+0x4699dd)
+
+DEDUP_TOKEN: iir_mem--nb_decode--speex_decode_frame
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/ffmpeg/libavcodec/speexdec.c:593:14 in iir_mem
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42503260

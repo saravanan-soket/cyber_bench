@@ -1,0 +1,40 @@
+ARVO id: 42537627
+Project: mpv
+Fuzz target: fuzzer_protocol_memory
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c
+Repo: https://github.com/mpv-player/mpv
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1297582007
+INFO: Loaded 1 modules   (496966 inline 8-bit counters): 496966 [0x55a91805f988, 0x55a9180d8ece), 
+INFO: Loaded 1 PC tables (496966 PCs): 496966 [0x55a9180d8ed0,0x55a91886e330), 
+/out/fuzzer_protocol_memory: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x55a9176c312c in mcc_read_header /src/ffmpeg/libavformat/mccdec.c:145:27
+    #1 0x55a9175a5eca in avformat_open_input /src/ffmpeg/libavformat/demux.c:305:20
+    #2 0x55a91302a452 in demux_open_lavf /src/mpv/build/../demux/demux_lavf.c:1084:9
+    #3 0x55a913010869 in open_given_type /src/mpv/build/../demux/demux.c:3322:15
+    #4 0x55a912ff013e in demux_open /src/mpv/build/../demux/demux.c:3434:27
+    #5 0x55a912ff013e in demux_open_url /src/mpv/build/../demux/demux.c:3496:25
+    #6 0x55a912e838e3 in open_demux_thread /src/mpv/build/../player/loadfile.c:1148:9
+    #7 0x7f39442d5608 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x8608) (BuildId: 9a65bb469e45a1c6fbcffae5b82a2fd7a69eb479)
+    #8 0x7f39441c1352 in __clone (/lib/x86_64-linux-gnu/libc.so.6+0x11f352) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+
+DEDUP_TOKEN: mcc_read_header--avformat_open_input--demux_open_lavf
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/ffmpeg/libavformat/mccdec.c:145:27 in mcc_read_header
+  ORIGIN: invalid (0). Might be a bug in MemorySanitizer origin tracking.
+    This could still be a bug in your code, too!
+Unique heap origins: 530
+Stack depot allocated bytes: 9764880
+Unique origin histories: 122
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42537627

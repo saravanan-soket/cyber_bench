@@ -1,0 +1,46 @@
+ARVO id: 42487691
+Project: openh264
+Fuzz target: decoder_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/cisco/openh264.git
+
+=== Crash report ===
+INFO: Seed: 1569833215
+INFO: Loaded 1 modules   (9790 inline 8-bit counters): 9790 [0x9b0308, 0x9b2946), 
+INFO: Loaded 1 PC tables (9790 PCs): 9790 [0x9b2948,0x9d8d28), 
+/out/decoder_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address 0x7f7258fe3020 (pc 0x0000004c90ca bp 0x7ffc11a2f870 sp 0x7ffc11a2f020 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x4c90ca in __msan::MsanDeallocate(__sanitizer::StackTrace*, void*) /src/llvm-project/compiler-rt/lib/msan/msan_allocator.cpp:200:21
+    #1 0x4cd0e4 in free /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:224:3
+    #2 0x5380e6 in WelsCommon::WelsFree(void*, char const*) /src/openh264/codec/common/src/memory_align.cpp:113:5
+    #3 0x538556 in WelsCommon::CMemoryAlign::WelsFree(void*, char const*) /src/openh264/codec/common/src/memory_align.cpp:154:3
+    #4 0x597dc9 in WelsDec::FreePicture(WelsDec::SPicture*, WelsCommon::CMemoryAlign*) /src/openh264/codec/decoder/core/src/pic_queue.cpp:141:12
+    #5 0x53b5d1 in DestroyPicBuff /src/openh264/codec/decoder/core/src/decoder.cpp:272:9
+    #6 0x540215 in WelsFreeDynamicMemory /src/openh264/codec/decoder/core/src/decoder.cpp:561:5
+    #7 0x541035 in WelsDec::WelsCloseDecoder(WelsDec::TagWelsDecoderContext*) /src/openh264/codec/decoder/core/src/decoder.cpp:627:3
+    #8 0x541781 in WelsEndDecoder /src/openh264/codec/decoder/core/src/decoder.cpp:707:3
+    #9 0x527976 in WelsDec::CWelsDecoder::UninitDecoderCtx(WelsDec::TagWelsDecoderContext*&) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:351:5
+    #10 0x526f90 in WelsDec::CWelsDecoder::UninitDecoder() /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:290:7
+    #11 0x5277e1 in WelsDec::CWelsDecoder::Uninitialize() /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:279:3
+    #12 0x524eec in LLVMFuzzerTestOneInput /src/decoder_fuzzer.cpp:80:13
+    #13 0x4592b1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:559:15
+    #14 0x444a52 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:301:6
+    #15 0x44a9ed in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:801:9
+    #16 0x4722d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7f7257fe883f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #18 0x41f1f8 in _start (/out/decoder_fuzzer+0x41f1f8)
+
+DEDUP_TOKEN: __msan::MsanDeallocate(__sanitizer::StackTrace*, void*)--free--WelsCommon::WelsFree(void*, char const*)
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV /src/llvm-project/compiler-rt/lib/msan/msan_allocator.cpp:200:21 in __msan::MsanDeallocate(__sanitizer::StackTrace*, void*)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42487691

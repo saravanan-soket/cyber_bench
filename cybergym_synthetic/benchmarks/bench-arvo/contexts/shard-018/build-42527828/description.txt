@@ -1,0 +1,99 @@
+ARVO id: 42527828
+Project: kimageformats
+Fuzz target: kimgio_xcf_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Stack-buffer-overflow WRITE {*}
+Language: c++
+Repo: https://invent.kde.org/frameworks/kimageformats.git
+
+=== Crash report ===
+Reading 524271 bytes from /tmp/poc
+QIODevice::skip (QBuffer): Called with maxSize < 0
+QBuffer::seek: Invalid pos: 282574521894144
+kf.imageformats.plugins.xcf: Unhandled layer mode XCFImageFormat::LayerModeType(-1244266496)
+QBuffer::seek: Invalid pos: 17179869184
+QBuffer::seek: Invalid pos: 36028797034299152
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7f2298a2a9d0 at pc 0x0000004ab4ec bp 0x7ffd1d7ea820 sp 0x7ffd1d7e9ff0
+[1m[0m[1m[34mWRITE of size 61440 at 0x7f2298a2a9d0 thread T0[1m[0m
+SCARINESS: 60 (multi-byte-write-stack-buffer-overflow)
+    #0 0x4ab4eb in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #1 0x13f2428 in QBuffer::readData(char*, long long) /src/qtbase/src/corelib/io/qbuffer.cpp:418:5
+    #2 0x145e9e7 in QIODevicePrivate::read(char*, long long, bool) /src/qtbase/src/corelib/io/qiodevice.cpp:1108:41
+    #3 0x17821ef in QDataStream::readBlock(char*, int) /src/qtbase/src/corelib/serialization/qdatastream.cpp:772:33
+    #4 0x17821ef in QDataStream::readRawData(char*, int) /src/qtbase/src/corelib/serialization/qdatastream.cpp:1094:12
+    #5 0x52222f in XCFImageFormat::loadLevel(QDataStream&, XCFImageFormat::Layer&, int, XCFImageFormat::GimpPrecision) /src/kimageformats/src/imageformats/xcf.cpp:2060:39
+    #6 0x50b1df in XCFImageFormat::loadHierarchy(QDataStream&, XCFImageFormat::Layer&, XCFImageFormat::GimpPrecision) /src/kimageformats/src/imageformats/xcf.cpp:1945:10
+    #7 0x4f793f in XCFImageFormat::loadLayer(QDataStream&, XCFImageFormat::XCFImage&) /src/kimageformats/src/imageformats/xcf.cpp:1179:10
+    #8 0x4f13f1 in XCFImageFormat::readXCF(QIODevice*, QImage*) /src/kimageformats/src/imageformats/xcf.cpp:911:14
+    #9 0x53fff7 in XCFHandler::read(QImage*) /src/kimageformats/src/imageformats/xcf.cpp:4140:18
+    #10 0x4e9812 in LLVMFuzzerTestOneInput /src/kimgio_fuzzer.cc:60:14
+    #11 0x1e47a5d in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+    #12 0x1e47868 in LLVMFuzzerRunDriver /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #13 0x1e47428 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:300:10
+    #14 0x7f2298f05082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #15 0x42ac6d in _start (/out/kimgio_xcf_fuzzer+0x42ac6d)
+
+DEDUP_TOKEN: __asan_memcpy--QBuffer::readData(char*, long long)--QIODevicePrivate::read(char*, long long, bool)
+[1m[32mAddress 0x7f2298a2a9d0 is located in stack of thread T0 at offset 49616 in frame[1m[0m
+[1m[0m    #0 0x4efe9f in XCFImageFormat::readXCF(QIODevice*, QImage*) /src/kimageformats/src/imageformats/xcf.cpp:862
+
+DEDUP_TOKEN: XCFImageFormat::readXCF(QIODevice*, QImage*)
+  This frame has 17 object(s):
+    [32, 40) 'ref.tmp.i288'
+    [64, 72) 'ref.tmp.i235'
+    [96, 104) 'ref.tmp.i'
+    [128, 136) 'ret.i' (line 531)
+    [160, 164) 'ret2.i' (line 535)
+    [176, 49616) 'xcf_image' (line 863)
+    [49872, 49904) 'xcf_io' (line 864)[1m[32m <== Memory access at offset 49616 partially underflows this variable[1m[0m
+    [49936, 49944) 'layer_offsets' (line 880)[1m[32m <== Memory access at offset 49616 partially underflows this variable[1m[0m
+    [49968, 49976) 'layer_offset' (line 883)[1m[32m <== Memory access at offset 49616 partially underflows this variable[1m[0m
+    [50000, 50008) 'ref.tmp' (line 890)[1m[32m <== Memory access at offset 49616 partially underflows this variable[1m[0m
+    [50032, 50064) 'ref.tmp20' (line 890)[1m[32m <== Memory access at offset 49616 partially underflows this variable[1m[0m
+    [50096, 50104) 'ref.tmp54' (line 900)[1m[32m <== Memory access at offset 49616 partially underflows this variable[1m[0m
+    [50128, 50160) 'ref.tmp55' (line 900)[1m[32m <== Memory access at offset 49616 partially underflows this variable[1m[0m
+    [50192, 50200) 'ref.tmp85' (line 903)[1m[32m <== Memory access at offset 49616 partially underflows this variable[1m[0m
+    [50224, 50256) 'ref.tmp86' (line 903)[1m[32m <== Memory access at offset 49616 partially underflows this variable[1m[0m
+    [50288, 50296) 'ref.tmp141' (line 917)[1m[32m <== Memory access at offset 49616 partially underflows this variable[1m[0m
+    [50320, 50352) 'ref.tmp142' (line 917)[1m[32m <== Memory access at offset 49616 partially underflows this variable[1m[0m
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x0fe4d313d4e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe4d313d4f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe4d313d500: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe4d313d510: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe4d313d520: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0fe4d313d530: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mf2[1m[0m][1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x0fe4d313d540: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x0fe4d313d550: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x0fe4d313d560: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x0fe4d313d570: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x0fe4d313d580: [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42527828

@@ -1,0 +1,38 @@
+ARVO id: 42501919
+Project: wolfmqtt
+Fuzz target: wolfmqtt-fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c
+Repo: https://github.com/wolfSSL/wolfMQTT.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/wolfmqtt-fuzzer[0m
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x0000004ee8db bp 0x7fffffffdc30 sp 0x7fffffffdc20 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x4ee8db in MqttProps_Free /src/wolfmqtt/src/mqtt_packet.c:1814:20
+    #1 0x4e622f in MqttClient_DecodePacket /src/wolfmqtt/src/mqtt_client.c:515:9
+    #2 0x4e2092 in MqttClient_HandlePacket /src/wolfmqtt/src/mqtt_client.c
+    #3 0x4e2092 in MqttClient_WaitType /src/wolfmqtt/src/mqtt_client.c:943:18
+    #4 0x4e4643 in MqttClient_Subscribe /src/wolfmqtt/src/mqtt_client.c:1752:10
+    #5 0x4d9b09 in wolfMQTTFuzzer::subscribe() /src/wolfmqtt-fuzzers/fuzzer.cpp:250:9
+    #6 0x4dd793 in wolfMQTTFuzzer::Run() /src/wolfmqtt-fuzzers/fuzzer.cpp:477:21
+    #7 0x4de5f3 in LLVMFuzzerTestOneInput /src/wolfmqtt-fuzzers/fuzzer.cpp:541:12
+    #8 0x646b4b in main (/out/wolfmqtt-fuzzer+0x646b4b)
+    #9 0x7ffff7c580b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #10 0x41d6dd in _start (/out/wolfmqtt-fuzzer+0x41d6dd)
+
+DEDUP_TOKEN: MqttProps_Free--MqttClient_DecodePacket--MqttClient_HandlePacket
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/wolfmqtt/src/mqtt_packet.c:1814:20 in MqttProps_Free
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42501919

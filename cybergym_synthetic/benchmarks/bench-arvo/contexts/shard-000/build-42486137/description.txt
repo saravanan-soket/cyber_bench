@@ -1,0 +1,46 @@
+ARVO id: 42486137
+Project: gdal
+Fuzz target: gtiff_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 2052780126
+INFO: Loaded 1 modules (325687 guards): [0x56a9900, 0x57e79dc), 
+/out/gtiff_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+ASAN:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x622000010000 (pc 0x0000021571fd bp 0x7ffc533155b0 sp 0x7ffc533154f0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x21571fc in inflateSync (/out/gtiff_fuzzer+0x21571fc)
+    #1 0x7363ff in ZIPDecode /src/gdal/gdal/frmts/gtiff/libtiff/tif_zip.c:184:8
+    #2 0x726f52 in TIFFReadEncodedTile /src/gdal/gdal/frmts/gtiff/libtiff/tif_read.c:1009:33
+    #3 0x5aa85c in GTiffRasterBand::IReadBlock(int, int, void*) /src/gdal/gdal/frmts/gtiff/geotiff.cpp:4203:17
+    #4 0x825123 in GDALRasterBand::GetLockedBlockRef(int, int, int) /src/gdal/gdal/gcore/gdalrasterband.cpp:1330:20
+    #5 0x863fa3 in GDALRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/rasterio.cpp:357:27
+    #6 0x5a8ec5 in GTiffRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/frmts/gtiff/geotiff.cpp:4006:28
+    #7 0x82232e in GDALRasterBand::RasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdalrasterband.cpp:387:16
+    #8 0x8229e4 in GDALRasterIO /src/gdal/gdal/gcore/gdalrasterband.cpp:421:21
+    #9 0xa1be44 in GDALChecksumImage /src/gdal/gdal/alg/gdalchecksum.cpp:155:17
+    #10 0x521e7a in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_fuzzer.cpp:160:17
+    #11 0x54b279 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:460:13
+    #12 0x54baaa in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:399:3
+    #13 0x5229e6 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #14 0x52db50 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #15 0x521ff8 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #16 0x7fd0616ea82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #17 0x428358 in _start (/out/gtiff_fuzzer+0x428358)
+
+DEDUP_TOKEN: inflateSync--ZIPDecode--TIFFReadEncodedTile
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/out/gtiff_fuzzer+0x21571fc) in inflateSync
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42486137

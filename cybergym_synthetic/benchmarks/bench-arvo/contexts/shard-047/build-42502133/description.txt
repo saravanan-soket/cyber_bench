@@ -1,0 +1,61 @@
+ARVO id: 42502133
+Project: tint
+Fuzz target: tint_spv_reader_msl_writer_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://dawn.googlesource.com/tint
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3196791022
+INFO: Loaded 1 modules   (122766 inline 8-bit counters): 122766 [0x1eb8208, 0x1ed6196), 
+INFO: Loaded 1 PC tables (122766 PCs): 122766 [0x1ed6198,0x20b5a78), 
+/out/tint_spv_reader_msl_writer_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x529d53 in std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::__put_character_sequence<char, std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*, unsigned long) /usr/local/bin/../include/c++/v1/ostream:715:13
+    #1 0x153024d in std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::operator<<<char, std::__1::char_traits<char>, std::__1::allocator<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /usr/local/bin/../include/c++/v1/ostream:1041:12
+    #2 0x153024d in (anonymous namespace)::Disassembler::HandleInstruction(spv_parsed_instruction_t const&) /src/tint/third_party/spirv-tools/source/disassemble.cpp:201:13
+    #3 0x152a82f in (anonymous namespace)::DisassembleTargetInstruction(void*, spv_parsed_instruction_t const*) /src/tint/third_party/spirv-tools/source/disassemble.cpp:466:38
+    #4 0x15168d4 in (anonymous namespace)::Parser::parseInstruction() /src/tint/third_party/spirv-tools/source/binary.cpp:399:22
+    #5 0x15168d4 in (anonymous namespace)::Parser::parseModule() /src/tint/third_party/spirv-tools/source/binary.cpp:275:22
+    #6 0x15168d4 in (anonymous namespace)::Parser::parse(unsigned int const*, unsigned long, spv_diagnostic_t**) /src/tint/third_party/spirv-tools/source/binary.cpp:233:31
+    #7 0x15168d4 in spvBinaryParse /src/tint/third_party/spirv-tools/source/binary.cpp:819:17
+    #8 0x1529541 in spvtools::spvInstructionBinaryToText(spv_target_env, unsigned int const*, unsigned long, unsigned int const*, unsigned long, unsigned int) /src/tint/third_party/spirv-tools/source/disassemble.cpp:533:3
+    #9 0x18d562a in spvtools::val::ValidationState_t::Disassemble(unsigned int const*, unsigned short) const /src/tint/third_party/spirv-tools/source/val/validation_state.cpp:1176:10
+    #10 0x18d562a in spvtools::val::ValidationState_t::Disassemble(spvtools::val::Instruction const&) const /src/tint/third_party/spirv-tools/source/val/validation_state.cpp:1168:10
+    #11 0x18d562a in spvtools::val::ValidationState_t::diag(spv_result_t, spvtools::val::Instruction const*) /src/tint/third_party/spirv-tools/source/val/validation_state.cpp:298:27
+    #12 0x181c43f in spvtools::val::(anonymous namespace)::ModuleScopedInstructions(spvtools::val::ValidationState_t&, spvtools::val::Instruction const*, SpvOp_) /src/tint/third_party/spirv-tools/source/val/validate_layout.cpp:120:20
+    #13 0x181c43f in spvtools::val::ModuleLayoutPass(spvtools::val::ValidationState_t&, spvtools::val::Instruction const*) /src/tint/third_party/spirv-tools/source/val/validate_layout.cpp:344:24
+    #14 0x158eeb0 in spvtools::val::(anonymous namespace)::ValidateBinaryUsingContextAndValidationState(spv_context_t const&, unsigned int const*, unsigned long, spv_diagnostic_t**, spvtools::val::ValidationState_t*) /src/tint/third_party/spirv-tools/source/val/validate.cpp:277:22
+    #15 0x15925e9 in spvValidateBinary /src/tint/third_party/spirv-tools/source/val/validate.cpp:424:7
+    #16 0x1539c72 in spvtools::SpirvTools::Validate(unsigned int const*, unsigned long) const /src/tint/third_party/spirv-tools/source/libspirv.cpp:115:10
+    #17 0x1539c72 in spvtools::SpirvTools::Validate(std::__1::vector<unsigned int, std::__1::allocator<unsigned int> > const&) const /src/tint/third_party/spirv-tools/source/libspirv.cpp:110:10
+    #18 0x899027 in tint::reader::spirv::ParserImpl::Parse() /src/tint/src/reader/spirv/parser_impl.cc:310:18
+    #19 0x891cb5 in tint::reader::spirv::Parse(std::__1::vector<unsigned int, std::__1::allocator<unsigned int> > const&) /src/tint/src/reader/spirv/parser.cc:31:24
+    #20 0x53844b in tint::fuzzers::CommonFuzzer::Run(unsigned char const*, unsigned long) /src/tint/fuzzers/tint_common_fuzzer.cc:247:17
+    #21 0x52898f in LLVMFuzzerTestOneInput /src/tint/fuzzers/tint_spv_reader_msl_writer_fuzzer.cc:30:17
+    #22 0x457803 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #23 0x443162 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #24 0x448bdd in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #25 0x471b52 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #26 0x7ffff7c580b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #27 0x42036d in _start (/out/tint_spv_reader_msl_writer_fuzzer+0x42036d)
+
+DEDUP_TOKEN: std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::__put_character_sequence<char, std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*, unsigned long)--std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::operator<<<char, std::__1::char_traits<char>, std::__1::allocator<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)--(anonymous namespace)::Disassembler::HandleInstruction(spv_parsed_instruction_t const&)
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32m__s[1m[35m' in the stack frame of function '[1m[32m_ZNSt3__124__put_character_sequenceIcNS_11char_traitsIcEEEERNS_13basic_ostreamIT_T0_EES7_PKS4_m[1m[35m'[1m[0m
+    #0 0x5296a0 in std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::__put_character_sequence<char, std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*, unsigned long) /usr/local/bin/../include/c++/v1/ostream:709
+
+DEDUP_TOKEN: std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::__put_character_sequence<char, std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*, unsigned long)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /usr/local/bin/../include/c++/v1/ostream:715:13 in std::__1::basic_ostream<char, std::__1::char_traits<char> >& std::__1::__put_character_sequence<char, std::__1::char_traits<char> >(std::__1::basic_ostream<char, std::__1::char_traits<char> >&, char const*, unsigned long)
+Unique heap origins: 150
+Stack depot allocated bytes: 20336
+Unique origin histories: 16
+History depot allocated bytes: 384
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42502133

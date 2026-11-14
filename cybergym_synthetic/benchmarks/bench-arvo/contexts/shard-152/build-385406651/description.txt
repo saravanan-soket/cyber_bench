@@ -1,0 +1,40 @@
+ARVO id: 385406651
+Project: binutils-gdb
+Fuzz target: fuzz_as
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Index-out-of-bounds
+Language: c++
+Repo: git://sourceware.org/git/binutils-gdb.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1241436009
+INFO: Loaded 1 modules   (276235 inline 8-bit counters): 276235 [0x56526199ffa8, 0x5652619e36b3), 
+INFO: Loaded 1 PC tables (276235 PCs): 276235 [0x5652619e36b8,0x565261e1a768), 
+/out/fuzz_as: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+/tmp/libfuzzer-7.s: Assembler messages:
+/tmp/libfuzzer-7.s: Warning: end of file in string; '"' inserted
+/tmp/libfuzzer-7.s:5: Warning: missing closing `"'
+[1mapp.c:844:16:[1m[31m runtime error: [1m[0m[1mindex -1 out of bounds for type 'char[256]'[1m[0m
+    #0 0x565260b940f9 in do_scrub_chars /src/binutils-gdb/gas/app.c:844:16
+    #1 0x565260b7a476 in sb_scrub_and_add_sb /src/binutils-gdb/gas/sb.c:126:19
+    #2 0x565260b5a2a5 in input_scrub_include_sb /src/binutils-gdb/gas/input-scrub.c:313:3
+    #3 0x565260b6ee3e in s_irp /src/binutils-gdb/gas/read.c:2455:3
+    #4 0x565260b69133 in read_a_source_file /src/binutils-gdb/gas/read.c:1285:9
+    #5 0x565260b3d399 in perform_an_assembly_pass /src/binutils-gdb/gas/./fuzz_as.h:1247:4
+    #6 0x565260b3d596 in LLVMFuzzerTestOneInput /src/fuzz_as.c:60:3
+    #7 0x565260a9dc60 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #8 0x565260a883f4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #9 0x565260a8de8a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #10 0x565260aba282 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7fb04d5b5082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #12 0x565260a7eecd in _start (/out/fuzz_as+0xadfecd)
+
+DEDUP_TOKEN: do_scrub_chars--sb_scrub_and_add_sb--input_scrub_include_sb
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior app.c:844:16 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/385406651

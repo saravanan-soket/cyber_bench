@@ -1,0 +1,42 @@
+ARVO id: 42487852
+Project: glib
+Fuzz target: fuzz_uri_escape
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://gitlab.gnome.org/GNOME/glib
+
+=== Crash report ===
+INFO: Seed: 160226016
+INFO: Loaded 1 modules   (15246 inline 8-bit counters): 15246 [0xbbbe58, 0xbbf9e6), 
+INFO: Loaded 1 PC tables (15246 PCs): 15246 [0xbbf9e8,0xbfb2c8), 
+/out/fuzz_uri_escape: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address 0x728000010000 (pc 0x7ffff7012c15 bp 0x7fffffffd720 sp 0x7fffffffced8 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7ffff7012c15  (/lib/x86_64-linux-gnu/libc.so.6+0x14dc15)
+    #1 0x446d02 in __msan_memcpy /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1559:15
+    #2 0x4d79ad in g_string_insert_len /work/meson/../../src/glib/glib/gstring.c
+    #3 0x4d633d in g_string_append_len /work/meson/../../src/glib/glib/gstring.c:575:10
+    #4 0x51c56a in _uri_encoder /work/meson/../../src/glib/glib/guri.c:383:11
+    #5 0x4d807c in g_string_append_uri_escaped /work/meson/../../src/glib/glib/gstring.c:530:3
+    #6 0x528900 in g_uri_escape_string /work/meson/../../src/glib/glib/guri.c:2222:3
+    #7 0x49da0f in test_string /work/meson/../../src/glib/fuzzing/fuzz_uri_escape.c:44:20
+    #8 0x49d54c in LLVMFuzzerTestOneInput /work/meson/../../src/glib/fuzzing/fuzz_uri_escape.c:62:3
+    #9 0x6ac5f5 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:558:15
+    #10 0x63db9b in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:296:6
+    #11 0x651031 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:796:9
+    #12 0x63cdc0 in main /src/libfuzzer/FuzzerMain.cpp:19:10
+    #13 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #14 0x420f28 in _start (/out/fuzz_uri_escape+0x420f28)
+
+DEDUP_TOKEN: __msan_memcpy--g_string_insert_len
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x14dc15) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42487852

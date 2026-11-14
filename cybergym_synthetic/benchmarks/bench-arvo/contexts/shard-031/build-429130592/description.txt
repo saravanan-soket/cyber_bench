@@ -1,0 +1,84 @@
+ARVO id: 429130592
+Project: arrow
+Fuzz target: parquet-arrow-fuzz
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Use-after-poison READ {*}
+Language: c++
+Repo: https://github.com/apache/arrow.git
+
+=== Crash report ===
+Reading 343 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: use-after-poison on address 0x7f8a7ccff957 at pc 0x5586e8e0c792 bp 0x7fff60021170 sp 0x7fff60020930
+[1m[0m[1m[34mREAD of size 15415454384 at 0x7f8a7ccff957 thread T0[1m[0m
+SCARINESS: 36 (multi-byte-read-use-after-poison)
+    #0 0x5586e8e0c791 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:63:3
+    #1 0x5586e9141c47 in parquet::(anonymous namespace)::PlainDecoder<parquet::PhysicalType<(parquet::Type::type)7>>::DecodeArrow(int, int, unsigned char const*, long, arrow::FixedSizeBinaryBuilder*) /src/arrow/cpp/src/parquet/decoder.cc:670:3
+    #2 0x5586e910b046 in parquet::internal::(anonymous namespace)::FLBARecordReader::ReadValuesSpaced(long, long) /src/arrow/cpp/src/parquet/column_reader.cc:1979:51
+    #3 0x5586e910cef9 in parquet::internal::(anonymous namespace)::TypedRecordReader<parquet::PhysicalType<(parquet::Type::type)7>>::ReadSpacedForOptionalOrRepeated(long, long*, long*) /src/arrow/cpp/src/parquet/column_reader.cc:1839:5
+    #4 0x5586e910cef9 in parquet::internal::(anonymous namespace)::TypedRecordReader<parquet::PhysicalType<(parquet::Type::type)7>>::ReadOptionalRecords(long, long*, long*) /src/arrow/cpp/src/parquet/column_reader.cc:1795:7
+    #5 0x5586e910cef9 in parquet::internal::(anonymous namespace)::TypedRecordReader<parquet::PhysicalType<(parquet::Type::type)7>>::ReadRecordData(long) /src/arrow/cpp/src/parquet/column_reader.cc:1865:22
+    #6 0x5586e9105974 in parquet::internal::(anonymous namespace)::TypedRecordReader<parquet::PhysicalType<(parquet::Type::type)7>>::ReadRecords(long) /src/arrow/cpp/src/parquet/column_reader.cc
+    #7 0x5586e8e75d7c in parquet::arrow::(anonymous namespace)::LeafReader::LoadBatch(long) /src/arrow/cpp/src/parquet/arrow/reader.cc:495:46
+    #8 0x5586e8e735f2 in parquet::arrow::ColumnReaderImpl::NextBatch(long, std::__1::shared_ptr<arrow::ChunkedArray>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:110:5
+    #9 0x5586e8e989f4 in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadColumn(int, std::__1::vector<int, std::__1::allocator<int>> const&, parquet::arrow::ColumnReader*, std::__1::shared_ptr<arrow::ChunkedArray>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:286:20
+    #10 0x5586e8ec338f in parquet::arrow::(anonymous namespace)::FileReaderImpl::DecodeRowGroups(std::__1::shared_ptr<parquet::arrow::(anonymous namespace)::FileReaderImpl>, std::__1::vector<int, std::__1::allocator<int>> const&, std::__1::vector<int, std::__1::allocator<int>> const&, arrow::internal::Executor*)::$_0::operator()(unsigned long, std::__1::shared_ptr<parquet::arrow::ColumnReaderImpl>) const /src/arrow/cpp/src/parquet/arrow/reader.cc:1282:5
+    #11 0x5586e8ec338f in arrow::Future<std::__1::vector<std::__1::shared_ptr<arrow::ChunkedArray>, std::__1::allocator<std::__1::shared_ptr<arrow::ChunkedArray>>>> arrow::internal::OptionalParallelForAsync<parquet::arrow::(anonymous namespace)::FileReaderImpl::DecodeRowGroups(std::__1::shared_ptr<parquet::arrow::(anonymous namespace)::FileReaderImpl>, std::__1::vector<int, std::__1::allocator<int>> const&, std::__1::vector<int, std::__1::allocator<int>> const&, arrow::internal::Executor*)::$_0&, std::__1::shared_ptr<parquet::arrow::ColumnReaderImpl>, std::__1::shared_ptr<arrow::ChunkedArray>>(bool, std::__1::vector<std::__1::shared_ptr<parquet::arrow::ColumnReaderImpl>, std::__1::allocator<std::__1::shared_ptr<parquet::arrow::ColumnReaderImpl>>>, parquet::arrow::(anonymous namespace)::FileReaderImpl::DecodeRowGroups(std::__1::shared_ptr<parquet::arrow::(anonymous namespace)::FileReaderImpl>, std::__1::vector<int, std::__1::allocator<int>> const&, std::__1::vector<int, std::__1::allocator<int>> const&, arrow::internal::Executor*)::$_0&, arrow::internal::Executor*, arrow::internal::TaskHints) /src/arrow/cpp/src/arrow/util/parallel.h:97:7
+    #12 0x5586e8ec338f in parquet::arrow::(anonymous namespace)::FileReaderImpl::DecodeRowGroups(std::__1::shared_ptr<parquet::arrow::(anonymous namespace)::FileReaderImpl>, std::__1::vector<int, std::__1::allocator<int>> const&, std::__1::vector<int, std::__1::allocator<int>> const&, arrow::internal::Executor*) /src/arrow/cpp/src/parquet/arrow/reader.cc:1300:10
+    #13 0x5586e8e660e1 in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadRowGroups(std::__1::vector<int, std::__1::allocator<int>> const&, std::__1::vector<int, std::__1::allocator<int>> const&, std::__1::shared_ptr<arrow::Table>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:1261:14
+    #14 0x5586e8e656a0 in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadRowGroup(int, std::__1::vector<int, std::__1::allocator<int>> const&, std::__1::shared_ptr<arrow::Table>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:323:12
+    #15 0x5586e8e65b7a in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadRowGroup(int, std::__1::shared_ptr<arrow::Table>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:327:12
+    #16 0x5586e8e56128 in parquet::arrow::internal::FuzzReader(std::__1::unique_ptr<parquet::arrow::FileReader, std::__1::default_delete<parquet::arrow::FileReader>>) /src/arrow/cpp/src/parquet/arrow/reader.cc:1408:37
+    #17 0x5586e8e574e6 in parquet::arrow::internal::FuzzReader(unsigned char const*, long) /src/arrow/cpp/src/parquet/arrow/reader.cc:1433:11
+    #18 0x5586e8e4e7f0 in LLVMFuzzerTestOneInput /src/arrow/cpp/src/parquet/arrow/fuzz.cc:22:17
+    #19 0x5586e8e4e6d9 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+    #20 0x5586e8e4e4d5 in LLVMFuzzerRunDriver /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #21 0x5586e8e4e08d in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:311:10
+    #22 0x7f8a7eb11082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 5792732f783158c66fb4f3756458ca24e46e827d)
+    #23 0x5586e8d7588d in _start (/out/parquet-arrow-fuzz+0x15a88d)
+
+DEDUP_TOKEN: __asan_memcpy--parquet::(anonymous namespace)::PlainDecoder<parquet::PhysicalType<(parquet::Type::type)7>>::DecodeArrow(int, int, unsigned char const*, long, arrow::FixedSizeBinaryBuilder*)--parquet::internal::(anonymous namespace)::FLBARecordReader::ReadValuesSpaced(long, long)
+[1m[32m0x7f8a7cdff800 is located 0 bytes after 1048576-byte region [0x7f8a7ccff800,0x7f8a7cdff800)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x5586e8e0e89f in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:68:3
+    #1 0x5586e8e4e601 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:221:41
+
+DEDUP_TOKEN: __interceptor_malloc--ExecuteFilesOnyByOne
+SUMMARY: AddressSanitizer: use-after-poison /src/arrow/cpp/src/parquet/decoder.cc:670:3 in parquet::(anonymous namespace)::PlainDecoder<parquet::PhysicalType<(parquet::Type::type)7>>::DecodeArrow(int, int, unsigned char const*, long, arrow::FixedSizeBinaryBuilder*)
+Shadow bytes around the buggy address:
+  0x7f8a7ccff680: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x7f8a7ccff700: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x7f8a7ccff780: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x7f8a7ccff800: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x7f8a7ccff880: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x7f8a7ccff900: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m07[1m[0m][1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x7f8a7ccff980: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x7f8a7ccffa00: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x7f8a7ccffa80: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x7f8a7ccffb00: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x7f8a7ccffb80: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/429130592

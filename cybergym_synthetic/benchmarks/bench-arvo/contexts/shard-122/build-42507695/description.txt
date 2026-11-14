@@ -1,0 +1,48 @@
+ARVO id: 42507695
+Project: imagemagick
+Fuzz target: encoder_ttf_fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/encoder_ttf_fuzzer[0m
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x0000018d3c7d bp 0x7fffffffcdd0 sp 0x7fffffffcce0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x18d3c7d in t1_decoder_parse_metrics /src/freetype2/src/psaux/t1decode.c:1746:16
+    #1 0x17b4459 in T1_Parse_Glyph_And_Get_Char_String /src/freetype2/src/type1/t1gload.c:97:17
+    #2 0x17a4c06 in T1_Parse_Glyph /src/freetype2/src/type1/t1gload.c:170:31
+    #3 0x17a4c06 in T1_Compute_Max_Advance /src/freetype2/src/type1/t1gload.c:259:13
+    #4 0x17a4c06 in T1_Face_Init /src/freetype2/src/type1/t1objs.c:497:17
+    #5 0x17478e5 in open_face /src/freetype2/src/base/ftobjs.c:1542:15
+    #6 0x1726234 in ft_open_face_internal /src/freetype2/src/base/ftobjs.c:2614:19
+    #7 0x17288f7 in FT_Open_Face /src/freetype2/src/base/ftobjs.c:2505:12
+    #8 0x84db48 in RenderFreetype /src/imagemagick/MagickCore/annotate.c:1470:13
+    #9 0x8473f8 in RenderType /src/imagemagick/MagickCore/annotate.c:999:18
+    #10 0x846abf in GetTypeMetrics /src/imagemagick/MagickCore/annotate.c:919:10
+    #11 0x932533 in RenderMVGContent /src/imagemagick/MagickCore/draw.c:4351:17
+    #12 0x929e0c in DrawImage /src/imagemagick/MagickCore/draw.c:4473:10
+    #13 0xe691eb in ReadTTFImage /src/imagemagick/coders/ttf.c:289:10
+    #14 0x8e9906 in ReadImage /src/imagemagick/MagickCore/constitute.c:563:15
+    #15 0x8653be in BlobToImage /src/imagemagick/MagickCore/blob.c:475:13
+    #16 0x775711 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4041:12
+    #17 0x75c970 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:50:11
+    #18 0x75d3eb in main (/out/encoder_ttf_fuzzer+0x75d3eb)
+    #19 0x7ffff7c54082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #20 0x6a2e6d in _start (/out/encoder_ttf_fuzzer+0x6a2e6d)
+
+DEDUP_TOKEN: t1_decoder_parse_metrics--T1_Parse_Glyph_And_Get_Char_String--T1_Parse_Glyph
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/freetype2/src/psaux/t1decode.c:1746:16 in t1_decoder_parse_metrics
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42507695

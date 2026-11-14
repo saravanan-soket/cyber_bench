@@ -1,0 +1,105 @@
+ARVO id: 42485181
+Project: gdal
+Fuzz target: mrf_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 4
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 3702963242
+INFO: Loaded 1 modules (325507 guards): [0x569fdc0, 0x57ddbcc), 
+/out/mrf_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x619000001400 at pc 0x00000162c682 bp 0x7ffef5014a30 sp 0x7ffef5014a28
+[1m[0m[1m[34mREAD of size 4 at 0x619000001400 thread T0[1m[0m
+SCARINESS: 17 (4-byte-read-heap-buffer-overflow)
+    #0 0x162c681 in LercNS::CntZImage::readZTile(unsigned char**, unsigned long&, int, int, int, int, double, float) /src/gdal/gdal/frmts/mrf/libLERC/CntZImage.cpp:1189:40
+    #1 0x1629165 in LercNS::CntZImage::readTiles(bool, double, int, int, float, unsigned char*, unsigned long) /src/gdal/gdal/frmts/mrf/libLERC/CntZImage.cpp:645:25
+    #2 0x1628246 in LercNS::CntZImage::read(unsigned char**, unsigned long&, double, bool, bool) /src/gdal/gdal/frmts/mrf/libLERC/CntZImage.cpp:470:15
+    #3 0xc8e7de in GDAL_MRF::DecompressLERC(GDAL_MRF::buf_mgr&, GDAL_MRF::buf_mgr&, GDAL_MRF::ILImage const&) /src/gdal/gdal/frmts/mrf/LERC_band.cpp:227:15
+    #4 0xc8da92 in GDAL_MRF::LERC_Band::Decompress(GDAL_MRF::buf_mgr&, GDAL_MRF::buf_mgr&) /src/gdal/gdal/frmts/mrf/LERC_band.cpp:363:16
+    #5 0xf6024c in GDAL_MRF::GDALMRFRasterBand::IReadBlock(int, int, void*) /src/gdal/gdal/frmts/mrf/mrf_band.cpp:818:18
+    #6 0x827dc3 in GDALRasterBand::GetLockedBlockRef(int, int, int) /src/gdal/gdal/gcore/gdalrasterband.cpp:1329:20
+    #7 0x866527 in GDALRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/rasterio.cpp:152:27
+    #8 0x824fce in GDALRasterBand::RasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdalrasterband.cpp:386:16
+    #9 0x825684 in GDALRasterIO /src/gdal/gdal/gcore/gdalrasterband.cpp:420:21
+    #10 0xa1ef44 in GDALChecksumImage /src/gdal/gdal/alg/gdalchecksum.cpp:155:17
+    #11 0x521e8a in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_fuzzer.cpp:160:17
+    #12 0x54b289 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:460:13
+    #13 0x54baba in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:399:3
+    #14 0x5229f6 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #15 0x52db60 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #16 0x522008 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #17 0x7f67399f582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #18 0x428358 in _start (/out/mrf_fuzzer+0x428358)
+
+DEDUP_TOKEN: LercNS::CntZImage::readZTile(unsigned char**, unsigned long&, int, int, int, int, double, float)--LercNS::CntZImage::readTiles(bool, double, int, int, float, unsigned char*, unsigned long)--LercNS::CntZImage::read(unsigned char**, unsigned long&, double, bool, bool)
+[1m[32m0x619000001400 is located 0 bytes to the right of 1152-byte region [0x619000000f80,0x619000001400)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x51d520 in operator new(unsigned long) /src/llvm/projects/compiler-rt/lib/asan/asan_new_delete.cc:82
+    #1 0xca8938 in __allocate /usr/local/bin/../include/c++/v1/new:226:10
+    #2 0xca8938 in allocate /usr/local/bin/../include/c++/v1/memory:1747
+    #3 0xca8938 in allocate /usr/local/bin/../include/c++/v1/memory:1502
+    #4 0xca8938 in std::__1::__split_buffer<unsigned int, std::__1::allocator<unsigned int>&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<unsigned int>&) /usr/local/bin/../include/c++/v1/__split_buffer:311
+    #5 0x1621cad in std::__1::vector<unsigned int, std::__1::allocator<unsigned int> >::__append(unsigned long, unsigned int const&) /usr/local/bin/../include/c++/v1/vector:1062:53
+    #6 0x1e040fd in LercNS::BitStuffer::read(unsigned char**, unsigned long&, std::__1::vector<unsigned int, std::__1::allocator<unsigned int> >&) /src/gdal/gdal/frmts/mrf/libLERC/BitStuffer.cpp:163:11
+    #7 0x162c126 in LercNS::CntZImage::readZTile(unsigned char**, unsigned long&, int, int, int, int, double, float) /src/gdal/gdal/frmts/mrf/libLERC/CntZImage.cpp:1173:12
+    #8 0x1629165 in LercNS::CntZImage::readTiles(bool, double, int, int, float, unsigned char*, unsigned long) /src/gdal/gdal/frmts/mrf/libLERC/CntZImage.cpp:645:25
+    #9 0x1628246 in LercNS::CntZImage::read(unsigned char**, unsigned long&, double, bool, bool) /src/gdal/gdal/frmts/mrf/libLERC/CntZImage.cpp:470:15
+    #10 0xc8e7de in GDAL_MRF::DecompressLERC(GDAL_MRF::buf_mgr&, GDAL_MRF::buf_mgr&, GDAL_MRF::ILImage const&) /src/gdal/gdal/frmts/mrf/LERC_band.cpp:227:15
+    #11 0xc8da92 in GDAL_MRF::LERC_Band::Decompress(GDAL_MRF::buf_mgr&, GDAL_MRF::buf_mgr&) /src/gdal/gdal/frmts/mrf/LERC_band.cpp:363:16
+    #12 0xf6024c in GDAL_MRF::GDALMRFRasterBand::IReadBlock(int, int, void*) /src/gdal/gdal/frmts/mrf/mrf_band.cpp:818:18
+    #13 0x827dc3 in GDALRasterBand::GetLockedBlockRef(int, int, int) /src/gdal/gdal/gcore/gdalrasterband.cpp:1329:20
+    #14 0x866527 in GDALRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/rasterio.cpp:152:27
+    #15 0x824fce in GDALRasterBand::RasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdalrasterband.cpp:386:16
+    #16 0x825684 in GDALRasterIO /src/gdal/gdal/gcore/gdalrasterband.cpp:420:21
+    #17 0xa1ef44 in GDALChecksumImage /src/gdal/gdal/alg/gdalchecksum.cpp:155:17
+    #18 0x521e8a in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_fuzzer.cpp:160:17
+    #19 0x54b289 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:460:13
+    #20 0x54baba in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:399:3
+    #21 0x5229f6 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #22 0x52db60 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #23 0x522008 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #24 0x7f67399f582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: operator new(unsigned long)--__allocate--allocate
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/gdal/gdal/frmts/mrf/libLERC/CntZImage.cpp:1189:40 in LercNS::CntZImage::readZTile(unsigned char**, unsigned long&, int, int, int, int, double, float)
+Shadow bytes around the buggy address:
+  0x0c327fff8230: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c327fff8240: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c327fff8250: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c327fff8260: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c327fff8270: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c327fff8280:[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c327fff8290: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c327fff82a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c327fff82b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c327fff82c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c327fff82d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42485181

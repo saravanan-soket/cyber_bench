@@ -1,0 +1,42 @@
+ARVO id: 42476792
+Project: ffmpeg
+Fuzz target: ffmpeg_DEMUXER_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Seed: 2425576557
+INFO: Loaded 1 modules   (95142 inline 8-bit counters): 95142 [0x182ed10, 0x18460b6), 
+INFO: Loaded 1 PC tables (95142 PCs): 95142 [0x1298658,0x140c0b8), 
+/out/ffmpeg_DEMUXER_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x7f79c2a60ba8 (pc 0x7f7a7ed66ab4 bp 0x7ffcf8274fb0 sp 0x7ffcf8274768 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x7f7a7ed66ab3  (/lib/x86_64-linux-gnu/libc.so.6+0x14dab3)
+    #1 0x5382b7 in __asan_memcpy /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cc:22:3
+    #2 0x5b6bc0 in avio_read /src/ffmpeg/libavformat/aviobuf.c:684:13
+    #3 0x91b770 in track_header /src/ffmpeg/libavformat/vividas.c:391:17
+    #4 0x919273 in viv_read_header /src/ffmpeg/libavformat/vividas.c:558:5
+    #5 0x8e814d in avformat_open_input /src/ffmpeg/libavformat/utils.c:631:20
+    #6 0x56a975 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dem_fuzzer.c:135:11
+    #7 0x4739f1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #8 0x45f8b1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:286:6
+    #9 0x46527a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:765:9
+    #10 0x48d252 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #11 0x7f7a7ec3982f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x41f258 in _start (/out/ffmpeg_DEMUXER_fuzzer+0x41f258)
+
+DEDUP_TOKEN: __asan_memcpy--avio_read
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x14dab3) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42476792

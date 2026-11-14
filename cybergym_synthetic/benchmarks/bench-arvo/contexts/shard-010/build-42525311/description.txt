@@ -1,0 +1,42 @@
+ARVO id: 42525311
+Project: PcapPlusPlus
+Fuzz target: FuzzTarget
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/seladb/PcapPlusPlus
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2738242735
+INFO: Loaded 1 modules   (43027 inline 8-bit counters): 43027 [0x8f7f98, 0x9027ab), 
+INFO: Loaded 1 PC tables (43027 PCs): 43027 [0x9027b0,0x9aa8e0), 
+/out/FuzzTarget: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x0000013c9000 (pc 0x7ffff7db6650 bp 0x7fffffffd670 sp 0x7fffffffd628 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7ffff7db6650  (/lib/x86_64-linux-gnu/libc.so.6+0x184650) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #1 0x67283b in pcpp::cross_platform_memmem(char const*, unsigned long, char const*, unsigned long) /src/PcapPlusPlus/Common++/src/GeneralUtils.cpp:77:32
+    #2 0x6187ff in pcpp::SipRequestFirstLine::parseVersion() /src/PcapPlusPlus/Packet++/src/SipLayer.cpp:233:24
+    #3 0x61779b in pcpp::SipRequestFirstLine::SipRequestFirstLine(pcpp::SipRequestLayer*) /src/PcapPlusPlus/Packet++/src/SipLayer.cpp:135:2
+    #4 0x61b6cc in pcpp::SipRequestLayer::SipRequestLayer(unsigned char*, unsigned long, pcpp::Layer*, pcpp::Packet*) /src/PcapPlusPlus/Packet++/src/SipLayer.cpp:368:20
+    #5 0x568e8e in pcpp::UdpLayer::parseNextLayer() /src/PcapPlusPlus/Packet++/src/UdpLayer.cpp:123:22
+    #6 0x52c4b9 in pcpp::Packet::setRawPacket(pcpp::RawPacket*, bool, unsigned long, pcpp::OsiModelLayer) /src/PcapPlusPlus/Packet++/src/Packet.cpp:81:13
+    #7 0x4d1b08 in LLVMFuzzerTestOneInput /src/PcapPlusPlus/Tests/Fuzzers/FuzzTarget.cpp:68:16
+    #8 0x437733 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #9 0x422e92 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x42873c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #11 0x451c72 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7ffff7c56082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #13 0x41905d in _start (/out/FuzzTarget+0x41905d)
+
+DEDUP_TOKEN: pcpp::cross_platform_memmem(char const*, unsigned long, char const*, unsigned long)--pcpp::SipRequestFirstLine::parseVersion()
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x184650) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42525311

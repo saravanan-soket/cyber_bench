@@ -1,0 +1,94 @@
+ARVO id: 42537789
+Project: gdal
+Fuzz target: gdal_vector_translate_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 8
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/gdal_vector_translate_fuzzer < INPUT_FILE
+or
+  /out/gdal_vector_translate_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/gdal_vector_translate_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 125 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x60200000a058 at pc 0x0000018d8bf6 bp 0x7ffe3695ed90 sp 0x7ffe3695ed88
+[1m[0m[1m[34mREAD of size 8 at 0x60200000a058 thread T0[1m[0m
+SCARINESS: 23 (8-byte-read-heap-buffer-overflow)
+    #0 0x18d8bf5 in OGRPolygonLabelPoint(OGRPolygon*, OGRPoint*) /src/gdal/gdal/ogr/ogrsf_frmts/mitab/mitab_geometry.cpp:269:24
+    #1 0x18b394f in TABRegion::GetCenter(double&, double&) /src/gdal/gdal/ogr/ogrsf_frmts/mitab/mitab_feature.cpp:3783:13
+    #2 0x18b2a6e in TABRegion::WriteGeometryToMAPFile(TABMAPFile*, TABMAPObjHdr*, int, TABMAPCoordBlock**) /src/gdal/gdal/ogr/ogrsf_frmts/mitab/mitab_feature.cpp:3326:13
+    #3 0x11a4702 in TABFile::WriteFeature(TABFeature*) /src/gdal/gdal/ogr/ogrsf_frmts/mitab/mitab_tabfile.cpp:1581:21
+    #4 0x11a4ae7 in TABFile::CreateFeature(TABFeature*) /src/gdal/gdal/ogr/ogrsf_frmts/mitab/mitab_tabfile.cpp:1655:9
+    #5 0x18da6a7 in IMapInfoFile::ICreateFeature(OGRFeature*) /src/gdal/gdal/ogr/ogrsf_frmts/mitab/mitab_imapinfofile.cpp:354:19
+    #6 0x7d9fca in LayerTranslator::Translate(OGRFeature*, TargetLayerInfo*, long long, long long*, long long&, int (*)(double, char const*, void*), void*, GDALVectorTranslateOptions*) /src/gdal/gdal/apps/ogr2ogr_lib.cpp:4684:29
+    #7 0x7c3355 in GDALVectorTranslate /src/gdal/gdal/apps/ogr2ogr_lib.cpp:3057:30
+    #8 0x52fbe7 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_vector_translate_fuzzer.cpp:97:39
+    #9 0x5305df in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:279:5
+    #10 0x530b7f in main /src/libfuzzer/afl/afl_driver.cpp:316:12
+    #11 0x7ff735ce582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x427be8 in _start (/out/gdal_vector_translate_fuzzer+0x427be8)
+
+DEDUP_TOKEN: OGRPolygonLabelPoint(OGRPolygon*, OGRPoint*)--TABRegion::GetCenter(double&, double&)--TABRegion::WriteGeometryToMAPFile(TABMAPFile*, TABMAPObjHdr*, int, TABMAPCoordBlock**)
+[1m[32m0x60200000a058 is located 0 bytes to the right of 8-byte region [0x60200000a050,0x60200000a058)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4f3bc0 in calloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:97
+    #1 0x18d7b72 in OGRPolygonLabelPoint(OGRPolygon*, OGRPoint*) /src/gdal/gdal/ogr/ogrsf_frmts/mitab/mitab_geometry.cpp:160:36
+    #2 0x18b394f in TABRegion::GetCenter(double&, double&) /src/gdal/gdal/ogr/ogrsf_frmts/mitab/mitab_feature.cpp:3783:13
+    #3 0x18b2a6e in TABRegion::WriteGeometryToMAPFile(TABMAPFile*, TABMAPObjHdr*, int, TABMAPCoordBlock**) /src/gdal/gdal/ogr/ogrsf_frmts/mitab/mitab_feature.cpp:3326:13
+    #4 0x11a4702 in TABFile::WriteFeature(TABFeature*) /src/gdal/gdal/ogr/ogrsf_frmts/mitab/mitab_tabfile.cpp:1581:21
+    #5 0x11a4ae7 in TABFile::CreateFeature(TABFeature*) /src/gdal/gdal/ogr/ogrsf_frmts/mitab/mitab_tabfile.cpp:1655:9
+    #6 0x18da6a7 in IMapInfoFile::ICreateFeature(OGRFeature*) /src/gdal/gdal/ogr/ogrsf_frmts/mitab/mitab_imapinfofile.cpp:354:19
+    #7 0x7d9fca in LayerTranslator::Translate(OGRFeature*, TargetLayerInfo*, long long, long long*, long long&, int (*)(double, char const*, void*), void*, GDALVectorTranslateOptions*) /src/gdal/gdal/apps/ogr2ogr_lib.cpp:4684:29
+    #8 0x7c3355 in GDALVectorTranslate /src/gdal/gdal/apps/ogr2ogr_lib.cpp:3057:30
+    #9 0x52fbe7 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_vector_translate_fuzzer.cpp:97:39
+    #10 0x5305df in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:279:5
+    #11 0x530b7f in main /src/libfuzzer/afl/afl_driver.cpp:316:12
+    #12 0x7ff735ce582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: calloc--OGRPolygonLabelPoint(OGRPolygon*, OGRPoint*)--TABRegion::GetCenter(double&, double&)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/gdal/gdal/ogr/ogrsf_frmts/mitab/mitab_geometry.cpp:269:24 in OGRPolygonLabelPoint(OGRPolygon*, OGRPoint*)
+Shadow bytes around the buggy address:
+  0x0c047fff93b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff93c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c047fff93d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff93e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m01[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff93f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m01[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c047fff9400: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m01[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff9410: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff9420: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff9430: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff9440: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff9450: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42537789

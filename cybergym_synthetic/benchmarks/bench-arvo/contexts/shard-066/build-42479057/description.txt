@@ -1,0 +1,51 @@
+ARVO id: 42479057
+Project: imagemagick
+Fuzz target: encoder_tiff_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 1556277566
+INFO: Loaded 1 modules   (176259 inline 8-bit counters): 176259 [0x9b71010, 0x9b9c093), 
+INFO: Loaded 1 PC tables (176259 PCs): 176259 [0x9b9c094,0x9cf44ac), 
+/out/encoder_tiff_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0xe650045c (pc 0xf7e9ebe2 bp 0xffffc888 sp 0xffffc448 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0xf7e9ebe1  (/lib/i386-linux-gnu/libc.so.6+0x129be1)
+    #1 0xf7e9ccd4  (/lib/i386-linux-gnu/libc.so.6+0x127cd4)
+    #2 0x8205b28 in __asan_memcpy /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #3 0x893048f in TIFFReadCustomStream /src/imagemagick/coders/tiff.c:1131:10
+    #4 0x833bf17 in ReadBlob /src/imagemagick/MagickCore/blob.c:3869:15
+    #5 0x8331a93 in ReadBlobStream /src/imagemagick/MagickCore/blob.c:4729:14
+    #6 0x833e109 in ReadBlobShort /src/imagemagick/MagickCore/blob.c:4187:29
+    #7 0x87fc857 in ReadPSDLayer /src/imagemagick/coders/psd.c:1498:38
+    #8 0x87f3f6b in ReadPSDLayersInternal /src/imagemagick/coders/psd.c:2009:12
+    #9 0x87f253d in ReadPSDLayers /src/imagemagick/coders/psd.c:2041:10
+    #10 0x892f671 in TIFFReadPhotoshopLayers /src/imagemagick/coders/tiff.c:1225:10
+    #11 0x89243ac in ReadTIFFImage /src/imagemagick/coders/tiff.c:2415:3
+    #12 0x83a8a15 in ReadImage /src/imagemagick/MagickCore/constitute.c:551:15
+    #13 0x832dc79 in BlobToImage /src/imagemagick/MagickCore/blob.c:475:13
+    #14 0x8243f3a in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4028:12
+    #15 0x823b503 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #16 0x81407b6 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #17 0x812cc63 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #18 0x8132368 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #19 0x81571b7 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #20 0xf7d8d646 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x18646)
+    #21 0x8107c81 in _start (/out/encoder_tiff_fuzzer+0x8107c81)
+
+DEDUP_TOKEN: __asan_memcpy
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib/i386-linux-gnu/libc.so.6+0x129be1) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42479057

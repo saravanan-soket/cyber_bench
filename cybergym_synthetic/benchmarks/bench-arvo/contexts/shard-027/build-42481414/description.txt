@@ -1,0 +1,92 @@
+ARVO id: 42481414
+Project: imagemagick
+Fuzz target: encoder_label_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 325778845
+INFO: Loaded 1 modules   (180648 inline 8-bit counters): 180648 [0x2c2e210, 0x2c5a3b8), 
+INFO: Loaded 1 PC tables (180648 PCs): 180648 [0x2c5a3b8,0x2f1be38), 
+/out/encoder_label_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x74e9fe in ScaleQuantumToChar /src/imagemagick/./MagickCore/quantum.h:117:7
+    #1 0x745d02 in IsSVGCompliant /src/imagemagick/MagickCore/color.c:1450:12
+    #2 0x744d34 in GetColorTuple /src/imagemagick/MagickCore/color.c:1562:29
+    #3 0x74de52 in QueryColorname /src/imagemagick/MagickCore/color.c:2596:3
+    #4 0xa7b9a2 in InterpretImageProperties /src/imagemagick/MagickCore/property.c:3865:22
+    #5 0xde702a in ReadLABELImage /src/imagemagick/coders/label.c:127:9
+    #6 0x7a6db8 in ReadImage /src/imagemagick/MagickCore/constitute.c:553:15
+    #7 0x53b9b6 in Magick::Image::read(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4094:12
+    #8 0x52b026 in fuzzEncoderWithStringFilename(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, unsigned char const*, unsigned long, bool (*)(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)) /src/imagemagick/Magick++/fuzz/encoder_utils.cc:15:11
+    #9 0x52ad1b in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_label_fuzzer.cc:19:10
+    #10 0x45fde1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #11 0x44a901 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #12 0x4505be in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #13 0x47a4e2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #14 0x7f0ec227483f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #15 0x423d78 in _start (/out/encoder_label_fuzzer+0x423d78)
+
+DEDUP_TOKEN: ScaleQuantumToChar--IsSVGCompliant--GetColorTuple
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x4d4cc6 in __msan_memcpy /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1567:3
+    #1 0x74dc9c in QueryColorname /src/imagemagick/MagickCore/color.c:2589:10
+    #2 0xa7b9a2 in InterpretImageProperties /src/imagemagick/MagickCore/property.c:3865:22
+    #3 0xde702a in ReadLABELImage /src/imagemagick/coders/label.c:127:9
+    #4 0x7a6db8 in ReadImage /src/imagemagick/MagickCore/constitute.c:553:15
+    #5 0x53b9b6 in Magick::Image::read(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4094:12
+    #6 0x52b026 in fuzzEncoderWithStringFilename(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, unsigned char const*, unsigned long, bool (*)(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)) /src/imagemagick/Magick++/fuzz/encoder_utils.cc:15:11
+    #7 0x52ad1b in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_label_fuzzer.cc:19:10
+    #8 0x45fde1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #9 0x44a901 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #10 0x4505be in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #11 0x47a4e2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #12 0x7f0ec227483f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: __msan_memcpy--QueryColorname--InterpretImageProperties
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0xa7e532 in InterpretImageProperties /src/imagemagick/MagickCore/property.c:3843:20
+    #1 0xde702a in ReadLABELImage /src/imagemagick/coders/label.c:127:9
+    #2 0x7a6db8 in ReadImage /src/imagemagick/MagickCore/constitute.c:553:15
+    #3 0x53b9b6 in Magick::Image::read(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4094:12
+    #4 0x52b026 in fuzzEncoderWithStringFilename(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, unsigned char const*, unsigned long, bool (*)(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)) /src/imagemagick/Magick++/fuzz/encoder_utils.cc:15:11
+    #5 0x52ad1b in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_label_fuzzer.cc:19:10
+    #6 0x45fde1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #7 0x44a901 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #8 0x4505be in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #9 0x47a4e2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #10 0x7f0ec227483f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: InterpretImageProperties--ReadLABELImage--ReadImage
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x8df520 in FxEvaluateChannelExpression /src/imagemagick/MagickCore/fx.c:2729:9
+    #1 0xa7a73f in InterpretImageProperties /src/imagemagick/MagickCore/property.c:3841:18
+    #2 0xde702a in ReadLABELImage /src/imagemagick/coders/label.c:127:9
+    #3 0x7a6db8 in ReadImage /src/imagemagick/MagickCore/constitute.c:553:15
+    #4 0x53b9b6 in Magick::Image::read(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4094:12
+    #5 0x52b026 in fuzzEncoderWithStringFilename(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, unsigned char const*, unsigned long, bool (*)(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)) /src/imagemagick/Magick++/fuzz/encoder_utils.cc:15:11
+    #6 0x52ad1b in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_label_fuzzer.cc:19:10
+    #7 0x45fde1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #8 0x44a901 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #9 0x4505be in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #10 0x47a4e2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #11 0x7f0ec227483f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: FxEvaluateChannelExpression--InterpretImageProperties--ReadLABELImage
+  [1m[35mUninitialized value was created[1m[0m
+    <empty stack>
+
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/imagemagick/./MagickCore/quantum.h:117:7 in ScaleQuantumToChar
+Unique heap origins: 837
+Stack depot allocated bytes: 116504
+Unique origin histories: 160
+History depot allocated bytes: 3840
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42481414

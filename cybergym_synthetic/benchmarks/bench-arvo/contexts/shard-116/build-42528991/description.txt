@@ -1,0 +1,41 @@
+ARVO id: 42528991
+Project: ffmpeg
+Fuzz target: ffmpeg_IO_DEMUXER_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+Reading 58 bytes from /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x7fc52a6ff800 (pc 0x000000f6e1d5 bp 0x7fff71053200 sp 0x7fff71052fa0 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0xf6e1d5 in read_vlc_prefix /src/ffmpeg/libavcodec/jpegxl_parser.c:788:28
+    #1 0xf6e1d5 in read_distribution_bundle /src/ffmpeg/libavcodec/jpegxl_parser.c:862:19
+    #2 0xf65f05 in entropy_decoder_init /src/ffmpeg/libavcodec/jpegxl_parser.c:902:11
+    #3 0xf644cd in skip_icc_profile /src/ffmpeg/libavcodec/jpegxl_parser.c:1058:11
+    #4 0xf6274e in try_parse /src/ffmpeg/libavcodec/jpegxl_parser.c:1390:15
+    #5 0xf6274e in jpegxl_parse /src/ffmpeg/libavcodec/jpegxl_parser.c:1428:15
+    #6 0x92c0f3 in av_parser_parse2 /src/ffmpeg/libavcodec/parser.c:163:13
+    #7 0x5c6083 in parse_packet /src/ffmpeg/libavformat/demux.c:1154:15
+    #8 0x5b2e7a in read_frame_internal /src/ffmpeg/libavformat/demux.c:1273:21
+    #9 0x5ba1a0 in avformat_find_stream_info /src/ffmpeg/libavformat/demux.c:2635:15
+    #10 0x50e1c8 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dem_fuzzer.c:206:11
+    #11 0x16a250d in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+    #12 0x16a2318 in LLVMFuzzerRunDriver /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #13 0x16a1ed8 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:300:10
+    #14 0x7fc50e07d082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 5792732f783158c66fb4f3756458ca24e46e827d)
+    #15 0x44ef4d in _start (/out/ffmpeg_IO_DEMUXER_fuzzer+0x44ef4d)
+
+DEDUP_TOKEN: read_vlc_prefix--read_distribution_bundle--entropy_decoder_init
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/ffmpeg/libavcodec/jpegxl_parser.c:788:28 in read_vlc_prefix
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42528991

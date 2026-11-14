@@ -1,0 +1,55 @@
+ARVO id: 42482115
+Project: harfbuzz
+Fuzz target: hb-draw-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/harfbuzz/harfbuzz.git
+
+=== Crash report ===
+INFO: Seed: 2405323533
+INFO: Loaded 1 modules   (28767 inline 8-bit counters): 28767 [0xe1b208, 0xe22267), 
+INFO: Loaded 1 PC tables (28767 PCs): 28767 [0xa02930,0xa72f20), 
+/out/hb-draw-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x5630ec in OT::TupleVarHeader::calculate_scalar(int const*, unsigned int, hb_array_t<OT::F2DOT14 const>) const /src/harfbuzz/src/./hb-ot-var-gvar-table.hh:137:17
+    #1 0x5467eb in OT::gvar::accelerator_t::apply_deltas_to_points(unsigned int, int const*, unsigned int, hb_array_t<OT::contour_point_t>) const /src/harfbuzz/src/./hb-ot-var-gvar-table.hh:593:41
+    #2 0x53de6d in bool OT::glyf::Glyph::get_points<bool OT::glyf::accelerator_t::get_points<OT::glyf::accelerator_t::path_builder_t>(hb_font_t*, unsigned int, OT::glyf::accelerator_t::path_builder_t) const::'lambda'(unsigned int)>(OT::glyf::accelerator_t::path_builder_t, hb_font_t*, OT::contour_point_vector_t&, bool, unsigned int) const /src/harfbuzz/src/./hb-ot-glyf-table.hh:741:11
+    #3 0x53c1bb in bool OT::glyf::accelerator_t::get_points<OT::glyf::accelerator_t::path_builder_t>(hb_font_t*, unsigned int, OT::glyf::accelerator_t::path_builder_t) const /src/harfbuzz/src/./hb-ot-glyf-table.hh:869:11
+    #4 0x53bec8 in OT::glyf::accelerator_t::get_path(hb_font_t*, unsigned int, draw_helper_t&) const /src/harfbuzz/src/./hb-ot-glyf-table.hh:1152:14
+    #5 0x53b808 in hb_font_draw_glyph /src/harfbuzz/src/hb-draw.cc:250:31
+    #6 0x5255b5 in LLVMFuzzerTestOneInput /src/harfbuzz/./test/fuzzing/hb-draw-fuzzer.cc:114:5
+    #7 0x45a081 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #8 0x444ba1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #9 0x44a85e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #10 0x474782 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #11 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x41e018 in _start (/out/hb-draw-fuzzer+0x41e018)
+
+DEDUP_TOKEN: OT::TupleVarHeader::calculate_scalar(int const*, unsigned int, hb_array_t<OT::F2DOT14 const>) const--OT::gvar::accelerator_t::apply_deltas_to_points(unsigned int, int const*, unsigned int, hb_array_t<OT::contour_point_t>) const--bool OT::glyf::Glyph::get_points<bool OT::glyf::accelerator_t::get_points<OT::glyf::accelerator_t::path_builder_t>(hb_font_t*, unsigned int, OT::glyf::accelerator_t::path_builder_t) const::'lambda'(unsigned int)>(OT::glyf::accelerator_t::path_builder_t, hb_font_t*, OT::contour_point_vector_t&, bool, unsigned int) const
+  [1m[35mUninitialized value was created by a heap deallocation[1m[0m
+    #0 0x4cf839 in free /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:222:3
+    #1 0x43ee18 in std::__Fuzzer::basic_filebuf<char, std::__Fuzzer::char_traits<char> >::setbuf(char*, long) /work/llvm-stage2/projects/compiler-rt/lib/fuzzer/libcxx_fuzzer_x86_64/include/c++/v1/fstream:872:9
+    #2 0x43ec85 in close /work/llvm-stage2/projects/compiler-rt/lib/fuzzer/libcxx_fuzzer_x86_64/include/c++/v1/fstream:703:9
+    #3 0x43ec85 in std::__Fuzzer::basic_filebuf<char, std::__Fuzzer::char_traits<char> >::~basic_filebuf() /work/llvm-stage2/projects/compiler-rt/lib/fuzzer/libcxx_fuzzer_x86_64/include/c++/v1/fstream:398:9
+    #4 0x455a7b in ~basic_ifstream /work/llvm-stage2/projects/compiler-rt/lib/fuzzer/libcxx_fuzzer_x86_64/include/c++/v1/iosfwd:144:32
+    #5 0x455a7b in ~basic_ifstream /work/llvm-stage2/projects/compiler-rt/lib/fuzzer/libcxx_fuzzer_x86_64/include/c++/v1/iosfwd:144:32
+    #6 0x455a7b in fuzzer::FileToVector(std::__Fuzzer::basic_string<char, std::__Fuzzer::char_traits<char>, std::__Fuzzer::allocator<char> > const&, unsigned long, bool) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerIO.cpp:51:1
+    #7 0x444b5b in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:289:12
+    #8 0x44a85e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #9 0x474782 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #10 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: free--std::__Fuzzer::basic_filebuf<char, std::__Fuzzer::char_traits<char> >::setbuf(char*, long)--close
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/harfbuzz/src/./hb-ot-var-gvar-table.hh:137:17 in OT::TupleVarHeader::calculate_scalar(int const*, unsigned int, hb_array_t<OT::F2DOT14 const>) const
+Unique heap origins: 47
+Stack depot allocated bytes: 4488
+Unique origin histories: 12
+History depot allocated bytes: 288
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42482115

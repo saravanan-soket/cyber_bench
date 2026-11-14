@@ -1,0 +1,154 @@
+ARVO id: 42530718
+Project: mupdf
+Fuzz target: pdf_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: git://git.ghostscript.com/mupdf.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 371146723
+INFO: Loaded 1 modules   (162196 inline 8-bit counters): 162196 [0x42b1ad1, 0x42d9465), 
+INFO: Loaded 1 PC tables (162196 PCs): 162196 [0x1f6ca40,0x21e6380), 
+/out/pdf_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+warning: treating invalid subimage as end of file
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x135826e in _cmsReadHeader /src/mupdf/thirdparty/lcms2/src/cmsio0.c:839:27
+    #1 0x135cc63 in cmsOpenProfileFromMem /src/mupdf/thirdparty/lcms2/src/cmsio0.c:1279:10
+    #2 0x94cddc in fz_new_icc_profile /src/mupdf/source/fitz/color-lcms.c:237:12
+    #3 0x538252 in fz_new_icc_colorspace /src/mupdf/source/fitz/colorspace.c:407:13
+    #4 0x686792 in bmp_read_color_profile /src/mupdf/source/fitz/load-bmp.c:818:9
+    #5 0x682404 in bmp_read_image /src/mupdf/source/fitz/load-bmp.c:1183:14
+    #6 0x68555f in fz_load_bmp_subimage /src/mupdf/source/fitz/load-bmp.c:1297:11
+    #7 0x90df56 in img_load_page /src/mupdf/source/cbz/muimg.c:137:13
+    #8 0x55c86b in fz_load_chapter_page /src/mupdf/source/fitz/document.c:657:10
+    #9 0x55c078 in fz_load_page /src/mupdf/source/fitz/document.c:519:11
+    #10 0x7adb5d in fz_new_pixmap_from_page_number_with_separations /src/mupdf/source/fitz/util.c:254:9
+    #11 0x7ada14 in fz_new_pixmap_from_page_number /src/mupdf/source/fitz/util.c:245:9
+    #12 0x535d49 in LLVMFuzzerTestOneInput /src/pdf_fuzzer.cc:146:13
+    #13 0x43ee93 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #14 0x42a5f2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #15 0x42fe9c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #16 0x4593d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7f29b0151082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: e678fe54a5d2c2092f8e47eb0b33105e380f7340)
+    #18 0x4207bd in _start (/out/pdf_fuzzer+0x4207bd)
+
+DEDUP_TOKEN: _cmsReadHeader--cmsOpenProfileFromMem--fz_new_icc_profile
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x137845c in _cmsReadUInt32Number /src/mupdf/thirdparty/lcms2/src/cmsplugin.c:164:23
+    #1 0x1357221 in _cmsReadHeader /src/mupdf/thirdparty/lcms2/src/cmsio0.c:836:14
+    #2 0x135cc63 in cmsOpenProfileFromMem /src/mupdf/thirdparty/lcms2/src/cmsio0.c:1279:10
+    #3 0x94cddc in fz_new_icc_profile /src/mupdf/source/fitz/color-lcms.c:237:12
+    #4 0x538252 in fz_new_icc_colorspace /src/mupdf/source/fitz/colorspace.c:407:13
+    #5 0x686792 in bmp_read_color_profile /src/mupdf/source/fitz/load-bmp.c:818:9
+    #6 0x682404 in bmp_read_image /src/mupdf/source/fitz/load-bmp.c:1183:14
+    #7 0x68555f in fz_load_bmp_subimage /src/mupdf/source/fitz/load-bmp.c:1297:11
+    #8 0x90df56 in img_load_page /src/mupdf/source/cbz/muimg.c:137:13
+    #9 0x55c86b in fz_load_chapter_page /src/mupdf/source/fitz/document.c:657:10
+    #10 0x55c078 in fz_load_page /src/mupdf/source/fitz/document.c:519:11
+    #11 0x7adb5d in fz_new_pixmap_from_page_number_with_separations /src/mupdf/source/fitz/util.c:254:9
+    #12 0x7ada14 in fz_new_pixmap_from_page_number /src/mupdf/source/fitz/util.c:245:9
+    #13 0x535d49 in LLVMFuzzerTestOneInput /src/pdf_fuzzer.cc:146:13
+    #14 0x43ee93 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #15 0x42a5f2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #16 0x42fe9c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #17 0x4593d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7f29b0151082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: e678fe54a5d2c2092f8e47eb0b33105e380f7340)
+
+DEDUP_TOKEN: _cmsReadUInt32Number--_cmsReadHeader--cmsOpenProfileFromMem
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x4dcf7f in __msan_memmove /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1589:3
+    #1 0x1353017 in MemoryRead /src/mupdf/thirdparty/lcms2/src/cmsio0.c:165:5
+    #2 0x1378355 in _cmsReadUInt32Number /src/mupdf/thirdparty/lcms2/src/cmsplugin.c:161:9
+    #3 0x1357221 in _cmsReadHeader /src/mupdf/thirdparty/lcms2/src/cmsio0.c:836:14
+    #4 0x135cc63 in cmsOpenProfileFromMem /src/mupdf/thirdparty/lcms2/src/cmsio0.c:1279:10
+    #5 0x94cddc in fz_new_icc_profile /src/mupdf/source/fitz/color-lcms.c:237:12
+    #6 0x538252 in fz_new_icc_colorspace /src/mupdf/source/fitz/colorspace.c:407:13
+    #7 0x686792 in bmp_read_color_profile /src/mupdf/source/fitz/load-bmp.c:818:9
+    #8 0x682404 in bmp_read_image /src/mupdf/source/fitz/load-bmp.c:1183:14
+    #9 0x68555f in fz_load_bmp_subimage /src/mupdf/source/fitz/load-bmp.c:1297:11
+    #10 0x90df56 in img_load_page /src/mupdf/source/cbz/muimg.c:137:13
+    #11 0x55c86b in fz_load_chapter_page /src/mupdf/source/fitz/document.c:657:10
+    #12 0x55c078 in fz_load_page /src/mupdf/source/fitz/document.c:519:11
+    #13 0x7adb5d in fz_new_pixmap_from_page_number_with_separations /src/mupdf/source/fitz/util.c:254:9
+    #14 0x7ada14 in fz_new_pixmap_from_page_number /src/mupdf/source/fitz/util.c:245:9
+    #15 0x535d49 in LLVMFuzzerTestOneInput /src/pdf_fuzzer.cc:146:13
+    #16 0x43ee93 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #17 0x42a5f2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #18 0x42fe9c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #19 0x4593d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+
+DEDUP_TOKEN: __msan_memmove--MemoryRead--_cmsReadUInt32Number
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x4dcf7f in __msan_memmove /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1589:3
+    #1 0x1352756 in cmsOpenIOhandlerFromMem /src/mupdf/thirdparty/lcms2/src/cmsio0.c:274:9
+    #2 0x135cbd2 in cmsOpenProfileFromMem /src/mupdf/thirdparty/lcms2/src/cmsio0.c:1276:26
+    #3 0x94cddc in fz_new_icc_profile /src/mupdf/source/fitz/color-lcms.c:237:12
+    #4 0x538252 in fz_new_icc_colorspace /src/mupdf/source/fitz/colorspace.c:407:13
+    #5 0x686792 in bmp_read_color_profile /src/mupdf/source/fitz/load-bmp.c:818:9
+    #6 0x682404 in bmp_read_image /src/mupdf/source/fitz/load-bmp.c:1183:14
+    #7 0x68555f in fz_load_bmp_subimage /src/mupdf/source/fitz/load-bmp.c:1297:11
+    #8 0x90df56 in img_load_page /src/mupdf/source/cbz/muimg.c:137:13
+    #9 0x55c86b in fz_load_chapter_page /src/mupdf/source/fitz/document.c:657:10
+    #10 0x55c078 in fz_load_page /src/mupdf/source/fitz/document.c:519:11
+    #11 0x7adb5d in fz_new_pixmap_from_page_number_with_separations /src/mupdf/source/fitz/util.c:254:9
+    #12 0x7ada14 in fz_new_pixmap_from_page_number /src/mupdf/source/fitz/util.c:245:9
+    #13 0x535d49 in LLVMFuzzerTestOneInput /src/pdf_fuzzer.cc:146:13
+    #14 0x43ee93 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #15 0x42a5f2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #16 0x42fe9c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #17 0x4593d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7f29b0151082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: e678fe54a5d2c2092f8e47eb0b33105e380f7340)
+
+DEDUP_TOKEN: __msan_memmove--cmsOpenIOhandlerFromMem--cmsOpenProfileFromMem
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x4dcc94 in __msan_memcpy /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1570:3
+    #1 0x923976 in fz_new_buffer_from_copied_data /src/mupdf/source/fitz/buffer.c:97:2
+    #2 0x6865a6 in bmp_read_color_profile /src/mupdf/source/fitz/load-bmp.c:815:13
+    #3 0x682404 in bmp_read_image /src/mupdf/source/fitz/load-bmp.c:1183:14
+    #4 0x68555f in fz_load_bmp_subimage /src/mupdf/source/fitz/load-bmp.c:1297:11
+    #5 0x90df56 in img_load_page /src/mupdf/source/cbz/muimg.c:137:13
+    #6 0x55c86b in fz_load_chapter_page /src/mupdf/source/fitz/document.c:657:10
+    #7 0x55c078 in fz_load_page /src/mupdf/source/fitz/document.c:519:11
+    #8 0x7adb5d in fz_new_pixmap_from_page_number_with_separations /src/mupdf/source/fitz/util.c:254:9
+    #9 0x7ada14 in fz_new_pixmap_from_page_number /src/mupdf/source/fitz/util.c:245:9
+    #10 0x535d49 in LLVMFuzzerTestOneInput /src/pdf_fuzzer.cc:146:13
+    #11 0x43ee93 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #12 0x42a5f2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #13 0x42fe9c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #14 0x4593d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0x7f29b0151082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: e678fe54a5d2c2092f8e47eb0b33105e380f7340)
+
+DEDUP_TOKEN: __msan_memcpy--fz_new_buffer_from_copied_data--bmp_read_color_profile
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x4e34b0 in __interceptor_malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:895:3
+    #1 0x5362a0 in fz_malloc_ossfuzz(void*, unsigned long) /src/pdf_fuzzer.cc:55:18
+    #2 0x6edbde in do_scavenging_malloc /src/mupdf/source/fitz/memory.c:51:7
+    #3 0x6ed505 in fz_malloc /src/mupdf/source/fitz/memory.c:89:6
+    #4 0x922fc4 in fz_new_buffer /src/mupdf/source/fitz/buffer.c:39:13
+    #5 0x787399 in fz_read_best /src/mupdf/source/fitz/stream-read.c:102:9
+    #6 0x786eb5 in fz_read_all /src/mupdf/source/fitz/stream-read.c:77:9
+    #7 0x90ce2f in img_open_document_with_stream /src/mupdf/source/cbz/muimg.c:192:17
+    #8 0x556c50 in fz_open_accelerated_document_with_stream /src/mupdf/source/fitz/document.c:223:9
+    #9 0x556c50 in fz_open_document_with_stream /src/mupdf/source/fitz/document.c:229:9
+    #10 0x535b2a in LLVMFuzzerTestOneInput /src/pdf_fuzzer.cc:143:11
+    #11 0x43ee93 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #12 0x42a5f2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #13 0x42fe9c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #14 0x4593d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0x7f29b0151082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: e678fe54a5d2c2092f8e47eb0b33105e380f7340)
+
+DEDUP_TOKEN: __interceptor_malloc--fz_malloc_ossfuzz(void*, unsigned long)--do_scavenging_malloc
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/mupdf/thirdparty/lcms2/src/cmsio0.c:839:27 in _cmsReadHeader
+Unique heap origins: 95
+Stack depot allocated bytes: 9764880
+Unique origin histories: 9
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42530718

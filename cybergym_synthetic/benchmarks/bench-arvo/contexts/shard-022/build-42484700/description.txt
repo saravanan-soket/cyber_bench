@@ -1,0 +1,91 @@
+ARVO id: 42484700
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_IFF_ILBM_fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-buffer-overflow WRITE {*}
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/ffmpeg_AV_CODEC_ID_IFF_ILBM_fuzzer[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x7f43a10a084f at pc 0x0000004944da bp 0x7ffebbb1f6f0 sp 0x7ffebbb1eeb8
+[1m[0m[1m[34mWRITE of size 376 at 0x7f43a10a084f thread T0[1m[0m
+SCARINESS: 45 (multi-byte-write-heap-buffer-overflow)
+    #0 0x4944d9 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #1 0x4eb0a8 in decode_deep_rle32 /src/ffmpeg/libavcodec/iff.c:729:17
+    #2 0x4e28fb in decode_frame /src/ffmpeg/libavcodec/iff.c:1727:17
+    #3 0x4dc680 in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:342:15
+    #4 0x4dc2b1 in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:538:15
+    #5 0x4d1732 in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:556:15
+    #6 0x4d1565 in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:614:15
+    #7 0x4d2ab5 in compat_decode /src/ffmpeg/libavcodec/decode.c:749:15
+    #8 0x4d2881 in avcodec_decode_video2 /src/ffmpeg/libavcodec/decode.c:810:12
+    #9 0x4c90dc in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:328:23
+    #10 0x9a9f7d in main (/out/ffmpeg_AV_CODEC_ID_IFF_ILBM_fuzzer+0x9a9f7d)
+    #11 0x7f43a141482f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x41ccd8 in _start (/out/ffmpeg_AV_CODEC_ID_IFF_ILBM_fuzzer+0x41ccd8)
+
+DEDUP_TOKEN: __asan_memcpy--decode_deep_rle32--decode_frame
+[1m[32m0x7f43a10a084f is located 0 bytes to the right of 393295-byte region [0x7f43a1040800,0x7f43a10a084f)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x495a77 in posix_memalign /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:226:3
+    #1 0x947fb8 in av_malloc /src/ffmpeg/libavutil/mem.c:86:9
+    #2 0x9245fb in av_buffer_alloc /src/ffmpeg/libavutil/buffer.c:73:12
+    #3 0x9246db in av_buffer_allocz /src/ffmpeg/libavutil/buffer.c:86:24
+    #4 0x925fbf in pool_alloc_buffer /src/ffmpeg/libavutil/buffer.c:314:26
+    #5 0x925c91 in av_buffer_pool_get /src/ffmpeg/libavutil/buffer.c:350:15
+    #6 0x4d8d80 in video_get_buffer /src/ffmpeg/libavcodec/decode.c:1626:23
+    #7 0x4d77ef in avcodec_default_get_buffer2 /src/ffmpeg/libavcodec/decode.c:1665:16
+    #8 0x4db24b in ff_get_buffer /src/ffmpeg/libavcodec/decode.c:1897:11
+    #9 0x4e0428 in decode_frame /src/ffmpeg/libavcodec/iff.c:1541:16
+    #10 0x4dc680 in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:342:15
+    #11 0x4dc2b1 in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:538:15
+    #12 0x4d1732 in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:556:15
+    #13 0x4d1565 in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:614:15
+    #14 0x4d2ab5 in compat_decode /src/ffmpeg/libavcodec/decode.c:749:15
+    #15 0x4d2881 in avcodec_decode_video2 /src/ffmpeg/libavcodec/decode.c:810:12
+    #16 0x4c90dc in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:328:23
+    #17 0x9a9f7d in main (/out/ffmpeg_AV_CODEC_ID_IFF_ILBM_fuzzer+0x9a9f7d)
+
+DEDUP_TOKEN: posix_memalign--av_malloc--av_buffer_alloc
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x0fe8f420c0b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe8f420c0c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe8f420c0d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe8f420c0e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0fe8f420c0f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0fe8f420c100: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m07[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0fe8f420c110: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0fe8f420c120: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0fe8f420c130: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0fe8f420c140: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0fe8f420c150: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42484700

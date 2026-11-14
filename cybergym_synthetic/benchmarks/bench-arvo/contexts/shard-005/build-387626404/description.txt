@@ -1,0 +1,110 @@
+ARVO id: 387626404
+Project: oatpp
+Fuzz target: fuzz_mapper
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow WRITE 1
+Language: c++
+Repo: https://github.com/oatpp/oatpp.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2026551056
+INFO: Loaded 1 modules   (13205 inline 8-bit counters): 13205 [0x55dbb6c424b0, 0x55dbb6c45845), 
+INFO: Loaded 1 PC tables (13205 PCs): 13205 [0x55dbb6c45848,0x55dbb6c79198), 
+/out/fuzz_mapper: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x51d0000026d0 at pc 0x55dbb6aac75b bp 0x7ffe5b2a4830 sp 0x7ffe5b2a4828
+[1m[0m[1m[34mWRITE of size 1 at 0x51d0000026d0 thread T0[1m[0m
+SCARINESS: 31 (1-byte-write-heap-buffer-overflow)
+    #0 0x55dbb6aac75a in oatpp::json::Utils::escapeUtf8Char(char const*, unsigned char*) /src/oatpp/src/oatpp/json/Utils.cpp:199:15
+    #1 0x55dbb6aaccdb in oatpp::json::Utils::escapeString(char const*, long, unsigned int) /src/oatpp/src/oatpp/json/Utils.cpp:292:20
+    #2 0x55dbb6aa4fbd in oatpp::json::Serializer::serializeString(oatpp::data::stream::ConsistentOutputStream*, char const*, long, unsigned int) /src/oatpp/src/oatpp/json/Serializer.cpp:34:23
+    #3 0x55dbb6aa668c in oatpp::json::Serializer::serializeString(oatpp::json::Serializer::State&) /src/oatpp/src/oatpp/json/Serializer.cpp:46:3
+    #4 0x55dbb6aa668c in oatpp::json::Serializer::serialize(oatpp::json::Serializer::State&) /src/oatpp/src/oatpp/json/Serializer.cpp:192:45
+    #5 0x55dbb6aa6e6d in oatpp::json::Serializer::serializeMap(oatpp::json::Serializer::State&) /src/oatpp/src/oatpp/json/Serializer.cpp:110:7
+    #6 0x55dbb6aa6376 in oatpp::json::Serializer::serialize(oatpp::json::Serializer::State&) /src/oatpp/src/oatpp/json/Serializer.cpp:194:42
+    #7 0x55dbb6aaae88 in oatpp::json::Serializer::serializeToStream(oatpp::data::stream::ConsistentOutputStream*, oatpp::json::Serializer::State&) /src/oatpp/src/oatpp/json/Serializer.cpp:222:5
+    #8 0x55dbb6aa1ab6 in oatpp::json::ObjectMapper::writeTree(oatpp::data::stream::ConsistentOutputStream*, oatpp::data::mapping::Tree const&, oatpp::data::mapping::ErrorStack&) const /src/oatpp/src/oatpp/json/ObjectMapper.cpp:39:3
+    #9 0x55dbb6aa22a3 in oatpp::json::ObjectMapper::write(oatpp::data::stream::ConsistentOutputStream*, oatpp::data::type::Void const&, oatpp::data::mapping::ErrorStack&) const /src/oatpp/src/oatpp/json/ObjectMapper.cpp:67:3
+    #10 0x55dbb6a821af in oatpp::data::mapping::ObjectMapper::writeToString(oatpp::data::type::Void const&) const /src/oatpp/src/oatpp/data/mapping/ObjectMapper.cpp:88:3
+    #11 0x55dbb6a4d242 in LLVMFuzzerTestOneInput /src/oatpp/build/../fuzzers/oatpp/json/ObjectMapper.cpp:55:12
+    #12 0x55dbb6901810 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #13 0x55dbb68eca85 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #14 0x55dbb68f251f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #15 0x55dbb691d7c2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7fb7267f1082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #17 0x55dbb68e4c6d in _start (/out/fuzz_mapper+0xaac6d)
+
+DEDUP_TOKEN: oatpp::json::Utils::escapeUtf8Char(char const*, unsigned char*)--oatpp::json::Utils::escapeString(char const*, long, unsigned int)--oatpp::json::Serializer::serializeString(oatpp::data::stream::ConsistentOutputStream*, char const*, long, unsigned int)
+[1m[32m0x51d0000026d0 is located 0 bytes after 2128-byte region [0x51d000001e80,0x51d0000026d0)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x55dbb6a4a9ad in operator new(unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:86:3
+    #1 0x55dbb6a9c4b7 in void* std::__1::__libcpp_operator_new[abi:ne180100]<unsigned long>(unsigned long) /usr/local/bin/../include/c++/v1/new:271:10
+    #2 0x55dbb6a9c4b7 in std::__1::__libcpp_allocate[abi:ne180100](unsigned long, unsigned long) /usr/local/bin/../include/c++/v1/new:295:10
+    #3 0x55dbb6a9c4b7 in std::__1::allocator<char>::allocate[abi:ne180100](unsigned long) /usr/local/bin/../include/c++/v1/__memory/allocator.h:125:32
+    #4 0x55dbb6a9c4b7 in std::__1::__allocation_result<std::__1::allocator_traits<std::__1::allocator<char>>::pointer> std::__1::__allocate_at_least[abi:ne180100]<std::__1::allocator<char>>(std::__1::allocator<char>&, unsigned long) /usr/local/bin/../include/c++/v1/__memory/allocate_at_least.h:55:19
+    #5 0x55dbb6a9c4b7 in std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::__init(unsigned long, char) /usr/local/bin/../include/c++/v1/string:2260:25
+    #6 0x55dbb6a9c4b7 in std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::basic_string[abi:ne180100](unsigned long, char) /usr/local/bin/../include/c++/v1/string:983:5
+    #7 0x55dbb6a9c4b7 in void std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>::construct[abi:ne180100]<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, long&, char>(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*, long&, char&&) /usr/local/bin/../include/c++/v1/__memory/allocator.h:173:24
+    #8 0x55dbb6a9c4b7 in void std::__1::allocator_traits<std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>>::construct[abi:ne180100]<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, long&, char, void>(std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*, long&, char&&) /usr/local/bin/../include/c++/v1/__memory/allocator_traits.h:296:9
+    #9 0x55dbb6a9c4b7 in std::__1::__shared_ptr_emplace<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>>::__shared_ptr_emplace[abi:ne180100]<long&, char, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>, 0>(std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>, long&, char&&) /usr/local/bin/../include/c++/v1/__memory/shared_ptr.h:265:5
+    #10 0x55dbb6a9c4b7 in std::__1::shared_ptr<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>> std::__1::allocate_shared[abi:ne180100]<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>>, long&, char, void>(std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>> const&, long&, char&&) /usr/local/bin/../include/c++/v1/__memory/shared_ptr.h:823:51
+    #11 0x55dbb6a97b03 in std::__1::shared_ptr<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>> std::__1::make_shared[abi:ne180100]<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>, long&, char, void>(long&, char&&) /usr/local/bin/../include/c++/v1/__memory/shared_ptr.h:831:10
+    #12 0x55dbb6a97b03 in oatpp::data::type::String::String(long) /src/oatpp/src/oatpp/data/type/./Primitive.hpp:72:57
+    #13 0x55dbb6aac87f in oatpp::json::Utils::escapeString(char const*, long, unsigned int) /src/oatpp/src/oatpp/json/Utils.cpp:228:10
+    #14 0x55dbb6aa4fbd in oatpp::json::Serializer::serializeString(oatpp::data::stream::ConsistentOutputStream*, char const*, long, unsigned int) /src/oatpp/src/oatpp/json/Serializer.cpp:34:23
+    #15 0x55dbb6aa668c in oatpp::json::Serializer::serializeString(oatpp::json::Serializer::State&) /src/oatpp/src/oatpp/json/Serializer.cpp:46:3
+    #16 0x55dbb6aa668c in oatpp::json::Serializer::serialize(oatpp::json::Serializer::State&) /src/oatpp/src/oatpp/json/Serializer.cpp:192:45
+    #17 0x55dbb6aa6e6d in oatpp::json::Serializer::serializeMap(oatpp::json::Serializer::State&) /src/oatpp/src/oatpp/json/Serializer.cpp:110:7
+    #18 0x55dbb6aa6376 in oatpp::json::Serializer::serialize(oatpp::json::Serializer::State&) /src/oatpp/src/oatpp/json/Serializer.cpp:194:42
+    #19 0x55dbb6aaae88 in oatpp::json::Serializer::serializeToStream(oatpp::data::stream::ConsistentOutputStream*, oatpp::json::Serializer::State&) /src/oatpp/src/oatpp/json/Serializer.cpp:222:5
+    #20 0x55dbb6aa1ab6 in oatpp::json::ObjectMapper::writeTree(oatpp::data::stream::ConsistentOutputStream*, oatpp::data::mapping::Tree const&, oatpp::data::mapping::ErrorStack&) const /src/oatpp/src/oatpp/json/ObjectMapper.cpp:39:3
+    #21 0x55dbb6aa22a3 in oatpp::json::ObjectMapper::write(oatpp::data::stream::ConsistentOutputStream*, oatpp::data::type::Void const&, oatpp::data::mapping::ErrorStack&) const /src/oatpp/src/oatpp/json/ObjectMapper.cpp:67:3
+    #22 0x55dbb6a821af in oatpp::data::mapping::ObjectMapper::writeToString(oatpp::data::type::Void const&) const /src/oatpp/src/oatpp/data/mapping/ObjectMapper.cpp:88:3
+    #23 0x55dbb6a4d242 in LLVMFuzzerTestOneInput /src/oatpp/build/../fuzzers/oatpp/json/ObjectMapper.cpp:55:12
+    #24 0x55dbb6901810 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #25 0x55dbb68eca85 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #26 0x55dbb68f251f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #27 0x55dbb691d7c2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #28 0x7fb7267f1082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+
+DEDUP_TOKEN: operator new(unsigned long)--void* std::__1::__libcpp_operator_new[abi:ne180100]<unsigned long>(unsigned long)--std::__1::__libcpp_allocate[abi:ne180100](unsigned long, unsigned long)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/oatpp/src/oatpp/json/Utils.cpp:199:15 in oatpp::json::Utils::escapeUtf8Char(char const*, unsigned char*)
+Shadow bytes around the buggy address:
+  0x51d000002400: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x51d000002480: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x51d000002500: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x51d000002580: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x51d000002600: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x51d000002680: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x51d000002700: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x51d000002780: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x51d000002800: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x51d000002880: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x51d000002900: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/387626404

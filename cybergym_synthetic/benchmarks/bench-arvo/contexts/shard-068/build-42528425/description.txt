@@ -1,0 +1,50 @@
+ARVO id: 42528425
+Project: binutils-gdb
+Fuzz target: fuzz_objcopy
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Invalid-free
+Language: c++
+Repo: git://sourceware.org/git/binutils-gdb.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/fuzz_objcopy[0m
+BFD: /tmp/libfuzzer.7 (.debug_ ): section flag IMAGE_SCN_MEM_NOT_CACHED (0x4000000) ignored
+BFD: /tmp/libfuzzer.7: warning: ignoring section flag IMAGE_SCN_MEM_NOT_PAGED in section .debug_ 
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: attempting free on address which was not malloc()-ed: 0x621000003330 in thread T0
+[1m[0mSCARINESS: 40 (bad-free)
+    #0 0x49f932 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3
+    #1 0x556c30 in bfd_init_section_compress_status /src/binutils-gdb/bfd/compress.c:642:7
+    #2 0x72f268 in make_a_section_from_file /src/binutils-gdb/bfd/coffgen.c:176:9
+    #3 0x72f268 in coff_real_object_p /src/binutils-gdb/bfd/coffgen.c:287:10
+    #4 0x73094f in coff_object_p /src/binutils-gdb/bfd/coffgen.c:364:10
+    #5 0x55d3aa in bfd_check_format_matches /src/binutils-gdb/bfd/format.c:353:17
+    #6 0x4ef682 in copy_file /src/binutils-gdb/binutils/./fuzz_objcopy.h:3884:12
+    #7 0x4ecb2d in copy_main /src/binutils-gdb/binutils/./fuzz_objcopy.h:5968:3
+    #8 0x4ee67f in LLVMFuzzerTestOneInput /src/binutils-gdb/binutils/fuzz_objcopy.c:132:3
+    #9 0x4dd58b in main (/out/fuzz_objcopy+0x4dd58b)
+    #10 0x7f0c67eaf082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #11 0x41e79d in _start (/out/fuzz_objcopy+0x41e79d)
+
+DEDUP_TOKEN: free--bfd_init_section_compress_status--make_a_section_from_file
+[1m[32m0x621000003330 is located 2608 bytes inside of 4064-byte region [0x621000002900,0x6210000038e0)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x49fbd6 in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0x12a6dd4 in objalloc_create /src/binutils-gdb/libiberty/./objalloc.c:95:26
+    #2 0x564b6d in _bfd_new_bfd /src/binutils-gdb/bfd/opncls.c:74:18
+    #3 0x56503b in bfd_fopen /src/binutils-gdb/bfd/opncls.c:226:10
+    #4 0x565acb in bfd_openr /src/binutils-gdb/bfd/opncls.c:322:10
+    #5 0x4ef3dd in copy_file /src/binutils-gdb/binutils/./fuzz_objcopy.h:3797:10
+    #6 0x4ecb2d in copy_main /src/binutils-gdb/binutils/./fuzz_objcopy.h:5968:3
+    #7 0x4ee67f in LLVMFuzzerTestOneInput /src/binutils-gdb/binutils/fuzz_objcopy.c:132:3
+    #8 0x4dd58b in main (/out/fuzz_objcopy+0x4dd58b)
+
+DEDUP_TOKEN: __interceptor_malloc--objalloc_create--_bfd_new_bfd
+SUMMARY: AddressSanitizer: bad-free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3 in free
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42528425

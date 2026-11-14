@@ -1,0 +1,64 @@
+ARVO id: 42476582
+Project: wireshark
+Fuzz target: fuzzshark_ip_proto-udp
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/wireshark/wireshark.git
+
+=== Crash report ===
+oss-fuzzshark: disabling: ip
+oss-fuzzshark: disabling: udplite
+oss-fuzzshark: disabling: ospf
+oss-fuzzshark: disabling: bgp
+oss-fuzzshark: disabling: dhcp
+oss-fuzzshark: disabling: json
+oss-fuzzshark: disabling: snort
+oss-fuzzshark: configured for dissector: udp in table: ip.proto
+INFO: Seed: 2617823233
+INFO: Loaded 1 modules   (418970 inline 8-bit counters): 418970 [0x4b2bad0, 0x4b91f6a), 
+INFO: Loaded 1 PC tables (418970 PCs): 418970 [0x4b91f70,0x51f6910), 
+/out/fuzzshark_ip_proto-udp: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x000006ff2030 (pc 0x0000005d2b58 bp 0x7fffffffd110 sp 0x7fffffffd0e0 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x5d2b57 in tvb_ensure_bytes_exist /src/wireshark/epan/tvbuff.c:594:2
+    #1 0x58cc19 in proto_tree_add_text_valist_internal /src/wireshark/epan/proto.c:1344:3
+    #2 0x58d0dd in proto_tree_add_subtree_format /src/wireshark/epan/proto.c:1378:7
+    #3 0x58d041 in proto_tree_add_subtree /src/wireshark/epan/proto.c:1365:9
+    #4 0x121cda9 in quic_add_connection_info /src/wireshark/epan/dissectors/packet-quic.c:1754:13
+    #5 0x121cda9 in dissect_quic /src/wireshark/epan/dissectors/packet-quic.c:2233
+    #6 0x121f867 in dissect_quic_heur /src/wireshark/epan/dissectors/packet-quic.c:2348:9
+    #7 0x56794f in dissector_try_heuristic /src/wireshark/epan/packet.c:2775:9
+    #8 0x1502af6 in decode_udp_ports /src/wireshark/epan/dissectors/packet-udp.c:697:9
+    #9 0x1505369 in dissect /src/wireshark/epan/dissectors/packet-udp.c:1222:5
+    #10 0x150384d in dissect_udp /src/wireshark/epan/dissectors/packet-udp.c:1228:3
+    #11 0x564489 in call_dissector_through_handle /src/wireshark/epan/packet.c:706:9
+    #12 0x564489 in call_dissector_work /src/wireshark/epan/packet.c:799
+    #13 0x569223 in call_dissector_only /src/wireshark/epan/packet.c:3174:8
+    #14 0x569223 in call_all_postdissectors /src/wireshark/epan/packet.c:3549
+    #15 0xc00510 in dissect_frame /src/wireshark/epan/dissectors/packet-frame.c:730:5
+    #16 0x564489 in call_dissector_through_handle /src/wireshark/epan/packet.c:706:9
+    #17 0x564489 in call_dissector_work /src/wireshark/epan/packet.c:799
+    #18 0x5627b7 in call_dissector_only /src/wireshark/epan/packet.c:3174:8
+    #19 0x5627b7 in call_dissector_with_data /src/wireshark/epan/packet.c:3187
+    #20 0x5625c7 in dissect_record /src/wireshark/epan/packet.c:580:3
+    #21 0x55cb13 in epan_dissect_run /src/wireshark/epan/epan.c:554:2
+    #22 0x4cffac in LLVMFuzzerTestOneInput /src/wireshark/fuzz/fuzzshark.c:343:2
+    #23 0x45fc81 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:553:15
+    #24 0x44a5c1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #25 0x45014e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:775:9
+    #26 0x4796f2 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #27 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #28 0x40a2f8 in _start (/out/fuzzshark_ip_proto-udp+0x40a2f8)
+
+DEDUP_TOKEN: tvb_ensure_bytes_exist--proto_tree_add_text_valist_internal--proto_tree_add_subtree_format
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/wireshark/epan/tvbuff.c:594:2 in tvb_ensure_bytes_exist
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42476582

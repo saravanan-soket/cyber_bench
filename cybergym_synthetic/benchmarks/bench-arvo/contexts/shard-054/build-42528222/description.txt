@@ -1,0 +1,89 @@
+ARVO id: 42528222
+Project: imagemagick
+Fuzz target: encoder_label_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 3816832729
+INFO: Loaded 1 modules   (52676 inline 8-bit counters): 52676 [0x16e0f38, 0x16edcfc), 
+INFO: Loaded 1 PC tables (52676 PCs): 52676 [0x1344820,0x1412460), 
+/out/encoder_label_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0xa95749 in GetMagickPropertyLetter /src/imagemagick/MagickCore/property.c:2523:33
+    #1 0xa97a7e in InterpretImageProperties /src/imagemagick/MagickCore/property.c:3500:16
+    #2 0xdcc850 in ReadLABELImage /src/imagemagick/coders/label.c:127:12
+    #3 0x7ab3c0 in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #4 0x57f47b in Magick::Image::read(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4081:12
+    #5 0x49e92f in fuzzEncoderWithStringFilename(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, unsigned char const*, unsigned long) /src/imagemagick/Magick++/fuzz/encoder_utils.cc:10:11
+    #6 0x49e515 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_label_fuzzer.cc:10:10
+    #7 0x4e5696 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #8 0x4a00c1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #9 0x4b4316 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #10 0x49f201 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x420138 in _start (/out/encoder_label_fuzzer+0x420138)
+
+DEDUP_TOKEN: GetMagickPropertyLetter--InterpretImageProperties--ReadLABELImage
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x94e8f1 in AcquireImage /src/imagemagick/MagickCore/image.c:244:11
+    #1 0xdcc7a1 in ReadLABELImage /src/imagemagick/coders/label.c:125:9
+    #2 0x7ab3c0 in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #3 0x57f47b in Magick::Image::read(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4081:12
+    #4 0x49e92f in fuzzEncoderWithStringFilename(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, unsigned char const*, unsigned long) /src/imagemagick/Magick++/fuzz/encoder_utils.cc:10:11
+    #5 0x49e515 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_label_fuzzer.cc:10:10
+    #6 0x4e5696 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #7 0x4a00c1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #8 0x4b4316 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #9 0x49f201 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #10 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: AcquireImage--ReadLABELImage--ReadImage
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x45153d in __msan_memcpy.part.49 /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:1520
+    #1 0x94d7fc in AcquireImage /src/imagemagick/MagickCore/image.c:243:31
+    #2 0xdcc7a1 in ReadLABELImage /src/imagemagick/coders/label.c:125:9
+    #3 0x7ab3c0 in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #4 0x57f47b in Magick::Image::read(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4081:12
+    #5 0x49e92f in fuzzEncoderWithStringFilename(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, unsigned char const*, unsigned long) /src/imagemagick/Magick++/fuzz/encoder_utils.cc:10:11
+    #6 0x49e515 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_label_fuzzer.cc:10:10
+    #7 0x4e5696 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #8 0x4a00c1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #9 0x4b4316 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #10 0x49f201 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: __msan_memcpy.part.49--AcquireImage--ReadLABELImage
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x923b58 in GetGeometry /src/imagemagick/MagickCore/geometry.c:320:15
+    #1 0x94d77e in AcquireImage /src/imagemagick/MagickCore/image.c:240:13
+    #2 0xdcc7a1 in ReadLABELImage /src/imagemagick/coders/label.c:125:9
+    #3 0x7ab3c0 in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #4 0x57f47b in Magick::Image::read(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4081:12
+    #5 0x49e92f in fuzzEncoderWithStringFilename(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, unsigned char const*, unsigned long) /src/imagemagick/Magick++/fuzz/encoder_utils.cc:10:11
+    #6 0x49e515 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_label_fuzzer.cc:10:10
+    #7 0x4e5696 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #8 0x4a00c1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #9 0x4b4316 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #10 0x49f201 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: GetGeometry--AcquireImage--ReadLABELImage
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mgeometry[1m[35m' in the stack frame of function '[1m[32mAcquireImage[1m[35m'[1m[0m
+    #0 0x94cb70 in AcquireImage /src/imagemagick/MagickCore/image.c:156
+
+DEDUP_TOKEN: AcquireImage
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/imagemagick/MagickCore/property.c:2523:33 in GetMagickPropertyLetter
+Unique heap origins: 434
+Stack depot allocated bytes: 60064
+Unique origin histories: 12
+History depot allocated bytes: 288
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42528222

@@ -1,0 +1,65 @@
+ARVO id: 42484854
+Project: libraw
+Fuzz target: libraw_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/libraw/libraw
+
+=== Crash report ===
+INFO: Seed: 4167159917
+INFO: Loaded 1 modules   (17393 inline 8-bit counters): 17393 [0xc7f140, 0xc83531), 
+INFO: Loaded 1 PC tables (17393 PCs): 17393 [0x982fe0,0x9c6ef0), 
+/out/libraw_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==8==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x7baf04 in LibRaw::PentaxLensInfo(unsigned long long, unsigned int) /src/libraw/src/metadata/pentax.cpp:185:34
+    #1 0x7bd2e8 in LibRaw::parsePentaxMakernotes(int, unsigned int, unsigned int, unsigned int, unsigned int) /src/libraw/src/metadata/pentax.cpp:396:7
+    #2 0x79f3d0 in LibRaw::parse_makernote(int, int) /src/libraw/src/metadata/makernotes.cpp:647:9
+    #3 0x754fb1 in LibRaw::parse_exif(int) /src/libraw/src/metadata/exif_gps.cpp:284:7
+    #4 0x70feee in LibRaw::parse_tiff_ifd(int) /src/libraw/src/metadata/tiff.cpp:741:7
+    #5 0x725c38 in LibRaw::parse_tiff(int) /src/libraw/src/metadata/tiff.cpp:1489:9
+    #6 0x69b77c in LibRaw::identify() /src/libraw/src/metadata/identify.cpp:494:14
+    #7 0x550e89 in LibRaw::open_datastream(LibRaw_abstract_datastream*) /src/libraw/src/utils/open.cpp:390:4
+    #8 0x54f472 in LibRaw::open_buffer(void*, unsigned long) /src/libraw/src/utils/open.cpp:153:13
+    #9 0x522811 in LLVMFuzzerTestOneInput /src/libraw_fuzzer.cc:41:24
+    #10 0x45ab11 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #11 0x446292 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #12 0x44c2ee in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #13 0x473c62 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #14 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #15 0x420928 in _start (/out/libraw_fuzzer+0x420928)
+
+DEDUP_TOKEN: LibRaw::PentaxLensInfo(unsigned long long, unsigned int)--LibRaw::parsePentaxMakernotes(int, unsigned int, unsigned int, unsigned int, unsigned int)--LibRaw::parse_makernote(int, int)
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x4d33cd in malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:901:3
+    #1 0x56644e in libraw_memmgr::malloc(unsigned long) /src/libraw/./libraw/libraw_alloc.h:49:17
+    #2 0x564eff in LibRaw::malloc(unsigned long) /src/libraw/src/utils/utils_libraw.cpp:245:20
+    #3 0x7b9832 in LibRaw::PentaxLensInfo(unsigned long long, unsigned int) /src/libraw/src/metadata/pentax.cpp:137:24
+    #4 0x7bd2e8 in LibRaw::parsePentaxMakernotes(int, unsigned int, unsigned int, unsigned int, unsigned int) /src/libraw/src/metadata/pentax.cpp:396:7
+    #5 0x79f3d0 in LibRaw::parse_makernote(int, int) /src/libraw/src/metadata/makernotes.cpp:647:9
+    #6 0x754fb1 in LibRaw::parse_exif(int) /src/libraw/src/metadata/exif_gps.cpp:284:7
+    #7 0x70feee in LibRaw::parse_tiff_ifd(int) /src/libraw/src/metadata/tiff.cpp:741:7
+    #8 0x725c38 in LibRaw::parse_tiff(int) /src/libraw/src/metadata/tiff.cpp:1489:9
+    #9 0x69b77c in LibRaw::identify() /src/libraw/src/metadata/identify.cpp:494:14
+    #10 0x550e89 in LibRaw::open_datastream(LibRaw_abstract_datastream*) /src/libraw/src/utils/open.cpp:390:4
+    #11 0x54f472 in LibRaw::open_buffer(void*, unsigned long) /src/libraw/src/utils/open.cpp:153:13
+    #12 0x522811 in LLVMFuzzerTestOneInput /src/libraw_fuzzer.cc:41:24
+    #13 0x45ab11 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #14 0x446292 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #15 0x44c2ee in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #16 0x473c62 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #17 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: malloc--libraw_memmgr::malloc(unsigned long)--LibRaw::malloc(unsigned long)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/libraw/src/metadata/pentax.cpp:185:34 in LibRaw::PentaxLensInfo(unsigned long long, unsigned int)
+Unique heap origins: 25
+Stack depot allocated bytes: 1768
+Unique origin histories: 3
+History depot allocated bytes: 72
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42484854

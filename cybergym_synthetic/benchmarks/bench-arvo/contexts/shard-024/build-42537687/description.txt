@@ -1,0 +1,131 @@
+ARVO id: 42537687
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_HEVC_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2392118125
+INFO: Loaded 1 modules   (74168 inline 8-bit counters): 74168 [0x55555631afd8, 0x55555632d190), 
+INFO: Loaded 1 PC tables (74168 PCs): 74168 [0x55555632d190,0x55555644ed10), 
+/out/ffmpeg_AV_CODEC_ID_HEVC_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x555555dd562a in av_clip_uintp2_c /src/ffmpeg/./libavutil/common.h:282:9
+    #1 0x555555dd562a in put_hevc_pel_bi_pixels_9 /src/ffmpeg/libavcodec/hevc/dsp_template.c:368:22
+    #2 0x5555559083cc in luma_mc_bi /src/ffmpeg/libavcodec/hevc/hevcdec.c:1632:9
+    #3 0x5555559083cc in hls_prediction_unit /src/ffmpeg/libavcodec/hevc/hevcdec.c:1993:9
+    #4 0x555555900bf9 in hls_coding_unit /src/ffmpeg/libavcodec/hevc/hevcdec.c
+    #5 0x555555900bf9 in hls_coding_quadtree /src/ffmpeg/libavcodec/hevc/hevcdec.c:2454:15
+    #6 0x5555558edad8 in hls_decode_entry /src/ffmpeg/libavcodec/hevc/hevcdec.c:2557:21
+    #7 0x5555558edad8 in decode_slice_data /src/ffmpeg/libavcodec/hevc/hevcdec.c:2814:12
+    #8 0x5555558edad8 in decode_slice /src/ffmpeg/libavcodec/hevc/hevcdec.c:3194:11
+    #9 0x5555558edad8 in decode_nal_unit /src/ffmpeg/libavcodec/hevc/hevcdec.c:3260:15
+    #10 0x5555558edad8 in decode_nal_units /src/ffmpeg/libavcodec/hevc/hevcdec.c:3361:15
+    #11 0x5555558db253 in hevc_decode_frame /src/ffmpeg/libavcodec/hevc/hevcdec.c:3442:14
+    #12 0x5555558bd89b in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:429:20
+    #13 0x5555558bd89b in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:600:15
+    #14 0x5555558bd89b in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:631:15
+    #15 0x5555558bce03 in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:721:15
+    #16 0x5555558aa8dc in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:534:25
+    #17 0x5555557a4040 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #18 0x55555578e7d4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #19 0x55555579426a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #20 0x5555557c0662 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #21 0x7ffff7c38082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #22 0x5555557852ad in _start (/out/ffmpeg_AV_CODEC_ID_HEVC_fuzzer+0x2312ad)
+
+DEDUP_TOKEN: av_clip_uintp2_c--put_hevc_pel_bi_pixels_9--luma_mc_bi
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x555555dd05f1 in put_luma_v_9 /src/ffmpeg/./libavcodec/h26x/h2656_inter_template.c:121:20
+    #1 0x555555dd05f1 in put_hevc_qpel_v_9 /src/ffmpeg/libavcodec/hevc/dsp_template.c:343:1
+    #2 0x555555907e9b in luma_mc_bi /src/ffmpeg/libavcodec/hevc/hevcdec.c:1629:5
+    #3 0x555555907e9b in hls_prediction_unit /src/ffmpeg/libavcodec/hevc/hevcdec.c:1993:9
+    #4 0x555555900bf9 in hls_coding_unit /src/ffmpeg/libavcodec/hevc/hevcdec.c
+    #5 0x555555900bf9 in hls_coding_quadtree /src/ffmpeg/libavcodec/hevc/hevcdec.c:2454:15
+    #6 0x5555558edad8 in hls_decode_entry /src/ffmpeg/libavcodec/hevc/hevcdec.c:2557:21
+    #7 0x5555558edad8 in decode_slice_data /src/ffmpeg/libavcodec/hevc/hevcdec.c:2814:12
+    #8 0x5555558edad8 in decode_slice /src/ffmpeg/libavcodec/hevc/hevcdec.c:3194:11
+    #9 0x5555558edad8 in decode_nal_unit /src/ffmpeg/libavcodec/hevc/hevcdec.c:3260:15
+    #10 0x5555558edad8 in decode_nal_units /src/ffmpeg/libavcodec/hevc/hevcdec.c:3361:15
+    #11 0x5555558db253 in hevc_decode_frame /src/ffmpeg/libavcodec/hevc/hevcdec.c:3442:14
+    #12 0x5555558bd89b in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:429:20
+    #13 0x5555558bd89b in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:600:15
+    #14 0x5555558bd89b in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:631:15
+    #15 0x5555558bce03 in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:721:15
+    #16 0x5555558aa8dc in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:534:25
+    #17 0x5555557a4040 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #18 0x55555578e7d4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #19 0x55555579426a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #20 0x5555557c0662 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #21 0x7ffff7c38082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+
+DEDUP_TOKEN: put_luma_v_9--put_hevc_qpel_v_9--luma_mc_bi
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x55555584684a in __msan_memcpy /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1733:3
+    #1 0x555555a57a5e in ff_emulated_edge_mc_16 /src/ffmpeg/libavcodec/videodsp_template.c:78:9
+    #2 0x5555559077c5 in luma_mc_bi /src/ffmpeg/libavcodec/hevc/hevcdec.c:1602:9
+    #3 0x5555559077c5 in hls_prediction_unit /src/ffmpeg/libavcodec/hevc/hevcdec.c:1993:9
+    #4 0x555555900bf9 in hls_coding_unit /src/ffmpeg/libavcodec/hevc/hevcdec.c
+    #5 0x555555900bf9 in hls_coding_quadtree /src/ffmpeg/libavcodec/hevc/hevcdec.c:2454:15
+    #6 0x5555558edad8 in hls_decode_entry /src/ffmpeg/libavcodec/hevc/hevcdec.c:2557:21
+    #7 0x5555558edad8 in decode_slice_data /src/ffmpeg/libavcodec/hevc/hevcdec.c:2814:12
+    #8 0x5555558edad8 in decode_slice /src/ffmpeg/libavcodec/hevc/hevcdec.c:3194:11
+    #9 0x5555558edad8 in decode_nal_unit /src/ffmpeg/libavcodec/hevc/hevcdec.c:3260:15
+    #10 0x5555558edad8 in decode_nal_units /src/ffmpeg/libavcodec/hevc/hevcdec.c:3361:15
+    #11 0x5555558db253 in hevc_decode_frame /src/ffmpeg/libavcodec/hevc/hevcdec.c:3442:14
+    #12 0x5555558bd89b in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:429:20
+    #13 0x5555558bd89b in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:600:15
+    #14 0x5555558bd89b in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:631:15
+    #15 0x5555558bce03 in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:721:15
+    #16 0x5555558aa8dc in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:534:25
+    #17 0x5555557a4040 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #18 0x55555578e7d4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #19 0x55555579426a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #20 0x5555557c0662 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #21 0x7ffff7c38082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+
+DEDUP_TOKEN: __msan_memcpy--ff_emulated_edge_mc_16--luma_mc_bi
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x555555846c23 in posix_memalign /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:162:3
+    #1 0x5555561c0b48 in av_malloc /src/ffmpeg/libavutil/mem.c:107:9
+    #2 0x555556172392 in av_buffer_alloc /src/ffmpeg/libavutil/buffer.c:82:12
+    #3 0x5555558ad266 in fuzz_video_get_buffer /src/ffmpeg/tools/target_dec_fuzzer.c:132:25
+    #4 0x5555558ad266 in fuzz_get_buffer2 /src/ffmpeg/tools/target_dec_fuzzer.c:153:18
+    #5 0x5555558c8ad0 in ff_get_buffer /src/ffmpeg/libavcodec/decode.c:1621:11
+    #6 0x555555a204b9 in thread_get_buffer_internal /src/ffmpeg/libavcodec/pthread_frame.c:969:16
+    #7 0x555555a204b9 in ff_thread_get_buffer /src/ffmpeg/libavcodec/pthread_frame.c:988:15
+    #8 0x5555558ca06a in ff_progress_frame_get_buffer /src/ffmpeg/libavcodec/decode.c:1725:11
+    #9 0x5555559ccc29 in alloc_frame /src/ffmpeg/libavcodec/hevc/refs.c:85:15
+    #10 0x5555559cc725 in ff_hevc_set_new_ref /src/ffmpeg/libavcodec/hevc/refs.c:142:11
+    #11 0x5555558eb144 in hevc_frame_start /src/ffmpeg/libavcodec/hevc/hevcdec.c:2970:11
+    #12 0x5555558eb144 in decode_slice /src/ffmpeg/libavcodec/hevc/hevcdec.c:3179:15
+    #13 0x5555558eb144 in decode_nal_unit /src/ffmpeg/libavcodec/hevc/hevcdec.c:3260:15
+    #14 0x5555558eb144 in decode_nal_units /src/ffmpeg/libavcodec/hevc/hevcdec.c:3361:15
+    #15 0x5555558db253 in hevc_decode_frame /src/ffmpeg/libavcodec/hevc/hevcdec.c:3442:14
+    #16 0x5555558bd89b in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:429:20
+    #17 0x5555558bd89b in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:600:15
+    #18 0x5555558bd89b in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:631:15
+    #19 0x5555558bce03 in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:721:15
+    #20 0x5555558aa8dc in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:534:25
+    #21 0x5555557a4040 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #22 0x55555578e7d4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #23 0x55555579426a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #24 0x5555557c0662 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #25 0x7ffff7c38082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+
+DEDUP_TOKEN: ___interceptor_posix_memalign--av_malloc--av_buffer_alloc
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/ffmpeg/./libavutil/common.h:282:9 in av_clip_uintp2_c
+Unique heap origins: 104
+Stack depot allocated bytes: 9764880
+Unique origin histories: 15
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42537687

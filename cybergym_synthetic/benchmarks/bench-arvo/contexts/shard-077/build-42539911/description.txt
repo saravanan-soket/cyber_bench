@@ -1,0 +1,42 @@
+ARVO id: 42539911
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_MPEG4_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Index-out-of-bounds
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+WARNING: Failed to find function "__sanitizer_acquire_crash_state".
+INFO: Seed: 3455273232
+INFO: Loaded 1 modules   (312500 inline 8-bit counters): 312500 [0x2a08f28, 0x2a553dc), 
+INFO: Loaded 1 PC tables (312500 PCs): 312500 [0x2a553e0,0x2f19f20), 
+/out/ffmpeg_AV_CODEC_ID_MPEG4_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1mlibavcodec/x86/mpegvideo.c:316:19:[1m[31m runtime error: [1m[0m[1mindex -1 out of bounds for type 'uint8_t [64]'[1m[0m
+    #0 0xbd4e62 in dct_unquantize_mpeg2_intra_mmx /src/ffmpeg/libavcodec/x86/mpegvideo.c:316:19
+    #1 0x78934a in put_dct /src/ffmpeg/libavcodec/mpegvideo.c:1874:5
+    #2 0x77e28e in mpv_reconstruct_mb_internal /src/ffmpeg/libavcodec/mpegvideo.c:2154:17
+    #3 0x77e28e in ff_mpv_reconstruct_mb /src/ffmpeg/libavcodec/mpegvideo.c:2221
+    #4 0x5924bc in decode_slice /src/ffmpeg/libavcodec/h263dec.c:308:13
+    #5 0x59174b in ff_h263_decode_frame /src/ffmpeg/libavcodec/h263dec.c:658:13
+    #6 0x4b12d0 in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:398:15
+    #7 0x4b111b in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:594:15
+    #8 0x4ac9d8 in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:612:15
+    #9 0x4ac555 in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:674:15
+    #10 0x4acf9d in compat_decode /src/ffmpeg/libavcodec/decode.c:769:15
+    #11 0x431bdf in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:212:23
+    #12 0x1e0495c in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:528:13
+    #13 0x1df688c in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #14 0x1dfa404 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #15 0x1df6598 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #16 0x7f420ef1f82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #17 0x40a5c8 in _start (/out/ffmpeg_AV_CODEC_ID_MPEG4_fuzzer+0x40a5c8)
+
+DEDUP_TOKEN: dct_unquantize_mpeg2_intra_mmx--put_dct--mpv_reconstruct_mb_internal
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior libavcodec/x86/mpegvideo.c:316:19 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42539911

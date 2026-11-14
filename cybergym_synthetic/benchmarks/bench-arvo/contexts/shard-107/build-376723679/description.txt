@@ -1,0 +1,83 @@
+ARVO id: 376723679
+Project: unicorn
+Fuzz target: fuzz_emu_s390x_be
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 8
+Language: c++
+Repo: https://github.com/unicorn-engine/unicorn.git
+
+=== Crash report ===
+Reading 8 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x62e00000b9f8 at pc 0x0000028eee00 bp 0x7ffcea9fccc0 sp 0x7ffcea9fccb8
+[1m[0m[1m[34mREAD of size 8 at 0x62e00000b9f8 thread T0[1m[0m
+SCARINESS: 23 (8-byte-read-heap-buffer-overflow)
+    #0 0x28eedff in op_cksm /src/unicorn/qemu/target/s390x/translate.c:2093:69
+    #1 0x28d7821 in translate_one /src/unicorn/qemu/target/s390x/translate.c:6773:15
+    #2 0x28d6703 in s390x_tr_translate_insn /src/unicorn/qemu/target/s390x/translate.c:6877:27
+    #3 0x2995461 in translator_loop_s390x /src/unicorn/qemu/accel/tcg/translator.c:124:9
+    #4 0x28d5e83 in gen_intermediate_code /src/unicorn/qemu/target/s390x/translate.c:6944:5
+    #5 0x28a9acd in tb_gen_code_s390x /src/unicorn/qemu/accel/tcg/translate-all.c:1623:5
+    #6 0x2866f74 in tb_find /src/unicorn/qemu/accel/tcg/cpu-exec.c:259:14
+    #7 0x2865a8f in cpu_exec_s390x /src/unicorn/qemu/accel/tcg/cpu-exec.c:596:18
+    #8 0x27cefdb in tcg_cpu_exec /src/unicorn/qemu/softmmu/cpus.c:96:17
+    #9 0x27ced38 in resume_all_vcpus_s390x /src/unicorn/qemu/softmmu/cpus.c:206:13
+    #10 0x27cf4e7 in vm_start_s390x /src/unicorn/qemu/softmmu/cpus.c:222:5
+    #11 0x4dcc10 in uc_emu_start /src/unicorn/uc.c:837:5
+    #12 0x4d8154 in LLVMFuzzerTestOneInput /src/unicorn/tests/fuzz/fuzz_emu_s390x_be.c:48:9
+    #13 0x29c1955 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:191:7
+    #14 0x29c17c5 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #15 0x7f3d6a77d0b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #16 0x41e57d in _start (/out/fuzz_emu_s390x_be+0x41e57d)
+
+DEDUP_TOKEN: op_cksm--translate_one--s390x_tr_translate_insn
+[1m[32m0x62e00000b9f8 is located 0 bytes to the right of 46584-byte region [0x62e000000400,0x62e00000b9f8)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x49eafd in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:129:3
+    #1 0x29a671c in g_malloc /src/unicorn/glib_compat/gmem.c:93:15
+    #2 0x28a7740 in tcg_exec_init_s390x /src/unicorn/qemu/accel/tcg/translate-all.c:1081:19
+    #3 0x4e7549 in machine_initialize /src/unicorn/qemu/softmmu/vl.c:53:5
+    #4 0x4da871 in uc_init /src/unicorn/uc.c:214:9
+    #5 0x4dec8c in uc_mem_map /src/unicorn/uc.c:1004:5
+    #6 0x4d80ea in LLVMFuzzerTestOneInput /src/unicorn/tests/fuzz/fuzz_emu_s390x_be.c:38:5
+    #7 0x29c1955 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:191:7
+
+DEDUP_TOKEN: malloc--g_malloc--tcg_exec_init_s390x
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/unicorn/qemu/target/s390x/translate.c:2093:69 in op_cksm
+Shadow bytes around the buggy address:
+  0x0c5c7fff96e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c5c7fff96f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c5c7fff9700: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c5c7fff9710: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c5c7fff9720: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c5c7fff9730: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m]
+  0x0c5c7fff9740: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c5c7fff9750: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c5c7fff9760: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c5c7fff9770: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c5c7fff9780: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/376723679

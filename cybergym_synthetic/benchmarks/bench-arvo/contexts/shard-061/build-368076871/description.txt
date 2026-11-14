@@ -1,0 +1,43 @@
+ARVO id: 368076871
+Project: mruby
+Fuzz target: mruby_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://github.com/mruby/mruby
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2617065524
+INFO: Loaded 1 modules   (24999 inline 8-bit counters): 24999 [0x5577a2c31330, 0x5577a2c374d7), 
+INFO: Loaded 1 PC tables (24999 PCs): 24999 [0x5577a2c374d8,0x5577a2c98f48), 
+/out/mruby_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x5577a2969dce bp 0x7ffc45467950 sp 0x7ffc45467800 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x5577a2969dce in udiv /src/mruby/mrbgems/mruby-bigint/core/bigint.c:499:19
+    #1 0x5577a295b097 in mpz_mmod /src/mruby/mrbgems/mruby-bigint/core/bigint.c:578:3
+    #2 0x5577a295b097 in mrb_bint_mod /src/mruby/mrbgems/mruby-bigint/core/bigint.c:1480:3
+    #3 0x5577a28e2ef2 in mrb_vm_exec /src/mruby/src/vm.c
+    #4 0x5577a298709a in mrb_load_exec /src/mruby/mrbgems/mruby-compiler/core/parse.y:6912:7
+    #5 0x5577a28befb0 in LLVMFuzzerTestOneInput /src/mruby/oss-fuzz/mruby_fuzzer.c:14:5
+    #6 0x5577a2771920 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #7 0x5577a275c0b4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #8 0x5577a2761b4a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #9 0x5577a278df42 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7f72dd6d3082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #11 0x5577a2752b8d in _start (/out/mruby_fuzzer+0x167b8d)
+
+DEDUP_TOKEN: udiv--mpz_mmod--mrb_bint_mod
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/mruby/mrbgems/mruby-bigint/core/bigint.c:499:19 in udiv
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/368076871

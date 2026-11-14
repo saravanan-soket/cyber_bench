@@ -1,0 +1,49 @@
+ARVO id: 433311403
+Project: harfbuzz
+Fuzz target: hb-shape-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/harfbuzz/harfbuzz.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 506486350
+INFO: Loaded 1 modules   (54855 inline 8-bit counters): 54855 [0x557c4f63e050, 0x557c4f64b697), 
+INFO: Loaded 1 PC tables (54855 PCs): 54855 [0x557c4f64b698,0x557c4f721b08), 
+/out/hb-shape-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x557c4f5876b8 (pc 0x557c4f282817 bp 0x7ffc64ef07e0 sp 0x7ffc64ef0640 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x557c4f282817 in _hb_atomic_ptr_impl_cmplexch /work/build/../../src/harfbuzz/src/hb-atomic.hh:72:10
+    #1 0x557c4f282817 in cmpexch /work/build/../../src/harfbuzz/src/hb-atomic.hh:197:49
+    #2 0x557c4f282817 in release_scratch /work/build/../../src/harfbuzz/src/OT/glyf/glyf.hh:537:25
+    #3 0x557c4f282817 in hb_ot_get_glyph_h_advances(hb_font_t*, void*, unsigned int, unsigned int const*, unsigned int, int*, unsigned int, void*) /work/build/../../src/harfbuzz/src/hb-ot-font.cc:488:10
+    #4 0x557c4f46dc9a in get_glyph_h_advances /work/build/../../src/harfbuzz/src/hb-font.hh:394:5
+    #5 0x557c4f46dc9a in hb_ot_position_default /work/build/../../src/harfbuzz/src/hb-ot-shape.cc:998:14
+    #6 0x557c4f46dc9a in hb_ot_position /work/build/../../src/harfbuzz/src/hb-ot-shape.cc:1085:3
+    #7 0x557c4f46dc9a in hb_ot_shape_internal /work/build/../../src/harfbuzz/src/hb-ot-shape.cc:1166:3
+    #8 0x557c4f46dc9a in _hb_ot_shape /work/build/../../src/harfbuzz/src/hb-ot-shape.cc:1187:3
+    #9 0x557c4f49440f in _hb_shape_plan_execute_internal /work/build/../../src/harfbuzz/src/hb-shaper-list.hh:47:1
+    #10 0x557c4f49440f in hb_shape_plan_execute /work/build/../../src/harfbuzz/src/hb-shape-plan.cc:452:14
+    #11 0x557c4f495770 in hb_shape_full /work/build/../../src/harfbuzz/src/hb-shape.cc:150:19
+    #12 0x557c4f151817 in LLVMFuzzerTestOneInput /work/build/../../src/harfbuzz/test/fuzzing/hb-shape-fuzzer.cc:38:5
+    #13 0x557c4f005f30 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #14 0x557c4eff11a5 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #15 0x557c4eff6c3f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #16 0x557c4f021ee2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7f26ca44e082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 5792732f783158c66fb4f3756458ca24e46e827d)
+    #18 0x557c4efe938d in _start (/out/hb-shape-fuzzer+0x19a38d)
+
+DEDUP_TOKEN: _hb_atomic_ptr_impl_cmplexch--cmpexch--release_scratch
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /work/build/../../src/harfbuzz/src/hb-atomic.hh:72:10 in _hb_atomic_ptr_impl_cmplexch
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/433311403

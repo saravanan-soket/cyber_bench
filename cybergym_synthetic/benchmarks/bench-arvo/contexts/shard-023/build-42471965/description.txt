@@ -1,0 +1,89 @@
+ARVO id: 42471965
+Project: skia
+Fuzz target: android_codec
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Seed: 1265466507
+INFO: Loaded 1 modules   (164562 inline 8-bit counters): 164562 [0x32c9658, 0x32f192a), 
+INFO: Loaded 1 PC tables (164562 PCs): 164562 [0x32f1930,0x3574650), 
+/out/android_codec: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m[1m[31mUninitialized bytes in [1m[32m__msan_check_mem_is_initialized[1m[31m at offset 0 inside [0x71d000000404, 4)[1m[0m
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0xa37e4c in sse2::blit_row_s32a_opaque(unsigned int*, unsigned int const*, int, unsigned int) /src/skia/out/Fuzz/../../src/opts/SkBlitRow_opts.h:85:5
+    #1 0x1d80297 in Sprite_D32_S32::blitRect(int, int, int, int) /src/skia/out/Fuzz/../../src/core/SkSpriteBlitter_ARGB32.cpp:47:13
+    #2 0x94ce83 in SkDraw::drawBitmap(SkBitmap const&, SkMatrix const&, SkRect const*, SkPaint const&) const /src/skia/out/Fuzz/../../src/core/SkDraw.cpp:1109:17
+    #3 0x1b9ce69 in SkBitmapDevice::drawBitmap(SkBitmap const&, SkMatrix const&, SkRect const*, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkBitmapDevice.cpp:411:5
+    #4 0x1b9c8dc in SkBitmapDevice::drawBitmap(SkBitmap const&, float, float, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkBitmapDevice.cpp:396:11
+    #5 0x8e8b00 in SkCanvas::onDrawBitmap(SkBitmap const&, float, float, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2298:27
+    #6 0x8dcd4d in SkCanvas::drawBitmap(SkBitmap const&, float, float, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1811:11
+    #7 0x8a080c in FuzzAndroidCodec(sk_sp<SkData>, unsigned char) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAndroidCodec.cpp:49:27
+    #8 0x8a177f in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAndroidCodec.cpp:60:5
+    #9 0x7ff42b in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #10 0x7b73d6 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #11 0x7c81fa in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #12 0x7b6501 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #13 0x7fadfeffa82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #14 0x742848 in _start (/out/android_codec+0x742848)
+
+DEDUP_TOKEN: sse2::blit_row_s32a_opaque(unsigned int*, unsigned int const*, int, unsigned int)--Sprite_D32_S32::blitRect(int, int, int, int)--SkDraw::drawBitmap(SkBitmap const&, SkMatrix const&, SkRect const*, SkPaint const&) const
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x1f8c9b6 in swizzle_index_to_n32(void*, unsigned char const*, int, int, int, int, unsigned int const*) /src/skia/out/Fuzz/../../src/codec/SkSwizzler.cpp:241:16
+    #1 0x1f92d84 in SkSwizzler::swizzle(void*, unsigned char const*) /src/skia/out/Fuzz/../../src/codec/SkSwizzler.cpp:1235:5
+    #2 0x176d623 in SkWuffsCodec::onIncrementalDecode(int*) /src/skia/out/Fuzz/../../src/codec/SkWuffsCodec.cpp:516:24
+    #3 0xd539e0 in SkCodec::incrementalDecode(int*) /src/skia/out/Fuzz/../../include/codec/SkCodec.h:451:22
+    #4 0xd51d70 in SkSampledCodec::sampledDecode(SkImageInfo const&, void*, unsigned long, SkAndroidCodec::AndroidOptions const&) /src/skia/out/Fuzz/../../src/codec/SkSampledCodec.cpp:247:62
+    #5 0xd4fdad in SkSampledCodec::onGetAndroidPixels(SkImageInfo const&, void*, unsigned long, SkAndroidCodec::AndroidOptions const&) /src/skia/out/Fuzz/../../src/codec/SkSampledCodec.cpp:87:22
+    #6 0xd3714b in SkAndroidCodec::getAndroidPixels(SkImageInfo const&, void*, unsigned long, SkAndroidCodec::AndroidOptions const*) /src/skia/out/Fuzz/../../src/codec/SkAndroidCodec.cpp:387:22
+    #7 0x8a065a in FuzzAndroidCodec(sk_sp<SkData>, unsigned char) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAndroidCodec.cpp:33:26
+    #8 0x8a177f in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAndroidCodec.cpp:60:5
+    #9 0x7ff42b in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #10 0x7b73d6 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #11 0x7c81fa in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #12 0x7b6501 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #13 0x7fadfeffa82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: swizzle_index_to_n32(void*, unsigned char const*, int, int, int, int, unsigned int const*)--SkSwizzler::swizzle(void*, unsigned char const*)--SkWuffsCodec::onIncrementalDecode(int*)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x176d05b in SkWuffsCodec::onIncrementalDecode(int*) /src/skia/out/Fuzz/../../src/codec/SkWuffsCodec.cpp:483:24
+    #1 0xd539e0 in SkCodec::incrementalDecode(int*) /src/skia/out/Fuzz/../../include/codec/SkCodec.h:451:22
+    #2 0xd51d70 in SkSampledCodec::sampledDecode(SkImageInfo const&, void*, unsigned long, SkAndroidCodec::AndroidOptions const&) /src/skia/out/Fuzz/../../src/codec/SkSampledCodec.cpp:247:62
+    #3 0xd4fdad in SkSampledCodec::onGetAndroidPixels(SkImageInfo const&, void*, unsigned long, SkAndroidCodec::AndroidOptions const&) /src/skia/out/Fuzz/../../src/codec/SkSampledCodec.cpp:87:22
+    #4 0xd3714b in SkAndroidCodec::getAndroidPixels(SkImageInfo const&, void*, unsigned long, SkAndroidCodec::AndroidOptions const*) /src/skia/out/Fuzz/../../src/codec/SkAndroidCodec.cpp:387:22
+    #5 0x8a065a in FuzzAndroidCodec(sk_sp<SkData>, unsigned char) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAndroidCodec.cpp:33:26
+    #6 0x8a177f in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAndroidCodec.cpp:60:5
+    #7 0x7ff42b in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #8 0x7b73d6 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #9 0x7c81fa in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #10 0x7b6501 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7fadfeffa82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: SkWuffsCodec::onIncrementalDecode(int*)--SkCodec::incrementalDecode(int*)--SkSampledCodec::sampledDecode(SkImageInfo const&, void*, unsigned long, SkAndroidCodec::AndroidOptions const&)
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x773bb0 in __interceptor_malloc /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:911
+    #1 0xd5ab8b in sk_malloc_flags(unsigned long, unsigned int) /src/skia/out/Fuzz/../../src/ports/SkMemory_malloc.cpp:71:13
+    #2 0x177308f in sk_malloc_canfail(unsigned long) /src/skia/out/Fuzz/../../include/android/../private/SkMalloc.h:93:12
+    #3 0x1772686 in SkWuffsCodec_MakeFromStream(std::__1::unique_ptr<SkStream, std::__1::default_delete<SkStream> >, SkCodec::Result*) /src/skia/out/Fuzz/../../src/codec/SkWuffsCodec.cpp:893:56
+    #4 0xd4096e in SkCodec::MakeFromStream(std::__1::unique_ptr<SkStream, std::__1::default_delete<SkStream> >, SkCodec::Result*, SkPngChunkReader*) /src/skia/out/Fuzz/../../src/codec/SkCodec.cpp:110:24
+    #5 0xd31330 in SkAndroidCodec::MakeFromStream(std::__1::unique_ptr<SkStream, std::__1::default_delete<SkStream> >, SkPngChunkReader*) /src/skia/out/Fuzz/../../src/codec/SkAndroidCodec.cpp:80:18
+    #6 0xd32a65 in SkAndroidCodec::MakeFromData(sk_sp<SkData>, SkPngChunkReader*) /src/skia/out/Fuzz/../../src/codec/SkAndroidCodec.cpp:121:12
+    #7 0x8a03de in FuzzAndroidCodec(sk_sp<SkData>, unsigned char) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAndroidCodec.cpp:17:18
+    #8 0x8a177f in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAndroidCodec.cpp:60:5
+    #9 0x7ff42b in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #10 0x7b73d6 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #11 0x7c81fa in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #12 0x7b6501 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #13 0x7fadfeffa82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: __interceptor_malloc--sk_malloc_flags(unsigned long, unsigned int)--sk_malloc_canfail(unsigned long)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/skia/out/Fuzz/../../src/opts/SkBlitRow_opts.h:85:5 in sse2::blit_row_s32a_opaque(unsigned int*, unsigned int const*, int, unsigned int)
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42471965

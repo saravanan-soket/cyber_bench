@@ -1,0 +1,45 @@
+ARVO id: 42513680
+Project: assimp
+Fuzz target: assimp_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/assimp/assimp.git
+
+=== Crash report ===
+Reading 99 bytes from /tmp/poc
+Info,  T0: Load $$$___magic___$$$.
+Info,  T0: File extension not known, trying signature-based detection
+Info,  T0: Found a matching importer for this file format: Wavefront Object Importer.
+Info,  T0: Import root directory is './'
+Error, T0: OBJ/MTL: Encountered unknown texture type
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x00000000505e (pc 0x000001eb3923 bp 0x7fffffffd650 sp 0x7fffffffd5a0 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x1eb3923 in Assimp::ObjFileMtlImporter::getTexture() /src/assimp/code/AssetLib/Obj/ObjFileMtlImporter.cpp:422:53
+    #1 0x1ea94cc in Assimp::ObjFileMtlImporter::load() /src/assimp/code/AssetLib/Obj/ObjFileMtlImporter.cpp:228:17
+    #2 0x1ea8f46 in Assimp::ObjFileMtlImporter::ObjFileMtlImporter(std::__1::vector<char, std::__1::allocator<char> >&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, Assimp::ObjFile::Model*) /src/assimp/code/AssetLib/Obj/ObjFileMtlImporter.cpp:106:5
+    #3 0xc323b2 in Assimp::ObjFileParser::getMaterialLib() /src/assimp/code/AssetLib/Obj/ObjFileParser.cpp:663:24
+    #4 0xc24655 in Assimp::ObjFileParser::parseFile(Assimp::IOStreamBuffer<char>&) /src/assimp/code/AssetLib/Obj/ObjFileParser.cpp:215:17
+    #5 0xc218cf in Assimp::ObjFileParser::ObjFileParser(Assimp::IOStreamBuffer<char>&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, Assimp::IOSystem*, Assimp::ProgressHandler*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/assimp/code/AssetLib/Obj/ObjFileParser.cpp:96:5
+    #6 0xc13c80 in Assimp::ObjFileImporter::InternReadFile(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, aiScene*, Assimp::IOSystem*) /src/assimp/code/AssetLib/Obj/ObjFileImporter.cpp:141:19
+    #7 0x1c89060 in Assimp::BaseImporter::ReadFile(Assimp::Importer*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, Assimp::IOSystem*) /src/assimp/code/Common/BaseImporter.cpp:112:9
+    #8 0x5dd607 in Assimp::Importer::ReadFile(char const*, unsigned int) /src/assimp/code/Common/Importer.cpp:717:30
+    #9 0x5d89c6 in Assimp::Importer::ReadFileFromMemory(void const*, unsigned long, unsigned int, char const*) /src/assimp/code/Common/Importer.cpp:512:5
+    #10 0x4dafbf in LLVMFuzzerTestOneInput /src/assimp/fuzz/assimp_fuzzer.cc:53:34
+    #11 0x4dae5a in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+    #12 0x4dac2d in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:318:12
+    #13 0x7ffff7c56082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #14 0x42217d in _start (/out/assimp_fuzzer+0x42217d)
+
+DEDUP_TOKEN: Assimp::ObjFileMtlImporter::getTexture()--Assimp::ObjFileMtlImporter::load()--Assimp::ObjFileMtlImporter::ObjFileMtlImporter(std::__1::vector<char, std::__1::allocator<char> >&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, Assimp::ObjFile::Model*)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/assimp/code/AssetLib/Obj/ObjFileMtlImporter.cpp:422:53 in Assimp::ObjFileMtlImporter::getTexture()
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42513680

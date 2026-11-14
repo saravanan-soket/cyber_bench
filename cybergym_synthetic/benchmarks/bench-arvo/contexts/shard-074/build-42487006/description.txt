@@ -1,0 +1,50 @@
+ARVO id: 42487006
+Project: php-src
+Fuzz target: php-fuzz-execute
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/php/php-src.git
+
+=== Crash report ===
+INFO: Seed: 3081248169
+INFO: Loaded 1 modules   (117960 inline 8-bit counters): 117960 [0x94c7440, 0x94e4108), 
+INFO: Loaded 1 PC tables (117960 PCs): 117960 [0x94e4108,0x95ca748), 
+/out/php-fuzz-execute: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0xbebebebe (pc 0x0896629c bp 0xffe8deb8 sp 0xffe8dea0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x896629c in zend_gc_delref /src/php-src/Zend/zend_types.h:1164:2
+    #1 0x8ad49c5 in zval_delref_p /src/php-src/Zend/zend_types.h:1200:9
+    #2 0x89698cf in zval_ptr_dtor_nogc /src/php-src/Zend/zend_variables.h:34:35
+    #3 0x8a843d7 in ZEND_HANDLE_EXCEPTION_SPEC_HANDLER /src/php-src/Zend/zend_vm_execute.h:2715:6
+    #4 0x8b8c9b2 in fuzzer_execute_ex /src/php-src/sapi/fuzzer/fuzzer-execute.c:39:14
+    #5 0x8b3d0f3 in zend_generator_resume /src/php-src/Zend/zend_generators.c:774:3
+    #6 0x8b3ee2f in zend_generator_ensure_initialized /src/php-src/Zend/zend_generators.c:823:3
+    #7 0x8b3ef1f in zim_Generator_current /src/php-src/Zend/zend_generators.c:878:2
+    #8 0x89fd3e7 in ZEND_DO_FCALL_SPEC_RETVAL_USED_HANDLER /src/php-src/Zend/zend_vm_execute.h:1720:4
+    #9 0x8b8c9b2 in fuzzer_execute_ex /src/php-src/sapi/fuzzer/fuzzer-execute.c:39:14
+    #10 0x89fc6f0 in ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER /src/php-src/Zend/zend_vm_execute.h:1588:4
+    #11 0x8b8c9b2 in fuzzer_execute_ex /src/php-src/sapi/fuzzer/fuzzer-execute.c:39:14
+    #12 0x89708ad in zend_execute /src/php-src/Zend/zend_vm_execute.h:57958:2
+    #13 0x8b8d588 in fuzzer_do_request_from_buffer /src/php-src/sapi/fuzzer/fuzzer-sapi.c:255:5
+    #14 0x8b8cb1e in LLVMFuzzerTestOneInput /src/php-src/sapi/fuzzer/fuzzer-execute.c:57:2
+    #15 0x80c0301 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:559:15
+    #16 0x80abebe in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:301:6
+    #17 0x80b19ae in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:801:9
+    #18 0x80d9247 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #19 0xe85ed646 in __libc_start_main (/lib32/libc.so.6+0x18646)
+    #20 0x8086374 in _start (/out/php-fuzz-execute+0x8086374)
+
+DEDUP_TOKEN: zend_gc_delref--zval_delref_p--zval_ptr_dtor_nogc
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/php-src/Zend/zend_types.h:1164:2 in zend_gc_delref
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42487006

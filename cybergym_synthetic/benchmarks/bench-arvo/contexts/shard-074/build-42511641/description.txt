@@ -1,0 +1,95 @@
+ARVO id: 42511641
+Project: openjpeg
+Fuzz target: opj_decompress_fuzzer_J2K
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow WRITE {*}
+Language: c++
+Repo: https://github.com/uclouvain/openjpeg
+
+=== Crash report ===
+Running LLVMFuzzerInitialize ...
+continue...
+Reading 1479 bytes from /tmp/poc
+=================================================================
+[1m[31m==6==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x61e0000016d0 at pc 0x00000049befe bp 0x7fffffffd670 sp 0x7fffffffce38
+[1m[0m[1m[34mWRITE of size 3828 at 0x61e0000016d0 thread T0[1m[0m
+SCARINESS: 45 (multi-byte-write-heap-buffer-overflow)
+    #0 0x49befd in __asan_memset /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:26:3
+    #1 0x5d7be6 in opj_t1_allocate_buffers /src/openjpeg/src/lib/openjp2/t1.c:1504:9
+    #2 0x5b5960 in opj_t1_decode_cblk /src/openjpeg/src/lib/openjp2/t1.c:1983:10
+    #3 0x5b5960 in opj_t1_clbl_decode_processor /src/openjpeg/src/lib/openjp2/t1.c:1704:26
+    #4 0x582fc3 in opj_thread_pool_submit_job /src/openjpeg/src/lib/openjp2/thread.c:835:9
+    #5 0x5b4950 in opj_t1_decode_cblks /src/openjpeg/src/lib/openjp2/t1.c:1943:21
+    #6 0x56e84e in opj_tcd_t1_decode /src/openjpeg/src/lib/openjp2/tcd.c:2000:9
+    #7 0x56e84e in opj_tcd_decode_tile /src/openjpeg/src/lib/openjp2/tcd.c:1654:11
+    #8 0x4f9db2 in opj_j2k_decode_tile /src/openjpeg/src/lib/openjp2/j2k.c:9862:11
+    #9 0x521b41 in opj_j2k_decode_tiles /src/openjpeg/src/lib/openjp2/j2k.c:11707:15
+    #10 0x502265 in opj_j2k_exec /src/openjpeg/src/lib/openjp2/j2k.c:9006:33
+    #11 0x502265 in opj_j2k_decode /src/openjpeg/src/lib/openjp2/j2k.c:12010:11
+    #12 0x4e00e4 in opj_decode /src/openjpeg/src/lib/openjp2/openjpeg.c:521:16
+    #13 0x4d6002 in LLVMFuzzerTestOneInput /src/openjpeg/./tests/fuzzers/opj_decompress_fuzzer_J2K.cpp:196:13
+    #14 0x4d6baa in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+    #15 0x4d697d in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:318:12
+    #16 0x7ffff7c56082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #17 0x41d4ed in _start (/out/opj_decompress_fuzzer_J2K+0x41d4ed)
+
+DEDUP_TOKEN: __asan_memset--opj_t1_allocate_buffers--opj_t1_decode_cblk
+[1m[32m0x61e0000016d0 is located 0 bytes to the right of 2640-byte region [0x61e000000c80,0x61e0000016d0)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x49d217 in posix_memalign /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:210:3
+    #1 0x4e24df in opj_aligned_alloc_n /src/openjpeg/src/lib/openjp2/opj_malloc.c:61:9
+    #2 0x4e24df in opj_aligned_malloc /src/openjpeg/src/lib/openjp2/opj_malloc.c:209:12
+    #3 0x62ff56 in opj_t1_allocate_buffers /src/openjpeg/src/lib/openjp2/ht_dec.c:1066:39
+    #4 0x62ff56 in opj_t1_ht_decode_cblk /src/openjpeg/src/lib/openjp2/ht_dec.c:1151:10
+    #5 0x5b5aba in opj_t1_clbl_decode_processor /src/openjpeg/src/lib/openjp2/t1.c:1690:26
+    #6 0x582fc3 in opj_thread_pool_submit_job /src/openjpeg/src/lib/openjp2/thread.c:835:9
+    #7 0x5b4950 in opj_t1_decode_cblks /src/openjpeg/src/lib/openjp2/t1.c:1943:21
+    #8 0x56e84e in opj_tcd_t1_decode /src/openjpeg/src/lib/openjp2/tcd.c:2000:9
+    #9 0x56e84e in opj_tcd_decode_tile /src/openjpeg/src/lib/openjp2/tcd.c:1654:11
+    #10 0x4f9db2 in opj_j2k_decode_tile /src/openjpeg/src/lib/openjp2/j2k.c:9862:11
+    #11 0x521b41 in opj_j2k_decode_tiles /src/openjpeg/src/lib/openjp2/j2k.c:11707:15
+    #12 0x502265 in opj_j2k_exec /src/openjpeg/src/lib/openjp2/j2k.c:9006:33
+    #13 0x502265 in opj_j2k_decode /src/openjpeg/src/lib/openjp2/j2k.c:12010:11
+    #14 0x4e00e4 in opj_decode /src/openjpeg/src/lib/openjp2/openjpeg.c:521:16
+    #15 0x4d6002 in LLVMFuzzerTestOneInput /src/openjpeg/./tests/fuzzers/opj_decompress_fuzzer_J2K.cpp:196:13
+    #16 0x4d6baa in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+
+DEDUP_TOKEN: posix_memalign--opj_aligned_alloc_n--opj_aligned_malloc
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:26:3 in __asan_memset
+Shadow bytes around the buggy address:
+  0x0c3c7fff8280: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c3c7fff8290: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c3c7fff82a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c3c7fff82b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c3c7fff82c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c3c7fff82d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c3c7fff82e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c3c7fff82f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c3c7fff8300: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c3c7fff8310: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c3c7fff8320: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==6==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42511641

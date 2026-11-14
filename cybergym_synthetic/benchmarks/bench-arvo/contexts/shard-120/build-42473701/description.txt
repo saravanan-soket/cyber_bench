@@ -1,0 +1,45 @@
+ARVO id: 42473701
+Project: openthread
+Fuzz target: ncp-uart-received-fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/openthread/openthread
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/ncp-uart-received-fuzzer < INPUT_FILE
+or
+  /out/ncp-uart-received-fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/ncp-uart-received-fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 1193 bytes from /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x00010284c07a (pc 0x00000057464a bp 0x7fffffffe0e0 sp 0x7fffffffe0d0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x574649 in ot::MessageQueue::GetTail() const /src/openthread/src/core/./common/message.hpp:977:66
+    #1 0x5744d4 in ot::Message::GetNext() const /src/openthread/src/core/common/message.cpp:318:30
+    #2 0x5bb094 in ot::MeshForwarder::GetDirectTransmission() /src/openthread/src/core/thread/mesh_forwarder.cpp:233:35
+    #3 0x5baf1d in ot::MeshForwarder::ScheduleTransmissionTask() /src/openthread/src/core/thread/mesh_forwarder.cpp:185:25
+    #4 0x578b81 in ot::TaskletScheduler::ProcessQueuedTasklets() /src/openthread/src/core/common/tasklet.cpp:112:14
+    #5 0x534e71 in LLVMFuzzerTestOneInput /src/openthread/tests/fuzz/ncp_uart_received.cpp:71:9
+    #6 0x68b5ca in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:156:5
+    #7 0x68b831 in main /src/libfuzzer/afl/afl_driver.cpp:193:12
+    #8 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #9 0x41cdf8 in _start (/out/ncp-uart-received-fuzzer+0x41cdf8)
+
+DEDUP_TOKEN: ot::MessageQueue::GetTail() const--ot::Message::GetNext() const--ot::MeshForwarder::GetDirectTransmission()
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/openthread/src/core/./common/message.hpp:977:66 in ot::MessageQueue::GetTail() const
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42473701

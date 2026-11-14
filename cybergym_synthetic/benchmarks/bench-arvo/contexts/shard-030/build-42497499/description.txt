@@ -1,0 +1,45 @@
+ARVO id: 42497499
+Project: libredwg
+Fuzz target: llvmfuzz
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c
+Repo: https://github.com/LibreDWG/libredwg
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2890812650
+INFO: Loaded 1 modules   (471757 inline 8-bit counters): 471757 [0x434fa40, 0x43c2d0d), 
+INFO: Loaded 1 PC tables (471757 PCs): 471757 [0x37afbb0,0x3ee2880), 
+/out/llvmfuzz: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x601ffffffff0 (pc 0x0000004a7254 bp 0x000000000000 sp 0x7fffffffd060 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x4a7254 in atomic_compare_exchange_strong<__sanitizer::atomic_uint8_t> /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_atomic_clang.h:80:10
+    #1 0x4a7254 in AtomicallySetQuarantineFlagIfAllocated /src/llvm-project/compiler-rt/lib/asan/asan_allocator.cpp:621:10
+    #2 0x4a7254 in __asan::Allocator::Deallocate(void*, unsigned long, unsigned long, __sanitizer::BufferedStackTrace*, __asan::AllocType) /src/llvm-project/compiler-rt/lib/asan/asan_allocator.cpp:697:10
+    #3 0x5217b5 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:128:3
+    #4 0xf6fe99 in dwg_free_BLOCK_private /src/libredwg/src/./dwg.spec:476:3
+    #5 0xf32f30 in dwg_free_BLOCK /src/libredwg/src/./dwg.spec:473:1
+    #6 0x1023720 in dwg_free_object /src/libredwg/src/free.c:624:7
+    #7 0x1024740 in dwg_free /src/libredwg/src/free.c:1265:13
+    #8 0x552d77 in LLVMFuzzerTestOneInput /src/libredwg/examples/llvmfuzz.c
+    #9 0x458393 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #10 0x443902 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #11 0x449591 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #12 0x472f62 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7ffff6b6383f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #14 0x41e628 in _start (/out/llvmfuzz+0x41e628)
+
+DEDUP_TOKEN: atomic_compare_exchange_strong<__sanitizer::atomic_uint8_t>--AtomicallySetQuarantineFlagIfAllocated--__asan::Allocator::Deallocate(void*, unsigned long, unsigned long, __sanitizer::BufferedStackTrace*, __asan::AllocType)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_atomic_clang.h:80:10 in atomic_compare_exchange_strong<__sanitizer::atomic_uint8_t>
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42497499

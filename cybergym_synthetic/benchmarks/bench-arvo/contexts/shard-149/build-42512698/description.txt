@@ -1,0 +1,49 @@
+ARVO id: 42512698
+Project: opencv
+Fuzz target: readnetfromtensorflow_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://github.com/opencv/opencv.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2758613316
+INFO: Loaded 1 modules   (294704 inline 8-bit counters): 294704 [0x425bf40, 0x42a3e70), 
+INFO: Loaded 1 PC tables (294704 PCs): 294704 [0x42a3e70,0x4723170), 
+/out/readnetfromtensorflow_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x00000381cc2b bp 0x7fff02c70150 sp 0x7fff02c70090 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x381cc2b in std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::basic_string(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) (/out/readnetfromtensorflow_fuzzer+0x381cc2b)
+    #1 0x6cf72b in Pin /src/opencv/modules/dnn/src/tensorflow/tf_importer.cpp:82:9
+    #2 0x6cf72b in cv::dnn::dnn4_v20220524::(anonymous namespace)::parsePin(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/opencv/modules/dnn/src/tensorflow/tf_importer.cpp:462:9
+    #3 0x6cce6a in cv::dnn::dnn4_v20220524::(anonymous namespace)::TFImporter::getConstBlob(opencv_tensorflow::NodeDef const&, std::__1::map<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, int, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, int> > >, int, int*) /src/opencv/modules/dnn/src/tensorflow/tf_importer.cpp:2834:22
+    #4 0x6ca36e in cv::dnn::dnn4_v20220524::(anonymous namespace)::TFImporter::parseArg(opencv_tensorflow::GraphDef&, opencv_tensorflow::NodeDef const&, cv::dnn::dnn4_v20220524::LayerParams&) /src/opencv/modules/dnn/src/tensorflow/tf_importer.cpp:2637:38
+    #5 0x6f0253 in cv::dnn::dnn4_v20220524::(anonymous namespace)::TFImporter::parseNode(opencv_tensorflow::NodeDef const&) /src/opencv/modules/dnn/src/tensorflow/tf_importer.cpp:3149:13
+    #6 0x65e695 in cv::dnn::dnn4_v20220524::(anonymous namespace)::TFImporter::populateNet() /src/opencv/modules/dnn/src/tensorflow/tf_importer.cpp:3098:9
+    #7 0x701485 in TFImporter /src/opencv/modules/dnn/src/tensorflow/tf_importer.cpp:2730:5
+    #8 0x701485 in cv::dnn::dnn4_v20220524::Net cv::dnn::dnn4_v20220524::detail::readNet<cv::dnn::dnn4_v20220524::(anonymous namespace)::TFImporter, char const*&, unsigned long&, char const*&, unsigned long&>(char const*&, unsigned long&, char const*&, unsigned long&) /src/opencv/modules/dnn/src/tensorflow/../dnn_common.hpp:75:14
+    #9 0x643da8 in readNetDiagnostic<cv::dnn::dnn4_v20220524::(anonymous namespace)::TFImporter, const char *&, unsigned long &, const char *&, unsigned long &> /src/opencv/modules/dnn/src/tensorflow/../dnn_common.hpp:82:25
+    #10 0x643da8 in cv::dnn::dnn4_v20220524::readNetFromTensorflow(char const*, unsigned long, char const*, unsigned long) /src/opencv/modules/dnn/src/tensorflow/tf_importer.cpp:3225:12
+    #11 0x5607c8 in LLVMFuzzerTestOneInput /src/readnetfromtensorflow_fuzzer.cc:24:5
+    #12 0x458a53 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #13 0x4446e2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #14 0x449f2c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #15 0x472b22 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7fc133218082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #17 0x422f0d in _start (/out/readnetfromtensorflow_fuzzer+0x422f0d)
+
+DEDUP_TOKEN: std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::basic_string(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)--Pin--cv::dnn::dnn4_v20220524::(anonymous namespace)::parsePin(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/out/readnetfromtensorflow_fuzzer+0x381cc2b) in std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::basic_string(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42512698

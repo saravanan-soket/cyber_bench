@@ -1,0 +1,57 @@
+ARVO id: 42521647
+Project: skia
+Fuzz target: image_filter_deserialize
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Seed: 2324047321
+INFO: Loaded 1 modules   (85195 inline 8-bit counters): 85195 [0x15cdf30, 0x15e2bfb), 
+INFO: Loaded 1 PC tables (85195 PCs): 85195 [0x15e2c00,0x172f8b0), 
+/out/image_filter_deserialize: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x60c000020100 (pc 0x000000ebc98e bp 0x7fffffffd0f0 sp 0x7fffffffd0b0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0xebc98d in S32_alpha_D32_nofilter_DX(SkBitmapProcState const&, unsigned int const*, int, unsigned int*) /src/skia/out/Fuzz/../../src/core/SkBitmapProcState_sample.h:98:26
+    #1 0xc2f581 in BitmapProcShaderContext::shadeSpan(int, int, unsigned int*, int) /src/skia/out/Fuzz/../../src/shaders/SkBitmapProcShader.cpp:77:13
+    #2 0xb6d8f7 in SkARGB32_Shader_Blitter::blitAntiH(int, int, unsigned char const*, short const*) /src/skia/out/Fuzz/../../src/core/SkBlitter_ARGB32.cpp:467:32
+    #3 0x892096 in call_hline_blitter(SkBlitter*, int, int, int, unsigned int) /src/skia/out/Fuzz/../../src/core/SkScan_Antihair.cpp:82:18
+    #4 0x891daa in HLine_SkAntiHairBlitter::drawLine(int, int, int, int) /src/skia/out/Fuzz/../../src/core/SkScan_Antihair.cpp:140:13
+    #5 0x88e31c in do_anti_hairline(int, int, int, int, SkIRect const*, SkBlitter*) /src/skia/out/Fuzz/../../src/core/SkScan_Antihair.cpp:515:31
+    #6 0x88d794 in SkScan::AntiHairLineRgn(SkPoint const*, int, SkRegion const*, SkBlitter*) /src/skia/out/Fuzz/../../src/core/SkScan_Antihair.cpp:590:21
+    #7 0x897776 in SkScan::AntiHairLine(SkPoint const*, int, SkRasterClip const&, SkBlitter*) /src/skia/out/Fuzz/../../src/core/SkScan_Hairline.cpp:691:9
+    #8 0x88eb6c in SkScan::AntiHairRect(SkRect const&, SkRasterClip const&, SkBlitter*) /src/skia/out/Fuzz/../../src/core/SkScan_Antihair.cpp:610:5
+    #9 0x76a473 in SkDraw::drawRect(SkRect const&, SkPaint const&, SkMatrix const*, SkRect const*) const /src/skia/out/Fuzz/../../src/core/SkDraw.cpp:825:21
+    #10 0xb53cb8 in SkBitmapDevice::drawRect(SkRect const&, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkBitmapDevice.cpp:198:18
+    #11 0x7243c4 in SkCanvas::onDrawRect(SkRect const&, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2033:27
+    #12 0x71ea8d in SkCanvas::drawRect(SkRect const&, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1714:11
+    #13 0xcaf4f9 in SkPaintImageFilter::onFilterImage(SkSpecialImage*, SkImageFilter::Context const&, SkIPoint*) const /src/skia/out/Fuzz/../../src/effects/SkPaintImageFilter.cpp:66:13
+    #14 0x7907d0 in SkImageFilter::filterImage(SkSpecialImage*, SkImageFilter::Context const&, SkIPoint*) const /src/skia/out/Fuzz/../../src/core/SkImageFilter.cpp:218:40
+    #15 0xb55a1b in SkBitmapDevice::drawSpecial(SkSpecialImage*, int, int, SkPaint const&, SkImage*, SkMatrix const&) /src/skia/out/Fuzz/../../src/core/SkBitmapDevice.cpp:424:33
+    #16 0x7180a0 in SkCanvas::internalDrawDevice(SkBaseDevice*, int, int, SkPaint const*, SkImage*, SkMatrix const&) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1314:25
+    #17 0x7132bb in SkCanvas::internalRestore() /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1202:19
+    #18 0x7197df in AutoDrawLooper::~AutoDrawLooper() /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:496:22
+    #19 0x727bdf in SkCanvas::onDrawBitmap(SkBitmap const&, float, float, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2312:1
+    #20 0x72165c in SkCanvas::drawBitmap(SkBitmap const&, float, float, SkPaint const*) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1835:11
+    #21 0x70322c in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/image_filter_deserialize.cpp:42:16
+    #22 0x6a99b0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #23 0x680ac9 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #24 0x68c414 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #25 0x68016c in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #26 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #27 0x58cc88 in _start (/out/image_filter_deserialize+0x58cc88)
+
+DEDUP_TOKEN: S32_alpha_D32_nofilter_DX(SkBitmapProcState const&, unsigned int const*, int, unsigned int*)--BitmapProcShaderContext::shadeSpan(int, int, unsigned int*, int)--SkARGB32_Shader_Blitter::blitAntiH(int, int, unsigned char const*, short const*)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/skia/out/Fuzz/../../src/core/SkBitmapProcState_sample.h:98:26 in S32_alpha_D32_nofilter_DX(SkBitmapProcState const&, unsigned int const*, int, unsigned int*)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42521647

@@ -1,0 +1,38 @@
+ARVO id: 42481620
+Project: htslib
+Fuzz target: hts_open_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/samtools/htslib.git
+
+=== Crash report ===
+INFO: Seed: 2776560547
+INFO: Loaded 1 modules   (26844 inline 8-bit counters): 26844 [0x92a9a8, 0x931284), 
+INFO: Loaded 1 PC tables (26844 PCs): 26844 [0x5f49c0,0x65d780), 
+/out/hts_open_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x000000010000 (pc 0x7ffff631206a bp 0x7fffffffdbb0 sp 0x7fffffffdb78 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7ffff631206a  (/lib/x86_64-linux-gnu/libc.so.6+0x14e06a)
+    #1 0x4c4cac in hpeek /src/htslib/hfile.c:301:5
+    #2 0x4ebf65 in sam_hdr_create /src/htslib/sam.c:1409:28
+    #3 0x4b5a50 in view_sam /src/htslib/test/fuzz/hts_open_fuzzer.c:53:22
+    #4 0x4b59ae in LLVMFuzzerTestOneInput /src/htslib/test/fuzz/hts_open_fuzzer.c:141:13
+    #5 0x444c61 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #6 0x42f781 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #7 0x43543e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #8 0x45f362 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #9 0x7ffff61e482f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #10 0x408bf8 in _start (/out/hts_open_fuzzer+0x408bf8)
+
+DEDUP_TOKEN: hpeek--sam_hdr_create
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x14e06a) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42481620

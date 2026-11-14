@@ -1,0 +1,45 @@
+ARVO id: 418125747
+Project: htslib
+Fuzz target: hts_open_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/samtools/htslib.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2863521427
+INFO: Loaded 1 modules   (35400 inline 8-bit counters): 35400 [0x55a25215a000, 0x55a252162a48), 
+INFO: Loaded 1 PC tables (35400 PCs): 35400 [0x55a252162a48,0x55a2521ecec8), 
+/out/hts_open_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[E::cram_get_ref] No reference found for id 85991456
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x000029010100 (pc 0x55a251f359f5 bp 0x7ffdb5618ec0 sp 0x7ffdb5618be0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x55a251f359f5 in cram_decode_slice /src/htslib/cram/cram_decode.c:2393:9
+    #1 0x55a251f43656 in cram_next_slice /src/htslib/cram/cram_decode.c:3364:13
+    #2 0x55a251f45080 in cram_get_seq /src/htslib/cram/cram_decode.c:3461:23
+    #3 0x55a251f4547b in cram_get_bam_seq /src/htslib/cram/cram_decode.c:3523:16
+    #4 0x55a251e86e54 in sam_read1_cram /src/htslib/sam.c:4258:15
+    #5 0x55a251e86e54 in sam_read1 /src/htslib/sam.c:4390:19
+    #6 0x55a251dff53d in view_sam /src/htslib/test/fuzz/hts_open_fuzzer.c:106:12
+    #7 0x55a251dff313 in LLVMFuzzerTestOneInput /src/htslib/test/fuzz/hts_open_fuzzer.c:201:13
+    #8 0x55a251cb3d30 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #9 0x55a251c9efa5 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #10 0x55a251ca4a3f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #11 0x55a251ccfce2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f0dbe651082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+    #13 0x55a251c9718d in _start (/out/hts_open_fuzzer+0x13318d)
+
+DEDUP_TOKEN: cram_decode_slice--cram_next_slice--cram_get_seq
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/htslib/cram/cram_decode.c:2393:9 in cram_decode_slice
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/418125747

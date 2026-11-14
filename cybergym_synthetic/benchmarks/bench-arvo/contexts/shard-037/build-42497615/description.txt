@@ -1,0 +1,53 @@
+ARVO id: 42497615
+Project: duckdb
+Fuzz target: parse_fuzz_test
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/duckdb/duckdb
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 234475216
+INFO: Loaded 1 modules   (413110 inline 8-bit counters): 413110 [0x35c2090, 0x3626e46), 
+INFO: Loaded 1 PC tables (413110 PCs): 413110 [0x3626e48,0x3c749a8), 
+/out/parse_fuzz_test: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x00009fff801c (pc 0x000000752c4e bp 0x7fffffffce10 sp 0x7fffffffccc0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x752c4e in duckdb::Transformer::TransformTypeName(duckdb_libpgquery::PGTypeName*) /src/duckdb/src/parser/transform/helpers/transform_typename.cpp:29:50
+    #1 0x15afa76 in duckdb::Transformer::TransformTypeCast(duckdb_libpgquery::PGTypeCast*) /src/duckdb/src/parser/transform/expression/transform_cast.cpp:15:28
+    #2 0x15aa145 in duckdb::Transformer::TransformExpression(duckdb_libpgquery::PGNode*) /src/duckdb/src/parser/transform/expression/transform_expression.cpp:49:10
+    #3 0x15b3ead in duckdb::Transformer::TransformAExpr(duckdb_libpgquery::PGAExpr*) /src/duckdb/src/parser/transform/expression/transform_operator.cpp:180:19
+    #4 0x15a9ef0 in duckdb::Transformer::TransformExpression(duckdb_libpgquery::PGNode*) /src/duckdb/src/parser/transform/expression/transform_expression.cpp:43:10
+    #5 0x15b3ead in duckdb::Transformer::TransformAExpr(duckdb_libpgquery::PGAExpr*) /src/duckdb/src/parser/transform/expression/transform_operator.cpp:180:19
+    #6 0x15a9ef0 in duckdb::Transformer::TransformExpression(duckdb_libpgquery::PGNode*) /src/duckdb/src/parser/transform/expression/transform_expression.cpp:43:10
+    #7 0x15b3ead in duckdb::Transformer::TransformAExpr(duckdb_libpgquery::PGAExpr*) /src/duckdb/src/parser/transform/expression/transform_operator.cpp:180:19
+    #8 0x15a9ef0 in duckdb::Transformer::TransformExpression(duckdb_libpgquery::PGNode*) /src/duckdb/src/parser/transform/expression/transform_expression.cpp:43:10
+    #9 0x15b3ead in duckdb::Transformer::TransformAExpr(duckdb_libpgquery::PGAExpr*) /src/duckdb/src/parser/transform/expression/transform_operator.cpp:180:19
+    #10 0x15a9ef0 in duckdb::Transformer::TransformExpression(duckdb_libpgquery::PGNode*) /src/duckdb/src/parser/transform/expression/transform_expression.cpp:43:10
+    #11 0x794653 in duckdb::Transformer::TransformUpdate(duckdb_libpgquery::PGNode*) /src/duckdb/src/parser/transform/statement/transform_update.cpp:21:33
+    #12 0x584f9d in duckdb::Transformer::TransformStatement(duckdb_libpgquery::PGNode*) /src/duckdb/src/parser/transformer.cpp:57:10
+    #13 0x5845ce in duckdb::Transformer::TransformStatement(duckdb_libpgquery::PGNode*) /src/duckdb/src/parser/transformer.cpp:27:17
+    #14 0x573940 in duckdb::Transformer::TransformParseTree(duckdb_libpgquery::PGList*, std::__1::vector<std::__1::unique_ptr<duckdb::SQLStatement, std::__1::default_delete<duckdb::SQLStatement> >, std::__1::allocator<std::__1::unique_ptr<duckdb::SQLStatement, std::__1::default_delete<duckdb::SQLStatement> > > >&) /src/duckdb/src/parser/transformer.cpp:12:15
+    #15 0x56f684 in duckdb::Parser::ParseQuery(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/duckdb/src/parser/parser.cpp:37:15
+    #16 0x563094 in LLVMFuzzerTestOneInput /src/duckdb/./parse_fuzz_test.cpp:19:15
+    #17 0x466363 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #18 0x4518d2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #19 0x457561 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #20 0x480f32 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #21 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #22 0x42c5f8 in _start (/out/parse_fuzz_test+0x42c5f8)
+
+DEDUP_TOKEN: duckdb::Transformer::TransformTypeName(duckdb_libpgquery::PGTypeName*)--duckdb::Transformer::TransformTypeCast(duckdb_libpgquery::PGTypeCast*)--duckdb::Transformer::TransformExpression(duckdb_libpgquery::PGNode*)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/duckdb/src/parser/transform/helpers/transform_typename.cpp:29:50 in duckdb::Transformer::TransformTypeName(duckdb_libpgquery::PGTypeName*)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42497615

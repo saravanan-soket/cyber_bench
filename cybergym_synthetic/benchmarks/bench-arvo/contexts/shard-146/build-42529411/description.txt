@@ -1,0 +1,75 @@
+ARVO id: 42529411
+Project: imagemagick
+Fuzz target: encoder_pcx_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 2246283230
+INFO: Loaded 1 modules   (52796 inline 8-bit counters): 52796 [0x16ebb98, 0x16f89d4), 
+INFO: Loaded 1 PC tables (52796 PCs): 52796 [0x1347f90,0x1416350), 
+/out/encoder_pcx_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==8==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x6dc360 in IsPixelMonochrome /src/imagemagick/./MagickCore/pixel-accessor.h:567:50
+    #1 0x6dc994 in IdentifyImageMonochrome /src/imagemagick/MagickCore/attribute.c:759:11
+    #2 0x763274 in SetImageMonochrome /src/imagemagick/MagickCore/colorspace.c:1288:7
+    #3 0xe7906f in WritePCXImage /src/imagemagick/coders/pcx.c:942:10
+    #4 0x7bbf81 in WriteImage /src/imagemagick/MagickCore/constitute.c:1118:14
+    #5 0x6eedac in ImageToBlob /src/imagemagick/MagickCore/blob.c:1912:18
+    #6 0x6f2cc0 in ImagesToBlob /src/imagemagick/MagickCore/blob.c:2289:14
+    #7 0x5ca711 in Magick::Image::write(Magick::Blob*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4894:8
+    #8 0x49ec6a in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:53:11
+    #9 0x4e6a93 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #10 0x4a0124 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #11 0x4b25a5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #12 0x49f221 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #13 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #14 0x41fa18 in _start (/out/encoder_pcx_fuzzer+0x41fa18)
+
+DEDUP_TOKEN: IsPixelMonochrome--IdentifyImageMonochrome--SetImageMonochrome
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x963a22 in SetPixelViaPixelInfo /src/imagemagick/./MagickCore/pixel-accessor.h:782:52
+    #1 0x9661b8 in SyncImage /src/imagemagick/MagickCore/image.c:3833:7
+    #2 0xe73b2b in ReadPCXImage /src/imagemagick/coders/pcx.c:655:14
+    #3 0x7b554b in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #4 0x6e2dc8 in BlobToImage /src/imagemagick/MagickCore/blob.c:469:13
+    #5 0x586179 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4015:12
+    #6 0x49ec2c in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:43:11
+    #7 0x4e6a93 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #8 0x4a0124 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #9 0x4b25a5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #10 0x49f221 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: SetPixelViaPixelInfo--SyncImage--ReadPCXImage
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0xe6fec4 in ReadPCXImage /src/imagemagick/coders/pcx.c:385:29
+    #1 0x7b554b in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #2 0x6e2dc8 in BlobToImage /src/imagemagick/MagickCore/blob.c:469:13
+    #3 0x586179 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4015:12
+    #4 0x49ec2c in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:43:11
+    #5 0x4e6a93 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #6 0x4a0124 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #7 0x4b25a5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #8 0x49f221 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #9 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: ReadPCXImage--ReadImage--BlobToImage
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mpcx_colormap[1m[35m' in the stack frame of function '[1m[32mReadPCXImage[1m[35m'[1m[0m
+    #0 0xe6ded0 in ReadPCXImage /src/imagemagick/coders/pcx.c:204
+
+DEDUP_TOKEN: ReadPCXImage
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/imagemagick/./MagickCore/pixel-accessor.h:567:50 in IsPixelMonochrome
+Unique heap origins: 684
+Stack depot allocated bytes: 93000
+Unique origin histories: 12
+History depot allocated bytes: 288
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42529411

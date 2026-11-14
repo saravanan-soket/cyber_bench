@@ -1,0 +1,47 @@
+ARVO id: 42486872
+Project: rdkit
+Fuzz target: mol_deserialization_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/rdkit/rdkit.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/mol_deserialization_fuzzer < INPUT_FILE
+or
+  /out/mol_deserialization_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/mol_deserialization_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 3912 bytes from /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x7ff3e886a008 (pc 0x000000657181 bp 0x7fffffffda50 sp 0x7fffffffd960 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x657181 in push_back /src/rdkit/Code/GraphMol/RingInfo.cpp
+    #1 0x657181 in RDKit::RingInfo::addRing(std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&) /src/rdkit/Code/GraphMol/RingInfo.cpp:107:22
+    #2 0x59b62a in void RDKit::MolPickler::_addRingInfoFromPickle<int>(std::__1::basic_istream<char, std::__1::char_traits<char> >&, RDKit::ROMol*, int, bool) /src/rdkit/Code/GraphMol/MolPickler.cpp:1974:17
+    #3 0x5462b5 in void RDKit::MolPickler::_depickle<int>(std::__1::basic_istream<char, std::__1::char_traits<char> >&, RDKit::ROMol*, int, int) /src/rdkit/Code/GraphMol/MolPickler.cpp:1175:5
+    #4 0x54387a in RDKit::MolPickler::molFromPickle(std::__1::basic_istream<char, std::__1::char_traits<char> >&, RDKit::ROMol*) /src/rdkit/Code/GraphMol/MolPickler.cpp:928:9
+    #5 0x54a16e in RDKit::MolPickler::molFromPickle(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, RDKit::ROMol*) /src/rdkit/Code/GraphMol/MolPickler.cpp:959:3
+    #6 0x500273 in molFromPickle /src/rdkit/Code/GraphMol/MolPickler.h:176:5
+    #7 0x500273 in LLVMFuzzerTestOneInput /src/rdkit/Code/Fuzz/mol_deserialization_fuzzer.cc:30:5
+    #8 0x79f34e in ExecuteFilesOnyByOne /src/libfuzzer/afl/afl_driver.cpp:217:5
+    #9 0x79f34e in main /src/libfuzzer/afl/afl_driver.cpp:254:12
+    #10 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #11 0x451d88 in _start (/out/mol_deserialization_fuzzer+0x451d88)
+
+DEDUP_TOKEN: push_back--RDKit::RingInfo::addRing(std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&)--void RDKit::MolPickler::_addRingInfoFromPickle<int>(std::__1::basic_istream<char, std::__1::char_traits<char> >&, RDKit::ROMol*, int, bool)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/rdkit/Code/GraphMol/RingInfo.cpp in push_back
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42486872

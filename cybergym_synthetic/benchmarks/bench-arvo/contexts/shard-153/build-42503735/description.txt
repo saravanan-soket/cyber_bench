@@ -1,0 +1,52 @@
+ARVO id: 42503735
+Project: assimp
+Fuzz target: assimp_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/assimp/assimp.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2705693769
+INFO: Loaded 1 modules   (197251 inline 8-bit counters): 197251 [0x1bf16d0, 0x1c21953), 
+INFO: Loaded 1 PC tables (197251 PCs): 197251 [0x1c21958,0x1f24188), 
+/out/assimp_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Info,  T0: Load $$$___magic___$$$.
+Info,  T0: Found a matching importer for this file format: ASE Importer.
+Info,  T0: Import root directory is './'
+Warn,  T0: Line 90: Unable to parse long: unexpected EOL [#1]
+Warn,  T0: Line 91: Out of range: material index is too large
+Warn,  T0: Line 1199: Unable to parse float: unexpected EOL [#1]
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==8==ERROR: AddressSanitizer: SEGV on unknown address 0x00537fff7fb5 (pc 0x000000732d3b bp 0x7fff5e7fe650 sp 0x7fff5e7fe5c0 T0)
+[1m[0m==8==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x732d3b in Assimp::ASE::Parser::ParseLV4MeshFloat(float&) /src/assimp/code/AssetLib/ASE/ASEParser.cpp:1842:14
+    #1 0x733982 in ParseLV4MeshFloatTriple /src/assimp/code/AssetLib/ASE/ASEParser.cpp:1834:9
+    #2 0x733982 in Assimp::ASE::Parser::ParseLV2MaterialBlock(Assimp::ASE::Material&) /src/assimp/code/AssetLib/ASE/ASEParser.cpp:525:17
+    #3 0x72afe6 in Assimp::ASE::Parser::ParseLV1MaterialListBlock() /src/assimp/code/AssetLib/ASE/ASEParser.cpp:496:17
+    #4 0x724ee9 in Assimp::ASE::Parser::Parse() /src/assimp/code/AssetLib/ASE/ASEParser.cpp:259:17
+    #5 0x6fb025 in Assimp::ASEImporter::InternReadFile(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, aiScene*, Assimp::IOSystem*) /src/assimp/code/AssetLib/ASE/ASELoader.cpp:168:14
+    #6 0x1565814 in Assimp::BaseImporter::ReadFile(Assimp::Importer*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, Assimp::IOSystem*) /src/assimp/code/Common/BaseImporter.cpp:111:9
+    #7 0x61c089 in Assimp::Importer::ReadFile(char const*, unsigned int) /src/assimp/code/Common/Importer.cpp:675:30
+    #8 0x61a4e0 in Assimp::Importer::ReadFileFromMemory(void const*, unsigned long, unsigned int, char const*) /src/assimp/code/Common/Importer.cpp:512:5
+    #9 0x560712 in LLVMFuzzerTestOneInput /src/assimp/fuzz/assimp_fuzzer.cc:53:34
+    #10 0x459773 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #11 0x445022 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #12 0x44aad5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #13 0x4737d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #14 0x7f07254480b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #15 0x4222bd in _start (/out/assimp_fuzzer+0x4222bd)
+
+DEDUP_TOKEN: Assimp::ASE::Parser::ParseLV4MeshFloat(float&)--ParseLV4MeshFloatTriple--Assimp::ASE::Parser::ParseLV2MaterialBlock(Assimp::ASE::Material&)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/assimp/code/AssetLib/ASE/ASEParser.cpp:1842:14 in Assimp::ASE::Parser::ParseLV4MeshFloat(float&)
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42503735

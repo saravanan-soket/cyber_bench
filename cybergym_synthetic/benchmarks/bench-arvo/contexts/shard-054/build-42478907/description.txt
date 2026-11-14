@@ -1,0 +1,49 @@
+ARVO id: 42478907
+Project: mruby
+Fuzz target: mruby_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/mruby/mruby
+
+=== Crash report ===
+INFO: Seed: 879217015
+INFO: Loaded 1 modules   (12736 inline 8-bit counters): 12736 [0x99f6e0, 0x9a28a0), 
+INFO: Loaded 1 PC tables (12736 PCs): 12736 [0x6f0028,0x721c28), 
+/out/mruby_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+line 35:18: syntax error, unexpected '.', expecting '|'
+line 79:18: syntax error, unexpected '.', expecting '|'
+line 97:21: syntax error, unexpected '}'
+line 102:3: syntax error, unexpected keyword_end, expecting '}'
+line 119:3: syntax error, unexpected keyword_end, expecting '}'
+line 124:35: syntax error, unexpected tIDENTIFIER, expecting '}'
+line 130:3: syntax error, unexpected keyword_end, expecting '}'
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==6==ERROR: AddressSanitizer: SEGV on unknown address 0x000000003809 (pc 0x000000592c40 bp 0x7fffffffd870 sp 0x7fffffffd860 T0)
+[1m[0m==6==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x592c3f in local_add_lv /src/mruby/mrbgems/mruby-compiler/core/parse.y:754:20
+    #1 0x583346 in new_args_tail /src/mruby/mrbgems/mruby-compiler/core/parse.y:805:7
+    #2 0x5747e9 in yyparse /src/mruby/mrbgems/mruby-compiler/core/parse.y
+    #3 0x56e1a1 in mrb_parser_parse /src/mruby/mrbgems/mruby-compiler/core/parse.y:6091:13
+    #4 0x57f9e0 in mrb_parse_nstring /src/mruby/mrbgems/mruby-compiler/core/parse.y:6275:3
+    #5 0x5805df in mrb_load_nstring_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6364:29
+    #6 0x5546d1 in LLVMFuzzerTestOneInput /src/mruby/oss-fuzz/mruby_fuzzer.c:14:5
+    #7 0x45aaf1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #8 0x445711 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #9 0x44b3ce in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #10 0x475542 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #11 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x41eac8 in _start (/out/mruby_fuzzer+0x41eac8)
+
+DEDUP_TOKEN: local_add_lv--new_args_tail--yyparse
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/mruby/mrbgems/mruby-compiler/core/parse.y:754:20 in local_add_lv
+==6==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42478907

@@ -1,0 +1,107 @@
+ARVO id: 42474701
+Project: karchive
+Fuzz target: kimgio_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-use-after-free READ 8
+Language: c++
+Repo: https://invent.kde.org/frameworks/karchive.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/kimgio_fuzzer < INPUT_FILE
+or
+  /out/kimgio_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/kimgio_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 136 bytes from /tmp/poc
+kf5.karchive: directory  "/" has no entry with name  "_rels"
+kf5.karchive: directory  "d" has entry "_rels" already
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-use-after-free on address 0x603000001a20 at pc 0x000001996be6 bp 0x7fffffffddb0 sp 0x7fffffffdda8
+[1m[0m[1m[34mREAD of size 8 at 0x603000001a20 thread T0[1m[0m
+SCARINESS: 51 (8-byte-read-heap-use-after-free)
+    #0 0x1996be5 in void qDeleteAll<QHash<QString, KArchiveEntry*>::const_iterator>(QHash<QString, KArchiveEntry*>::const_iterator, QHash<QString, KArchiveEntry*>::const_iterator) /src/qtbase/include/QtCore/../../src/corelib/tools/qalgorithms.h:320:9
+    #1 0x19930fc in KArchiveDirectoryPrivate::~KArchiveDirectoryPrivate() /src/karchive/src/karchive.cpp:792:9
+    #2 0x19930af in KArchiveDirectory::~KArchiveDirectory() /src/karchive/src/karchive.cpp:812:5
+    #3 0x199312c in KArchiveDirectory::~KArchiveDirectory() /src/karchive/src/karchive.cpp:811:1
+    #4 0x1996b2c in void qDeleteAll<QHash<QString, KArchiveEntry*>::const_iterator>(QHash<QString, KArchiveEntry*>::const_iterator, QHash<QString, KArchiveEntry*>::const_iterator) /src/qtbase/include/QtCore/../../src/corelib/tools/qalgorithms.h:320:9
+    #5 0x19930fc in KArchiveDirectoryPrivate::~KArchiveDirectoryPrivate() /src/karchive/src/karchive.cpp:792:9
+    #6 0x19930af in KArchiveDirectory::~KArchiveDirectory() /src/karchive/src/karchive.cpp:812:5
+    #7 0x199312c in KArchiveDirectory::~KArchiveDirectory() /src/karchive/src/karchive.cpp:811:1
+    #8 0x198d001 in KArchive::close() /src/karchive/src/karchive.cpp:184:5
+    #9 0x19a0f04 in KZip::~KZip() /src/karchive/src/kzip.cpp:434:9
+    #10 0x4cdcaa in KraHandler::read(QImage*) /src/kimageformats/src/imageformats/kra.cpp:50:1
+    #11 0x4cbe6d in LLVMFuzzerTestOneInput /src/kimgio_fuzzer.cc:65:12
+    #12 0x1963a7a in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:156:5
+    #13 0x1963ce1 in main /src/libfuzzer/afl/afl_driver.cpp:193:12
+    #14 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #15 0x4224f8 in _start (/out/kimgio_fuzzer+0x4224f8)
+
+DEDUP_TOKEN: void qDeleteAll<QHash<QString, KArchiveEntry*>::const_iterator>(QHash<QString, KArchiveEntry*>::const_iterator, QHash<QString, KArchiveEntry*>::const_iterator)--KArchiveDirectoryPrivate::~KArchiveDirectoryPrivate()--KArchiveDirectory::~KArchiveDirectory()
+[1m[32m0x603000001a20 is located 0 bytes inside of 32-byte region [0x603000001a20,0x603000001a40)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x4c9c3d in operator delete(void*) /src/llvm/projects/compiler-rt/lib/asan/asan_new_delete.cc:166:3
+    #1 0x1990463 in KArchivePrivate::findOrCreate(QString const&, int) /src/karchive/src/karchive.cpp:491:13
+    #2 0x19a2ec0 in KZip::openArchive(QFlags<QIODevice::OpenModeFlag>) /src/karchive/src/kzip.cpp:757:47
+    #3 0x198bca0 in KArchive::open(QFlags<QIODevice::OpenModeFlag>) /src/karchive/src/karchive.cpp:113:12
+    #4 0x4cdb10 in KraHandler::read(QImage*) /src/kimageformats/src/imageformats/kra.cpp:40:14
+    #5 0x4cbe6d in LLVMFuzzerTestOneInput /src/kimgio_fuzzer.cc:65:12
+    #6 0x1963a7a in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:156:5
+    #7 0x1963ce1 in main /src/libfuzzer/afl/afl_driver.cpp:193:12
+    #8 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: operator delete(void*)--KArchivePrivate::findOrCreate(QString const&, int)--KZip::openArchive(QFlags<QIODevice::OpenModeFlag>)
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x4c93dd in operator new(unsigned long) /src/llvm/projects/compiler-rt/lib/asan/asan_new_delete.cc:105:3
+    #1 0x19a29f3 in KZip::openArchive(QFlags<QIODevice::OpenModeFlag>) /src/karchive/src/kzip.cpp:740:25
+    #2 0x198bca0 in KArchive::open(QFlags<QIODevice::OpenModeFlag>) /src/karchive/src/karchive.cpp:113:12
+    #3 0x4cdb10 in KraHandler::read(QImage*) /src/kimageformats/src/imageformats/kra.cpp:40:14
+    #4 0x4cbe6d in LLVMFuzzerTestOneInput /src/kimgio_fuzzer.cc:65:12
+    #5 0x1963a7a in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:156:5
+    #6 0x1963ce1 in main /src/libfuzzer/afl/afl_driver.cpp:193:12
+    #7 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: operator new(unsigned long)--KZip::openArchive(QFlags<QIODevice::OpenModeFlag>)--KArchive::open(QFlags<QIODevice::OpenModeFlag>)
+SUMMARY: AddressSanitizer: heap-use-after-free /src/qtbase/include/QtCore/../../src/corelib/tools/qalgorithms.h:320:9 in void qDeleteAll<QHash<QString, KArchiveEntry*>::const_iterator>(QHash<QString, KArchiveEntry*>::const_iterator, QHash<QString, KArchiveEntry*>::const_iterator)
+Shadow bytes around the buggy address:
+  0x0c067fff82f0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c067fff8300: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c067fff8310: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff8320: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m07[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c067fff8330: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c067fff8340: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[35mfd[1m[0m][1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m07[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff8350: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m06[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m07[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff8360: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m06[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m01[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c067fff8370: [1m[0m00[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m01[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m07[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff8380: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m01[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c067fff8390: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m01[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42474701

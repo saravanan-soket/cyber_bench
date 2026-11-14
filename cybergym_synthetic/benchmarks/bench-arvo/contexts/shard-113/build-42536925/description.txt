@@ -1,0 +1,90 @@
+ARVO id: 42536925
+Project: libjxl
+Fuzz target: encoder_heic_fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ {*}
+Language: c++
+Repo: https://github.com/libjxl/libjxl
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/encoder_heic_fuzzer[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x53100001080f at pc 0x5653179f7e7a bp 0x7ffcb7346e30 sp 0x7ffcb73465f0
+[1m[0m[1m[34mREAD of size 256 at 0x53100001080f thread T0[1m[0m
+SCARINESS: 26 (multi-byte-read-heap-buffer-overflow)
+    #0 0x5653179f7e79 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:63:3
+    #1 0x565318638958 in HeifPixelImage::overlay(std::__1::shared_ptr<HeifPixelImage>&, int, int) /src/libheif/libheif/pixelimage.cc:865:9
+    #2 0x5653185aedb0 in HeifContext::decode_overlay_image(unsigned int, std::__1::shared_ptr<HeifPixelImage>&, std::__1::vector<unsigned char, std::__1::allocator<unsigned char>> const&, heif_decoding_options const&) const /src/libheif/libheif/context.cc:2222:16
+    #3 0x5653185a1d61 in HeifContext::decode_image_planar(unsigned int, std::__1::shared_ptr<HeifPixelImage>&, heif_colorspace, heif_decoding_options const&, bool) const /src/libheif/libheif/context.cc:1536:13
+    #4 0x56531859b678 in HeifContext::decode_image_user(unsigned int, std::__1::shared_ptr<HeifPixelImage>&, heif_colorspace, heif_chroma, heif_decoding_options const&) const /src/libheif/libheif/context.cc:1330:15
+    #5 0x5653184b8e0b in heif_decode_image /src/libheif/libheif/api/libheif/heif.cc:1083:35
+    #6 0x5653182396ea in ReadHEICImageHandle /src/imagemagick/coders/heic.c:488:9
+    #7 0x56531823421f in ReadHEICImage /src/imagemagick/coders/heic.c:706:10
+    #8 0x565317bf6542 in ReadImage /src/imagemagick/MagickCore/constitute.c:736:15
+    #9 0x565317b63278 in BlobToImage /src/imagemagick/MagickCore/blob.c:520:9
+    #10 0x565317a60153 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4044:12
+    #11 0x565317a393b1 in LLVMFuzzerTestOneInput /src/imagemagick/oss-fuzz/encoder_fuzzer.cc:84:11
+    #12 0x565317a39fbd in main (/out/encoder_heic_fuzzer+0x8a2fbd)
+    #13 0x7eff858c7082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #14 0x56531795e9ed in _start (/out/encoder_heic_fuzzer+0x7c79ed)
+
+DEDUP_TOKEN: __asan_memcpy--HeifPixelImage::overlay(std::__1::shared_ptr<HeifPixelImage>&, int, int)--HeifContext::decode_overlay_image(unsigned int, std::__1::shared_ptr<HeifPixelImage>&, std::__1::vector<unsigned char, std::__1::allocator<unsigned char>> const&, heif_decoding_options const&) const
+[1m[32m0x53100001080f is located 0 bytes after 65551-byte region [0x531000000800,0x53100001080f)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x565317a36cdd in operator new[](unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:98:3
+    #1 0x56531862b833 in alloc /src/libheif/libheif/pixelimage.cc:194:21
+    #2 0x56531862b833 in HeifPixelImage::add_plane(heif_channel, int, int, int) /src/libheif/libheif/pixelimage.cc:147:13
+    #3 0x5653185ae4ad in HeifContext::decode_overlay_image(unsigned int, std::__1::shared_ptr<HeifPixelImage>&, std::__1::vector<unsigned char, std::__1::allocator<unsigned char>> const&, heif_decoding_options const&) const /src/libheif/libheif/context.cc:2193:8
+    #4 0x5653185a1d61 in HeifContext::decode_image_planar(unsigned int, std::__1::shared_ptr<HeifPixelImage>&, heif_colorspace, heif_decoding_options const&, bool) const /src/libheif/libheif/context.cc:1536:13
+    #5 0x5653185ae88f in HeifContext::decode_overlay_image(unsigned int, std::__1::shared_ptr<HeifPixelImage>&, std::__1::vector<unsigned char, std::__1::allocator<unsigned char>> const&, heif_decoding_options const&) const /src/libheif/libheif/context.cc:2208:11
+    #6 0x5653185a1d61 in HeifContext::decode_image_planar(unsigned int, std::__1::shared_ptr<HeifPixelImage>&, heif_colorspace, heif_decoding_options const&, bool) const /src/libheif/libheif/context.cc:1536:13
+    #7 0x56531859b678 in HeifContext::decode_image_user(unsigned int, std::__1::shared_ptr<HeifPixelImage>&, heif_colorspace, heif_chroma, heif_decoding_options const&) const /src/libheif/libheif/context.cc:1330:15
+    #8 0x5653184b8e0b in heif_decode_image /src/libheif/libheif/api/libheif/heif.cc:1083:35
+    #9 0x5653182396ea in ReadHEICImageHandle /src/imagemagick/coders/heic.c:488:9
+    #10 0x56531823421f in ReadHEICImage /src/imagemagick/coders/heic.c:706:10
+    #11 0x565317bf6542 in ReadImage /src/imagemagick/MagickCore/constitute.c:736:15
+    #12 0x565317b63278 in BlobToImage /src/imagemagick/MagickCore/blob.c:520:9
+    #13 0x565317a60153 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4044:12
+    #14 0x565317a393b1 in LLVMFuzzerTestOneInput /src/imagemagick/oss-fuzz/encoder_fuzzer.cc:84:11
+    #15 0x565317a39fbd in main (/out/encoder_heic_fuzzer+0x8a2fbd)
+
+DEDUP_TOKEN: operator new[](unsigned long)--alloc--HeifPixelImage::add_plane(heif_channel, int, int, int)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:63:3 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x531000010580: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x531000010600: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x531000010680: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x531000010700: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x531000010780: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x531000010800: [1m[0m00[1m[0m[[1m[0m07[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x531000010880: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x531000010900: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x531000010980: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x531000010a00: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x531000010a80: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42536925

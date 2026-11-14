@@ -1,0 +1,76 @@
+ARVO id: 394650777
+Project: mruby
+Fuzz target: mruby_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/mruby/mruby
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1306347004
+INFO: Loaded 1 modules   (25624 inline 8-bit counters): 25624 [0x555555b0c920, 0x555555b12d38), 
+INFO: Loaded 1 PC tables (25624 PCs): 25624 [0x555555b12d38,0x555555b76eb8), 
+/out/mruby_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x5555558b9433 in mark_context_stack /src/mruby/src/gc.c:554:10
+    #1 0x5555558b9433 in mark_context /src/mruby/src/gc.c:573:3
+    #2 0x5555558b6ca5 in root_scan_phase /src/mruby/src/gc.c:944:3
+    #3 0x5555558b6ca5 in incremental_gc /src/mruby/src/gc.c:1112:5
+    #4 0x5555558af832 in incremental_gc_finish /src/mruby/src/gc.c:1143:5
+    #5 0x5555558af832 in mrb_incremental_gc /src/mruby/src/gc.c:1187:5
+    #6 0x5555558ad0c0 in mrb_obj_alloc /src/mruby/src/gc.c:502:5
+    #7 0x5555559196f3 in ary_new_capa /src/mruby/src/array.c:48:22
+    #8 0x55555591960f in mrb_ary_new_capa /src/mruby/src/array.c:65:22
+    #9 0x5555558f9879 in mrb_vm_exec /src/mruby/src/vm.c:2198:18
+    #10 0x5555558c8d90 in mrb_run /src/mruby/src/vm.c:3093:10
+    #11 0x5555558c8d90 in mrb_funcall_with_block /src/mruby/src/vm.c:750:13
+    #12 0x5555559526e8 in obj_hash_code /src/mruby/src/hash.c:340:23
+    #13 0x5555559526e8 in ib_it_init /src/mruby/src/hash.c:647:31
+    #14 0x555555956130 in ht_set /src/mruby/src/hash.c:894:3
+    #15 0x55555594c47a in h_set /src/mruby/src/hash.c:1031:3
+    #16 0x55555594c47a in mrb_hash_set /src/mruby/src/hash.c:1263:3
+    #17 0x55555594e594 in mrb_hash_aset /src/mruby/src/hash.c:1589:3
+    #18 0x5555558fc56a in mrb_vm_exec /src/mruby/src/vm.c
+    #19 0x555555814582 in mrb_load_exec /src/mruby/mrbgems/mruby-compiler/core/parse.y:6920:7
+    #20 0x55555577566e in LLVMFuzzerTestOneInput /src/mruby/oss-fuzz/mruby_fuzzer.c:14:5
+    #21 0x55555566b5c0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #22 0x555555656835 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #23 0x55555565c2cf in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #24 0x555555687572 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #25 0x7ffff7c38082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #26 0x55555564ea1d in _start (/out/mruby_fuzzer+0xfaa1d)
+
+DEDUP_TOKEN: mark_context_stack--mark_context--root_scan_phase
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x55555571879a in realloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1009:3
+    #1 0x5555558ac084 in mrb_realloc_simple /src/mruby/src/gc.c:197:8
+    #2 0x5555558ac084 in mrb_realloc /src/mruby/src/gc.c:211:8
+    #3 0x5555558ac084 in mrb_malloc /src/mruby/src/gc.c:227:10
+    #4 0x5555558ce88b in stack_init /src/mruby/src/vm.c:119:27
+    #5 0x5555558ce88b in mrb_vm_run /src/mruby/src/vm.c:1337:5
+    #6 0x5555558a8bb3 in mrb_init_core /src/mruby/src/init.c:48:3
+    #7 0x5555557831e5 in mrb_core_init_protect /src/mruby/src/error.c:562:5
+    #8 0x555555775ac8 in mrb_open_core /src/mruby/src/state.c:53:7
+    #9 0x555555775ac8 in mrb_open_allocf /src/mruby/src/state.c:80:20
+    #10 0x555555775ac8 in mrb_open /src/mruby/src/state.c:64:20
+    #11 0x555555775651 in LLVMFuzzerTestOneInput /src/mruby/oss-fuzz/mruby_fuzzer.c:13:22
+    #12 0x55555566b5c0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #13 0x555555656835 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #14 0x55555565c2cf in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #15 0x555555687572 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7ffff7c38082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+
+DEDUP_TOKEN: __interceptor_realloc--mrb_realloc_simple--mrb_realloc
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/mruby/src/gc.c:554:10 in mark_context_stack
+Unique heap origins: 675
+Stack depot allocated bytes: 9764880
+Unique origin histories: 16
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/394650777

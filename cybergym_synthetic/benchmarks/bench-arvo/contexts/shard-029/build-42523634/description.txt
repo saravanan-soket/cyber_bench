@@ -1,0 +1,69 @@
+ARVO id: 42523634
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_JPEG2000_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Invalid-free
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1390569105
+INFO: Loaded 1 modules   (58656 inline 8-bit counters): 58656 [0xf00dd0, 0xf0f2f0), 
+INFO: Loaded 1 PC tables (58656 PCs): 58656 [0xd109a0,0xdf5ba0), 
+/out/ffmpeg_AV_CODEC_ID_JPEG2000_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: attempting free on address which was not malloc()-ed: 0x7fff62642770 in thread T0
+[1m[0mSCARINESS: 40 (bad-free)
+    #0 0x54e6c2 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3
+    #1 0xb51216 in av_free /src/ffmpeg/libavutil/mem.c:241:5
+    #2 0xb51216 in av_freep /src/ffmpeg/libavutil/mem.c:251:5
+    #3 0x5daadc in ff_jpeg2000_decode_htj2k /src/ffmpeg/libavcodec/jpeg2000htdec.c:1282:5
+    #4 0x5c18c4 in tile_codeblocks /src/ffmpeg/libavcodec/jpeg2000dec.c:1928:35
+    #5 0x5c18c4 in jpeg2000_decode_tile /src/ffmpeg/libavcodec/jpeg2000dec.c:2039:5
+    #6 0x5911b7 in avcodec_default_execute2 /src/ffmpeg/libavcodec/avcodec.c:63:17
+    #7 0x5bda4a in jpeg2000_decode_frame /src/ffmpeg/libavcodec/jpeg2000dec.c:2501:5
+    #8 0x5a297d in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:287:15
+    #9 0x5a297d in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:540:15
+    #10 0x5a297d in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:560:15
+    #11 0x5a21a2 in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:635:15
+    #12 0x58e45f in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:514:25
+    #13 0x45d7d3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #14 0x448f32 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #15 0x44e7dc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #16 0x477d12 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7fae7a9e6082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 5792732f783158c66fb4f3756458ca24e46e827d)
+    #18 0x43f0fd in _start (/out/ffmpeg_AV_CODEC_ID_JPEG2000_fuzzer+0x43f0fd)
+
+DEDUP_TOKEN: free--av_free--av_freep
+[1m[32mAddress 0x7fff62642770 is located in stack of thread T0 at offset 688 in frame[1m[0m
+[1m[0m    #0 0x5da5ff in ff_jpeg2000_decode_htj2k /src/ffmpeg/libavcodec/jpeg2000htdec.c:1149
+
+DEDUP_TOKEN: ff_jpeg2000_decode_htj2k
+  This frame has 16 object(s):
+    [32, 34) 'sig_pat.i' (line 554)
+    [48, 50) 'res_off.i' (line 555)
+    [64, 66) 'emb_pat_k.i' (line 556)
+    [80, 82) 'emb_pat_1.i' (line 557)
+    [96, 98) 'u_sfx.i' (line 567)
+    [112, 114) 'u_ext.i' (line 568)
+    [128, 136) 'u.i' (line 570)
+    [160, 192) 'm.i' (line 575)
+    [224, 232) 'sigma_n.i' (line 600)
+    [256, 264) 'E.i' (line 601)
+    [288, 296) 'mu_n.i' (line 602)
+    [320, 352) 'mel' (line 1167)
+    [384, 416) 'vlc' (line 1168)
+    [448, 451) 'mel_state' (line 1171)
+    [464, 472) 'sample_buf' (line 1176)
+    [496, 504) 'block_states' (line 1177)[1m[32m <== Memory access at offset 688 overflows this variable[1m[0m
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: bad-free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3 in free
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42523634

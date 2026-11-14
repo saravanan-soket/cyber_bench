@@ -1,0 +1,95 @@
+ARVO id: 42517704
+Project: librawspeed
+Fuzz target: TiffDecoderFuzzer-IiqDecoder
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Container-overflow READ 8
+Language: c++
+Repo: https://github.com/darktable-org/rawspeed.git
+
+=== Crash report ===
+INFO: Seed: 1711970698
+INFO: Loaded 1 modules   (13952 inline 8-bit counters): 13952 [0xb1e310, 0xb21990), 
+INFO: Loaded 1 PC tables (13952 PCs): 13952 [0xb21990,0xb58190), 
+/out/TiffDecoderFuzzer-IiqDecoder: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: container-overflow on address 0x6120000005d0 at pc 0x0000005cb6c7 bp 0x7fffffffd850 sp 0x7fffffffd848
+[1m[0m[1m[34mREAD of size 8 at 0x6120000005d0 thread T0[1m[0m
+SCARINESS: 23 (8-byte-read-container-overflow)
+    #0 0x5cb6c6 in rawspeed::Spline<unsigned short, void>::prepare() /src/librawspeed/src/librawspeed/common/Spline.h:97:31
+    #1 0x5c748d in rawspeed::Spline<unsigned short, void>::Spline(std::__1::vector<rawspeed::iPoint2D, std::__1::allocator<rawspeed::iPoint2D> > const&) /src/librawspeed/src/librawspeed/common/Spline.h:143:5
+    #2 0x5bec21 in rawspeed::IiqDecoder::CorrectQuadrantMultipliersCombined(rawspeed::ByteStream, unsigned int, unsigned int) /src/librawspeed/src/librawspeed/decoders/IiqDecoder.cpp:346:22
+    #3 0x5b9c1a in rawspeed::IiqDecoder::CorrectPhaseOneC(rawspeed::ByteStream, unsigned int, unsigned int) /src/librawspeed/src/librawspeed/decoders/IiqDecoder.cpp:287:7
+    #4 0x5b783e in rawspeed::IiqDecoder::decodeRawInternal() /src/librawspeed/src/librawspeed/decoders/IiqDecoder.cpp:209:5
+    #5 0x5fc320 in rawspeed::RawDecoder::decodeRaw() /src/librawspeed/src/librawspeed/decoders/RawDecoder.cpp:268:20
+    #6 0x56af50 in LLVMFuzzerTestOneInput /src/librawspeed/fuzz/librawspeed/decoders/TiffDecoders/main.cpp:76:14
+    #7 0x737d50 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #8 0x712619 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #9 0x71df64 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #10 0x711cbc in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x46b128 in _start (/out/TiffDecoderFuzzer-IiqDecoder+0x46b128)
+
+DEDUP_TOKEN: rawspeed::Spline<unsigned short, void>::prepare()--rawspeed::Spline<unsigned short, void>::Spline(std::__1::vector<rawspeed::iPoint2D, std::__1::allocator<rawspeed::iPoint2D> > const&)--rawspeed::IiqDecoder::CorrectQuadrantMultipliersCombined(rawspeed::ByteStream, unsigned int, unsigned int)
+[1m[32m0x6120000005d0 is located 272 bytes inside of 288-byte region [0x6120000004c0,0x6120000005e0)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x566978 in operator new(unsigned long) /src/llvm/projects/compiler-rt/lib/asan/asan_new_delete.cc:92
+    #1 0x5cc427 in std::__1::__allocate(unsigned long) /usr/local/bin/../include/c++/v1/new:228:10
+    #2 0x5cc427 in std::__1::allocator<rawspeed::Spline<unsigned short, void>::Segment>::allocate(unsigned long, void const*) /usr/local/bin/../include/c++/v1/memory:1790
+    #3 0x5cc427 in std::__1::allocator_traits<std::__1::allocator<rawspeed::Spline<unsigned short, void>::Segment> >::allocate(std::__1::allocator<rawspeed::Spline<unsigned short, void>::Segment>&, unsigned long) /usr/local/bin/../include/c++/v1/memory:1544
+    #4 0x5cc427 in std::__1::__split_buffer<rawspeed::Spline<unsigned short, void>::Segment, std::__1::allocator<rawspeed::Spline<unsigned short, void>::Segment>&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<rawspeed::Spline<unsigned short, void>::Segment>&) /usr/local/bin/../include/c++/v1/__split_buffer:311
+    #5 0x5cc427 in std::__1::vector<rawspeed::Spline<unsigned short, void>::Segment, std::__1::allocator<rawspeed::Spline<unsigned short, void>::Segment> >::__append(unsigned long) /usr/local/bin/../include/c++/v1/vector:1047
+    #6 0x5c7220 in std::__1::vector<rawspeed::Spline<unsigned short, void>::Segment, std::__1::allocator<rawspeed::Spline<unsigned short, void>::Segment> >::resize(unsigned long) /usr/local/bin/../include/c++/v1/vector:2008:15
+    #7 0x5c7220 in rawspeed::Spline<unsigned short, void>::Spline(std::__1::vector<rawspeed::iPoint2D, std::__1::allocator<rawspeed::iPoint2D> > const&) /src/librawspeed/src/librawspeed/common/Spline.h:137
+    #8 0x5bec21 in rawspeed::IiqDecoder::CorrectQuadrantMultipliersCombined(rawspeed::ByteStream, unsigned int, unsigned int) /src/librawspeed/src/librawspeed/decoders/IiqDecoder.cpp:346:22
+    #9 0x5b9c1a in rawspeed::IiqDecoder::CorrectPhaseOneC(rawspeed::ByteStream, unsigned int, unsigned int) /src/librawspeed/src/librawspeed/decoders/IiqDecoder.cpp:287:7
+    #10 0x5b783e in rawspeed::IiqDecoder::decodeRawInternal() /src/librawspeed/src/librawspeed/decoders/IiqDecoder.cpp:209:5
+    #11 0x5fc320 in rawspeed::RawDecoder::decodeRaw() /src/librawspeed/src/librawspeed/decoders/RawDecoder.cpp:268:20
+    #12 0x56af50 in LLVMFuzzerTestOneInput /src/librawspeed/fuzz/librawspeed/decoders/TiffDecoders/main.cpp:76:14
+    #13 0x737d50 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #14 0x712619 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #15 0x71df64 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #16 0x711cbc in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #17 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: operator new(unsigned long)--std::__1::__allocate(unsigned long)--std::__1::allocator<rawspeed::Spline<unsigned short, void>::Segment>::allocate(unsigned long, void const*)
+HINT: if you don't care about these errors you may set ASAN_OPTIONS=detect_container_overflow=0.
+If you suspect a false positive see also: https://github.com/google/sanitizers/wiki/AddressSanitizerContainerOverflow.
+SUMMARY: AddressSanitizer: container-overflow /src/librawspeed/src/librawspeed/common/Spline.h:97:31 in rawspeed::Spline<unsigned short, void>::prepare()
+Shadow bytes around the buggy address:
+  0x0c247fff8060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c247fff8070: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c247fff8080: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c247fff8090: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c247fff80a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c247fff80b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[34mfc[1m[0m [1m[34mfc[1m[0m[[1m[34mfc[1m[0m][1m[34mfc[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c247fff80c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c247fff80d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c247fff80e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c247fff80f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c247fff8100: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42517704

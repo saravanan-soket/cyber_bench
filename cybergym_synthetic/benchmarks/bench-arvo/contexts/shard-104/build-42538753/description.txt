@@ -1,0 +1,99 @@
+ARVO id: 42538753
+Project: gdal
+Fuzz target: mrf_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/mrf_fuzzer < INPUT_FILE
+or
+  /out/mrf_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/mrf_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 408 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6120000005d3 at pc 0x000000c3780c bp 0x7ffc42f45100 sp 0x7ffc42f450f8
+[1m[0m[1m[34mREAD of size 1 at 0x6120000005d3 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0xc3780b in GDAL_MRF::fromYarn(char const*, unsigned long, char*, unsigned long, unsigned char) /src/gdal/gdal/frmts/mrf/Packer_RLE.cpp:125:14
+    #1 0xc37408 in GDAL_MRF::RLEC3Packer::load(GDAL_MRF::storage_manager*, GDAL_MRF::storage_manager*) /src/gdal/gdal/frmts/mrf/Packer_RLE.cpp:180:23
+    #2 0xbdffed in GDAL_MRF::BitMap2D<unsigned long long>::load(GDAL_MRF::storage_manager*) /src/gdal/gdal/frmts/mrf/./BitMask2D.h:157:31
+    #3 0xbdd8ef in GDAL_MRF::MaskProcessor(jpeg_decompress_struct*) /src/gdal/gdal/frmts/mrf/JPEG_band.cpp:462:16
+    #4 0x5be12b in read_markers /src/gdal/gdal/frmts/jpeg/libjpeg/jdmarker.c:1065:13
+    #5 0x5ba964 in consume_markers /src/gdal/gdal/frmts/jpeg/libjpeg/jdinput.c:296:9
+    #6 0x5b9430 in jpeg_consume_input /src/gdal/gdal/frmts/jpeg/libjpeg/jdapimin.c:301:15
+    #7 0x5b9166 in jpeg_read_header /src/gdal/gdal/frmts/jpeg/libjpeg/jdapimin.c:249:13
+    #8 0xbdc750 in GDAL_MRF::JPEG_Codec::DecompressJPEG(GDAL_MRF::buf_mgr&, GDAL_MRF::buf_mgr&) /src/gdal/gdal/frmts/mrf/JPEG_band.cpp:525:5
+    #9 0xe8c411 in GDAL_MRF::GDALMRFRasterBand::IReadBlock(int, int, void*) /src/gdal/gdal/frmts/mrf/mrf_band.cpp:817:18
+    #10 0x79839d in GDALRasterBand::GetLockedBlockRef(int, int, int) /src/gdal/gdal/gcore/gdalrasterband.cpp:1333:20
+    #11 0x7d3da3 in GDALRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/rasterio.cpp:152:27
+    #12 0x79597e in GDALRasterBand::RasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdalrasterband.cpp:387:16
+    #13 0x795fd4 in GDALRasterIO /src/gdal/gdal/gcore/gdalrasterband.cpp:421:21
+    #14 0x98c973 in GDALChecksumImage /src/gdal/gdal/alg/gdalchecksum.cpp:155:17
+    #15 0x5259fd in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_fuzzer.cpp:219:17
+    #16 0x5262ef in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:271:5
+    #17 0x52688f in main /src/libfuzzer/afl/afl_driver.cpp:308:12
+    #18 0x7fdc1a4d882f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #19 0x427618 in _start (/out/mrf_fuzzer+0x427618)
+
+DEDUP_TOKEN: GDAL_MRF::fromYarn(char const*, unsigned long, char*, unsigned long, unsigned char)--GDAL_MRF::RLEC3Packer::load(GDAL_MRF::storage_manager*, GDAL_MRF::storage_manager*)--GDAL_MRF::BitMap2D<unsigned long long>::load(GDAL_MRF::storage_manager*)
+[1m[32m0x6120000005d3 is located 0 bytes to the right of 275-byte region [0x6120000004c0,0x6120000005d3)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4e99e8 in __interceptor_malloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:88
+    #1 0xe8bcb6 in GDAL_MRF::GDALMRFRasterBand::IReadBlock(int, int, void*) /src/gdal/gdal/frmts/mrf/mrf_band.cpp:746:18
+    #2 0x79839d in GDALRasterBand::GetLockedBlockRef(int, int, int) /src/gdal/gdal/gcore/gdalrasterband.cpp:1333:20
+    #3 0x7d3da3 in GDALRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/rasterio.cpp:152:27
+    #4 0x79597e in GDALRasterBand::RasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdalrasterband.cpp:387:16
+    #5 0x795fd4 in GDALRasterIO /src/gdal/gdal/gcore/gdalrasterband.cpp:421:21
+    #6 0x98c973 in GDALChecksumImage /src/gdal/gdal/alg/gdalchecksum.cpp:155:17
+    #7 0x5259fd in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_fuzzer.cpp:219:17
+    #8 0x5262ef in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:271:5
+    #9 0x52688f in main /src/libfuzzer/afl/afl_driver.cpp:308:12
+    #10 0x7fdc1a4d882f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: __interceptor_malloc--GDAL_MRF::GDALMRFRasterBand::IReadBlock(int, int, void*)--GDALRasterBand::GetLockedBlockRef(int, int, int)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/gdal/gdal/frmts/mrf/Packer_RLE.cpp:125:14 in GDAL_MRF::fromYarn(char const*, unsigned long, char*, unsigned long, unsigned char)
+Shadow bytes around the buggy address:
+  0x0c247fff8060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c247fff8070: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c247fff8080: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c247fff8090: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c247fff80a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c247fff80b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m03[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c247fff80c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c247fff80d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c247fff80e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c247fff80f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c247fff8100: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42538753

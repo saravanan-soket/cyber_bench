@@ -1,0 +1,42 @@
+ARVO id: 42492074
+Project: qt
+Fuzz target: qtbase_gui_text_qtextdocument_sethtml
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: git://code.qt.io/qt/qtbase.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1298840883
+INFO: Loaded 1 modules   (338205 inline 8-bit counters): 338205 [0x2db1c10, 0x2e0452d), 
+INFO: Loaded 1 PC tables (338205 PCs): 338205 [0x2e04530,0x332d700), 
+/out/qtbase_gui_text_qtextdocument_sethtml: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+QStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-root'
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x6288000079c0 (pc 0x000000eff4ee bp 0x7ffc64649d50 sp 0x7ffc64649ba0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0xeff4ee in QTextHtmlImporter::scanTable(int) /src/qt/qtbase/src/gui/text/qtextdocumentfragment.cpp:932:34
+    #1 0xef811b in QTextHtmlImporter::processSpecialNodes() /src/qt/qtbase/src/gui/text/qtextdocumentfragment.cpp:712:23
+    #2 0xef52f7 in QTextHtmlImporter::import() /src/qt/qtbase/src/gui/text/qtextdocumentfragment.cpp:517:13
+    #3 0xe960ef in QTextDocument::setHtml(QString const&) /src/qt/qtbase/src/gui/text/qtextdocument.cpp:1257:72
+    #4 0x559f97 in LLVMFuzzerTestOneInput /src/qt/qtbase/tests/libfuzzer/gui/text/qtextdocument/sethtml/main.cpp:39:21
+    #5 0x45eb21 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #6 0x4488b2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #7 0x44ebf5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #8 0x478aa2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #9 0x7f31602e383f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #10 0x4237c8 in _start (/out/qtbase_gui_text_qtextdocument_sethtml+0x4237c8)
+
+DEDUP_TOKEN: QTextHtmlImporter::scanTable(int)--QTextHtmlImporter::processSpecialNodes()--QTextHtmlImporter::import()
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/qt/qtbase/src/gui/text/qtextdocumentfragment.cpp:932:34 in QTextHtmlImporter::scanTable(int)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42492074

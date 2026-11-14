@@ -1,0 +1,58 @@
+ARVO id: 42503147
+Project: imagemagick
+Fuzz target: ping_wpg_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 96961492
+INFO: Loaded 1 modules   (226679 inline 8-bit counters): 226679 [0x2421eb0, 0x2459427), 
+INFO: Loaded 1 PC tables (226679 PCs): 226679 [0x2459428,0x2613fe0), 
+/out/ping_wpg_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x0da12e86 (pc 0x01eab895 bp 0xffc88a68 sp 0xffc88a40 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x1eab895 in skip_spaces /src/freetype2/src/psaux/psobjs.c:320:13
+    #1 0x1eab895 in ps_parser_skip_spaces /src/freetype2/src/psaux/psobjs.c:617:5
+    #2 0x1d69b6c in parse_dict /src/freetype2/src/type1/t1load.c:2457:7
+    #3 0x1d53663 in T1_Open_Face /src/freetype2/src/type1/t1load.c:2532:13
+    #4 0x1d53663 in T1_Face_Init /src/freetype2/src/type1/t1objs.c:349:13
+    #5 0x1cec49c in open_face /src/freetype2/src/base/ftobjs.c:1465:15
+    #6 0x1cc6671 in ft_open_face_internal /src/freetype2/src/base/ftobjs.c:2537:19
+    #7 0x1cc9381 in FT_Open_Face /src/freetype2/src/base/ftobjs.c:2428:12
+    #8 0xc0e2e3 in RenderFreetype /src/imagemagick/MagickCore/annotate.c:1455:13
+    #9 0xc06c12 in RenderType /src/imagemagick/MagickCore/annotate.c
+    #10 0xc05c37 in GetTypeMetrics /src/imagemagick/MagickCore/annotate.c:919:10
+    #11 0xd1d16f in RenderMVGContent /src/imagemagick/MagickCore/draw.c:4351:17
+    #12 0xd1452c in DrawImage /src/imagemagick/MagickCore/draw.c:4473:10
+    #13 0x1330031 in ReadTTFImage /src/imagemagick/coders/ttf.c:289:10
+    #14 0xcbfc02 in ReadImage /src/imagemagick/MagickCore/constitute.c:563:15
+    #15 0x13588fd in ExtractPostscript /src/imagemagick/coders/wpg.c:855:10
+    #16 0x13556cc in ReadWPGImage /src/imagemagick/coders/wpg.c:1567:25
+    #17 0xcbfc02 in ReadImage /src/imagemagick/MagickCore/constitute.c:563:15
+    #18 0x1073986 in ReadStream /src/imagemagick/MagickCore/stream.c:1081:9
+    #19 0xc3bec2 in PingBlob /src/imagemagick/MagickCore/blob.c:3646:13
+    #20 0xae5289 in Magick::Image::ping(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:3873:12
+    #21 0xa7e075 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/ping_fuzzer.cc:44:11
+    #22 0x966d0e in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #23 0x9510ae in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #24 0x956dc4 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #25 0x980ca7 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #26 0xf1a09ed4 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x1aed4)
+    #27 0x92d6b5 in _start (/out/ping_wpg_fuzzer+0x92d6b5)
+
+DEDUP_TOKEN: skip_spaces--ps_parser_skip_spaces--parse_dict
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/freetype2/src/psaux/psobjs.c:320:13 in skip_spaces
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42503147

@@ -1,0 +1,41 @@
+ARVO id: 42496374
+Project: wasm3
+Fuzz target: fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: UNKNOWN READ
+Language: c
+Repo: https://github.com/wasm3/wasm3
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 250323761
+INFO: Loaded 1 modules   (3361 inline 8-bit counters): 3361 [0x83b6e8, 0x83c409), 
+INFO: Loaded 1 PC tables (3361 PCs): 3361 [0x5e1ba8,0x5eedb8), 
+/out/fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address 0x00000000fccd (pc 0x000000541ccb bp 0x7fffffffd670 sp 0x7fffffffd610 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x541ccb in NumFreeLines /src/wasm3/source/m3_code.c:78:25
+    #1 0x535d6c in ReleaseCodePageNoTrack /src/wasm3/source/m3_env.c:968:26
+    #2 0x553cd7 in Compile_ExtendedOpcode /src/wasm3/source/m3_compile.c:1120:1
+    #3 0x5b1a0b in CompileBlockStatements /src/wasm3/source/m3_compile.c:2477:1
+    #4 0x5b5469 in CompileFunction /src/wasm3/source/m3_compile.c:2767:1
+    #5 0x53070c in m3_FindFunction /src/wasm3/source/m3_env.c:686:1
+    #6 0x527045 in LLVMFuzzerTestOneInput /src/wasm3/platforms/app_fuzz/fuzzer.c:33:30
+    #7 0x459dc3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #8 0x443bd2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #9 0x449a1a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #10 0x475702 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #12 0x41e8b8 in _start (/out/fuzzer+0x41e8b8)
+
+DEDUP_TOKEN: NumFreeLines--ReleaseCodePageNoTrack--Compile_ExtendedOpcode
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV /src/wasm3/source/m3_code.c:78:25 in NumFreeLines
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42496374

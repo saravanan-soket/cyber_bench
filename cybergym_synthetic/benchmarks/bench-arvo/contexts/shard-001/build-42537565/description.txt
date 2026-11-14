@@ -1,0 +1,40 @@
+ARVO id: 42537565
+Project: ffmpeg
+Fuzz target: ffmpeg_dem_W64_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3448510707
+INFO: Loaded 1 modules   (107898 inline 8-bit counters): 107898 [0x563f3fb629c0, 0x563f3fb7cf3a), 
+INFO: Loaded 1 PC tables (107898 PCs): 107898 [0x563f3fb7cf40,0x563f3fd226e0), 
+/out/ffmpeg_dem_W64_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m[1m[31mUninitialized bytes in [1m[32mMemcmpInterceptorCommon[1m[31m at offset 0 inside [0x7fff5983bee0, 16)[1m[0m
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x563f3ef8b8b0 in memcmp /src/llvm-project/compiler-rt/lib/msan/../sanitizer_common/sanitizer_common_interceptors.inc:842:10
+    #1 0x563f3f388d9f in w64_read_header /src/ffmpeg/libavformat/wavdec.c:878:9
+    #2 0x563f3f092887 in avformat_open_input /src/ffmpeg/libavformat/demux.c:305:20
+    #3 0x563f3efdf247 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dem_fuzzer.c:202:11
+    #4 0x563f3eedb590 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #5 0x563f3eec5d24 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #6 0x563f3eecb7ba in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #7 0x563f3eef7bb2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #8 0x7f1e12c20082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #9 0x563f3eebc7fd in _start (/out/ffmpeg_dem_W64_fuzzer+0x3097fd)
+
+DEDUP_TOKEN: ___interceptor_memcmp--w64_read_header--avformat_open_input
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mguid[1m[35m' in the stack frame[1m[0m
+    #0 0x563f3f388d6e in w64_read_header /src/ffmpeg/libavformat/wavdec.c:874:5
+
+DEDUP_TOKEN: w64_read_header
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/llvm-project/compiler-rt/lib/msan/../sanitizer_common/sanitizer_common_interceptors.inc:842:10 in memcmp
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42537565

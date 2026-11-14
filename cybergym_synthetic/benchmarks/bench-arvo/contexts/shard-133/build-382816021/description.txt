@@ -1,0 +1,116 @@
+ARVO id: 382816021
+Project: nss
+Fuzz target: dtls-client
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-use-after-free READ {*}
+Language: c++
+Repo: https://hg.mozilla.org/projects/nss
+
+=== Crash report ===
+INFO: found LLVMFuzzerCustomMutator (0x5632d542f750). Disabling -len_control by default.
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1131946644
+INFO: Loaded 1 modules   (103828 inline 8-bit counters): 103828 [0x5632d6055dc8, 0x5632d606f35c), 
+INFO: Loaded 1 PC tables (103828 PCs): 103828 [0x5632d606f360,0x5632d6204ca0), 
+/out/dtls-client: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-use-after-free on address 0x52900000020f at pc 0x5632d53eadca bp 0x7ffca9b677f0 sp 0x7ffca9b66fb0
+[1m[0m[1m[34mREAD of size 32 at 0x52900000020f thread T0[1m[0m
+SCARINESS: 54 (multi-byte-read-heap-use-after-free)
+    #0 0x5632d53eadc9 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:63:3
+    #1 0x5632d554e6e1 in sslBuffer_AppendVariable /src/nss/out/Debug/../../lib/ssl/sslencode.c:126:9
+    #2 0x5632d54bd54f in tls13_ClientSendHrrCookieXtn /src/nss/out/Debug/../../lib/ssl/tls13exthandle.c:1006:10
+    #3 0x5632d5535d8f in ssl_ConstructExtensions /src/nss/out/Debug/../../lib/ssl/ssl3ext.c:823:14
+    #4 0x5632d54f39f2 in ssl3_SendClientHello /src/nss/out/Debug/../../lib/ssl/ssl3con.c:5602:14
+    #5 0x5632d5490cfe in tls13_HandleHelloRetryRequest /src/nss/out/Debug/../../lib/ssl/tls13con.c:2981:10
+    #6 0x5632d550ea9d in ssl3_HandleServerHello /src/nss/out/Debug/../../lib/ssl/ssl3con.c:7245:14
+    #7 0x5632d550ea9d in ssl3_HandleHandshakeMessage /src/nss/out/Debug/../../lib/ssl/ssl3con.c:12695:18
+    #8 0x5632d54cf130 in dtls_HandleHandshakeMessage /src/nss/out/Debug/../../lib/ssl/dtlscon.c:248:12
+    #9 0x5632d54cf130 in dtls_HandleHandshake /src/nss/out/Debug/../../lib/ssl/dtlscon.c:360:18
+    #10 0x5632d5516c3e in ssl3_HandleNonApplicationData /src/nss/out/Debug/../../lib/ssl/ssl3con.c:13413:22
+    #11 0x5632d551ab4b in ssl3_HandleRecord /src/nss/out/Debug/../../lib/ssl/ssl3con.c:13775:10
+    #12 0x5632d5544787 in ssl3_GatherCompleteHandshake /src/nss/out/Debug/../../lib/ssl/ssl3gthr.c:561:18
+    #13 0x5632d554bb74 in ssl_GatherRecord1stHandshake /src/nss/out/Debug/../../lib/ssl/sslcon.c:73:10
+    #14 0x5632d54429d4 in ssl_Do1stHandshake /src/nss/out/Debug/../../lib/ssl/sslsecur.c:43:14
+    #15 0x5632d5445ade in SSL_ForceHandshake /src/nss/out/Debug/../../lib/ssl/sslsecur.c:431:14
+    #16 0x5632d54330a7 in DoHandshake(PRFileDesc*, bool) /src/nss/out/Debug/../../fuzz/tls_common.cc:54:10
+    #17 0x5632d542ec6d in LLVMFuzzerTestOneInput /src/nss/out/Debug/../../fuzz/tls_client_target.cc:240:3
+    #18 0x5632d5c01d80 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #19 0x5632d5bec514 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #20 0x5632d5bf1faa in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #21 0x5632d5c1e3a2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #22 0x7fd45b563082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #23 0x5632d535193d in _start (/out/dtls-client+0x36293d)
+
+DEDUP_TOKEN: __asan_memcpy--sslBuffer_AppendVariable--tls13_ClientSendHrrCookieXtn
+[1m[32m0x52900000020f is located 15 bytes inside of 18432-byte region [0x529000000200,0x529000004a00)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x5632d53eca66 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3
+    #1 0x5632d554f27c in sslBuffer_Clear /src/nss/out/Debug/../../lib/ssl/sslencode.c:209:13
+    #2 0x5632d551ab55 in ssl3_HandleRecord /src/nss/out/Debug/../../lib/ssl/ssl3con.c:13783:5
+    #3 0x5632d5544787 in ssl3_GatherCompleteHandshake /src/nss/out/Debug/../../lib/ssl/ssl3gthr.c:561:18
+    #4 0x5632d554bb74 in ssl_GatherRecord1stHandshake /src/nss/out/Debug/../../lib/ssl/sslcon.c:73:10
+    #5 0x5632d54429d4 in ssl_Do1stHandshake /src/nss/out/Debug/../../lib/ssl/sslsecur.c:43:14
+    #6 0x5632d5445ade in SSL_ForceHandshake /src/nss/out/Debug/../../lib/ssl/sslsecur.c:431:14
+    #7 0x5632d54330a7 in DoHandshake(PRFileDesc*, bool) /src/nss/out/Debug/../../fuzz/tls_common.cc:54:10
+    #8 0x5632d542ec6d in LLVMFuzzerTestOneInput /src/nss/out/Debug/../../fuzz/tls_client_target.cc:240:3
+    #9 0x5632d5c01d80 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #10 0x5632d5bec514 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #11 0x5632d5bf1faa in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #12 0x5632d5c1e3a2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7fd45b563082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+
+DEDUP_TOKEN: __interceptor_free--sslBuffer_Clear--ssl3_HandleRecord
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x5632d53ecd0e in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0x5632d556ba63 in PORT_Alloc_Util /src/nss/out/Debug/../../lib/util/secport.c:87:14
+    #2 0x5632d554dcee in sslBuffer_Grow /src/nss/out/Debug/../../lib/ssl/sslencode.c:52:39
+    #3 0x5632d546a310 in ssl_NewSocket /src/nss/out/Debug/../../lib/ssl/sslsock.c:4273:10
+    #4 0x5632d545e811 in ssl_ImportFD /src/nss/out/Debug/../../lib/ssl/sslsock.c:2165:14
+    #5 0x5632d542e42a in LLVMFuzzerTestOneInput /src/nss/out/Debug/../../fuzz/tls_client_target.cc:225:24
+    #6 0x5632d5c01d80 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #7 0x5632d5bec514 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #8 0x5632d5bf1faa in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #9 0x5632d5c1e3a2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7fd45b563082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+
+DEDUP_TOKEN: __interceptor_malloc--PORT_Alloc_Util--sslBuffer_Grow
+SUMMARY: AddressSanitizer: heap-use-after-free /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:63:3 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x528fffffff80: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x529000000000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x529000000080: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x529000000100: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x529000000180: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x529000000200: [1m[35mfd[1m[0m[[1m[35mfd[1m[0m][1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x529000000280: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x529000000300: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x529000000380: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x529000000400: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x529000000480: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/382816021

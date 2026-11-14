@@ -1,0 +1,40 @@
+ARVO id: 42515668
+Project: hunspell
+Fuzz target: affdicfuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/hunspell/hunspell.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1902089169
+INFO: Loaded 1 modules   (15817 inline 8-bit counters): 15817 [0x9e6dc8, 0x9eab91), 
+INFO: Loaded 1 PC tables (15817 PCs): 15817 [0x918438,0x9560c8), 
+/out/affdicfuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address 0x709000010000 (pc 0x0000005b870b bp 0x7fffffffce80 sp 0x7fffffffcd40 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x5b870b in SuggestMgr::badchar_utf(std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > >&, w_char const*, int, int) /src/hunspell/src/hunspell/suggestmgr.cxx:680:19
+    #1 0x5a64ea in SuggestMgr::suggest(std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > >&, char const*, int*) /src/hunspell/src/hunspell/suggestmgr.cxx:314:9
+    #2 0x55d00b in HunspellImpl::suggest_internal(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, bool&, unsigned long&, int&) /src/hunspell/src/hunspell/hunspell.cxx:1031:22
+    #3 0x5586db in HunspellImpl::suggest(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/hunspell/src/hunspell/hunspell.cxx:882:35
+    #4 0x58aeb7 in Hunspell::suggest(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/hunspell/src/hunspell/hunspell.cxx:2043:18
+    #5 0x537e5f in LLVMFuzzerTestOneInput /src/hunspell/./src/tools/affdicfuzzer.cxx:66:14
+    #6 0x440443 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #7 0x42bba2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #8 0x43144c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #9 0x45a982 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7ffff7c55082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #11 0x421d6d in _start (/out/affdicfuzzer+0x421d6d)
+
+DEDUP_TOKEN: SuggestMgr::badchar_utf(std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > >&, w_char const*, int, int)--SuggestMgr::suggest(std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > >&, char const*, int*)--HunspellImpl::suggest_internal(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, bool&, unsigned long&, int&)
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV /src/hunspell/src/hunspell/suggestmgr.cxx:680:19 in SuggestMgr::badchar_utf(std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > >&, w_char const*, int, int)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42515668

@@ -1,0 +1,103 @@
+ARVO id: 42512011
+Project: grpc
+Fuzz target: client_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-use-after-free READ 1
+Language: c++
+Repo: https://github.com/grpc/grpc
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1578875570
+INFO: Loaded 1 modules   (193721 inline 8-bit counters): 193721 [0x1b52770, 0x1b81c29), 
+INFO: Loaded 1 PC tables (193721 PCs): 193721 [0x1b81c30,0x1e767c0), 
+/out/client_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-use-after-free on address 0x61f000001d10 at pc 0x00000128fbc9 bp 0x7fffffffd330 sp 0x7fffffffd328
+[1m[0m[1m[34mREAD of size 1 at 0x61f000001d10 thread T0[1m[0m
+SCARINESS: 40 (1-byte-read-heap-use-after-free)
+    #0 0x128fbc8 in inflate /proc/self/cwd/external/zlib/inflate.c:663:13
+    #1 0x1192c61 in zlib_body(z_stream_s*, grpc_slice_buffer*, grpc_slice_buffer*, int (*)(z_stream_s*, int)) /proc/self/cwd/src/core/lib/compression/message_compress.cc:60:11
+    #2 0x1191c38 in zlib_decompress(grpc_slice_buffer*, grpc_slice_buffer*, int) /proc/self/cwd/src/core/lib/compression/message_compress.cc:131:7
+    #3 0x11919a0 in grpc_msg_decompress(grpc_compression_algorithm, grpc_slice_buffer*, grpc_slice_buffer*) /proc/self/cwd/src/core/lib/compression/message_compress.cc
+    #4 0xb6c8f8 in grpc_core::(anonymous namespace)::CallData::OnRecvMessageReady(void*, grpc_error*) /proc/self/cwd/src/core/ext/filters/http/message_compress/message_decompress_filter.cc:187:11
+    #5 0x12cad82 in exec_ctx_run /proc/self/cwd/src/core/lib/iomgr/exec_ctx.cc:49:3
+    #6 0x12cad82 in grpc_core::ExecCtx::Flush() /proc/self/cwd/src/core/lib/iomgr/exec_ctx.cc:79:9
+    #7 0x562f97 in LLVMFuzzerTestOneInput /proc/self/cwd/test/core/end2end/fuzzers/client_fuzzer.cc:123:34
+    #8 0x45c923 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #9 0x4485a2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x44ddec in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #11 0x4769f2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7ffff7c55082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #13 0x426dcd in _start (/out/client_fuzzer+0x426dcd)
+
+DEDUP_TOKEN: inflate--zlib_body(z_stream_s*, grpc_slice_buffer*, grpc_slice_buffer*, int (*)(z_stream_s*, int))--zlib_decompress(grpc_slice_buffer*, grpc_slice_buffer*, int)
+[1m[32m0x61f000001d10 is located 144 bytes inside of 3408-byte region [0x61f000001c80,0x61f0000029d0)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x52afa2 in __interceptor_free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:111:3
+    #1 0x13007ec in operator() /proc/self/cwd/src/core/lib/slice/slice.cc:221:36
+    #2 0x13007ec in grpc_slice_malloc_large::$_0::__invoke(grpc_slice_refcount*) /proc/self/cwd/src/core/lib/slice/slice.cc:221:7
+    #3 0x12ab50d in Unref /proc/self/cwd/./src/core/lib/slice/slice_refcount_base.h:46:7
+    #4 0x12ab50d in grpc_slice_unref_internal /proc/self/cwd/./src/core/lib/slice/slice_refcount.h:41:21
+    #5 0x12ab50d in grpc_slice_buffer_reset_and_unref_internal(grpc_slice_buffer*) /proc/self/cwd/src/core/lib/slice/slice_buffer.cc:241:5
+    #6 0xae2773 in read_action_locked(void*, grpc_error*) /proc/self/cwd/src/core/ext/transport/chttp2/transport/chttp2_transport.cc:2546:3
+    #7 0x12c54b1 in grpc_combiner_continue_exec_ctx() /proc/self/cwd/src/core/lib/iomgr/combiner.cc:240:5
+    #8 0x12cab9d in grpc_core::ExecCtx::Flush() /proc/self/cwd/src/core/lib/iomgr/exec_ctx.cc:82:17
+    #9 0x562f97 in LLVMFuzzerTestOneInput /proc/self/cwd/test/core/end2end/fuzzers/client_fuzzer.cc:123:34
+    #10 0x45c923 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #11 0x4485a2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #12 0x44ddec in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #13 0x4769f2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #14 0x7ffff7c55082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+
+DEDUP_TOKEN: __interceptor_free--operator()--grpc_slice_malloc_large::$_0::__invoke(grpc_slice_refcount*)
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x52b20d in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:129:3
+    #1 0x14f70c4 in operator new(unsigned long) (/out/client_fuzzer+0x14f70c4)
+    #2 0x562f31 in LLVMFuzzerTestOneInput /proc/self/cwd/test/core/end2end/fuzzers/client_fuzzer.cc:119:24
+    #3 0x45c923 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #4 0x4485a2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #5 0x44ddec in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #6 0x4769f2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #7 0x7ffff7c55082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+
+DEDUP_TOKEN: __interceptor_malloc--operator new(unsigned long)--LLVMFuzzerTestOneInput
+SUMMARY: AddressSanitizer: heap-use-after-free /proc/self/cwd/external/zlib/inflate.c:663:13 in inflate
+Shadow bytes around the buggy address:
+  0x0c3e7fff8350: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c3e7fff8360: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c3e7fff8370: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c3e7fff8380: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c3e7fff8390: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+=>0x0c3e7fff83a0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m[[1m[35mfd[1m[0m][1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c3e7fff83b0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c3e7fff83c0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c3e7fff83d0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c3e7fff83e0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c3e7fff83f0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42512011

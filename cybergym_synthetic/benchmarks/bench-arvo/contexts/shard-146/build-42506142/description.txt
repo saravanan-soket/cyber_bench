@@ -1,0 +1,115 @@
+ARVO id: 42506142
+Project: imagemagick
+Fuzz target: ping_tiff_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Stack-buffer-overflow WRITE 4
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1955230195
+INFO: Loaded 1 modules   (192049 inline 8-bit counters): 192049 [0x20d64b0, 0x21052e1), 
+INFO: Loaded 1 PC tables (192049 PCs): 192049 [0x21052e4,0x227c46c), 
+/out/ping_tiff_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0xf11ff930 at pc 0x0137a8ab bp 0xfff74298 sp 0xfff74290
+[1m[0m[1m[34mWRITE of size 4 at 0xf11ff930 thread T0[1m[0m
+SCARINESS: 51 (4-byte-write-stack-buffer-overflow)
+    #0 0x137a8aa in _TIFFVGetField /src/libtiff/libtiff/tif_dir.c:1154:31
+    #1 0x136fae0 in TIFFVGetField /src/libtiff/libtiff/tif_dir.c:1292:6
+    #2 0x136a745 in TIFFVGetFieldDefaulted /src/libtiff/libtiff/tif_aux.c:212:6
+    #3 0x136c7b7 in TIFFGetFieldDefaulted /src/libtiff/libtiff/tif_aux.c:350:8
+    #4 0x12d8df8 in ReadTIFFImage /src/imagemagick/coders/tiff.c:1505:9
+    #5 0xd293d7 in ReadImage /src/imagemagick/MagickCore/constitute.c:563:15
+    #6 0xfac3a6 in ReadStream /src/imagemagick/MagickCore/stream.c:1081:9
+    #7 0xcb9c12 in PingBlob /src/imagemagick/MagickCore/blob.c:3647:13
+    #8 0xb915cb in Magick::Image::ping(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:3873:12
+    #9 0xb44fc4 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/ping_fuzzer.cc:44:11
+    #10 0xa3a0ce in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #11 0xa243de in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #12 0xa2a2c5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #13 0xa54dd7 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #14 0xf240d646 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x18646)
+    #15 0x9fe8e0 in _start (/out/ping_tiff_fuzzer+0x9fe8e0)
+
+DEDUP_TOKEN: _TIFFVGetField--TIFFVGetField--TIFFVGetFieldDefaulted
+[1m[32mAddress 0xf11ff930 is located in stack of thread T0 at offset 304 in frame[1m[0m
+[1m[0m    #0 0x12d7aff in ReadTIFFImage /src/imagemagick/coders/tiff.c:1191
+
+DEDUP_TOKEN: ReadTIFFImage
+  This frame has 32 object(s):
+    [16, 20) 'chromaticity' (line 1205)
+    [32, 36) 'x_position' (line 1205)
+    [48, 52) 'y_position' (line 1205)
+    [64, 68) 'x_resolution' (line 1205)
+    [80, 84) 'y_resolution' (line 1205)
+    [96, 98) 'compress_tag' (line 1247)
+    [112, 114) 'bits_per_sample' (line 1247)
+    [128, 130) 'endian' (line 1247)
+    [144, 146) 'extra_samples' (line 1247)
+    [160, 162) 'interlace' (line 1247)
+    [176, 178) 'max_sample_value' (line 1247)
+    [192, 194) 'min_sample_value' (line 1247)
+    [208, 210) 'orientation' (line 1247)
+    [224, 226) 'pages' (line 1247)
+    [240, 242) 'photometric' (line 1247)
+    [256, 260) 'sample_info' (line 1247)
+    [272, 274) 'sample_format' (line 1247)
+    [288, 290) 'samples_per_pixel' (line 1247)
+    [304, 306) 'units' (line 1247)[1m[32m <== Memory access at offset 304 partially overflows this variable[1m[0m
+    [320, 322) 'value' (line 1247)
+    [336, 340) 'height' (line 1264)
+    [352, 356) 'rows_per_strip' (line 1264)
+    [368, 372) 'width' (line 1264)
+    [384, 400) 'sans' (line 1272)
+    [416, 420) 'blue_colormap' (line 1619)
+    [432, 436) 'green_colormap' (line 1619)
+    [448, 452) 'red_colormap' (line 1619)
+    [464, 4560) 'buffer' (line 1741)
+    [4688, 4692) 'columns754' (line 1753)
+    [4704, 4708) 'rows755' (line 1753)
+    [4720, 4724) 'columns1304' (line 1983)
+    [4736, 4740) 'rows1305' (line 1983)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/libtiff/libtiff/tif_dir.c:1154:31 in _TIFFVGetField
+Shadow bytes around the buggy address:
+  0x3e23fed0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3e23fee0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3e23fef0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3e23ff00: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m
+  0x3e23ff10: [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m
+=>0x3e23ff20: [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m[[1m[0m02[1m[0m][1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m
+  0x3e23ff30: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x3e23ff40: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x3e23ff50: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x3e23ff60: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+  0x3e23ff70: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42506142

@@ -1,0 +1,50 @@
+ARVO id: 42495469
+Project: rdkit
+Fuzz target: mol_deserialization_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Bad parameters to --sanitizer-annotate-contiguous-container
+Language: c++
+Repo: https://github.com/rdkit/rdkit.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1146085680
+INFO: Loaded 1 modules   (39980 inline 8-bit counters): 39980 [0xc48940, 0xc5256c), 
+INFO: Loaded 1 PC tables (39980 PCs): 39980 [0xc52570,0xcee830), 
+/out/mol_deserialization_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+==7==ERROR: AddressSanitizer: bad parameters to __sanitizer_annotate_contiguous_container:
+      beg     : 0x3e3e3e3e3e3e3e3e
+      end     : 0x3e3e3e3e3e3e3e3e
+      old_mid : 0x3e3e3e3e3e3e3e3e
+      new_mid : 0x3e3e3e3e3e3e3e3e
+==7==ERROR: beg is not aligned by 8
+    #0 0x565299 in __sanitizer_annotate_contiguous_container /src/llvm-project/compiler-rt/lib/asan/asan_poisoning.cpp:362:5
+    #1 0x5fc2e0 in __annotate_contiguous_container /usr/local/bin/../include/c++/v1/vector:864:9
+    #2 0x5fc2e0 in __annotate_delete /usr/local/bin/../include/c++/v1/vector:879:7
+    #3 0x5fc2e0 in std::__1::vector<int, std::__1::allocator<int> >::__swap_out_circular_buffer(std::__1::__split_buffer<int, std::__1::allocator<int>&>&) /usr/local/bin/../include/c++/v1/vector:953:5
+    #4 0x6ff056 in void std::__1::vector<int, std::__1::allocator<int> >::__push_back_slow_path<int const&>(int const&) /usr/local/bin/../include/c++/v1/vector:1628:5
+    #5 0x709b22 in push_back /usr/local/bin/../include/c++/v1/vector:1641:9
+    #6 0x709b22 in RDKit::RingInfo::addRing(std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&) /src/rdkit/Code/GraphMol/RingInfo.cpp:107:22
+    #7 0x63aac9 in void RDKit::MolPickler::_addRingInfoFromPickle<int>(std::__1::basic_istream<char, std::__1::char_traits<char> >&, RDKit::ROMol*, int, bool) /src/rdkit/Code/GraphMol/MolPickler.cpp:1978:17
+    #8 0x5e0340 in void RDKit::MolPickler::_depickle<int>(std::__1::basic_istream<char, std::__1::char_traits<char> >&, RDKit::ROMol*, int, int) /src/rdkit/Code/GraphMol/MolPickler.cpp:1179:5
+    #9 0x5dd3d8 in RDKit::MolPickler::molFromPickle(std::__1::basic_istream<char, std::__1::char_traits<char> >&, RDKit::ROMol*) /src/rdkit/Code/GraphMol/MolPickler.cpp:932:9
+    #10 0x5e438f in RDKit::MolPickler::molFromPickle(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, RDKit::ROMol*) /src/rdkit/Code/GraphMol/MolPickler.cpp:963:3
+    #11 0x59620e in molFromPickle /src/rdkit/Code/GraphMol/MolPickler.h:176:5
+    #12 0x59620e in LLVMFuzzerTestOneInput /src/rdkit/Code/Fuzz/mol_deserialization_fuzzer.cc:30:5
+    #13 0x4989b3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #14 0x482812 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #15 0x48865a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #16 0x4b4392 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #18 0x45d4a8 in _start (/out/mol_deserialization_fuzzer+0x45d4a8)
+
+DEDUP_TOKEN: __sanitizer_annotate_contiguous_container--__annotate_contiguous_container--__annotate_delete
+SUMMARY: AddressSanitizer: bad-__sanitizer_annotate_contiguous_container /src/llvm-project/compiler-rt/lib/asan/asan_poisoning.cpp:362:5 in __sanitizer_annotate_contiguous_container
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42495469

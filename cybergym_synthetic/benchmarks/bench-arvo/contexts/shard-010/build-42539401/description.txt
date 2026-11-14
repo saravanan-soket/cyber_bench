@@ -1,0 +1,107 @@
+ARVO id: 42539401
+Project: gdal
+Fuzz target: gdal_translate_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/gdal_translate_fuzzer < INPUT_FILE
+or
+  /out/gdal_translate_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/gdal_translate_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 149 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x60300000c68b at pc 0x000000c22925 bp 0x7ffcf7e13770 sp 0x7ffcf7e13768
+[1m[0m[1m[34mREAD of size 1 at 0x60300000c68b thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0xc22924 in CPLErr GDALResampleChunk32R_AverageT<unsigned char, int>(double, double, double, double, GDALDataType, unsigned char*, unsigned char*, int, int, int, int, int, int, int, int, GDALRasterBand*, char const*, int, float, GDALColorTable*, bool) /src/gdal/gdal/gcore/overview.cpp:437:27
+    #1 0xc1890a in GDALResampleChunk32R_Average(double, double, double, double, GDALDataType, void*, unsigned char*, int, int, int, int, int, int, int, int, GDALRasterBand*, char const*, int, float, GDALColorTable*, GDALDataType, bool) /src/gdal/gdal/gcore/overview.cpp:567:16
+    #2 0xc378d8 in GDALRasterBand::RasterIOResampled(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/rasterio.cpp:1220:28
+    #3 0xc34550 in GDALRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/rasterio.cpp:634:24
+    #4 0xb985f6 in GDALDataset::BandBasedRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, int, int*, long long, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdaldataset.cpp:1788:24
+    #5 0xb97e4a in GDALDataset::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, int, int*, long long, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdaldataset.cpp:1731:12
+    #6 0xb9912d in GDALDataset::RasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, int, int*, long long, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdaldataset.cpp:2080:16
+    #7 0xaf17d4 in VRTSimpleSource::DatasetRasterIO(int, int, int, int, void*, int, int, GDALDataType, int, int*, long long, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/frmts/vrt/vrtsources.cpp:1588:31
+    #8 0xaaa28d in VRTDataset::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, int, int*, long long, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/frmts/vrt/vrtdataset.cpp:1638:30
+    #9 0xb9912d in GDALDataset::RasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, int, int*, long long, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdaldataset.cpp:2080:16
+    #10 0xc40304 in GDALDatasetCopyWholeRaster /src/gdal/gdal/gcore/rasterio.cpp:4542:37
+    #11 0x5864eb in GTiffDataset::CreateCopy(char const*, GDALDataset*, int, char**, int (*)(double, char const*, void*), void*) /src/gdal/gdal/frmts/gtiff/geotiff.cpp:17440:16
+    #12 0xbb80db in GDALDriver::CreateCopy(char const*, GDALDataset*, int, char**, int (*)(double, char const*, void*), void*) /src/gdal/gdal/gcore/gdaldriver.cpp:892:19
+    #13 0xbb84f5 in GDALCreateCopy /src/gdal/gdal/gcore/gdaldriver.cpp:939:9
+    #14 0xe7d770 in GDALTranslate /src/gdal/gdal/apps/gdal_translate_lib.cpp:1796:18
+    #15 0x525260 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_translate_fuzzer.cpp:107:47
+    #16 0x5256df in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:271:5
+    #17 0x525c7f in main /src/libfuzzer/afl/afl_driver.cpp:308:12
+    #18 0x7f515ffd782f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #19 0x4275d8 in _start (/out/gdal_translate_fuzzer+0x4275d8)
+
+DEDUP_TOKEN: CPLErr GDALResampleChunk32R_AverageT<unsigned char, int>(double, double, double, double, GDALDataType, unsigned char*, unsigned char*, int, int, int, int, int, int, int, int, GDALRasterBand*, char const*, int, float, GDALColorTable*, bool)--GDALResampleChunk32R_Average(double, double, double, double, GDALDataType, void*, unsigned char*, int, int, int, int, int, int, int, int, GDALRasterBand*, char const*, int, float, GDALColorTable*, GDALDataType, bool)--GDALRasterBand::RasterIOResampled(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*)
+[1m[32m0x60300000c68b is located 0 bytes to the right of 27-byte region [0x60300000c670,0x60300000c68b)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4e9d78 in __interceptor_malloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:88
+    #1 0xd370f7 in VSIMalloc3Verbose /src/gdal/gdal/port/cpl_vsisimple.cpp:1185:18
+    #2 0xc37043 in GDALRasterBand::RasterIOResampled(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/rasterio.cpp:1071:13
+    #3 0xc34550 in GDALRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/rasterio.cpp:634:24
+    #4 0xb985f6 in GDALDataset::BandBasedRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, int, int*, long long, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdaldataset.cpp:1788:24
+    #5 0xb97e4a in GDALDataset::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, int, int*, long long, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdaldataset.cpp:1731:12
+    #6 0xb9912d in GDALDataset::RasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, int, int*, long long, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdaldataset.cpp:2080:16
+    #7 0xaf17d4 in VRTSimpleSource::DatasetRasterIO(int, int, int, int, void*, int, int, GDALDataType, int, int*, long long, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/frmts/vrt/vrtsources.cpp:1588:31
+    #8 0xaaa28d in VRTDataset::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, int, int*, long long, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/frmts/vrt/vrtdataset.cpp:1638:30
+    #9 0xb9912d in GDALDataset::RasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, int, int*, long long, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdaldataset.cpp:2080:16
+    #10 0xc40304 in GDALDatasetCopyWholeRaster /src/gdal/gdal/gcore/rasterio.cpp:4542:37
+    #11 0x5864eb in GTiffDataset::CreateCopy(char const*, GDALDataset*, int, char**, int (*)(double, char const*, void*), void*) /src/gdal/gdal/frmts/gtiff/geotiff.cpp:17440:16
+    #12 0xbb80db in GDALDriver::CreateCopy(char const*, GDALDataset*, int, char**, int (*)(double, char const*, void*), void*) /src/gdal/gdal/gcore/gdaldriver.cpp:892:19
+    #13 0xbb84f5 in GDALCreateCopy /src/gdal/gdal/gcore/gdaldriver.cpp:939:9
+    #14 0xe7d770 in GDALTranslate /src/gdal/gdal/apps/gdal_translate_lib.cpp:1796:18
+    #15 0x525260 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_translate_fuzzer.cpp:107:47
+    #16 0x5256df in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:271:5
+    #17 0x525c7f in main /src/libfuzzer/afl/afl_driver.cpp:308:12
+    #18 0x7f515ffd782f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: __interceptor_malloc--VSIMalloc3Verbose--GDALRasterBand::RasterIOResampled(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/gdal/gdal/gcore/overview.cpp:437:27 in CPLErr GDALResampleChunk32R_AverageT<unsigned char, int>(double, double, double, double, GDALDataType, unsigned char*, unsigned char*, int, int, int, int, int, int, int, int, GDALRasterBand*, char const*, int, float, GDALColorTable*, bool)
+Shadow bytes around the buggy address:
+  0x0c067fff9880: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff9890: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c067fff98a0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff98b0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff98c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c067fff98d0: [1m[0m00[1m[0m[[1m[0m03[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff98e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff98f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff9900: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff9910: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff9920: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42539401

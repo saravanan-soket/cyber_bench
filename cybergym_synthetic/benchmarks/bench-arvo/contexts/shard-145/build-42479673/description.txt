@@ -1,0 +1,37 @@
+ARVO id: 42479673
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_IFF_ILBM_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Index-out-of-bounds
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Seed: 3284847921
+INFO: Loaded 1 modules   (62136 inline 8-bit counters): 62136 [0xc0e570, 0xc1d828), 
+INFO: Loaded 1 PC tables (62136 PCs): 62136 [0x833180,0x925d00), 
+/out/ffmpeg_AV_CODEC_ID_IFF_ILBM_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1mlibavcodec/iff.c:459:27:[1m[31m runtime error: [1m[0m[1mindex 9 out of bounds for type 'const uint64_t [8][256]'[1m[0m
+    #0 0x4c4ee4 in decodeplane8 /src/ffmpeg/libavcodec/iff.c:459:27
+    #1 0x4c1079 in decode_frame /src/ffmpeg/libavcodec/iff.c:1652:25
+    #2 0x4be78d in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:432:15
+    #3 0x4be5c4 in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:628:15
+    #4 0x4b98c8 in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:646:15
+    #5 0x4b97dd in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:704:15
+    #6 0x4ba24d in compat_decode /src/ffmpeg/libavcodec/decode.c:840:15
+    #7 0x4b56db in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:281:23
+    #8 0x443e61 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #9 0x42ea81 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #10 0x43473e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #11 0x45e8b2 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #12 0x7fe6fa7bb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #13 0x407e38 in _start (/out/ffmpeg_AV_CODEC_ID_IFF_ILBM_fuzzer+0x407e38)
+
+DEDUP_TOKEN: decodeplane8--decode_frame--decode_simple_internal
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior libavcodec/iff.c:459:27 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42479673

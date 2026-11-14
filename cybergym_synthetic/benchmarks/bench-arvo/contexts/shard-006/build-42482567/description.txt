@@ -1,0 +1,40 @@
+ARVO id: 42482567
+Project: binutils-gdb
+Fuzz target: fuzz_disassemble
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: git://sourceware.org/git/binutils-gdb.git
+
+=== Crash report ===
+INFO: Seed: 3080320844
+INFO: Loaded 1 modules   (187030 inline 8-bit counters): 187030 [0x345eab7, 0x348c54d), 
+INFO: Loaded 1 PC tables (187030 PCs): 187030 [0x2bdf8e8,0x2eba248), 
+/out/fuzz_disassemble: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x892adf in print_insn_ns32k /src/binutils-gdb/opcodes/ns32k-dis.c:851:4
+    #1 0x525bd1 in LLVMFuzzerTestOneInput /src/binutils-gdb/fuzz/fuzz_disassemble.c:86:30
+    #2 0x45a741 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #3 0x445261 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #4 0x44af1e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #5 0x474e42 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #6 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #7 0x41e6d8 in _start (/out/fuzz_disassemble+0x41e6d8)
+
+DEDUP_TOKEN: print_insn_ns32k--LLVMFuzzerTestOneInput--fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long)
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32marg_bufs[1m[35m' in the stack frame of function '[1m[32mprint_insn_ns32k[1m[35m'[1m[0m
+    #0 0x890ef0 in print_insn_ns32k /src/binutils-gdb/opcodes/ns32k-dis.c:735
+
+DEDUP_TOKEN: print_insn_ns32k
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/binutils-gdb/opcodes/ns32k-dis.c:851:4 in print_insn_ns32k
+Unique heap origins: 21
+Stack depot allocated bytes: 1240
+Unique origin histories: 3
+History depot allocated bytes: 72
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42482567

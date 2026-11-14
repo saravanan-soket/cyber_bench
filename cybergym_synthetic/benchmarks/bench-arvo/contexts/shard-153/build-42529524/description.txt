@@ -1,0 +1,39 @@
+ARVO id: 42529524
+Project: php-src
+Fuzz target: php-fuzz-tracing-jit
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://github.com/php/php-src.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 397409424
+INFO: Loaded 2 modules   (183511 inline 8-bit counters): 147720 [0x1b67c00, 0x1b8bd08), 35791 [0x7f10aaf5ee90, 0x7f10aaf67a5f), 
+INFO: Loaded 2 PC tables (183511 PCs): 147720 [0x1b8bd08,0x1dccd88), 35791 [0x7f10aaf67a60,0x7f10aaff3750), 
+/out/php-fuzz-tracing-jit: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x000000f642ba bp 0x7ffdd64261a0 sp 0x7ffdd6426110 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+SCARINESS: 20 (wild-addr-read)
+LLVMSymbolizer: error reading file: No such file or directory
+    #0 0xf642ba in zend_gc_delref /src/php-src/Zend/zend_types.h:1342:2
+    #1 0xf642ba in zval_delref_p /src/php-src/Zend/zend_types.h:1378:9
+    #2 0xf642ba in zval_ptr_dtor_nogc /src/php-src/Zend/zend_variables.h:35:35
+    #3 0xf642ba in cleanup_live_vars /src/php-src/Zend/zend_execute.c:4495:6
+    #4 0x113f5c8 in zend_dispatch_try_catch_finally_helper_SPEC /src/php-src/Zend/zend_vm_execute.h:3192:2
+    #5 0x10ba968 in ZEND_HANDLE_EXCEPTION_SPEC_HANDLER /src/php-src/Zend/zend_vm_execute.h
+    #6 0xa800037  (/dev/zero (deleted)+0x8000037)
+
+DEDUP_TOKEN: zend_gc_delref--zval_delref_p--zval_ptr_dtor_nogc
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/php-src/Zend/zend_types.h:1342:2 in zend_gc_delref
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42529524

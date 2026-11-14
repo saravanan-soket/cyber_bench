@@ -1,0 +1,85 @@
+ARVO id: 42471690
+Project: imagemagick
+Fuzz target: encoder_icon_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 2584077451
+INFO: Loaded 1 modules   (166058 inline 8-bit counters): 166058 [0x2bdfb08, 0x2c083b2), 
+INFO: Loaded 1 PC tables (166058 PCs): 166058 [0x2c083b8,0x2e90e58), 
+/out/encoder_icon_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x1311683 in png_crc_finish /src/libpng/pngrutil.c:229:8
+    #1 0x1325f9b in png_cache_unknown_chunk /src/libpng/pngrutil.c:2914:7
+    #2 0x1324efd in png_handle_unknown /src/libpng/pngrutil.c:2957:11
+    #3 0x12c9899 in png_read_info /src/libpng/pngread.c:259:10
+    #4 0x1123c9c in ReadOnePNGImage /src/imagemagick/coders/png.c:2573:3
+    #5 0x10fa163 in ReadPNGImage /src/imagemagick/coders/png.c:4291:9
+    #6 0x7f42f2 in ReadImage /src/imagemagick/MagickCore/constitute.c:547:15
+    #7 0x71e21c in BlobToImage /src/imagemagick/MagickCore/blob.c:473:13
+    #8 0xdfa9c6 in ReadICONImage /src/imagemagick/coders/icon.c:379:20
+    #9 0x7f42f2 in ReadImage /src/imagemagick/MagickCore/constitute.c:547:15
+    #10 0x71e21c in BlobToImage /src/imagemagick/MagickCore/blob.c:473:13
+    #11 0x597667 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4028:12
+    #12 0x4a61dd in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #13 0x4f0a0b in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #14 0x4a8b36 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #15 0x4b995a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #16 0x4a7c61 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #17 0x7f0ba6d7182f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #18 0x422458 in _start (/out/encoder_icon_fuzzer+0x422458)
+
+DEDUP_TOKEN: png_crc_finish--png_cache_unknown_chunk--png_handle_unknown
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x462e8d in __msan_memcpy.part.51 /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:1490
+    #1 0x7395b3 in ReadBlob /src/imagemagick/MagickCore/blob.c:3856:14
+    #2 0x113f256 in png_get_data /src/imagemagick/coders/png.c:1414:26
+    #3 0x131192c in png_crc_error /src/libpng/pngrutil.c:275:4
+    #4 0x1311421 in png_crc_finish /src/libpng/pngrutil.c:229:8
+    #5 0x1325f9b in png_cache_unknown_chunk /src/libpng/pngrutil.c:2914:7
+    #6 0x1324efd in png_handle_unknown /src/libpng/pngrutil.c:2957:11
+    #7 0x12c9899 in png_read_info /src/libpng/pngread.c:259:10
+    #8 0x1123c9c in ReadOnePNGImage /src/imagemagick/coders/png.c:2573:3
+    #9 0x10fa163 in ReadPNGImage /src/imagemagick/coders/png.c:4291:9
+    #10 0x7f42f2 in ReadImage /src/imagemagick/MagickCore/constitute.c:547:15
+    #11 0x71e21c in BlobToImage /src/imagemagick/MagickCore/blob.c:473:13
+    #12 0xdfa9c6 in ReadICONImage /src/imagemagick/coders/icon.c:379:20
+    #13 0x7f42f2 in ReadImage /src/imagemagick/MagickCore/constitute.c:547:15
+    #14 0x71e21c in BlobToImage /src/imagemagick/MagickCore/blob.c:473:13
+    #15 0x597667 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4028:12
+    #16 0x4a61dd in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #17 0x4f0a0b in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #18 0x4a8b36 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #19 0x4b995a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+
+DEDUP_TOKEN: __msan_memcpy.part.51--ReadBlob--png_get_data
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x463160 in __interceptor_malloc /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:911
+    #1 0xa10277 in AcquireQuantumMemory /src/imagemagick/MagickCore/memory.c:541:10
+    #2 0xdfa737 in ReadICONImage /src/imagemagick/coders/icon.c:362:31
+    #3 0x7f42f2 in ReadImage /src/imagemagick/MagickCore/constitute.c:547:15
+    #4 0x71e21c in BlobToImage /src/imagemagick/MagickCore/blob.c:473:13
+    #5 0x597667 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4028:12
+    #6 0x4a61dd in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #7 0x4f0a0b in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #8 0x4a8b36 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #9 0x4b995a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #10 0x4a7c61 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7f0ba6d7182f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: __interceptor_malloc--AcquireQuantumMemory--ReadICONImage
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/libpng/pngrutil.c:229:8 in png_crc_finish
+Unique heap origins: 857
+Stack depot allocated bytes: 118752
+Unique origin histories: 11
+History depot allocated bytes: 264
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42471690

@@ -1,0 +1,92 @@
+ARVO id: 42490986
+Project: skia
+Fuzz target: skruntimeeffect
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Use-after-poison READ 8
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/skruntimeeffect[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: use-after-poison on address 0x631000000bb8 at pc 0x000000863b37 bp 0x7fffffffd1b0 sp 0x7fffffffd1a8
+[1m[0m[1m[34mREAD of size 8 at 0x631000000bb8 thread T0[1m[0m
+SCARINESS: 33 (8-byte-read-use-after-poison)
+    #0 0x863b36 in SkTArray<std::__1::unique_ptr<SkSL::Expression, std::__1::default_delete<SkSL::Expression> >, false>::begin() const /src/skia/out/Fuzz/../../include/private/SkTArray.h:360:16
+    #1 0x9cd00f in int SkSL::Constructor::getVecComponent<int>(int) const /src/skia/out/Fuzz/../../src/sksl/ir/SkSLConstructor.cpp:81:49
+    #2 0x896363 in SkSL::Constructor::getIVecComponent(int) const /src/skia/out/Fuzz/../../src/sksl/ir/SkSLConstructor.h:110:22
+    #3 0x9ce3a4 in SkSL::Constructor::compareConstant(SkSL::Context const&, SkSL::Expression const&) const /src/skia/out/Fuzz/../../src/sksl/ir/SkSLConstructor.cpp:46:55
+    #4 0x9cfdeb in SkSL::PrefixExpression::compareConstant(SkSL::Context const&, SkSL::Expression const&) const /src/skia/out/Fuzz/../../src/sksl/ir/SkSLPrefixExpression.h:95:33
+    #5 0x906a25 in std::__1::unique_ptr<SkSL::Expression, std::__1::default_delete<SkSL::Expression> > SkSL::IRGenerator::constantFoldVector<int>(SkSL::Expression const&, SkSL::Token::Kind, SkSL::Expression const&) const /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:1779:32
+    #6 0x903d61 in SkSL::IRGenerator::constantFold(SkSL::Expression const&, SkSL::Token::Kind, SkSL::Expression const&) const /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:1939:20
+    #7 0x8fbaa4 in SkSL::IRGenerator::convertBinaryExpression(SkSL::ASTNode const&) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:2014:48
+    #8 0x8e69a3 in SkSL::IRGenerator::convertExpression(SkSL::ASTNode const&) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:1350:26
+    #9 0x8de028 in SkSL::IRGenerator::convertExpressionStatement(SkSL::ASTNode const&) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:672:43
+    #10 0x8d9be9 in SkSL::IRGenerator::convertSingleStatement(SkSL::ASTNode const&) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:206:55
+    #11 0x8df3e4 in SkSL::IRGenerator::convertStatement(SkSL::ASTNode const&) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:228:47
+    #12 0x8da181 in SkSL::IRGenerator::convertBlock(SkSL::ASTNode const&) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:249:54
+    #13 0x8f36e2 in SkSL::IRGenerator::convertFunction(SkSL::ASTNode const&) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:1091:45
+    #14 0x9164ce in SkSL::IRGenerator::convertProgram(SkSL::Program::Kind, SkSL::Program::Settings const*, GrShaderCaps const*, SkSL::ParsedModule const&, bool, char const*, unsigned long, std::__1::vector<std::__1::unique_ptr<SkSL::ExternalValue, std::__1::default_delete<SkSL::ExternalValue> >, std::__1::allocator<std::__1::unique_ptr<SkSL::ExternalValue, std::__1::default_delete<SkSL::ExternalValue> > > > const*) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:3079:23
+    #15 0x882369 in SkSL::Compiler::convertProgram(SkSL::Program::Kind, SkSL::String, SkSL::Program::Settings const&, std::__1::vector<std::__1::unique_ptr<SkSL::ExternalValue, std::__1::default_delete<SkSL::ExternalValue> >, std::__1::allocator<std::__1::unique_ptr<SkSL::ExternalValue, std::__1::default_delete<SkSL::ExternalValue> > > > const*) /src/skia/out/Fuzz/../../src/sksl/SkSLCompiler.cpp:1596:46
+    #16 0x6f50a5 in SkRuntimeEffect::Make(SkString) /src/skia/out/Fuzz/../../src/core/SkRuntimeEffect.cpp:159:30
+    #17 0x501338 in FuzzSkRuntimeEffect_Once(sk_sp<SkData>) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSkRuntimeEffect.cpp:39:43
+    #18 0x5010a3 in FuzzSkRuntimeEffect(sk_sp<SkData>) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSkRuntimeEffect.cpp:68:19
+    #19 0x5017c2 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSkRuntimeEffect.cpp:83:5
+    #20 0x4f74ab in main (/out/skruntimeeffect+0x4f74ab)
+    #21 0x7ffff1b7283f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #22 0x44f658 in _start (/out/skruntimeeffect+0x44f658)
+
+DEDUP_TOKEN: SkTArray<std::__1::unique_ptr<SkSL::Expression, std::__1::default_delete<SkSL::Expression> >, false>::begin() const--int SkSL::Constructor::getVecComponent<int>(int) const--SkSL::Constructor::getIVecComponent(int) const
+[1m[32m0x631000000bb8 is located 952 bytes inside of 65536-byte region [0x631000000800,0x631000010800)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4f45bd in operator new(unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:99:3
+    #1 0xa3262c in GrMemoryPool::Make(unsigned long, unsigned long) /src/skia/out/Fuzz/../../src/gpu/GrMemoryPool.cpp:27:17
+    #2 0x9b4bac in SkSL::Pool::Create() /src/skia/out/Fuzz/../../src/sksl/SkSLPool.cpp:67:22
+    #3 0x88229a in SkSL::Compiler::convertProgram(SkSL::Program::Kind, SkSL::String, SkSL::Program::Settings const&, std::__1::vector<std::__1::unique_ptr<SkSL::ExternalValue, std::__1::default_delete<SkSL::ExternalValue> >, std::__1::allocator<std::__1::unique_ptr<SkSL::ExternalValue, std::__1::default_delete<SkSL::ExternalValue> > > > const*) /src/skia/out/Fuzz/../../src/sksl/SkSLCompiler.cpp:1594:34
+    #4 0x6f50a5 in SkRuntimeEffect::Make(SkString) /src/skia/out/Fuzz/../../src/core/SkRuntimeEffect.cpp:159:30
+    #5 0x501338 in FuzzSkRuntimeEffect_Once(sk_sp<SkData>) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSkRuntimeEffect.cpp:39:43
+    #6 0x5010a3 in FuzzSkRuntimeEffect(sk_sp<SkData>) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSkRuntimeEffect.cpp:68:19
+    #7 0x5017c2 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSkRuntimeEffect.cpp:83:5
+    #8 0x4f74ab in main (/out/skruntimeeffect+0x4f74ab)
+
+DEDUP_TOKEN: operator new(unsigned long)--GrMemoryPool::Make(unsigned long, unsigned long)--SkSL::Pool::Create()
+SUMMARY: AddressSanitizer: use-after-poison /src/skia/out/Fuzz/../../include/private/SkTArray.h:360:16 in SkTArray<std::__1::unique_ptr<SkSL::Expression, std::__1::default_delete<SkSL::Expression> >, false>::begin() const
+Shadow bytes around the buggy address:
+  0x0c627fff8120: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[34mf7[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[34mf7[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m
+  0x0c627fff8130: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[34mf7[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m
+  0x0c627fff8140: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[34mf7[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c627fff8150: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[34mf7[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[34mf7[1m[0m
+  0x0c627fff8160: [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[34mf7[1m[0m
+=>0x0c627fff8170: [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[34mf7[1m[0m][1m[0m00[1m[0m [1m[0m04[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[34mf7[1m[0m
+  0x0c627fff8180: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x0c627fff8190: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x0c627fff81a0: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x0c627fff81b0: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+  0x0c627fff81c0: [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m [1m[34mf7[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42490986

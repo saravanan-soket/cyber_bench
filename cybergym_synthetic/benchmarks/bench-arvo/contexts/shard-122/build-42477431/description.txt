@@ -1,0 +1,38 @@
+ARVO id: 42477431
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_PNG_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Seed: 2980299776
+INFO: Loaded 1 modules   (62208 inline 8-bit counters): 62208 [0xbff5f0, 0xc0e8f0), 
+INFO: Loaded 1 PC tables (62208 PCs): 62208 [0x8253b8,0x9183b8), 
+/out/ffmpeg_AV_CODEC_ID_PNG_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+pixels decoded: 0, iterations: 0
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x00000045dfd0 (pc 0x00000073b6ff bp 0x7fffc7582820 sp 0x7fffc7582820 T7)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+    #0 0x73b6fe in av_freep /src/ffmpeg/libavutil/mem.c:231:5
+    #1 0x4b63bb in av_packet_free_side_data /src/ffmpeg/libavcodec/avpacket.c:274:9
+    #2 0x4b57a8 in av_packet_unref /src/ffmpeg/libavcodec/avpacket.c:601:5
+    #3 0x4b4f50 in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:278:5
+    #4 0x444251 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:554:15
+    #5 0x42ea81 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #6 0x43479e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:775:9
+    #7 0x45e122 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #8 0x7f6ce70d582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #9 0x407f28 in _start (/out/ffmpeg_AV_CODEC_ID_PNG_fuzzer+0x407f28)
+
+DEDUP_TOKEN: av_freep--av_packet_free_side_data--av_packet_unref
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/ffmpeg/libavutil/mem.c:231:5 in av_freep
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42477431

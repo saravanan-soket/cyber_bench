@@ -1,0 +1,86 @@
+ARVO id: 42481554
+Project: imagemagick
+Fuzz target: encoder_plasma_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 572789753
+INFO: Loaded 1 modules   (180716 inline 8-bit counters): 180716 [0x2c30420, 0x2c5c60c), 
+INFO: Loaded 1 PC tables (180716 PCs): 180716 [0x2c5c610,0x2f1e4d0), 
+/out/encoder_plasma_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x835d2a in RoundToUnity /src/imagemagick/./MagickCore/composite-private.h:49:10
+    #1 0x8066b1 in CompositePixelInfoOver /src/imagemagick/./MagickCore/composite-private.h:136:42
+    #2 0x80aa03 in DrawGradientImage /src/imagemagick/MagickCore/draw.c:2210:7
+    #3 0x9f25db in GradientImage /src/imagemagick/MagickCore/paint.c:612:10
+    #4 0xd94a52 in ReadGRADIENTImage /src/imagemagick/coders/gradient.c:246:10
+    #5 0x7a71ee in ReadImage /src/imagemagick/MagickCore/constitute.c:553:15
+    #6 0xeecbfa in ReadPlasmaImage /src/imagemagick/coders/plasma.c:152:9
+    #7 0x7a71ee in ReadImage /src/imagemagick/MagickCore/constitute.c:553:15
+    #8 0x53ac96 in Magick::Image::read(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4094:12
+    #9 0x52b009 in fuzzEncoderWithStringFilename(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, unsigned char const*, unsigned long, bool (*)(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)) /src/imagemagick/Magick++/fuzz/encoder_utils.cc:15:11
+    #10 0x52ad1b in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_plasma_fuzzer.cc:12:10
+    #11 0x45fde1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #12 0x44a901 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #13 0x4505be in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #14 0x47a4e2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #15 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #16 0x423d78 in _start (/out/encoder_plasma_fuzzer+0x423d78)
+
+DEDUP_TOKEN: RoundToUnity--CompositePixelInfoOver--DrawGradientImage
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x8063d6 in GetPixelInfoPixel /src/imagemagick/./MagickCore/pixel-accessor.h:425:32
+    #1 0x808fc3 in DrawGradientImage /src/imagemagick/MagickCore/draw.c:2078:7
+    #2 0x9f25db in GradientImage /src/imagemagick/MagickCore/paint.c:612:10
+    #3 0xd94a52 in ReadGRADIENTImage /src/imagemagick/coders/gradient.c:246:10
+    #4 0x7a71ee in ReadImage /src/imagemagick/MagickCore/constitute.c:553:15
+    #5 0xeecbfa in ReadPlasmaImage /src/imagemagick/coders/plasma.c:152:9
+    #6 0x7a71ee in ReadImage /src/imagemagick/MagickCore/constitute.c:553:15
+    #7 0x53ac96 in Magick::Image::read(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4094:12
+    #8 0x52b009 in fuzzEncoderWithStringFilename(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, unsigned char const*, unsigned long, bool (*)(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)) /src/imagemagick/Magick++/fuzz/encoder_utils.cc:15:11
+    #9 0x52ad1b in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_plasma_fuzzer.cc:12:10
+    #10 0x45fde1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #11 0x44a901 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #12 0x4505be in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #13 0x47a4e2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #14 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: GetPixelInfoPixel--DrawGradientImage--GradientImage
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x4d50a5 in posix_memalign /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:170:3
+    #1 0x9a827c in AcquireAlignedMemory_POSIX /src/imagemagick/MagickCore/memory.c:271:7
+    #2 0x9a7eff in AcquireAlignedMemory /src/imagemagick/MagickCore/memory.c:346:10
+    #3 0x7125a7 in OpenPixelCache /src/imagemagick/MagickCore/cache.c:3733:46
+    #4 0x71934f in GetImagePixelCache /src/imagemagick/MagickCore/cache.c:1757:18
+    #5 0x6fbf97 in QueueAuthenticPixelCacheNexus /src/imagemagick/MagickCore/cache.c:4161:28
+    #6 0x6fb892 in GetAuthenticPixelCacheNexus /src/imagemagick/MagickCore/cache.c:1326:10
+    #7 0x727e1d in GetCacheViewAuthenticPixels /src/imagemagick/MagickCore/cache-view.c:312:10
+    #8 0x9542c6 in SetImageAlpha /src/imagemagick/MagickCore/image.c:2370:7
+    #9 0xd941a5 in ReadGRADIENTImage /src/imagemagick/coders/gradient.c:204:10
+    #10 0x7a71ee in ReadImage /src/imagemagick/MagickCore/constitute.c:553:15
+    #11 0xeecbfa in ReadPlasmaImage /src/imagemagick/coders/plasma.c:152:9
+    #12 0x7a71ee in ReadImage /src/imagemagick/MagickCore/constitute.c:553:15
+    #13 0x53ac96 in Magick::Image::read(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4094:12
+    #14 0x52b009 in fuzzEncoderWithStringFilename(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, unsigned char const*, unsigned long, bool (*)(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)) /src/imagemagick/Magick++/fuzz/encoder_utils.cc:15:11
+    #15 0x52ad1b in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_plasma_fuzzer.cc:12:10
+    #16 0x45fde1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #17 0x44a901 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #18 0x4505be in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #19 0x47a4e2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+
+DEDUP_TOKEN: posix_memalign--AcquireAlignedMemory_POSIX--AcquireAlignedMemory
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/imagemagick/./MagickCore/composite-private.h:49:10 in RoundToUnity
+Unique heap origins: 810
+Stack depot allocated bytes: 115072
+Unique origin histories: 143
+History depot allocated bytes: 3432
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42481554

@@ -1,0 +1,52 @@
+ARVO id: 42541031
+Project: gdal
+Fuzz target: gdal_translate_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 2380186712
+INFO: Loaded 1 modules   (356853 inline 8-bit counters): 356853 [0x5750a30, 0x57a7c25), 
+INFO: Loaded 1 PC tables (356853 PCs): 356853 [0x57a7c28,0x5d19b78), 
+/out/gdal_translate_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x602080811a90 (pc 0x000001771f72 bp 0x7ffec09d34f0 sp 0x7ffec09d3440 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x1771f71 in GDAL_LercNS::BitStuffer2::Decode(unsigned char const**, unsigned long&, std::__1::vector<unsigned int, std::__1::allocator<unsigned int> >&, int) const /src/gdal/gdal/third_party/LercLib/BitStuffer2.cpp:236:20
+    #1 0x134a9a8 in bool GDAL_LercNS::Lerc2::ReadTile<unsigned short>(unsigned char const**, unsigned long&, unsigned short*, int, int, int, int, int, std::__1::vector<unsigned int, std::__1::allocator<unsigned int> >&) const /src/gdal/gdal/frmts/mrf/../../third_party/LercLib/Lerc2.h:1283:26
+    #2 0x1349962 in bool GDAL_LercNS::Lerc2::ReadTiles<unsigned short>(unsigned char const**, unsigned long&, unsigned short*) const /src/gdal/gdal/frmts/mrf/../../third_party/LercLib/Lerc2.h:937:14
+    #3 0x12f4545 in bool GDAL_LercNS::Lerc2::Decode<unsigned short>(unsigned char const**, unsigned long&, unsigned short*, unsigned char*) /src/gdal/gdal/frmts/mrf/../../third_party/LercLib/Lerc2.h:559:10
+    #4 0x12ea94d in GDAL_MRF::LERC_Band::Decompress(GDAL_MRF::buf_mgr&, GDAL_MRF::buf_mgr&) /src/gdal/gdal/frmts/mrf/LERC_band.cpp:396:25
+    #5 0x15ffbfa in GDAL_MRF::GDALMRFRasterBand::IReadBlock(int, int, void*) /src/gdal/gdal/frmts/mrf/mrf_band.cpp:817:18
+    #6 0xd095f4 in GDALRasterBand::GetLockedBlockRef(int, int, int) /src/gdal/gdal/gcore/gdalrasterband.cpp:1309:20
+    #7 0xd48d97 in GDALRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/rasterio.cpp:153:27
+    #8 0xca5cfa in GDALDataset::BandBasedRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, int, int*, long long, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdaldataset.cpp:1753:24
+    #9 0xca5039 in GDALDataset::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, int, int*, long long, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdaldataset.cpp:1696:12
+    #10 0xca6a76 in GDALDataset::RasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, int, int*, long long, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdaldataset.cpp:2045:16
+    #11 0xd585ec in GDALDatasetCopyWholeRaster /src/gdal/gdal/gcore/rasterio.cpp:4564:37
+    #12 0x62890c in GTiffDataset::CreateCopy(char const*, GDALDataset*, int, char**, int (*)(double, char const*, void*), void*) /src/gdal/gdal/frmts/gtiff/geotiff.cpp:17779:16
+    #13 0xcc8113 in GDALDriver::CreateCopy(char const*, GDALDataset*, int, char**, int (*)(double, char const*, void*), void*) /src/gdal/gdal/gcore/gdaldriver.cpp:903:19
+    #14 0xcc8519 in GDALCreateCopy /src/gdal/gdal/gcore/gdaldriver.cpp:950:9
+    #15 0xfc1702 in GDALTranslate /src/gdal/gdal/apps/gdal_translate_lib.cpp:954:18
+    #16 0x539813 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_translate_fuzzer.cpp:208:47
+    #17 0x5636cc in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:526:13
+    #18 0x53a57a in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #19 0x545d49 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:707:9
+    #20 0x539c1c in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #21 0x7f0cab23c82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #22 0x428108 in _start (/out/gdal_translate_fuzzer+0x428108)
+
+DEDUP_TOKEN: GDAL_LercNS::BitStuffer2::Decode(unsigned char const**, unsigned long&, std::__1::vector<unsigned int, std::__1::allocator<unsigned int> >&, int) const--bool GDAL_LercNS::Lerc2::ReadTile<unsigned short>(unsigned char const**, unsigned long&, unsigned short*, int, int, int, int, int, std::__1::vector<unsigned int, std::__1::allocator<unsigned int> >&) const--bool GDAL_LercNS::Lerc2::ReadTiles<unsigned short>(unsigned char const**, unsigned long&, unsigned short*) const
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/gdal/gdal/third_party/LercLib/BitStuffer2.cpp:236:20 in GDAL_LercNS::BitStuffer2::Decode(unsigned char const**, unsigned long&, std::__1::vector<unsigned int, std::__1::allocator<unsigned int> >&, int) const
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42541031

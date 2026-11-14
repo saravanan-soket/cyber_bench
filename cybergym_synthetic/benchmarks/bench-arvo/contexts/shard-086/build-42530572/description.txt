@@ -1,0 +1,44 @@
+ARVO id: 42530572
+Project: PcapPlusPlus
+Fuzz target: FuzzTarget
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/seladb/PcapPlusPlus
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 922321491
+INFO: Loaded 1 modules   (46845 inline 8-bit counters): 46845 [0x947f98, 0x953695), 
+INFO: Loaded 1 PC tables (46845 PCs): 46845 [0x953698,0xa0a668), 
+/out/FuzzTarget: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Read 0 packets successfully and 0 packets could not be read
+IPv4 Layer, Src: 255.255.32.32, Dst: 32.32.32.32
+TCP Layer, Src port: 23, Dst port: 8224
+Telnet Data
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x00001e341000 (pc 0x7f9b57f65660 bp 0x7ffffad12840 sp 0x7ffffad127f8 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7f9b57f65660  (/lib/x86_64-linux-gnu/libc.so.6+0x184660) (BuildId: e678fe54a5d2c2092f8e47eb0b33105e380f7340)
+    #1 0x60c0e0 in pcpp::TelnetLayer::distanceToNextIAC(unsigned char*, unsigned long) /src/PcapPlusPlus/Packet++/src/TelnetLayer.cpp:36:20
+    #2 0x60c813 in pcpp::TelnetLayer::getNextCommandField(unsigned char*, unsigned long) /src/PcapPlusPlus/Packet++/src/TelnetLayer.cpp:87:19
+    #3 0x60da2d in pcpp::TelnetLayer::getTotalNumberOfCommands() /src/PcapPlusPlus/Packet++/src/TelnetLayer.cpp:154:9
+    #4 0x4d65e4 in readParsedPacket(pcpp::Packet, pcpp::Layer*) /src/PcapPlusPlus/Tests/Fuzzers/ReadParsedPacket.h:35:26
+    #5 0x4d536f in LLVMFuzzerTestOneInput /src/PcapPlusPlus/Tests/Fuzzers/FuzzTarget.cpp:67:5
+    #6 0x43a303 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #7 0x425a62 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #8 0x42b30c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #9 0x454842 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7f9b57e05082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: e678fe54a5d2c2092f8e47eb0b33105e380f7340)
+    #11 0x41bc2d in _start (/out/FuzzTarget+0x41bc2d)
+
+DEDUP_TOKEN: pcpp::TelnetLayer::distanceToNextIAC(unsigned char*, unsigned long)--pcpp::TelnetLayer::getNextCommandField(unsigned char*, unsigned long)
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x184660) (BuildId: e678fe54a5d2c2092f8e47eb0b33105e380f7340) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42530572

@@ -1,0 +1,100 @@
+ARVO id: 42521082
+Project: mupdf
+Fuzz target: pdf_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: git://git.ghostscript.com/mupdf.git
+
+=== Crash report ===
+INFO: Seed: 2625392533
+INFO: Loaded 1 modules   (66585 inline 8-bit counters): 66585 [0x38ba308, 0x38ca721), 
+INFO: Loaded 1 PC tables (66585 PCs): 66585 [0x3482490,0x3586620), 
+/out/pdf_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+error: cannot recognize version marker
+warning: trying to repair broken xref
+warning: repairing PDF document
+warning: object missing 'endobj' token
+warning: ... repeated 3 times ...
+warning: premature end of data in flate filter
+warning: expected 'endobj' or 'stream' keyword (2 0 R)
+warning: premature end of data in flate filter
+warning: cannot seek backwards
+warning: ... repeated 2 times ...
+warning: expected 'endobj' or 'stream' keyword (13 0 R)
+warning: non-page object in page tree ()
+warning: premature end of data in flate filter
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0xa349cb in pdf_lex /src/mupdf/source/pdf/pdf-lex.c:508:3
+    #1 0xa04fa9 in pdf_process_stream /src/mupdf/source/pdf/pdf-interpret.c:843:11
+    #2 0xa0435c in pdf_process_contents /src/mupdf/source/pdf/pdf-interpret.c:1057:3
+    #3 0xabd2ad in pdf_run_page_contents_with_usage /src/mupdf/source/pdf/pdf-run.c:84:3
+    #4 0xabc1c3 in pdf_run_page_contents /src/mupdf/source/pdf/pdf-run.c:110:3
+    #5 0x5b3ced in fz_run_page_contents /src/mupdf/source/fitz/document.c:368:4
+    #6 0x5b4628 in fz_run_page /src/mupdf/source/fitz/document.c:400:2
+    #7 0x75c2af in fz_new_pixmap_from_page /src/mupdf/source/fitz/util.c:237:3
+    #8 0x75c917 in fz_new_pixmap_from_page_number /src/mupdf/source/fitz/util.c:261:9
+    #9 0x49e84f in LLVMFuzzerTestOneInput /src/mupdf/source/fuzz/pdf_fuzzer.cc:34:13
+    #10 0x4e55a6 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #11 0x49fa31 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #12 0x4b3c86 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #13 0x49eb71 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #14 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #15 0x41ffd8 in _start (/out/pdf_fuzzer+0x41ffd8)
+
+DEDUP_TOKEN: pdf_lex--pdf_process_stream--pdf_process_contents
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x8e5c2d in next_predict /src/mupdf/source/fitz/filter-predict.c:199:9
+    #1 0xa34db2 in fz_read_byte /src/mupdf/include/mupdf/fitz/stream.h:376:7
+    #2 0xa34268 in pdf_lex /src/mupdf/source/pdf/pdf-lex.c:507:11
+    #3 0xa04fa9 in pdf_process_stream /src/mupdf/source/pdf/pdf-interpret.c:843:11
+    #4 0xa0435c in pdf_process_contents /src/mupdf/source/pdf/pdf-interpret.c:1057:3
+    #5 0xabd2ad in pdf_run_page_contents_with_usage /src/mupdf/source/pdf/pdf-run.c:84:3
+    #6 0xabc1c3 in pdf_run_page_contents /src/mupdf/source/pdf/pdf-run.c:110:3
+    #7 0x5b3ced in fz_run_page_contents /src/mupdf/source/fitz/document.c:368:4
+    #8 0x5b4628 in fz_run_page /src/mupdf/source/fitz/document.c:400:2
+    #9 0x75c2af in fz_new_pixmap_from_page /src/mupdf/source/fitz/util.c:237:3
+    #10 0x75c917 in fz_new_pixmap_from_page_number /src/mupdf/source/fitz/util.c:261:9
+    #11 0x49e84f in LLVMFuzzerTestOneInput /src/mupdf/source/fuzz/pdf_fuzzer.cc:34:13
+    #12 0x4e55a6 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #13 0x49fa31 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #14 0x4b3c86 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #15 0x49eb71 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #16 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: next_predict--fz_read_byte--pdf_lex
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x4516b0 in malloc /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:939
+    #1 0x6df5d7 in do_scavenging_malloc /src/mupdf/source/fitz/memory.c:22:7
+    #2 0x6df33b in fz_malloc /src/mupdf/source/fitz/memory.c:62:6
+    #3 0x8e47a3 in fz_open_predict /src/mupdf/source/fitz/filter-predict.c:271:16
+    #4 0x8425aa in fz_open_image_decomp_stream /src/mupdf/source/fitz/compressed-buffer.c
+    #5 0xac9d02 in build_filter /src/mupdf/source/pdf/pdf-stream.c:179:12
+    #6 0xacdab6 in pdf_open_filter /src/mupdf/source/pdf/pdf-stream.c:358:12
+    #7 0xacd0ad in pdf_open_image_stream /src/mupdf/source/pdf/pdf-stream.c:467:9
+    #8 0xa042e1 in pdf_process_contents /src/mupdf/source/pdf/pdf-interpret.c:1056:9
+    #9 0xabd2ad in pdf_run_page_contents_with_usage /src/mupdf/source/pdf/pdf-run.c:84:3
+    #10 0xabc1c3 in pdf_run_page_contents /src/mupdf/source/pdf/pdf-run.c:110:3
+    #11 0x5b3ced in fz_run_page_contents /src/mupdf/source/fitz/document.c:368:4
+    #12 0x5b4628 in fz_run_page /src/mupdf/source/fitz/document.c:400:2
+    #13 0x75c2af in fz_new_pixmap_from_page /src/mupdf/source/fitz/util.c:237:3
+    #14 0x75c917 in fz_new_pixmap_from_page_number /src/mupdf/source/fitz/util.c:261:9
+    #15 0x49e84f in LLVMFuzzerTestOneInput /src/mupdf/source/fuzz/pdf_fuzzer.cc:34:13
+    #16 0x4e55a6 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #17 0x49fa31 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #18 0x4b3c86 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #19 0x49eb71 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+
+DEDUP_TOKEN: malloc--do_scavenging_malloc--fz_malloc
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/mupdf/source/pdf/pdf-lex.c:508:3 in pdf_lex
+Unique heap origins: 224
+Stack depot allocated bytes: 29208
+Unique origin histories: 9
+History depot allocated bytes: 216
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42521082

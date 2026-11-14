@@ -1,0 +1,82 @@
+ARVO id: 42476428
+Project: gdal
+Fuzz target: ogr_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Memcpy-param-overlap
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 1448985333
+INFO: Loaded 1 modules (288011 guards): [0x3134cd0, 0x324e0fc), 
+/out/ogr_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: memcpy-param-overlap: memory ranges [0x60300000ade0,0x60300000adf0) and [0x60300000ade8, 0x60300000adf8) overlap
+[1m[0mSCARINESS: 10 (memcpy-param-overlap)
+    #0 0x4cc601 in __asan_memcpy /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors.cc:469
+    #1 0x1bf86c4 in KML::unregisterLayerIfMatchingThisNode(KMLNode*) /src/gdal/gdal/ogr/ogrsf_frmts/kml/kml.cpp:657:17
+    #2 0x1bfb789 in KMLNode::eliminateEmpty(KML*) /src/gdal/gdal/ogr/ogrsf_frmts/kml/kmlnode.cpp:314:20
+    #3 0x1c045c7 in KMLVector::findLayers(KMLNode*, int) /src/gdal/gdal/ogr/ogrsf_frmts/kml/kmlvector.cpp:111:25
+    #4 0x1c0410f in KMLVector::findLayers(KMLNode*, int) /src/gdal/gdal/ogr/ogrsf_frmts/kml/kmlvector.cpp:100:17
+    #5 0x1983ed2 in OGRKMLDataSource::Open(char const*, int) /src/gdal/gdal/ogr/ogrsf_frmts/kml/ogrkmldatasource.cpp:179:17
+    #6 0x10c5039 in OGRKMLDriverOpen(GDALOpenInfo*) /src/gdal/gdal/ogr/ogrsf_frmts/kml/ogrkmldriver.cpp:69:15
+    #7 0xd5d9f8 in GDALOpenEx /src/gdal/gdal/gcore/gdaldataset.cpp:2817:20
+    #8 0x5f8a25 in OGROpen /src/gdal/gdal/ogr/ogrsf_frmts/generic/ogrsfdriverregistrar.cpp:113:24
+    #9 0x51f734 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/ogr_fuzzer.cpp:45:26
+    #10 0x548bd9 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:458:13
+    #11 0x54940a in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:397:3
+    #12 0x520336 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #13 0x52b89c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #14 0x51f948 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #15 0x7ff30aa4e82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #16 0x423f28 in _start (/out/ogr_fuzzer+0x423f28)
+
+DEDUP_TOKEN: __asan_memcpy--KML::unregisterLayerIfMatchingThisNode(KMLNode*)--KMLNode::eliminateEmpty(KML*)
+[1m[32m0x60300000ade0 is located 0 bytes inside of 24-byte region [0x60300000ade0,0x60300000adf8)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4e39c8 in realloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:79
+    #1 0xe30f0e in CPLRealloc /src/gdal/gdal/port/cpl_conv.cpp:238:19
+    #2 0x1c0453c in KMLVector::findLayers(KMLNode*, int) /src/gdal/gdal/ogr/ogrsf_frmts/kml/kmlvector.cpp:127:17
+    #3 0x1c0410f in KMLVector::findLayers(KMLNode*, int) /src/gdal/gdal/ogr/ogrsf_frmts/kml/kmlvector.cpp:100:17
+    #4 0x1c0410f in KMLVector::findLayers(KMLNode*, int) /src/gdal/gdal/ogr/ogrsf_frmts/kml/kmlvector.cpp:100:17
+    #5 0x1983ed2 in OGRKMLDataSource::Open(char const*, int) /src/gdal/gdal/ogr/ogrsf_frmts/kml/ogrkmldatasource.cpp:179:17
+    #6 0x10c5039 in OGRKMLDriverOpen(GDALOpenInfo*) /src/gdal/gdal/ogr/ogrsf_frmts/kml/ogrkmldriver.cpp:69:15
+    #7 0xd5d9f8 in GDALOpenEx /src/gdal/gdal/gcore/gdaldataset.cpp:2817:20
+    #8 0x5f8a25 in OGROpen /src/gdal/gdal/ogr/ogrsf_frmts/generic/ogrsfdriverregistrar.cpp:113:24
+    #9 0x51f734 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/ogr_fuzzer.cpp:45:26
+    #10 0x548bd9 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:458:13
+    #11 0x54940a in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:397:3
+    #12 0x520336 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #13 0x52b89c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #14 0x51f948 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #15 0x7ff30aa4e82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: realloc--CPLRealloc--KMLVector::findLayers(KMLNode*, int)
+[1m[32m0x60300000ade8 is located 8 bytes inside of 24-byte region [0x60300000ade0,0x60300000adf8)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4e39c8 in realloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:79
+    #1 0xe30f0e in CPLRealloc /src/gdal/gdal/port/cpl_conv.cpp:238:19
+    #2 0x1c0453c in KMLVector::findLayers(KMLNode*, int) /src/gdal/gdal/ogr/ogrsf_frmts/kml/kmlvector.cpp:127:17
+    #3 0x1c0410f in KMLVector::findLayers(KMLNode*, int) /src/gdal/gdal/ogr/ogrsf_frmts/kml/kmlvector.cpp:100:17
+    #4 0x1c0410f in KMLVector::findLayers(KMLNode*, int) /src/gdal/gdal/ogr/ogrsf_frmts/kml/kmlvector.cpp:100:17
+    #5 0x1983ed2 in OGRKMLDataSource::Open(char const*, int) /src/gdal/gdal/ogr/ogrsf_frmts/kml/ogrkmldatasource.cpp:179:17
+    #6 0x10c5039 in OGRKMLDriverOpen(GDALOpenInfo*) /src/gdal/gdal/ogr/ogrsf_frmts/kml/ogrkmldriver.cpp:69:15
+    #7 0xd5d9f8 in GDALOpenEx /src/gdal/gdal/gcore/gdaldataset.cpp:2817:20
+    #8 0x5f8a25 in OGROpen /src/gdal/gdal/ogr/ogrsf_frmts/generic/ogrsfdriverregistrar.cpp:113:24
+    #9 0x51f734 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/ogr_fuzzer.cpp:45:26
+    #10 0x548bd9 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:458:13
+    #11 0x54940a in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:397:3
+    #12 0x520336 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #13 0x52b89c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #14 0x51f948 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #15 0x7ff30aa4e82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: realloc--CPLRealloc--KMLVector::findLayers(KMLNode*, int)
+SUMMARY: AddressSanitizer: memcpy-param-overlap /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors.cc:469 in __asan_memcpy
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42476428

@@ -1,0 +1,62 @@
+ARVO id: 42494576
+Project: kimageformats
+Fuzz target: kimgio_avif_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://invent.kde.org/frameworks/kimageformats.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3421618083
+INFO: Loaded 1 modules   (340430 inline 8-bit counters): 340430 [0x514ab40, 0x519dd0e), 
+INFO: Loaded 1 PC tables (340430 PCs): 340430 [0x519dd10,0x56cf9f0), 
+/out/kimgio_avif_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m[1m[31mUninitialized bytes in [1m[32mMemcmpInterceptorCommon[1m[31m at offset 1 inside [0x71b0000000ec, 20)[1m[0m
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x4df93e in memcmp /src/llvm-project/compiler-rt/lib/msan/../sanitizer_common/sanitizer_common_interceptors.inc:875:10
+    #1 0x54bf5c in avifDecoderFindMetadata /src/libavif/src/read.c:1053:21
+    #2 0x543bd6 in avifDecoderReset /src/libavif/src/read.c:2692:33
+    #3 0x5495be in avifDecoderParse /src/libavif/src/read.c:2442:12
+    #4 0x52e738 in QAVIFHandler::ensureDecoder() /src/kimageformats/src/imageformats/avif.cpp:115:20
+    #5 0x52e2bf in QAVIFHandler::ensureParsed() const /src/kimageformats/src/imageformats/avif.cpp:81:18
+    #6 0x532b47 in QAVIFHandler::read(QImage*) /src/kimageformats/src/imageformats/avif.cpp:405:10
+    #7 0x52ca14 in LLVMFuzzerTestOneInput /src/kimgio_fuzzer.cc:55:14
+    #8 0x4611c1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #9 0x44af52 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #10 0x451295 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #11 0x47b142 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7faa946d783f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #13 0x425e68 in _start (/out/kimgio_avif_fuzzer+0x425e68)
+
+DEDUP_TOKEN: memcmp--avifDecoderFindMetadata--avifDecoderReset
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x4d5439 in __msan_memcpy /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1558:3
+    #1 0x563a08 in avifParseItemInfoEntry /src/libavif/src/read.c:1600:5
+    #2 0x55cc79 in avifParseItemInfoBox /src/libavif/src/read.c:1626:13
+    #3 0x558f20 in avifParseMetaBox /src/libavif/src/read.c:1736:13
+    #4 0x54a793 in avifParse /src/libavif/src/read.c:2170:13
+    #5 0x5494e3 in avifDecoderParse /src/libavif/src/read.c:2429:30
+    #6 0x52e738 in QAVIFHandler::ensureDecoder() /src/kimageformats/src/imageformats/avif.cpp:115:20
+    #7 0x52e2bf in QAVIFHandler::ensureParsed() const /src/kimageformats/src/imageformats/avif.cpp:81:18
+    #8 0x532b47 in QAVIFHandler::read(QImage*) /src/kimageformats/src/imageformats/avif.cpp:405:10
+    #9 0x52ca14 in LLVMFuzzerTestOneInput /src/kimgio_fuzzer.cc:55:14
+    #10 0x4611c1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #11 0x44af52 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #12 0x451295 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #13 0x47b142 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #14 0x7faa946d783f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: __msan_memcpy--avifParseItemInfoEntry--avifParseItemInfoBox
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mcontentType[1m[35m' in the stack frame of function '[1m[32mavifParseItemInfoEntry[1m[35m'[1m[0m
+    #0 0x563490 in avifParseItemInfoEntry /src/libavif/src/read.c:1574
+
+DEDUP_TOKEN: avifParseItemInfoEntry
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/llvm-project/compiler-rt/lib/msan/../sanitizer_common/sanitizer_common_interceptors.inc:875:10 in memcmp
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42494576

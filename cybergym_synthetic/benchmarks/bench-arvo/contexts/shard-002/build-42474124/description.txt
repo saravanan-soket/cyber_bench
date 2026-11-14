@@ -1,0 +1,102 @@
+ARVO id: 42474124
+Project: radare2
+Fuzz target: ia_fuzz
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/radare/radare2
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/ia_fuzz < INPUT_FILE
+or
+  /out/ia_fuzz INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/ia_fuzz [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 6146 bytes from /tmp/poc
+3
+=================================================================
+[1m[31m==8==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x623000101102 at pc 0x0000008bf189 bp 0x7fffffffd5e0 sp 0x7fffffffd5d8
+[1m[0m[1m[34mREAD of size 1 at 0x623000101102 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x8bf188 in r_utf8_strlen /src/radare2/libr/util/utf8.c:578:14
+    #1 0xa91116 in getstr /src/radare2/libr/../libr/bin/p/bin_dex.c:68:13
+    #2 0xa8f7b1 in parse_class /src/radare2/libr/../libr/bin/p/bin_dex.c:1452:15
+    #3 0xa8ec1f in dex_loadcode /src/radare2/libr/../libr/bin/p/bin_dex.c:1672:4
+    #4 0xa8b265 in entries /src/radare2/libr/../libr/bin/p/bin_dex.c:1810:3
+    #5 0xba9817 in r_bin_object_set_items /src/radare2/libr/bin/obj.c:338:16
+    #6 0xba915f in r_bin_object_new /src/radare2/libr/bin/obj.c:239:2
+    #7 0xa65158 in r_bin_file_new_from_bytes /src/radare2/libr/bin/bfile.c:467:18
+    #8 0xa6bbb8 in r_bin_open_io /src/radare2/libr/bin/bin.c:407:13
+    #9 0x5f0cff in cmd_open_bin /src/radare2/libr/core/./cmd_open.c:302:6
+    #10 0x540a1c in cmd_open /src/radare2/libr/core/./cmd_open.c:1360:3
+    #11 0x619b9a in r_cmd_call /src/radare2/libr/core/cmd_api.c:235:10
+    #12 0x568893 in r_core_cmd_subst_i /src/radare2/libr/core/cmd.c:3027:12
+    #13 0x51592d in r_core_cmd_subst /src/radare2/libr/core/cmd.c:2036:9
+    #14 0x50ed2d in r_core_cmd /src/radare2/libr/core/cmd.c:3761:9
+    #15 0x4f5d05 in LLVMFuzzerTestOneInput /src/radare2/targets/ia_fuzz.cc:13:2
+    #16 0x100eb9f in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:156:5
+    #17 0x100ee01 in main /src/libfuzzer/afl/afl_driver.cpp:193:12
+    #18 0x7ffff6ce282f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #19 0x41efa8 in _start (/out/ia_fuzz+0x41efa8)
+
+DEDUP_TOKEN: r_utf8_strlen--getstr--parse_class
+[1m[32m0x623000101102 is located 0 bytes to the right of 6146-byte region [0x6230000ff900,0x623000101102)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4b1d8a in calloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:154
+    #1 0xa6b98b in r_bin_open_io /src/radare2/libr/bin/bin.c:364:15
+    #2 0x5f0cff in cmd_open_bin /src/radare2/libr/core/./cmd_open.c:302:6
+    #3 0x540a1c in cmd_open /src/radare2/libr/core/./cmd_open.c:1360:3
+    #4 0x619b9a in r_cmd_call /src/radare2/libr/core/cmd_api.c:235:10
+    #5 0x568893 in r_core_cmd_subst_i /src/radare2/libr/core/cmd.c:3027:12
+    #6 0x51592d in r_core_cmd_subst /src/radare2/libr/core/cmd.c:2036:9
+    #7 0x50ed2d in r_core_cmd /src/radare2/libr/core/cmd.c:3761:9
+    #8 0x4f5d05 in LLVMFuzzerTestOneInput /src/radare2/targets/ia_fuzz.cc:13:2
+    #9 0x100eb9f in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:156:5
+    #10 0x100ee01 in main /src/libfuzzer/afl/afl_driver.cpp:193:12
+    #11 0x7ffff6ce282f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: calloc--r_bin_open_io--cmd_open_bin
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/radare2/libr/util/utf8.c:578:14 in r_utf8_strlen
+Shadow bytes around the buggy address:
+  0x0c46800181d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c46800181e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c46800181f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c4680018200: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c4680018210: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c4680018220:[[1m[0m02[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4680018230: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4680018240: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4680018250: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4680018260: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c4680018270: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42474124

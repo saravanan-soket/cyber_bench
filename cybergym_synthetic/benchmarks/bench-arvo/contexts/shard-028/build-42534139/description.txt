@@ -1,0 +1,45 @@
+ARVO id: 42534139
+Project: libraw
+Fuzz target: libraw_cr2_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/libraw/libraw
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 914718133
+INFO: Loaded 1 modules   (22547 inline 8-bit counters): 22547 [0x952c90, 0x9584a3), 
+INFO: Loaded 1 PC tables (22547 PCs): 22547 [0x82ca40,0x884b70), 
+/out/libraw_cr2_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x7f0ff60f5806 (pc 0x00000059ce51 bp 0x7fffc07befe0 sp 0x7fffc07befd0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x59ce51 in libraw_sget4_static(short, unsigned char*) /src/libraw/src/utils/read_utils.cpp:63:12
+    #1 0x5ad8eb in checked_buffer_t::sget4(int) /src/libraw/src/utils/utils_libraw.cpp:704:10
+    #2 0x77ddd2 in LibRaw::parseAdobeRAFMakernote() /src/libraw/src/metadata/fuji.cpp:229:33
+    #3 0x74ac9b in LibRaw::parse_tiff_ifd(int) /src/libraw/src/metadata/tiff.cpp:1531:21
+    #4 0x751ab9 in LibRaw::parse_tiff(int) /src/libraw/src/metadata/tiff.cpp:1707:9
+    #5 0x6d062a in LibRaw::identify() /src/libraw/src/metadata/identify.cpp:474:14
+    #6 0x592e3c in LibRaw::open_datastream(LibRaw_abstract_datastream*) /src/libraw/src/utils/open.cpp:480:4
+    #7 0x591ef9 in LibRaw::open_buffer(void const*, unsigned long) /src/libraw/src/utils/open.cpp:240:13
+    #8 0x56dc20 in LLVMFuzzerTestOneInput /src/libraw_fuzzer.cc:62:24
+    #9 0x43df33 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #10 0x429692 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #11 0x42ef3c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #12 0x458472 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7f0ffb107082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: eebe5d5f4b608b8a53ec446b63981bba373ca0ca)
+    #14 0x41f85d in _start (/out/libraw_cr2_fuzzer+0x41f85d)
+
+DEDUP_TOKEN: libraw_sget4_static(short, unsigned char*)--checked_buffer_t::sget4(int)--LibRaw::parseAdobeRAFMakernote()
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/libraw/src/utils/read_utils.cpp:63:12 in libraw_sget4_static(short, unsigned char*)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42534139

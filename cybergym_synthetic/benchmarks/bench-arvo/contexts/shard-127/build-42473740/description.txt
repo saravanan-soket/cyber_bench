@@ -1,0 +1,39 @@
+ARVO id: 42473740
+Project: openthread
+Fuzz target: radio-receive-done-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/openthread/openthread
+
+=== Crash report ===
+INFO: Seed: 3655741840
+INFO: Loaded 1 modules   (19664 inline 8-bit counters): 19664 [0x8c0288, 0x8c4f58), 
+INFO: Loaded 1 PC tables (19664 PCs): 19664 [0x5ebba8,0x6388a8), 
+/out/radio-receive-done-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x00000000524f (pc 0x00000043e3a7 bp 0x7fffffffde90 sp 0x7fffffffde58 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x43e3a6 in ot::Message::GetPriority() const /src/openthread/src/core/./common/message.hpp:356
+    #1 0x43ea7d in ot::PriorityQueue::RemoveFromList(unsigned char, ot::Message&) /src/openthread/src/core/common/message.cpp:1056:43
+    #2 0x43e9b6 in ot::PriorityQueue::Dequeue(ot::Message&) /src/openthread/src/core/common/message.cpp:1091:5
+    #3 0x45a5c4 in ot::Ip6::Ip6::HandleSendQueue() /src/openthread/src/core/net/ip6.cpp:544:20
+    #4 0x441a9e in ot::TaskletScheduler::ProcessQueuedTasklets() /src/openthread/src/core/common/tasklet.cpp:112:14
+    #5 0x43208e in LLVMFuzzerTestOneInput /src/openthread/tests/fuzz/radio_receive_done.cpp:75:9
+    #6 0x52a1e9 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:529:15
+    #7 0x5127a2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:286:6
+    #8 0x5164ba in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:715:9
+    #9 0x512528 in main /src/libfuzzer/FuzzerMain.cpp:19:10
+    #10 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #11 0x405e28 in _start (/out/radio-receive-done-fuzzer+0x405e28)
+
+DEDUP_TOKEN: ot::Message::GetPriority() const--ot::PriorityQueue::RemoveFromList(unsigned char, ot::Message&)--ot::PriorityQueue::Dequeue(ot::Message&)
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/openthread/src/core/./common/message.hpp:356 in ot::Message::GetPriority() const
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42473740

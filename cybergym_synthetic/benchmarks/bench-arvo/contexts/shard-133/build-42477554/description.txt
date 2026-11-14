@@ -1,0 +1,49 @@
+ARVO id: 42477554
+Project: libmpeg2
+Fuzz target: mpeg2_dec_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://android.googlesource.com/platform/external/libmpeg2
+
+=== Crash report ===
+INFO: Seed: 1292002460
+INFO: Loaded 1 modules   (1942 inline 8-bit counters): 1942 [0x827c970, 0x827d106), 
+INFO: Loaded 1 PC tables (1942 PCs): 1942 [0x8229e14,0x822dac4), 
+/out/mpeg2_dec_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x0006f600 (pc 0xf7e9f95d bp 0xed8fc008 sp 0xed8fbbc8 T26)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+AddressSanitizer:DEADLYSIGNAL
+    #0 0xf7e9f95c  (/lib32/libc.so.6+0x12695c)
+    #1 0x8278fff in _fini (/out/mpeg2_dec_fuzzer+0x8278fff)
+
+DEDUP_TOKEN: _fini
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib32/libc.so.6+0x12695c) 
+Thread T26 created by T0 here:
+    #0 0x815342c in pthread_create /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors.cpp:209:3
+    #1 0x81d24ab in ithread_create /src/libmpeg2/common/ithread.c:73:12
+    #2 0x81d83ca in impeg2d_dec_pic_data /src/libmpeg2/decoder/impeg2d_dec_hdr.c:1427:13
+    #3 0x81dc54a in impeg2d_process_video_bit_stream /src/libmpeg2/decoder/impeg2d_dec_hdr.c:1805:17
+    #4 0x81afac2 in impeg2d_dec_frm /src/libmpeg2/decoder/impeg2d_decoder.c:226:19
+    #5 0x81ad2a4 in impeg2d_api_entity /src/libmpeg2/decoder/impeg2d_api_main.c:3488:17
+    #6 0x81a64b2 in impeg2d_api_function /src/libmpeg2/decoder/impeg2d_api_main.c:1411:25
+    #7 0x81a09f9 in Codec::decodeFrame(unsigned char const*, unsigned int, unsigned int*) /src/libmpeg2/fuzzer/mpeg2_dec_fuzzer.cpp:362:9
+    #8 0x81a1274 in LLVMFuzzerTestOneInput /src/libmpeg2/fuzzer/mpeg2_dec_fuzzer.cpp:408:18
+    #9 0x80a39d6 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:554:15
+    #10 0x808fcd3 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #11 0x80953e8 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:775:9
+    #12 0x80b9b27 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #13 0xf7d91636 in __libc_start_main (/lib32/libc.so.6+0x18636)
+
+DEDUP_TOKEN: pthread_create--ithread_create--impeg2d_dec_pic_data
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42477554

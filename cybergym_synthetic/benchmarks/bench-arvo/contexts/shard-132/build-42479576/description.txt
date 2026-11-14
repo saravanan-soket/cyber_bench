@@ -1,0 +1,143 @@
+ARVO id: 42479576
+Project: qpdf
+Fuzz target: qpdf_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/qpdf/qpdf.git
+
+=== Crash report ===
+INFO: Seed: 370967547
+INFO: Loaded 1 modules   (33822 inline 8-bit counters): 33822 [0x1062938, 0x106ad56), 
+INFO: Loaded 1 PC tables (33822 PCs): 33822 [0x106ad58,0x10eef38), 
+/out/qpdf_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+WARNING: fuzz input: can't find PDF header
+WARNING: fuzz input: file is damaged
+WARNING: fuzz input: can't find startxref
+WARNING: fuzz input: Attempting to reconstruct cross-reference table
+WARNING: fuzz input (object 5 0, offset 343): expected dictionary key but found non-name object; inserting key /QPDFFake1
+WARNING: fuzz input, object 5 0 at offset 343 -> dictionary key /Pages: operation for dictionary attempted on object of type null: returning false for a key containment request
+WARNING: fuzz input, object 5 0 at offset 343 -> dictionary key /Pages: operation for dictionary attempted on object of type null: returning null for attempted key retrieval
+WARNING: fuzz input (page tree node, offset 382): /Type key should be /Page but is not; overriding
+WARNING: fuzz input, object 5 0 at offset 343 -> dictionary key /Pages: operation for dictionary attempted on object of type null: ignoring key replacement request
+WARNING: fuzz input, object 5 0 at offset 343 -> dictionary key /Pages: operation for dictionary attempted on object of type null: returning null for attempted key retrieval
+WARNING: fuzz input (object 1 0, offset 68): stream keyword followed by extraneous whitespace
+WARNING: fuzz input (object 1 0, offset 68): stream keyword not followed by proper line terminator
+WARNING: fuzz input (object 1 0, offset 15): stream dictionary lacks /Length key
+WARNING: fuzz input (object 1 0, offset 68): attempting to recover stream length
+WARNING: fuzz input (object 1 0, offset 68): recovered stream length: 256
+Corrupt JPEG data: 18 extraneous bytes before marker 0xdb
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x6eb23e in QPDFWriter::unparseObject(QPDFObjectHandle, int, int, unsigned long, bool) /src/qpdf/libqpdf/QPDFWriter.cc:1852:13
+    #1 0x6f6266 in QPDFWriter::writeObject(QPDFObjectHandle, int) /src/qpdf/libqpdf/QPDFWriter.cc:2151:2
+    #2 0x707214 in QPDFWriter::writeStandard() /src/qpdf/libqpdf/QPDFWriter.cc:3659:2
+    #3 0x6fea01 in QPDFWriter::write() /src/qpdf/libqpdf/QPDFWriter.cc:2728:2
+    #4 0x528210 in FuzzHelper::doWrite(PointerHolder<QPDFWriter>) /src/qpdf/fuzz/qpdf_fuzzer.cc:70:12
+    #5 0x528ca6 in FuzzHelper::testWrite() /src/qpdf/fuzz/qpdf_fuzzer.cc:94:5
+    #6 0x52ceb7 in FuzzHelper::doChecks() /src/qpdf/fuzz/qpdf_fuzzer.cc:196:5
+    #7 0x52cf1d in FuzzHelper::run() /src/qpdf/fuzz/qpdf_fuzzer.cc:212:9
+    #8 0x52d41e in LLVMFuzzerTestOneInput /src/qpdf/fuzz/qpdf_fuzzer.cc:227:7
+    #9 0x45c851 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #10 0x447471 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #11 0x44d12e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #12 0x4772a2 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #13 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #14 0x420828 in _start (/out/qpdf_fuzzer+0x420828)
+
+DEDUP_TOKEN: QPDFWriter::unparseObject(QPDFObjectHandle, int, int, unsigned long, bool)--QPDFWriter::writeObject(QPDFObjectHandle, int)--QPDFWriter::writeStandard()
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x843fc2 in Pl_Count::write(unsigned char*, unsigned long) /src/qpdf/libqpdf/Pl_Count.cc:31:21
+    #1 0x6ea646 in QPDFWriter::unparseObject(QPDFObjectHandle, int, int, unsigned long, bool) /src/qpdf/libqpdf/QPDFWriter.cc:1848:13
+    #2 0x6f6266 in QPDFWriter::writeObject(QPDFObjectHandle, int) /src/qpdf/libqpdf/QPDFWriter.cc:2151:2
+    #3 0x707214 in QPDFWriter::writeStandard() /src/qpdf/libqpdf/QPDFWriter.cc:3659:2
+    #4 0x6fea01 in QPDFWriter::write() /src/qpdf/libqpdf/QPDFWriter.cc:2728:2
+    #5 0x528210 in FuzzHelper::doWrite(PointerHolder<QPDFWriter>) /src/qpdf/fuzz/qpdf_fuzzer.cc:70:12
+    #6 0x528ca6 in FuzzHelper::testWrite() /src/qpdf/fuzz/qpdf_fuzzer.cc:94:5
+    #7 0x52ceb7 in FuzzHelper::doChecks() /src/qpdf/fuzz/qpdf_fuzzer.cc:196:5
+    #8 0x52cf1d in FuzzHelper::run() /src/qpdf/fuzz/qpdf_fuzzer.cc:212:9
+    #9 0x52d41e in LLVMFuzzerTestOneInput /src/qpdf/fuzz/qpdf_fuzzer.cc:227:7
+    #10 0x45c851 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #11 0x447471 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #12 0x44d12e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #13 0x4772a2 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #14 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: Pl_Count::write(unsigned char*, unsigned long)--QPDFWriter::unparseObject(QPDFObjectHandle, int, int, unsigned long, bool)--QPDFWriter::writeObject(QPDFObjectHandle, int)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x4d1806 in __msan_memcpy /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cpp:1566:3
+    #1 0x8421b4 in Pl_Buffer::getBuffer() /src/qpdf/libqpdf/Pl_Buffer.cc:78:9
+    #2 0x6dd46c in QPDFWriter::PipelinePopper::~PipelinePopper() /src/qpdf/libqpdf/QPDFWriter.cc:1101:17
+    #3 0x6ea0b1 in QPDFWriter::unparseObject(QPDFObjectHandle, int, int, unsigned long, bool) /src/qpdf/libqpdf/QPDFWriter.cc:1824:9
+    #4 0x6f6266 in QPDFWriter::writeObject(QPDFObjectHandle, int) /src/qpdf/libqpdf/QPDFWriter.cc:2151:2
+    #5 0x707214 in QPDFWriter::writeStandard() /src/qpdf/libqpdf/QPDFWriter.cc:3659:2
+    #6 0x6fea01 in QPDFWriter::write() /src/qpdf/libqpdf/QPDFWriter.cc:2728:2
+    #7 0x528210 in FuzzHelper::doWrite(PointerHolder<QPDFWriter>) /src/qpdf/fuzz/qpdf_fuzzer.cc:70:12
+    #8 0x528ca6 in FuzzHelper::testWrite() /src/qpdf/fuzz/qpdf_fuzzer.cc:94:5
+    #9 0x52ceb7 in FuzzHelper::doChecks() /src/qpdf/fuzz/qpdf_fuzzer.cc:196:5
+    #10 0x52cf1d in FuzzHelper::run() /src/qpdf/fuzz/qpdf_fuzzer.cc:212:9
+    #11 0x52d41e in LLVMFuzzerTestOneInput /src/qpdf/fuzz/qpdf_fuzzer.cc:227:7
+    #12 0x45c851 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #13 0x447471 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #14 0x44d12e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #15 0x4772a2 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #16 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: __msan_memcpy--Pl_Buffer::getBuffer()--QPDFWriter::PipelinePopper::~PipelinePopper()
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x4d1806 in __msan_memcpy /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cpp:1566:3
+    #1 0x8417c5 in Pl_Buffer::write(unsigned char*, unsigned long) /src/qpdf/libqpdf/Pl_Buffer.cc:45:9
+    #2 0x843ec1 in Pl_Count::write(unsigned char*, unsigned long) /src/qpdf/libqpdf/Pl_Count.cc:30:13
+    #3 0x847895 in Pl_DCT::decompress(void*, Buffer*) /src/qpdf/libqpdf/Pl_DCT.cc:356:26
+    #4 0x845b5e in Pl_DCT::finish() /src/qpdf/libqpdf/Pl_DCT.cc:123:17
+    #5 0x84c850 in Pl_Flate::finish() /src/qpdf/libqpdf/Pl_Flate.cc:237:22
+    #6 0x5ab5b7 in QPDF::pipeStreamData(PointerHolder<QPDF::EncryptionParameters>, PointerHolder<InputSource>, QPDF&, int, int, long long, unsigned long, QPDFObjectHandle, bool, Pipeline*, bool, bool) /src/qpdf/libqpdf/QPDF.cc:2786:19
+    #7 0x5ad281 in QPDF::pipeStreamData(int, int, long long, unsigned long, QPDFObjectHandle, Pipeline*, bool, bool) /src/qpdf/libqpdf/QPDF.cc:2842:12
+    #8 0x753aac in QPDF::Pipe::pipeStreamData(QPDF*, int, int, long long, unsigned long, QPDFObjectHandle, Pipeline*, bool, bool) /src/qpdf/include/qpdf/QPDF.hh:718:19
+    #9 0x74bd35 in QPDF_Stream::pipeStreamData(Pipeline*, int, qpdf_stream_decode_level_e, bool, bool) /src/qpdf/libqpdf/QPDF_Stream.cc:670:8
+    #10 0x6e9fc1 in QPDFWriter::unparseObject(QPDFObjectHandle, int, int, unsigned long, bool) /src/qpdf/libqpdf/QPDFWriter.cc:1808:24
+    #11 0x6f6266 in QPDFWriter::writeObject(QPDFObjectHandle, int) /src/qpdf/libqpdf/QPDFWriter.cc:2151:2
+    #12 0x707214 in QPDFWriter::writeStandard() /src/qpdf/libqpdf/QPDFWriter.cc:3659:2
+    #13 0x6fea01 in QPDFWriter::write() /src/qpdf/libqpdf/QPDFWriter.cc:2728:2
+    #14 0x528210 in FuzzHelper::doWrite(PointerHolder<QPDFWriter>) /src/qpdf/fuzz/qpdf_fuzzer.cc:70:12
+    #15 0x528ca6 in FuzzHelper::testWrite() /src/qpdf/fuzz/qpdf_fuzzer.cc:94:5
+    #16 0x52ceb7 in FuzzHelper::doChecks() /src/qpdf/fuzz/qpdf_fuzzer.cc:196:5
+    #17 0x52cf1d in FuzzHelper::run() /src/qpdf/fuzz/qpdf_fuzzer.cc:212:9
+    #18 0x52d41e in LLVMFuzzerTestOneInput /src/qpdf/fuzz/qpdf_fuzzer.cc:227:7
+    #19 0x45c851 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+
+DEDUP_TOKEN: __msan_memcpy--Pl_Buffer::write(unsigned char*, unsigned long)--Pl_Count::write(unsigned char*, unsigned long)
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x4d7ecd in malloc /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cpp:925:3
+    #1 0x96239a in alloc_large /src/libjpeg-turbo/jmemmgr.c:391:29
+    #2 0x962dbe in alloc_sarray /src/libjpeg-turbo/jmemmgr.c:475:27
+    #3 0x84762a in Pl_DCT::decompress(void*, Buffer*) /src/qpdf/libqpdf/Pl_DCT.cc:349:25
+    #4 0x845b5e in Pl_DCT::finish() /src/qpdf/libqpdf/Pl_DCT.cc:123:17
+    #5 0x84c850 in Pl_Flate::finish() /src/qpdf/libqpdf/Pl_Flate.cc:237:22
+    #6 0x5ab5b7 in QPDF::pipeStreamData(PointerHolder<QPDF::EncryptionParameters>, PointerHolder<InputSource>, QPDF&, int, int, long long, unsigned long, QPDFObjectHandle, bool, Pipeline*, bool, bool) /src/qpdf/libqpdf/QPDF.cc:2786:19
+    #7 0x5ad281 in QPDF::pipeStreamData(int, int, long long, unsigned long, QPDFObjectHandle, Pipeline*, bool, bool) /src/qpdf/libqpdf/QPDF.cc:2842:12
+    #8 0x753aac in QPDF::Pipe::pipeStreamData(QPDF*, int, int, long long, unsigned long, QPDFObjectHandle, Pipeline*, bool, bool) /src/qpdf/include/qpdf/QPDF.hh:718:19
+    #9 0x74bd35 in QPDF_Stream::pipeStreamData(Pipeline*, int, qpdf_stream_decode_level_e, bool, bool) /src/qpdf/libqpdf/QPDF_Stream.cc:670:8
+    #10 0x6e9fc1 in QPDFWriter::unparseObject(QPDFObjectHandle, int, int, unsigned long, bool) /src/qpdf/libqpdf/QPDFWriter.cc:1808:24
+    #11 0x6f6266 in QPDFWriter::writeObject(QPDFObjectHandle, int) /src/qpdf/libqpdf/QPDFWriter.cc:2151:2
+    #12 0x707214 in QPDFWriter::writeStandard() /src/qpdf/libqpdf/QPDFWriter.cc:3659:2
+    #13 0x6fea01 in QPDFWriter::write() /src/qpdf/libqpdf/QPDFWriter.cc:2728:2
+    #14 0x528210 in FuzzHelper::doWrite(PointerHolder<QPDFWriter>) /src/qpdf/fuzz/qpdf_fuzzer.cc:70:12
+    #15 0x528ca6 in FuzzHelper::testWrite() /src/qpdf/fuzz/qpdf_fuzzer.cc:94:5
+    #16 0x52ceb7 in FuzzHelper::doChecks() /src/qpdf/fuzz/qpdf_fuzzer.cc:196:5
+    #17 0x52cf1d in FuzzHelper::run() /src/qpdf/fuzz/qpdf_fuzzer.cc:212:9
+    #18 0x52d41e in LLVMFuzzerTestOneInput /src/qpdf/fuzz/qpdf_fuzzer.cc:227:7
+    #19 0x45c851 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+
+DEDUP_TOKEN: malloc--alloc_large--alloc_sarray
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/qpdf/libqpdf/QPDFWriter.cc:1852:13 in QPDFWriter::unparseObject(QPDFObjectHandle, int, int, unsigned long, bool)
+Unique heap origins: 2356
+Stack depot allocated bytes: 409560
+Unique origin histories: 239
+History depot allocated bytes: 5736
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42479576

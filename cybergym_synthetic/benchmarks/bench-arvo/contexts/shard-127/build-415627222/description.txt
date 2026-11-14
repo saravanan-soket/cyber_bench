@@ -1,0 +1,98 @@
+ARVO id: 415627222
+Project: libheif
+Fuzz target: file_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Container-overflow WRITE 3
+Language: c++
+Repo: https://github.com/strukturag/libheif.git
+
+=== Crash report ===
+Reading 145 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: container-overflow on address 0x502000000170 at pc 0x561f30c953f4 bp 0x7fffb5cd8980 sp 0x7fffb5cd8140
+[1m[0m[1m[34mWRITE of size 3 at 0x502000000170 thread T0[1m[0m
+SCARINESS: 34 (3-byte-write-container-overflow)
+    #0 0x561f30c953f3 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:63:3
+    #1 0x561f30e81267 in StreamReader_memory::read(void*, unsigned long) /src/libheif/libheif/bitstream.cc:114:3
+    #2 0x561f30e84edf in BitstreamRange::read(unsigned char*, unsigned long) /src/libheif/libheif/bitstream.cc:466:24
+    #3 0x561f310df8dc in Box_saiz::parse(BitstreamRange&, heif_security_limits const*) /src/libheif/libheif/sequences/seq_boxes.cc:1672:11
+    #4 0x561f30e9912c in Box::read(BitstreamRange&, std::__1::shared_ptr<Box>*, heif_security_limits const*) /src/libheif/libheif/box.cc:929:14
+    #5 0x561f30ebdd3a in Box::read_children(BitstreamRange&, unsigned int, heif_security_limits const*) /src/libheif/libheif/box.cc:1034:19
+    #6 0x561f30ec816a in Box_meta::parse(BitstreamRange&, heif_security_limits const*) /src/libheif/libheif/box.cc:1358:10
+    #7 0x561f30e9912c in Box::read(BitstreamRange&, std::__1::shared_ptr<Box>*, heif_security_limits const*) /src/libheif/libheif/box.cc:929:14
+    #8 0x561f30fbb5b4 in FileLayout::read(std::__1::shared_ptr<StreamReader> const&, heif_security_limits const*) /src/libheif/libheif/file_layout.cc:152:13
+    #9 0x561f30f8c567 in HeifFile::read(std::__1::shared_ptr<StreamReader> const&) /src/libheif/libheif/file.cc:136:24
+    #10 0x561f30f8cc34 in HeifFile::read_from_memory(void const*, unsigned long, bool) /src/libheif/libheif/file.cc:125:10
+    #11 0x561f30f4470f in HeifContext::read_from_memory(void const*, unsigned long, bool) /src/libheif/libheif/context.cc:190:28
+    #12 0x561f30cdf5ac in heif_context_read_from_memory /src/libheif/libheif/api/libheif/heif.cc:550:29
+    #13 0x561f30cd7508 in LLVMFuzzerTestOneInput /src/libheif/fuzzing/file_fuzzer.cc:110:9
+    #14 0x561f30cd72a9 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+    #15 0x561f30cd70a5 in LLVMFuzzerRunDriver /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #16 0x561f30cd6c5d in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:311:10
+    #17 0x7eff96eb6082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+    #18 0x561f30bfe45d in _start (/out/file_fuzzer+0x8545d)
+
+DEDUP_TOKEN: __asan_memcpy--StreamReader_memory::read(void*, unsigned long)--BitstreamRange::read(unsigned char*, unsigned long)
+[1m[32m0x502000000170 is located 0 bytes inside of 3-byte region [0x502000000170,0x502000000173)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x561f30cd483d in operator new(unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:86:3
+    #1 0x561f310e027e in void* std::__1::__libcpp_operator_new[abi:ne180100]<unsigned long>(unsigned long) /usr/local/bin/../include/c++/v1/new:271:10
+    #2 0x561f310e027e in std::__1::__libcpp_allocate[abi:ne180100](unsigned long, unsigned long) /usr/local/bin/../include/c++/v1/new:295:10
+    #3 0x561f310e027e in std::__1::allocator<unsigned char>::allocate[abi:ne180100](unsigned long) /usr/local/bin/../include/c++/v1/__memory/allocator.h:125:32
+    #4 0x561f310e027e in std::__1::__allocation_result<std::__1::allocator_traits<std::__1::allocator<unsigned char>>::pointer> std::__1::__allocate_at_least[abi:ne180100]<std::__1::allocator<unsigned char>>(std::__1::allocator<unsigned char>&, unsigned long) /usr/local/bin/../include/c++/v1/__memory/allocate_at_least.h:55:19
+    #5 0x561f310e027e in std::__1::__split_buffer<unsigned char, std::__1::allocator<unsigned char>&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<unsigned char>&) /usr/local/bin/../include/c++/v1/__split_buffer:343:25
+    #6 0x561f310e027e in std::__1::vector<unsigned char, std::__1::allocator<unsigned char>>::reserve(unsigned long) /usr/local/bin/../include/c++/v1/vector:1425:49
+    #7 0x561f310df8a9 in Box_saiz::parse(BitstreamRange&, heif_security_limits const*) /src/libheif/libheif/sequences/seq_boxes.cc:1671:20
+    #8 0x561f30e9912c in Box::read(BitstreamRange&, std::__1::shared_ptr<Box>*, heif_security_limits const*) /src/libheif/libheif/box.cc:929:14
+    #9 0x561f30ebdd3a in Box::read_children(BitstreamRange&, unsigned int, heif_security_limits const*) /src/libheif/libheif/box.cc:1034:19
+    #10 0x561f30ec816a in Box_meta::parse(BitstreamRange&, heif_security_limits const*) /src/libheif/libheif/box.cc:1358:10
+    #11 0x561f30e9912c in Box::read(BitstreamRange&, std::__1::shared_ptr<Box>*, heif_security_limits const*) /src/libheif/libheif/box.cc:929:14
+    #12 0x561f30fbb5b4 in FileLayout::read(std::__1::shared_ptr<StreamReader> const&, heif_security_limits const*) /src/libheif/libheif/file_layout.cc:152:13
+    #13 0x561f30f8c567 in HeifFile::read(std::__1::shared_ptr<StreamReader> const&) /src/libheif/libheif/file.cc:136:24
+    #14 0x561f30f8cc34 in HeifFile::read_from_memory(void const*, unsigned long, bool) /src/libheif/libheif/file.cc:125:10
+    #15 0x561f30f4470f in HeifContext::read_from_memory(void const*, unsigned long, bool) /src/libheif/libheif/context.cc:190:28
+    #16 0x561f30cdf5ac in heif_context_read_from_memory /src/libheif/libheif/api/libheif/heif.cc:550:29
+    #17 0x561f30cd7508 in LLVMFuzzerTestOneInput /src/libheif/fuzzing/file_fuzzer.cc:110:9
+    #18 0x561f30cd72a9 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+
+DEDUP_TOKEN: operator new(unsigned long)--void* std::__1::__libcpp_operator_new[abi:ne180100]<unsigned long>(unsigned long)--std::__1::__libcpp_allocate[abi:ne180100](unsigned long, unsigned long)
+HINT: if you don't care about these errors you may set ASAN_OPTIONS=detect_container_overflow=0.
+If you suspect a false positive see also: https://github.com/google/sanitizers/wiki/AddressSanitizerContainerOverflow.
+SUMMARY: AddressSanitizer: container-overflow /src/libheif/libheif/bitstream.cc:114:3 in StreamReader_memory::read(void*, unsigned long)
+Shadow bytes around the buggy address:
+  0x501ffffffe80: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x501fffffff00: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x501fffffff80: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x502000000000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x502000000080: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+=>0x502000000100: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[34mfc[1m[0m][1m[31mfa[1m[0m
+  0x502000000180: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x502000000200: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x502000000280: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x502000000300: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x502000000380: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/415627222

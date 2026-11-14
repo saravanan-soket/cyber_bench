@@ -1,0 +1,45 @@
+ARVO id: 42531117
+Project: libavc
+Fuzz target: svc_dec_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Check failed
+Language: c++
+Repo: https://github.com/ittiam-systems/libavc.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4194194870
+INFO: Loaded 1 modules   (16557 inline 8-bit counters): 16557 [0x9d9b70, 0x9ddc1d), 
+INFO: Loaded 1 PC tables (16557 PCs): 16557 [0x93e480,0x97ef50), 
+/out/svc_dec_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address 0x7fcb36f47b4c (pc 0x00000081a808 bp 0x7ffc3a8c0d70 sp 0x7ffc3a8c0d00 T7)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+    #0 0x81a808 in isvcd_iquant_itrans_chroma_4x4_dc /src/libavc/decoder/svc/isvcd_iquant_itrans.c:369:18
+    #1 0x5cd9e8 in isvcd_process_inter_mb_no_rsd_pred_non_target /src/libavc/decoder/svc/isvcd_process_epslice.c:746:29
+    #2 0x5db57c in isvcd_decode_recon_tfr_nmb_base_lyr /src/libavc/decoder/svc/isvcd_process_epslice.c:1494:19
+    #3 0x59065c in isvcd_parse_inter_slice_data_cabac /src/libavc/decoder/svc/isvcd_parse_epslice.c:778:21
+    #4 0x80637f in isvcd_parse_bslice /src/libavc/decoder/svc/isvcd_parse_ebslice.c:2157:11
+    #5 0x5c14e9 in isvcd_parse_decode_slice /src/libavc/decoder/svc/isvcd_parse_slice.c:2712:15
+    #6 0x5a3117 in isvcd_parse_nal_unit /src/libavc/decoder/svc/isvcd_parse_headers.c:1005:40
+    #7 0x5564cb in isvcd_video_decode /src/libavc/decoder/svc/isvcd_api.c:5292:27
+    #8 0x5659ca in isvcd_api_function /src/libavc/decoder/svc/isvcd_api.c:7267:26
+    #9 0x536c53 in Codec::decodeFrame(unsigned char const*, unsigned long, unsigned long*) /src/libavc/fuzzer/svc_dec_fuzzer.cpp:375:11
+    #10 0x5382bc in LLVMFuzzerTestOneInput /src/libavc/fuzzer/svc_dec_fuzzer.cpp:437:22
+    #11 0x43dc53 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #12 0x4293b2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #13 0x42ec5c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #14 0x458192 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0x7fcb37809082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #16 0x41f57d in _start (/out/svc_dec_fuzzer+0x41f57d)
+
+DEDUP_TOKEN: isvcd_iquant_itrans_chroma_4x4_dc--isvcd_process_inter_mb_no_rsd_pred_non_target--isvcd_decode_recon_tfr_nmb_base_lyr
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV /src/libavc/decoder/svc/isvcd_iquant_itrans.c:369:18 in isvcd_iquant_itrans_chroma_4x4_dc
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42531117

@@ -1,0 +1,47 @@
+ARVO id: 42534919
+Project: unit
+Fuzz target: Fuzz_http
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c
+Repo: https://github.com/nginx/unit
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3153597659
+INFO: Loaded 1 modules   (12629 inline 8-bit counters): 12629 [0x559f06b7d580, 0x559f06b806d5), 
+INFO: Loaded 1 PC tables (12629 PCs): 12629 [0x559f06b806d8,0x559f06bb1c28), 
+/out/Fuzz_http: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+tests: [debug] sys_nerr: 132
+tests: [debug] malloc(6820): 723000000000
+tests: [debug] stderr flags: 0x8002
+tests: [debug] ncpu: 192
+tests: [debug] pagesize: 4096
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x559f069cedea in nxt_lvlhsh_new_bucket /src/unit/src/nxt_lvlhsh.c:292:14
+    #1 0x559f06a0558e in nxt_http_fields_hash /src/unit/src/nxt_http_parse.c:1199:15
+    #2 0x559f069771d1 in LLVMFuzzerTestOneInput /src/unit/fuzzer/Fuzz_http.c:33:9
+    #3 0x559f0686a630 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #4 0x559f06854dc4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #5 0x559f0685a85a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #6 0x559f06886c52 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #7 0x7f0313bd4082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 87b331c034a6458c64ce09c03939e947212e18ce)
+    #8 0x559f0684b89d in _start (/out/Fuzz_http+0x9489d)
+
+DEDUP_TOKEN: nxt_lvlhsh_new_bucket--nxt_http_fields_hash--LLVMFuzzerTestOneInput
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mlhq[1m[35m' in the stack frame[1m[0m
+    #0 0x559f06a05251 in nxt_http_fields_hash /src/unit/src/nxt_http_parse.c:1181:5
+
+DEDUP_TOKEN: nxt_http_fields_hash
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/unit/src/nxt_lvlhsh.c:292:14 in nxt_lvlhsh_new_bucket
+Unique heap origins: 25
+Stack depot allocated bytes: 9764880
+Unique origin histories: 3
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42534919

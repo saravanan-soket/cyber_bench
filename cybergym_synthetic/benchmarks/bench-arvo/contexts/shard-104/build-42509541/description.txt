@@ -1,0 +1,47 @@
+ARVO id: 42509541
+Project: open62541
+Fuzz target: fuzz_binary_message
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/open62541/open62541.git
+
+=== Crash report ===
+INFO: Seed: 1510886706
+INFO: Loaded 1 modules   (4029 inline 8-bit counters): 4029 [0x7b8250, 0x7b920d), 
+INFO: Loaded 1 PC tables (4029 PCs): 4029 [0x7b9210,0x7c8de0), 
+/out/fuzz_binary_message: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0xfffffffffffffff9 (pc 0x7ffff6f49512 bp 0x7fffffffc580 sp 0x7fffffffc3f0 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7ffff6f49511 in cfree (/lib/x86_64-linux-gnu/libc.so.6+0x84511)
+    #1 0x4a242c in writeArrayDimensionsAttribute /src/open62541/src/server/ua_services_attribute.c:736:5
+    #2 0x4a242c in copyAttributeIntoNode /src/open62541/src/server/ua_services_attribute.c:1145
+    #3 0x496550 in UA_Server_editNode /src/open62541/src/server/ua_server_utils.c:310:28
+    #4 0x49fd3f in Operation_Write /src/open62541/src/server/ua_services_attribute.c:1188:15
+    #5 0x49666c in UA_Server_processServiceOperations /src/open62541/src/server/ua_server_utils.c:355:9
+    #6 0x49fced in Service_Write /src/open62541/src/server/ua_services_attribute.c:1206:9
+    #7 0x49520b in processMSG /src/open62541/src/server/ua_server_binary.c:514:5
+    #8 0x471d6e in UA_SecureChannel_processChunk /src/open62541/src/ua_securechannel.c
+    #9 0x46fc3e in processChunk /src/open62541/src/ua_connection.c:139:12
+    #10 0x46fc3e in UA_Connection_processChunks /src/open62541/src/ua_connection.c:164
+    #11 0x493f40 in processBinaryMessage /src/open62541/src/server/ua_server_binary.c:685:28
+    #12 0x493f40 in UA_Server_processBinaryMessage /src/open62541/src/server/ua_server_binary.c:705
+    #13 0x464794 in LLVMFuzzerTestOneInput /src/open62541/tests/fuzz/fuzz_binary_message.cc:29:5
+    #14 0x4c226c in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:514:13
+    #15 0x4b60bc in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #16 0x4b9fe7 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:695:9
+    #17 0x4b5dc8 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #18 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #19 0x43d508 in _start (/out/fuzz_binary_message+0x43d508)
+
+DEDUP_TOKEN: cfree--writeArrayDimensionsAttribute--copyAttributeIntoNode
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x84511) in cfree
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42509541

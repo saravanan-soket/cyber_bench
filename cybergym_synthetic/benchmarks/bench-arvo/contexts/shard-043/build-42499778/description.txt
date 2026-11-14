@@ -1,0 +1,65 @@
+ARVO id: 42499778
+Project: libraw
+Fuzz target: libraw_raf_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/libraw/libraw
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3675006403
+INFO: Loaded 1 modules   (18078 inline 8-bit counters): 18078 [0xb9bdb0, 0xba044e), 
+INFO: Loaded 1 PC tables (18078 PCs): 18078 [0x8b1f00,0x8f88e0), 
+/out/libraw_raf_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x74281d in LibRaw::median4(int*) /src/libraw/src/decoders/smal.cpp:122:9
+    #1 0x742d04 in LibRaw::fill_holes(int) /src/libraw/src/decoders/smal.cpp:144:23
+    #2 0x743f43 in LibRaw::smal_v9_load_raw() /src/libraw/src/decoders/smal.cpp:178:5
+    #3 0x528de6 in LibRaw::unpack() /src/libraw/src/decoders/unpack.cpp:287:7
+    #4 0x526bd4 in LLVMFuzzerTestOneInput /src/libraw_fuzzer.cc:47:20
+    #5 0x458ee3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #6 0x444652 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #7 0x44a31e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #8 0x473dd2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #9 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #10 0x41f708 in _start (/out/libraw_raf_fuzzer+0x41f708)
+
+DEDUP_TOKEN: LibRaw::median4(int*)--LibRaw::fill_holes(int)--LibRaw::smal_v9_load_raw()
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x742deb in LibRaw::fill_holes(int) /src/libraw/src/decoders/smal.cpp:141:14
+    #1 0x743f43 in LibRaw::smal_v9_load_raw() /src/libraw/src/decoders/smal.cpp:178:5
+    #2 0x528de6 in LibRaw::unpack() /src/libraw/src/decoders/unpack.cpp:287:7
+    #3 0x526bd4 in LLVMFuzzerTestOneInput /src/libraw_fuzzer.cc:47:20
+    #4 0x458ee3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #5 0x444652 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #6 0x44a31e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #7 0x473dd2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #8 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: LibRaw::fill_holes(int)--LibRaw::smal_v9_load_raw()--LibRaw::unpack()
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x4d4dfd in malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:901:3
+    #1 0x56b6fe in libraw_memmgr::malloc(unsigned long) /src/libraw/./libraw/libraw_alloc.h:49:17
+    #2 0x56a2df in LibRaw::malloc(unsigned long) /src/libraw/src/utils/utils_libraw.cpp:251:20
+    #3 0x5283d0 in LibRaw::unpack() /src/libraw/src/decoders/unpack.cpp:237:37
+    #4 0x526bd4 in LLVMFuzzerTestOneInput /src/libraw_fuzzer.cc:47:20
+    #5 0x458ee3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #6 0x444652 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #7 0x44a31e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #8 0x473dd2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #9 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: malloc--libraw_memmgr::malloc(unsigned long)--LibRaw::malloc(unsigned long)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/libraw/src/decoders/smal.cpp:122:9 in LibRaw::median4(int*)
+Unique heap origins: 28
+Stack depot allocated bytes: 1944
+Unique origin histories: 6
+History depot allocated bytes: 144
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42499778

@@ -1,0 +1,114 @@
+ARVO id: 42514905
+Project: libjxl
+Fuzz target: djxl_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 4
+Language: c++
+Repo: https://github.com/libjxl/libjxl.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4069985991
+INFO: Loaded 1 modules   (27141 inline 8-bit counters): 27141 [0x555555d30d98, 0x555555d3779d), 
+INFO: Loaded 1 PC tables (27141 PCs): 27141 [0x555555d377a0,0x555555da17f0), 
+/out/djxl_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x7ffff3942600 at pc 0x555555b03dab bp 0x7fffffffc4d0 sp 0x7fffffffc4c8
+[1m[0m[1m[34mREAD of size 4 at 0x7ffff3942600 thread T0[1m[0m
+SCARINESS: 17 (4-byte-read-heap-buffer-overflow)
+    #0 0x555555b03daa in jxl::PerformBlending(float const* const*, float const* const*, float* const*, unsigned long, unsigned long, jxl::PatchBlending const&, jxl::PatchBlending const*, std::__1::vector<jxl::ExtraChannelInfo, std::__1::allocator<jxl::ExtraChannelInfo> > const&) /src/libjxl/lib/jxl/blending.cc:51:29
+    #1 0x555555b4f35c in jxl::N_EMU128::BlendingStage::ProcessRow(std::__1::vector<std::__1::vector<float*, std::__1::allocator<float*> >, std::__1::allocator<std::__1::vector<float*, std::__1::allocator<float*> > > > const&, std::__1::vector<std::__1::vector<float*, std::__1::allocator<float*> >, std::__1::allocator<std::__1::vector<float*, std::__1::allocator<float*> > > > const&, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long) const /src/libjxl/lib/jxl/render_pipeline/stage_blending.cc:150:5
+    #2 0x555555b34609 in jxl::LowMemoryRenderPipeline::RenderRect(unsigned long, std::__1::vector<jxl::Plane<float>, std::__1::allocator<jxl::Plane<float> > >&, jxl::RectT<unsigned long>, jxl::RectT<unsigned long>) /src/libjxl/lib/jxl/render_pipeline/low_memory_render_pipeline.cc:739:19
+    #3 0x555555b36e77 in jxl::LowMemoryRenderPipeline::ProcessBuffers(unsigned long, unsigned long) /src/libjxl/lib/jxl/render_pipeline/low_memory_render_pipeline.cc:845:5
+    #4 0x555555a56610 in operator() /src/libjxl/lib/jxl/dec_modular.cc:652:3
+    #5 0x555555a56610 in jxl::ThreadPool::RunCallState<jxl::ModularFrameDecoder::FinalizeDecoding(jxl::PassesDecoderState*, jxl::ThreadPool*, jxl::ImageBundle*, bool)::$_4, jxl::ModularFrameDecoder::FinalizeDecoding(jxl::PassesDecoderState*, jxl::ThreadPool*, jxl::ImageBundle*, bool)::$_5>::CallDataFunc(void*, unsigned int, unsigned long) /src/libjxl/lib/jxl/base/data_parallel.h:81:14
+    #6 0x5555558c4491 in jxl::ThreadPool::SequentialRunnerStatic(void*, void*, int (*)(void*, unsigned long), void (*)(void*, unsigned int, unsigned long), unsigned int, unsigned int) /src/libjxl/lib/jxl/base/data_parallel.cc:18:5
+    #7 0x555555a516f3 in Run<(lambda at /src/libjxl/lib/jxl/dec_modular.cc:652:3), (lambda at /src/libjxl/lib/jxl/dec_modular.cc:652:3)> /src/libjxl/lib/jxl/base/data_parallel.h:50:12
+    #8 0x555555a516f3 in RunOnPool<(lambda at /src/libjxl/lib/jxl/dec_modular.cc:652:3), (lambda at /src/libjxl/lib/jxl/dec_modular.cc:652:3)> /src/libjxl/lib/jxl/base/data_parallel.h:106:25
+    #9 0x555555a516f3 in jxl::ModularFrameDecoder::FinalizeDecoding(jxl::PassesDecoderState*, jxl::ThreadPool*, jxl::ImageBundle*, bool) /src/libjxl/lib/jxl/dec_modular.cc:652:3
+    #10 0x55555590b390 in jxl::FrameDecoder::Flush() /src/libjxl/lib/jxl/dec_frame.cc:882:3
+    #11 0x555555901e6d in jxl::FrameDecoder::FinalizeFrame() /src/libjxl/lib/jxl/dec_frame.cc:967:3
+    #12 0x5555557b0daf in JxlDecoderProcessCodestream /src/libjxl/lib/jxl/decode.cc:1514:28
+    #13 0x5555557b0daf in HandleBoxes(JxlDecoderStruct*) /src/libjxl/lib/jxl/decode.cc:1973:33
+    #14 0x5555557a84af in JxlDecoderProcessInput /src/libjxl/lib/jxl/decode.cc:2119:29
+    #15 0x55555579685e in DecodeJpegXl /src/libjxl/tools/djxl_fuzzer.cc:178:31
+    #16 0x55555579685e in TestOneInput /src/libjxl/tools/djxl_fuzzer.cc:559:3
+    #17 0x55555579685e in LLVMFuzzerTestOneInput /src/libjxl/tools/djxl_fuzzer.cc:569:10
+    #18 0x55555568d513 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #19 0x5555556791a2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #20 0x55555567e9ec in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #21 0x5555556a75e2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #22 0x7ffff7c55082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #23 0x5555556579cd in _start (/out/djxl_fuzzer+0x1039cd)
+
+DEDUP_TOKEN: jxl::PerformBlending(float const* const*, float const* const*, float* const*, unsigned long, unsigned long, jxl::PatchBlending const&, jxl::PatchBlending const*, std::__1::vector<jxl::ExtraChannelInfo, std::__1::allocator<jxl::ExtraChannelInfo> > const&)--jxl::N_EMU128::BlendingStage::ProcessRow(std::__1::vector<std::__1::vector<float*, std::__1::allocator<float*> >, std::__1::allocator<std::__1::vector<float*, std::__1::allocator<float*> > > > const&, std::__1::vector<std::__1::vector<float*, std::__1::allocator<float*> >, std::__1::allocator<std::__1::vector<float*, std::__1::allocator<float*> > > > const&, unsigned long, unsigned long, unsigned long, unsigned long, unsigned long) const--jxl::LowMemoryRenderPipeline::RenderRect(unsigned long, std::__1::vector<jxl::Plane<float>, std::__1::allocator<jxl::Plane<float> > >&, jxl::RectT<unsigned long>, jxl::RectT<unsigned long>)
+[1m[32m0x7ffff3942600 is located 0 bytes to the right of 167424-byte region [0x7ffff3919800,0x7ffff3942600)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x55555575bdfd in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:129:3
+    #1 0x5555558c4006 in jxl::CacheAligned::Allocate(unsigned long, unsigned long) /src/libjxl/lib/jxl/base/cache_aligned.cc:87:21
+    #2 0x5555557fac77 in Allocate /src/libjxl/lib/jxl/base/cache_aligned.h:43:12
+    #3 0x5555557fac77 in AllocateArray /src/libjxl/lib/jxl/base/cache_aligned.h:61:29
+    #4 0x5555557fac77 in jxl::PlaneBase::PlaneBase(unsigned long, unsigned long, unsigned long) /src/libjxl/lib/jxl/image.cc:93:14
+    #5 0x555555bc5b44 in Plane /src/libjxl/lib/jxl/image.h:150:9
+    #6 0x555555bc5b44 in construct<jxl::Plane<float>, const unsigned long &, const unsigned long &> /usr/local/bin/../include/c++/v1/__memory/allocator.h:151:28
+    #7 0x555555bc5b44 in construct<jxl::Plane<float>, const unsigned long &, const unsigned long &, void> /usr/local/bin/../include/c++/v1/__memory/allocator_traits.h:290:13
+    #8 0x555555bc5b44 in void std::__1::vector<jxl::Plane<float>, std::__1::allocator<jxl::Plane<float> > >::__emplace_back_slow_path<unsigned long const&, unsigned long const&>(unsigned long const&, unsigned long const&) /usr/local/bin/../include/c++/v1/vector:1676:5
+    #9 0x555555bc5559 in emplace_back<const unsigned long &, const unsigned long &> /usr/local/bin/../include/c++/v1/vector:1696:9
+    #10 0x555555bc5559 in jxl::(anonymous namespace)::WriteToImageBundleStage::SetInputSizes(std::__1::vector<std::__1::pair<unsigned long, unsigned long>, std::__1::allocator<std::__1::pair<unsigned long, unsigned long> > > const&) /src/libjxl/lib/jxl/render_pipeline/stage_write.cc:200:39
+    #11 0x555555b2bb7f in jxl::LowMemoryRenderPipeline::Init() /src/libjxl/lib/jxl/render_pipeline/low_memory_render_pipeline.cc:285:17
+    #12 0x555555ac21fa in jxl::RenderPipeline::Builder::Finalize(jxl::FrameDimensions) && /src/libjxl/lib/jxl/render_pipeline/render_pipeline.cc:91:8
+    #13 0x555555b25e1f in jxl::PassesDecoderState::PreparePipeline(jxl::ImageBundle*, jxl::PassesDecoderState::PipelineOptions) /src/libjxl/lib/jxl/dec_cache.cc:231:40
+    #14 0x5555558ff913 in jxl::FrameDecoder::ProcessSections(jxl::FrameDecoder::SectionInfo const*, unsigned long, jxl::FrameDecoder::SectionStatus*) /src/libjxl/lib/jxl/dec_frame.cc:752:5
+    #15 0x5555557aff90 in JxlDecoderProcessSections /src/libjxl/lib/jxl/decode.cc:1143:40
+    #16 0x5555557aff90 in JxlDecoderProcessCodestream /src/libjxl/lib/jxl/decode.cc:1472:7
+    #17 0x5555557aff90 in HandleBoxes(JxlDecoderStruct*) /src/libjxl/lib/jxl/decode.cc:1973:33
+    #18 0x5555557a84af in JxlDecoderProcessInput /src/libjxl/lib/jxl/decode.cc:2119:29
+    #19 0x55555579685e in DecodeJpegXl /src/libjxl/tools/djxl_fuzzer.cc:178:31
+    #20 0x55555579685e in TestOneInput /src/libjxl/tools/djxl_fuzzer.cc:559:3
+    #21 0x55555579685e in LLVMFuzzerTestOneInput /src/libjxl/tools/djxl_fuzzer.cc:569:10
+    #22 0x55555568d513 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #23 0x5555556791a2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #24 0x55555567e9ec in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #25 0x5555556a75e2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #26 0x7ffff7c55082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+
+DEDUP_TOKEN: __interceptor_malloc--jxl::CacheAligned::Allocate(unsigned long, unsigned long)--Allocate
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/libjxl/lib/jxl/blending.cc:51:29 in jxl::PerformBlending(float const* const*, float const* const*, float* const*, unsigned long, unsigned long, jxl::PatchBlending const&, jxl::PatchBlending const*, std::__1::vector<jxl::ExtraChannelInfo, std::__1::allocator<jxl::ExtraChannelInfo> > const&)
+Shadow bytes around the buggy address:
+  0x10007e720470: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007e720480: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007e720490: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007e7204a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007e7204b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x10007e7204c0:[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007e7204d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007e7204e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007e7204f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007e720500: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x10007e720510: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42514905

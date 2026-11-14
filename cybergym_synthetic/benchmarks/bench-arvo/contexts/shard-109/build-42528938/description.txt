@@ -1,0 +1,119 @@
+ARVO id: 42528938
+Project: radare2
+Fuzz target: ia_fuzz
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ {*}
+Language: c++
+Repo: https://github.com/radareorg/radare2
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 256244162
+INFO: Loaded 1 modules   (263141 inline 8-bit counters): 263141 [0x2d04aa0, 0x2d44e85), 
+INFO: Loaded 1 PC tables (263141 PCs): 263141 [0x2d44e88,0x3148cd8), 
+/out/ia_fuzz: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[35mWARN:[0m chopping hdr.sizeofcmds because it's larger than the file size
+[35mWARN:[0m mach0_header 1 = cmdsize<1. (0x1000001f7 vs 0x3d8)
+[35mWARN:[0m Unknown section flags 0x4550fe
+[35mWARN:[0m Unknown section flags 0xc3020b21
+[35mWARN:[0m Unknown section flags 0xffffffff
+[35mWARN:[0m Unknown section flags 0xffffffff
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x614000001fd0 at pc 0x0000004c6319 bp 0x7ffe5db69c70 sp 0x7ffe5db69438
+[1m[0m[1m[34mREAD of size 161 at 0x614000001fd0 thread T0[1m[0m
+SCARINESS: 26 (multi-byte-read-heap-buffer-overflow)
+    #0 0x4c6318 in strlen /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:389:5
+    #1 0x867b87 in r_str_ncpy /src/radare2/libr/include/r_util/r_str.h:112:17
+    #2 0x867b87 in load_sections_64 /src/radare2/libr/../libr/bin/p/../format/mach0/mach0.c:2615:3
+    #3 0x8503cc in metadata_sections_init /src/radare2/libr/../libr/bin/p/../format/objc/mach0_classes.c:74:28
+    #4 0x8503cc in parse_classes_64 /src/radare2/libr/../libr/bin/p/../format/objc/mach0_classes.c:1533:20
+    #5 0x85eb11 in classes /src/radare2/libr/../libr/bin/p/bin_mach0.c:656:9
+    #6 0x6e8039 in r_bin_object_set_items /src/radare2/libr/bin/bobj.c:392:21
+    #7 0x6e6bfb in r_bin_object_new /src/radare2/libr/bin/bobj.c:182:2
+    #8 0x6dd752 in r_bin_file_new_from_buffer /src/radare2/libr/bin/bfile.c:613:19
+    #9 0x6b78ae in r_bin_open_buf /src/radare2/libr/bin/bin.c:303:8
+    #10 0x6b6e26 in r_bin_open_io /src/radare2/libr/bin/bin.c:369:13
+    #11 0x124a78e in cmd_open_bin /src/radare2/libr/core/./cmd_open.inc.c:273:6
+    #12 0x1168897 in cmd_open /src/radare2/libr/core/./cmd_open.inc.c:2110:3
+    #13 0x1335d1e in r_cmd_call /src/radare2/libr/core/cmd_api.c:520:11
+    #14 0x11b4a3a in r_core_cmd_subst_i /src/radare2/libr/core/cmd.c:5016:8
+    #15 0x11ad18a in r_core_cmd_subst /src/radare2/libr/core/cmd.c:3842:10
+    #16 0x110ef95 in run_cmd_depth /src/radare2/libr/core/cmd.c:5958:9
+    #17 0x110481a in r_core_cmd /src/radare2/libr/core/cmd.c:6046:8
+    #18 0x10e5281 in r_core_cmd0 /src/radare2/libr/core/cmd.c:6220:9
+    #19 0x56ea42 in LLVMFuzzerTestOneInput /src/radare2/targets/ia_fuzz.cc:13:2
+    #20 0x440403 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #21 0x42bb62 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #22 0x43140c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #23 0x45a942 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #24 0x7fdeae599082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: e678fe54a5d2c2092f8e47eb0b33105e380f7340)
+    #25 0x421d2d in _start (/out/ia_fuzz+0x421d2d)
+
+DEDUP_TOKEN: strlen--r_str_ncpy--load_sections_64
+[1m[32m0x614000001fd0 is located 0 bytes to the right of 400-byte region [0x614000001e40,0x614000001fd0)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x53199c in __interceptor_realloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:85:3
+    #1 0x88f064 in parse_segments /src/radare2/libr/../libr/bin/p/../format/mach0/mach0.c:419:21
+    #2 0x88f064 in init_items /src/radare2/libr/../libr/bin/p/../format/mach0/mach0.c:1807:9
+    #3 0x864bab in init /src/radare2/libr/../libr/bin/p/../format/mach0/mach0.c:2187:7
+    #4 0x864bab in new_buf_64 /src/radare2/libr/../libr/bin/p/../format/mach0/mach0.c:2337:8
+    #5 0x85b19d in load /src/radare2/libr/../libr/bin/p/bin_mach0.c:53:29
+    #6 0x6e6b82 in r_bin_object_new /src/radare2/libr/bin/bobj.c:161:8
+    #7 0x6dd752 in r_bin_file_new_from_buffer /src/radare2/libr/bin/bfile.c:613:19
+    #8 0x6b78ae in r_bin_open_buf /src/radare2/libr/bin/bin.c:303:8
+    #9 0x6b6e26 in r_bin_open_io /src/radare2/libr/bin/bin.c:369:13
+    #10 0x124a78e in cmd_open_bin /src/radare2/libr/core/./cmd_open.inc.c:273:6
+    #11 0x1168897 in cmd_open /src/radare2/libr/core/./cmd_open.inc.c:2110:3
+    #12 0x1335d1e in r_cmd_call /src/radare2/libr/core/cmd_api.c:520:11
+    #13 0x11b4a3a in r_core_cmd_subst_i /src/radare2/libr/core/cmd.c:5016:8
+    #14 0x11ad18a in r_core_cmd_subst /src/radare2/libr/core/cmd.c:3842:10
+    #15 0x110ef95 in run_cmd_depth /src/radare2/libr/core/cmd.c:5958:9
+    #16 0x110481a in r_core_cmd /src/radare2/libr/core/cmd.c:6046:8
+    #17 0x10e5281 in r_core_cmd0 /src/radare2/libr/core/cmd.c:6220:9
+    #18 0x56ea42 in LLVMFuzzerTestOneInput /src/radare2/targets/ia_fuzz.cc:13:2
+    #19 0x440403 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #20 0x42bb62 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #21 0x43140c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #22 0x45a942 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #23 0x7fdeae599082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: e678fe54a5d2c2092f8e47eb0b33105e380f7340)
+
+DEDUP_TOKEN: __interceptor_realloc--parse_segments--init_items
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:389:5 in strlen
+Shadow bytes around the buggy address:
+  0x0c287fff83a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c287fff83b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c287fff83c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c287fff83d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c287fff83e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c287fff83f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c287fff8400: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c287fff8410: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c287fff8420: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c287fff8430: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c287fff8440: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42528938

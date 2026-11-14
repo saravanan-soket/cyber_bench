@@ -1,0 +1,98 @@
+ARVO id: 42499978
+Project: rdkit
+Fuzz target: mol_data_stream_to_mol_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-use-after-free READ 4
+Language: c++
+Repo: https://github.com/rdkit/rdkit.git
+
+=== Crash report ===
+Reading 23179 bytes from /tmp/poc
+=================================================================
+[1m[31m==8==ERROR: AddressSanitizer: heap-use-after-free on address 0x607000036534 at pc 0x000000599373 bp 0x7fffffffd4c0 sp 0x7fffffffd4b8
+[1m[0m[1m[34mREAD of size 4 at 0x607000036534 thread T0[1m[0m
+SCARINESS: 45 (4-byte-read-heap-use-after-free)
+    #0 0x599372 in RDKit::Atom::getIdx() const /src/rdkit/Code/GraphMol/Atom.h:132:40
+    #1 0xc1c9cb in RDKit::ROMol::initFromOther(RDKit::ROMol const&, bool, int) /src/rdkit/Code/GraphMol/ROMol.cpp:108:49
+    #2 0x73e330 in RDKit::ROMol::ROMol(RDKit::ROMol const&, bool, int) /src/rdkit/Code/GraphMol/ROMol.h:287:5
+    #3 0x731b73 in RDKit::RecursiveStructureQuery::copy() const /src/rdkit/Code/GraphMol/QueryOps.h:780:32
+    #4 0x6c974b in RDKit::(anonymous namespace)::ParseNewAtomList(RDKit::RWMol*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, unsigned int) /src/rdkit/Code/GraphMol/FileParsers/MolFileParser.cpp:1128:29
+    #5 0x5336e7 in RDKit::(anonymous namespace)::ParseMolBlockProperties(std::__1::basic_istream<char, std::__1::char_traits<char> >*, unsigned int&, RDKit::RWMol*, bool) /src/rdkit/Code/GraphMol/FileParsers/MolFileParser.cpp:1913:7
+    #6 0x545f5b in RDKit::MolDataStreamToMol(std::__1::basic_istream<char, std::__1::char_traits<char> >*, unsigned int&, bool, bool, bool) /src/rdkit/Code/GraphMol/FileParsers/MolFileParser.cpp:3301:22
+    #7 0x4e8809 in LLVMFuzzerTestOneInput /src/rdkit/Code/Fuzz/mol_data_stream_to_mol_fuzzer.cc:35:18
+    #8 0x1195830 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:191:7
+    #9 0x1195600 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #10 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #11 0x439498 in _start (/out/mol_data_stream_to_mol_fuzzer+0x439498)
+
+DEDUP_TOKEN: RDKit::Atom::getIdx() const--RDKit::ROMol::initFromOther(RDKit::ROMol const&, bool, int)--RDKit::ROMol::ROMol(RDKit::ROMol const&, bool, int)
+[1m[32m0x607000036534 is located 52 bytes inside of 80-byte region [0x607000036500,0x607000036550)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x4e5b1d in operator delete(void*) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:160:3
+    #1 0xc72f39 in RDKit::RWMol::replaceAtom(unsigned int, RDKit::Atom*, bool, bool) /src/rdkit/Code/GraphMol/RWMol.cpp:145:3
+    #2 0x98ebd2 in void SmilesParseOps::(anonymous namespace)::addquery<Queries::OrQuery<int, RDKit::Atom const*, true> >(Queries::OrQuery<int, RDKit::Atom const*, true>*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, RDKit::RWMol&, unsigned int) /src/rdkit/Code/GraphMol/SmilesParse/CXSmilesOps.cpp:730:7
+    #3 0x97cec3 in SmilesParseOps::(anonymous namespace)::processCXSmilesLabels(RDKit::RWMol&) /src/rdkit/Code/GraphMol/SmilesParse/CXSmilesOps.cpp:766:9
+    #4 0x8fd4ff in RDKit::SmartsToMol(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, RDKit::SmartsParserParams const&) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.cpp:465:7
+    #5 0x72f69c in RDKit::SmartsToMol(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, int, bool, std::__1::map<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >*) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.h:117:10
+    #6 0x7061ed in RDKit::(anonymous namespace)::ParseMarvinSmartsLine(RDKit::RWMol*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, unsigned int) /src/rdkit/Code/GraphMol/FileParsers/MolFileParser.cpp:840:9
+    #7 0x5371ef in RDKit::(anonymous namespace)::ParseMolBlockProperties(std::__1::basic_istream<char, std::__1::char_traits<char> >*, unsigned int&, RDKit::RWMol*, bool) /src/rdkit/Code/GraphMol/FileParsers/MolFileParser.cpp:1986:7
+    #8 0x545f5b in RDKit::MolDataStreamToMol(std::__1::basic_istream<char, std::__1::char_traits<char> >*, unsigned int&, bool, bool, bool) /src/rdkit/Code/GraphMol/FileParsers/MolFileParser.cpp:3301:22
+    #9 0x4e8809 in LLVMFuzzerTestOneInput /src/rdkit/Code/Fuzz/mol_data_stream_to_mol_fuzzer.cc:35:18
+    #10 0x1195830 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:191:7
+
+DEDUP_TOKEN: operator delete(void*)--RDKit::RWMol::replaceAtom(unsigned int, RDKit::Atom*, bool, bool)--void SmilesParseOps::(anonymous namespace)::addquery<Queries::OrQuery<int, RDKit::Atom const*, true> >(Queries::OrQuery<int, RDKit::Atom const*, true>*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, RDKit::RWMol&, unsigned int)
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x4e52bd in operator new(unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:99:3
+    #1 0xa1aa3b in yysmarts_lex(YYSTYPE*, void*, int&) /src/rdkit/build/Code/GraphMol/SmilesParse/smarts.ll:338:17
+    #2 0x9d5358 in yysmarts_parse(char const*, std::__1::vector<RDKit::RWMol*, std::__1::allocator<RDKit::RWMol*> >*, RDKit::Atom*&, RDKit::Bond*&, void*, int&) /scratch/RDKit_git/Code/GraphMol/SmilesParse/smarts.tab.cpp:1711:16
+    #3 0x905266 in RDKit::(anonymous namespace)::smarts_parse_helper(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::vector<RDKit::RWMol*, std::__1::allocator<RDKit::RWMol*> >&, RDKit::Atom*&, RDKit::Bond*&, int) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.cpp:67:11
+    #4 0x8f339c in RDKit::(anonymous namespace)::smarts_parse(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::vector<RDKit::RWMol*, std::__1::allocator<RDKit::RWMol*> >&) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.cpp:101:10
+    #5 0x8f0ca0 in RDKit::toMol(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, int (*)(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::vector<RDKit::RWMol*, std::__1::allocator<RDKit::RWMol*> >&), std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.cpp:224:5
+    #6 0x8fd2e0 in RDKit::SmartsToMol(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, RDKit::SmartsParserParams const&) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.cpp:460:9
+    #7 0x72f69c in RDKit::SmartsToMol(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, int, bool, std::__1::map<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::less<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > >, std::__1::allocator<std::__1::pair<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > >*) /src/rdkit/Code/GraphMol/SmilesParse/SmilesParse.h:117:10
+    #8 0x7061ed in RDKit::(anonymous namespace)::ParseMarvinSmartsLine(RDKit::RWMol*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, unsigned int) /src/rdkit/Code/GraphMol/FileParsers/MolFileParser.cpp:840:9
+    #9 0x5371ef in RDKit::(anonymous namespace)::ParseMolBlockProperties(std::__1::basic_istream<char, std::__1::char_traits<char> >*, unsigned int&, RDKit::RWMol*, bool) /src/rdkit/Code/GraphMol/FileParsers/MolFileParser.cpp:1986:7
+    #10 0x545f5b in RDKit::MolDataStreamToMol(std::__1::basic_istream<char, std::__1::char_traits<char> >*, unsigned int&, bool, bool, bool) /src/rdkit/Code/GraphMol/FileParsers/MolFileParser.cpp:3301:22
+    #11 0x4e8809 in LLVMFuzzerTestOneInput /src/rdkit/Code/Fuzz/mol_data_stream_to_mol_fuzzer.cc:35:18
+    #12 0x1195830 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:191:7
+
+DEDUP_TOKEN: operator new(unsigned long)--yysmarts_lex(YYSTYPE*, void*, int&)--yysmarts_parse(char const*, std::__1::vector<RDKit::RWMol*, std::__1::allocator<RDKit::RWMol*> >*, RDKit::Atom*&, RDKit::Bond*&, void*, int&)
+SUMMARY: AddressSanitizer: heap-use-after-free /src/rdkit/Code/GraphMol/Atom.h:132:40 in RDKit::Atom::getIdx() const
+Shadow bytes around the buggy address:
+  0x0c0e7fffec50: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c0e7fffec60: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c0e7fffec70: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c0e7fffec80: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0e7fffec90: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x0c0e7fffeca0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m[[1m[35mfd[1m[0m][1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c0e7fffecb0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c0e7fffecc0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c0e7fffecd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c0e7fffece0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c0e7fffecf0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42499978

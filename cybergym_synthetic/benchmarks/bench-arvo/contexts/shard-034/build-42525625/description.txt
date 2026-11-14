@@ -1,0 +1,47 @@
+ARVO id: 42525625
+Project: libdwarf
+Fuzz target: fuzz_set_frame_all
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c
+Repo: https://github.com/davea42/libdwarf-code
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4017154187
+INFO: Loaded 1 modules   (11480 inline 8-bit counters): 11480 [0x7627e0, 0x7654b8), 
+INFO: Loaded 1 PC tables (11480 PCs): 11480 [0x6c77f0,0x6f4570), 
+/out/fuzz_set_frame_all: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+ Print .debug_frame
+1 cies present. 1 fdes present. 
+Print cie of fde 0
+Print fde 0
+
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x605fffffea12 (pc 0x000000587d29 bp 0x7ffc6eabe020 sp 0x7ffc6eabdd40 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x587d29 in _dwarf_exec_frame_instr /src/libdwarf/src/lib/libdwarf/dwarf_frame.c
+    #1 0x592d2a in _dwarf_get_fde_info_for_a_pc_row /src/libdwarf/src/lib/libdwarf/dwarf_frame.c:2100:15
+    #2 0x59376f in dwarf_get_fde_info_for_reg3_b /src/libdwarf/src/lib/libdwarf/dwarf_frame.c:2296:15
+    #3 0x56b435 in print_fde_selected_regs /src/libdwarf/fuzz/fuzz_set_frame_all.c:364:15
+    #4 0x56b435 in read_frame_data /src/libdwarf/fuzz/fuzz_set_frame_all.c:168:5
+    #5 0x56a003 in LLVMFuzzerTestOneInput /src/libdwarf/fuzz/fuzz_set_frame_all.c:81:7
+    #6 0x43de03 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #7 0x429562 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #8 0x42ee0c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #9 0x458342 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7f4575862082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #11 0x41f72d in _start (/out/fuzz_set_frame_all+0x41f72d)
+
+DEDUP_TOKEN: _dwarf_exec_frame_instr--_dwarf_get_fde_info_for_a_pc_row--dwarf_get_fde_info_for_reg3_b
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/libdwarf/src/lib/libdwarf/dwarf_frame.c in _dwarf_exec_frame_instr
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42525625

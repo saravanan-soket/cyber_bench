@@ -1,0 +1,41 @@
+ARVO id: 42489585
+Project: openvswitch
+Fuzz target: odp_target
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/openvswitch/ovs.git
+
+=== Crash report ===
+INFO: Seed: 3266922802
+INFO: Loaded 1 modules   (40020 inline 8-bit counters): 40020 [0xf6f458, 0xf790ac), 
+INFO: Loaded 1 PC tables (40020 PCs): 40020 [0xbbccd8,0xc59218), 
+/out/odp_target: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+odp_flow_from_string: error
+odp_flow_from_string: error
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address 0x731000043e28 (pc 0x00000052a758 bp 0x7fffffffd7c0 sp 0x7fffffffd790 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x52a758 in nl_attr_is_valid /src/openvswitch/./lib/netlink.h:165:21
+    #1 0x52d832 in odp_nsh_hdr_from_attr /src/openvswitch/lib/odp-util.c:2730:5
+    #2 0x52b06c in format_odp_action /src/openvswitch/lib/odp-util.c:1231:9
+    #3 0x52a1da in format_odp_actions /src/openvswitch/lib/odp-util.c:1261:13
+    #4 0x525a6c in parse_actions /src/openvswitch/tests/oss-fuzz/odp_target.c:115:5
+    #5 0x524fd2 in LLVMFuzzerTestOneInput /src/openvswitch/tests/oss-fuzz/odp_target.c:146:5
+    #6 0x45c361 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #7 0x446e81 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #8 0x44cb3e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #9 0x476a62 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #10 0x7ffff62ae82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #11 0x4202f8 in _start (/out/odp_target+0x4202f8)
+
+DEDUP_TOKEN: nl_attr_is_valid--odp_nsh_hdr_from_attr--format_odp_action
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV /src/openvswitch/./lib/netlink.h:165:21 in nl_attr_is_valid
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42489585

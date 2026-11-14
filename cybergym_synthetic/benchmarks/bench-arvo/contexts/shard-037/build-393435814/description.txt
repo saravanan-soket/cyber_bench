@@ -1,0 +1,51 @@
+ARVO id: 393435814
+Project: ntopng
+Fuzz target: fuzz_dissect_packet
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://github.com/ntop/ntopng.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2982334576
+INFO: Loaded 1 modules   (47364 inline 8-bit counters): 47364 [0x56430d6ad490, 0x56430d6b8d94), 
+INFO: Loaded 1 PC tables (47364 PCs): 47364 [0x56430d6b8d98,0x56430d771dd8), 
+/out/fuzz_dissect_packet: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+31/Jul/2025 09:59:16 [NetworkInterface.cpp:2523] WARNING: If TSO/GRO is enabled, please disable it for best accuracy
+31/Jul/2025 09:59:16 [NetworkInterface.cpp:2527] WARNING: using: sudo ethtool -K custom gro off gso off tso off
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x56430cce5b82 bp 0x000000000000 sp 0x7ffe5eebf3b0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x56430cce5b82 in atomic_compare_exchange_strong<__sanitizer::atomic_uint8_t> /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_atomic_clang.h:81:10
+    #1 0x56430cce5b82 in AtomicallySetQuarantineFlagIfAllocated /src/llvm-project/compiler-rt/lib/asan/asan_allocator.cpp:668:10
+    #2 0x56430cce5b82 in __asan::Allocator::Deallocate(void*, unsigned long, unsigned long, __sanitizer::BufferedStackTrace*, __asan::AllocType) /src/llvm-project/compiler-rt/lib/asan/asan_allocator.cpp:724:10
+    #3 0x56430cd7c60b in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:53:3
+    #4 0x56430d155eac in ndpi_free_flow_data (/out/fuzz_dissect_packet+0x81deac)
+    #5 0x56430d14e0ed in ndpi_free_flow (/out/fuzz_dissect_packet+0x8160ed)
+    #6 0x56430cecb2b6 in Flow::freeDPIMemory() /src/ntopng/src/Flow.cpp:416:5
+    #7 0x56430ced8915 in Flow::setExtraDissectionCompleted() /src/ntopng/src/Flow.cpp:1384:3
+    #8 0x56430ced4f4f in Flow::processPacket(pcap_pkthdr const*, unsigned char const*, unsigned short, unsigned long, unsigned char*, unsigned short, unsigned short) /src/ntopng/src/Flow.cpp:1133:7
+    #9 0x56430ce4dc3b in NetworkInterface::processPacket(int, unsigned int, int, bool*, timeval const*, unsigned long, ndpi_ethhdr*, unsigned short, ndpi_iphdr*, ndpi_ipv6hdr*, unsigned short, unsigned short, unsigned int, pcap_pkthdr const*, unsigned char const*, unsigned short*, Host**, Host**, Flow**) /src/ntopng/src/NetworkInterface.cpp:2107:13
+    #10 0x56430ce5636e in NetworkInterface::dissectPacket(int, unsigned int, int, bool, unsigned char*, pcap_pkthdr const*, unsigned char const*, unsigned short*, Host**, Host**, Flow**) /src/ntopng/src/NetworkInterface.cpp:3005:17
+    #11 0x56430cdbca71 in LLVMFuzzerTestOneInput /src/ntopng/fuzz/fuzz_dissect_packet.cpp:200:12
+    #12 0x56430cc70a70 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #13 0x56430cc5bce5 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #14 0x56430cc6177f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #15 0x56430cc8ca22 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7f8df5d81082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #17 0x56430cc53ecd in _start (/out/fuzz_dissect_packet+0x31becd)
+
+DEDUP_TOKEN: atomic_compare_exchange_strong<__sanitizer::atomic_uint8_t>--AtomicallySetQuarantineFlagIfAllocated--__asan::Allocator::Deallocate(void*, unsigned long, unsigned long, __sanitizer::BufferedStackTrace*, __asan::AllocType)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/out/fuzz_dissect_packet+0x81deac) in ndpi_free_flow_data
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/393435814

@@ -1,0 +1,89 @@
+ARVO id: 42490125
+Project: php-src
+Fuzz target: php-fuzz-parser
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 4
+Language: c++
+Repo: https://github.com/php/php-src.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/php-fuzz-parser[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x603000003128 at pc 0x000000b89201 bp 0x7fffffffd880 sp 0x7fffffffd878
+[1m[0m[1m[34mREAD of size 4 at 0x603000003128 thread T0[1m[0m
+SCARINESS: 17 (4-byte-read-heap-buffer-overflow)
+    #0 0xb89200 in _zend_is_inconsistent /src/php-src/Zend/zend_hash.c:54:7
+    #1 0xb98565 in zend_hash_find /src/php-src/Zend/zend_hash.c:2240:2
+    #2 0xb1fd43 in zend_hash_find_ptr /src/php-src/Zend/zend_hash.h:833:7
+    #3 0xb1f61b in zend_get_constant_ex /src/php-src/Zend/zend_constants.c:377:8
+    #4 0xb24fd9 in zval_update_constant_ex /src/php-src/Zend/zend_execute_API.c:599:15
+    #5 0xbb6ad7 in zend_get_attribute_value /src/php-src/Zend/zend_attributes.c:128:18
+    #6 0xbb67f7 in validate_attribute /src/php-src/Zend/zend_attributes.c:36:18
+    #7 0xb00b2a in zend_compile_attributes /src/php-src/Zend/zend_compile.c:6281:4
+    #8 0xaefe55 in zend_compile_class_decl /src/php-src/Zend/zend_compile.c:7370:3
+    #9 0xb0853f in zend_compile_top_stmt /src/php-src/Zend/zend_compile.c:9337:3
+    #10 0xb084ac in zend_compile_top_stmt /src/php-src/Zend/zend_compile.c:9326:4
+    #11 0xa896df in zend_compile /src/php-src/Zend/zend_language_scanner.l:628:3
+    #12 0xa8925a in compile_file /src/php-src/Zend/zend_language_scanner.l:663:14
+    #13 0xd8f9e6 in fuzzer_do_request_from_buffer /src/php-src/sapi/fuzzer/fuzzer-sapi.c:254:29
+    #14 0xd8f0dc in LLVMFuzzerTestOneInput /src/php-src/sapi/fuzzer/fuzzer-parser.c:35:2
+    #15 0xe26a4b in main (/out/php-fuzz-parser+0xe26a4b)
+    #16 0x7ffff6ac783f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #17 0x444c58 in _start (/out/php-fuzz-parser+0x444c58)
+
+DEDUP_TOKEN: _zend_is_inconsistent--zend_hash_find--zend_hash_find_ptr
+[1m[32m0x603000003128 is located 8 bytes to the left of 32-byte region [0x603000003130,0x603000003150)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4c013d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0xacfcbd in __zend_malloc /src/php-src/Zend/zend_alloc.c:3030:14
+    #2 0xd42e9c in zend_string_alloc /src/php-src/Zend/zend_string.h:141:36
+    #3 0xd42f89 in zend_string_init /src/php-src/Zend/zend_string.h:163:21
+    #4 0xd42783 in zend_interned_strings_init /src/php-src/Zend/zend_string.c:109:9
+    #5 0xb59947 in zend_startup /src/php-src/Zend/zend.c:950:2
+    #6 0xa05725 in php_module_startup /src/php-src/main/main.c:2052:2
+    #7 0x444760 in startup /src/php-src/sapi/fuzzer/fuzzer-sapi.c:63:6
+    #8 0xd8f1d5 in fuzzer_init_php /src/php-src/sapi/fuzzer/fuzzer-sapi.c:152:6
+    #9 0xd8f110 in LLVMFuzzerInitialize /src/php-src/sapi/fuzzer/fuzzer-parser.c:45:2
+    #10 0xe268f5 in main (/out/php-fuzz-parser+0xe268f5)
+
+DEDUP_TOKEN: malloc--__zend_malloc--zend_string_alloc
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/php-src/Zend/zend_hash.c:54:7 in _zend_is_inconsistent
+Shadow bytes around the buggy address:
+  0x0c067fff85d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c067fff85e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff85f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c067fff8600: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c067fff8610: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x0c067fff8620: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m[[1m[31mfa[1m[0m][1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c067fff8630: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c067fff8640: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff8650: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c067fff8660: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c067fff8670: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42490125

@@ -1,0 +1,96 @@
+ARVO id: 42472493
+Project: openvswitch
+Fuzz target: odp_target
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/openvswitch/ovs.git
+
+=== Crash report ===
+INFO: Seed: 3518987010
+INFO: Loaded 1 modules   (38086 inline 8-bit counters): 38086 [0xea5d40, 0xeaf206), 
+INFO: Loaded 1 PC tables (38086 PCs): 38086 [0xa79628,0xb0e288), 
+/out/odp_target: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+odp_flow_from_string: error
+odp_flow_from_string: error
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x63100030882c at pc 0x0000006555c4 bp 0x7fffffffdca0 sp 0x7fffffffdc98
+[1m[0m[1m[34mREAD of size 1 at 0x63100030882c thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x6555c3 in format_generic_odp_key /src/openvswitch/lib/odp-util.c:2527:39
+    #1 0x636d34 in check_attr_len /src/openvswitch/lib/odp-util.c:3268:13
+    #2 0x6480ca in format_odp_key_attr /src/openvswitch/lib/odp-util.c:4052:9
+    #3 0x63232f in format_odp_action /src/openvswitch/lib/odp-util.c:1116:9
+    #4 0x631d05 in format_odp_actions /src/openvswitch/lib/odp-util.c:1197:13
+    #5 0x52e70e in parse_actions /src/openvswitch/tests/oss-fuzz/odp_target.c:114:5
+    #6 0x52df0d in LLVMFuzzerTestOneInput /src/openvswitch/tests/oss-fuzz/odp_target.c:144:5
+    #7 0x558f25 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:570:15
+    #8 0x52f25d in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #9 0x53aaa6 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #10 0x52e8dc in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff663082f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x41f118 in _start (/out/odp_target+0x41f118)
+
+DEDUP_TOKEN: format_generic_odp_key--check_attr_len--format_odp_key_attr
+[1m[32m0x63100030882c is located 0 bytes to the right of 65580-byte region [0x6310002f8800,0x63100030882c)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4ee2be in realloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:165
+    #1 0x67a173 in xrealloc /src/openvswitch/lib/util.c:134:9
+    #2 0x663d99 in ofpbuf_resize__ /src/openvswitch/lib/ofpbuf.c:244:24
+    #3 0x6643bf in ofpbuf_put_uninit /src/openvswitch/lib/ofpbuf.c:365:5
+    #4 0x6d9f54 in nl_msg_put_uninit /src/openvswitch/lib/netlink.c:179:15
+    #5 0x6da205 in nl_msg_put_unspec_uninit /src/openvswitch/lib/netlink.c:217:26
+    #6 0x6da34f in nl_msg_put_unspec /src/openvswitch/lib/netlink.c:245:11
+    #7 0x63ec5f in parse_odp_key_mask_attr /src/openvswitch/lib/odp-util.c:5493:7
+    #8 0x63f10d in parse_odp_key_mask_attr /src/openvswitch/lib/odp-util.c:5539:22
+    #9 0x6333cb in parse_odp_action /src/openvswitch/lib/odp-util.c:2221:18
+    #10 0x632c87 in odp_actions_from_string /src/openvswitch/lib/odp-util.c:2429:18
+    #11 0x52e693 in parse_actions /src/openvswitch/tests/oss-fuzz/odp_target.c:106:13
+    #12 0x52df0d in LLVMFuzzerTestOneInput /src/openvswitch/tests/oss-fuzz/odp_target.c:144:5
+    #13 0x558f25 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:570:15
+    #14 0x52f25d in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #15 0x53aaa6 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #16 0x52e8dc in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #17 0x7ffff663082f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: realloc--xrealloc--ofpbuf_resize__
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/openvswitch/lib/odp-util.c:2527:39 in format_generic_odp_key
+Shadow bytes around the buggy address:
+  0x0c62800590b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c62800590c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c62800590d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c62800590e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c62800590f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c6280059100: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m04[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c6280059110: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c6280059120: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c6280059130: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c6280059140: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c6280059150: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42472493

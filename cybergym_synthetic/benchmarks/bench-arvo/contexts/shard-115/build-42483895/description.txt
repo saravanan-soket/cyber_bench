@@ -1,0 +1,32 @@
+ARVO id: 42483895
+Project: ffmpeg
+Fuzz target: ffmpeg_DEMUXER_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Index-out-of-bounds
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Seed: 600541858
+INFO: Loaded 1 modules   (148647 inline 8-bit counters): 148647 [0x1284350, 0x12a87f7), 
+INFO: Loaded 1 PC tables (148647 PCs): 148647 [0xc62220,0xea6c90), 
+/out/ffmpeg_DEMUXER_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1mlibavformat/thp.c:100:13:[1m[31m runtime error: [1m[0m[1mindex 16 out of bounds for type 'unsigned char [16]'[1m[0m
+    #0 0x698c99 in thp_read_header /src/ffmpeg/libavformat/thp.c:100:13
+    #1 0x6a1006 in avformat_open_input /src/ffmpeg/libavformat/utils.c:631:20
+    #2 0x4cbedd in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dem_fuzzer.c:135:11
+    #3 0x45d671 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #4 0x449531 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:286:6
+    #5 0x44eefa in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:765:9
+    #6 0x476ed2 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #7 0x7fbda626282f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #8 0x408ed8 in _start (/out/ffmpeg_DEMUXER_fuzzer+0x408ed8)
+
+DEDUP_TOKEN: thp_read_header--avformat_open_input--LLVMFuzzerTestOneInput
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior libavformat/thp.c:100:13 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42483895

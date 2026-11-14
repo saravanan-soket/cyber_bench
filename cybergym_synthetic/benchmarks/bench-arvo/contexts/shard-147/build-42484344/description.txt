@@ -1,0 +1,39 @@
+ARVO id: 42484344
+Project: oniguruma
+Fuzz target: fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Index-out-of-bounds
+Language: c
+Repo: https://github.com/kkos/oniguruma.git
+
+=== Crash report ===
+INFO: Seed: 3515918749
+INFO: Loaded 1 modules   (10866 inline 8-bit counters): 10866 [0x838850, 0x83b2c2), 
+INFO: Loaded 1 PC tables (10866 PCs): 10866 [0x58ef80,0x5b96a0), 
+/out/fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1mregparse.c:8443:48:[1m[31m runtime error: [1m[0m[1mindex -400 out of bounds for type 'OnigUChar [7]'[1m[0m
+    #0 0x4c1302 in parse_exp /src/oniguruma/src/regparse.c:8443:48
+    #1 0x4bffe0 in parse_branch /src/oniguruma/src/regparse.c:8713:7
+    #2 0x4bcaa3 in parse_alts /src/oniguruma/src/regparse.c:8766:7
+    #3 0x4b9060 in parse_regexp /src/oniguruma/src/regparse.c:8827:7
+    #4 0x4b8db5 in onig_parse_tree /src/oniguruma/src/regparse.c:8882:7
+    #5 0x4d212f in onig_compile /src/oniguruma/src/regcomp.c:7244:7
+    #6 0x4d70b6 in onig_new /src/oniguruma/src/regcomp.c:7516:7
+    #7 0x4b3b3d in exec /src/oniguruma/harnesses/base.c:190:7
+    #8 0x4b3a3b in alloc_exec /src/oniguruma/harnesses/base.c:248:7
+    #9 0x4b38b6 in LLVMFuzzerTestOneInput /src/oniguruma/harnesses/base.c:442:7
+    #10 0x442ad1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #11 0x42d5f1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #12 0x4332ae in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #13 0x45d1d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #14 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #15 0x406a68 in _start (/out/fuzzer+0x406a68)
+
+DEDUP_TOKEN: parse_exp--parse_branch--parse_alts
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior regparse.c:8443:48 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42484344

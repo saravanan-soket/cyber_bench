@@ -1,0 +1,49 @@
+ARVO id: 42511921
+Project: ghostpdl
+Fuzz target: gstoraster_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://cgit.ghostscript.com/ghostpdl.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2015881418
+INFO: Loaded 3 modules   (185855 inline 8-bit counters): 13708 [0x7ffff7f619e0, 0x7ffff7f64f6c), 959 [0x7ffff7fc2a40, 0x7ffff7fc2dff), 171188 [0x315be60, 0x3185b14), 
+INFO: Loaded 3 PC tables (185855 PCs): 13708 [0x7ffff7f64f70,0x7ffff7f9a830), 959 [0x7ffff7fc2e00,0x7ffff7fc69f0), 171188 [0x24ee7b0,0x278b2f0), 
+/out/gstoraster_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+gsapi_init_with_args: error -100
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x629ffd684170 (pc 0x7ffff79f2af3 bp 0x7fffffffd690 sp 0x7fffffffce48 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x7ffff79f2af3 in memcpy (/lib/x86_64-linux-gnu/libc.so.6+0xbbaf3)
+    #1 0x5240e8 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #2 0xe0f91e in restore_space /src/ghostpdl/./psi/isave.c:838:17
+    #3 0xe0f91e in alloc_restore_step_in /src/ghostpdl/./psi/isave.c:784:9
+    #4 0xe10c3c in alloc_restore_all /src/ghostpdl/./psi/isave.c:888:16
+    #5 0x56a74d in gs_main_finit /src/ghostpdl/./psi/imain.c:1391:20
+    #6 0x56b293 in gs_to_exit_with_code /src/ghostpdl/./psi/imain.c:1434:12
+    #7 0x56b293 in gs_to_exit /src/ghostpdl/./psi/imain.c:1439:12
+    #8 0xcf8245 in psapi_exit /src/ghostpdl/./psi/psapi.c:517:5
+    #9 0x55f60c in gsapi_exit /src/ghostpdl/./psi/iapi.c:440:12
+    #10 0x55e42d in gs_to_raster_fuzz /src/gstoraster_fuzzer.cc:102:8
+    #11 0x55e42d in LLVMFuzzerTestOneInput /src/gstoraster_fuzzer.cc:114:2
+    #12 0x456543 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #13 0x4421d2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #14 0x447a1c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #15 0x470612 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7ffff795b082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #17 0x4209fd in _start (/out/gstoraster_fuzzer+0x4209fd)
+
+DEDUP_TOKEN: memcpy--__asan_memcpy--restore_space
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0xbbaf3) in memcpy
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42511921

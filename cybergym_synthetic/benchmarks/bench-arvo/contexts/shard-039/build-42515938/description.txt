@@ -1,0 +1,47 @@
+ARVO id: 42515938
+Project: imagemagick
+Fuzz target: encoder_bmp3_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 4006062742
+INFO: Loaded 1 modules   (167068 inline 8-bit counters): 167068 [0x2b6eb08, 0x2b977a4), 
+INFO: Loaded 1 PC tables (167068 PCs): 167068 [0x2b977a8,0x2e24168), 
+/out/encoder_bmp3_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x14d7a88 in cmsMLUgetASCII /src/Little-CMS/src/cmsnamed.c:397:13
+    #1 0x148c419 in cmsGetProfileInfoASCII /src/Little-CMS/src/cmsio1.c:1028:12
+    #2 0xac632d in GetICCProperty /src/imagemagick/MagickCore/property.c:1731:20
+    #3 0xabdec7 in GetImageProperty /src/imagemagick/MagickCore/property.c:2280:18
+    #4 0xae9f40 in SetImageProfileInternal /src/imagemagick/MagickCore/profile.c:1770:10
+    #5 0xcd7b62 in ReadBMPImage /src/imagemagick/coders/bmp.c:1483:20
+    #6 0x7eb357 in ReadImage /src/imagemagick/MagickCore/constitute.c:547:15
+    #7 0x717e3c in BlobToImage /src/imagemagick/MagickCore/blob.c:474:13
+    #8 0x592587 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4028:12
+    #9 0x4a8e0d in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:46:11
+    #10 0x4fcb93 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:527:15
+    #11 0x4ab762 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:285:6
+    #12 0x4be9ab in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:759:9
+    #13 0x4aa891 in main /src/libfuzzer/FuzzerMain.cpp:19:10
+    #14 0x7f278709b82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #15 0x422738 in _start (/out/encoder_bmp3_fuzzer+0x422738)
+
+DEDUP_TOKEN: cmsMLUgetASCII--cmsGetProfileInfoASCII--GetICCProperty
+  [1m[35mUninitialized value was created[1m[0m
+    <empty stack>
+
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/Little-CMS/src/cmsnamed.c:397:13 in cmsMLUgetASCII
+Unique heap origins: 752
+Stack depot allocated bytes: 99176
+Unique origin histories: 11
+History depot allocated bytes: 264
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42515938

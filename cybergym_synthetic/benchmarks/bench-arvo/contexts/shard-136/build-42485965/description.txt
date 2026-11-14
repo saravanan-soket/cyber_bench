@@ -1,0 +1,92 @@
+ARVO id: 42485965
+Project: rnp
+Fuzz target: fuzz_dump
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Global-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/rnpgp/rnp.git
+
+=== Crash report ===
+INFO: Seed: 1278437970
+INFO: Loaded 3 modules   (141005 inline 8-bit counters): 88363 [0x7ffff723f170, 0x7ffff7254a9b), 52636 [0x7ffff7cfc660, 0x7ffff7d093fc), 6 [0x7a8f30, 0x7a8f36), 
+INFO: Loaded 3 PC tables (141005 PCs): 88363 [0x7ffff7254aa0,0x7ffff73add50), 52636 [0x7ffff7d09400,0x7ffff7dd6dc0), 6 [0x56a4a0,0x56a500), 
+/out/fuzz_dump: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m/src/rnp/src/librepgp/stream-armor.cpp:143:23:[1m[31m runtime error: [1m[0m[1mindex -1 out of bounds for type 'const uint8_t [256]'[1m[0m
+    #0 0x7ffff76c4dcc in armor_read_crc(pgp_source_t*) /src/rnp/src/librepgp/stream-armor.cpp:143:23
+    #1 0x7ffff76b9f46 in armored_src_read(pgp_source_t*, void*, unsigned long, unsigned long*) /src/rnp/src/librepgp/stream-armor.cpp:325:18
+    #2 0x7ffff76c9829 in src_peek(pgp_source_t*, void*, unsigned long, unsigned long*) /src/rnp/src/librepgp/stream-common.cpp:182:14
+    #3 0x7ffff76cb47d in src_eof(pgp_source_t*) /src/rnp/src/librepgp/stream-common.cpp:269:12
+    #4 0x7ffff76d8862 in stream_dump_packets(rnp_dump_ctx_t*, pgp_source_t*, pgp_dest_t*) /src/rnp/src/librepgp/stream-dump.cpp:1309:9
+    #5 0x7ffff78ed82d in rnp_dump_packets_to_output /src/rnp/src/lib/rnp.cpp:7217:24
+    #6 0x5506f8 in LLVMFuzzerTestOneInput /src/rnp/src/fuzzing/dump.c:53:11
+    #7 0x457da1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #8 0x443532 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #9 0x44954e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #10 0x470f62 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #11 0x7ffff48b783f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #12 0x41e578 in _start (/out/fuzz_dump+0x41e578)
+
+DEDUP_TOKEN: armor_read_crc(pgp_source_t*)--armored_src_read(pgp_source_t*, void*, unsigned long, unsigned long*)--src_peek(pgp_source_t*, void*, unsigned long, unsigned long*)
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /src/rnp/src/librepgp/stream-armor.cpp:143:23 in 
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: global-buffer-overflow on address 0x7ffff7903d9f at pc 0x7ffff76c53cc bp 0x7fffffffd5d0 sp 0x7fffffffd5c8
+[1m[0m[1m[34mREAD of size 1 at 0x7ffff7903d9f thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-global-buffer-overflow)
+    #0 0x7ffff76c53cb in armor_read_crc(pgp_source_t*) /src/rnp/src/librepgp/stream-armor.cpp:143:23
+    #1 0x7ffff76b9f46 in armored_src_read(pgp_source_t*, void*, unsigned long, unsigned long*) /src/rnp/src/librepgp/stream-armor.cpp:325:18
+    #2 0x7ffff76c9829 in src_peek(pgp_source_t*, void*, unsigned long, unsigned long*) /src/rnp/src/librepgp/stream-common.cpp:182:14
+    #3 0x7ffff76cb47d in src_eof(pgp_source_t*) /src/rnp/src/librepgp/stream-common.cpp:269:12
+    #4 0x7ffff76d8862 in stream_dump_packets(rnp_dump_ctx_t*, pgp_source_t*, pgp_dest_t*) /src/rnp/src/librepgp/stream-dump.cpp:1309:9
+    #5 0x7ffff78ed82d in rnp_dump_packets_to_output /src/rnp/src/lib/rnp.cpp:7217:24
+    #6 0x5506f8 in LLVMFuzzerTestOneInput /src/rnp/src/fuzzing/dump.c:53:11
+    #7 0x457da1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #8 0x443532 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #9 0x44954e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #10 0x470f62 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #11 0x7ffff48b783f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #12 0x41e578 in _start (/out/fuzz_dump+0x41e578)
+
+DEDUP_TOKEN: armor_read_crc(pgp_source_t*)--armored_src_read(pgp_source_t*, void*, unsigned long, unsigned long*)--src_peek(pgp_source_t*, void*, unsigned long, unsigned long*)
+[1m[32m0x7ffff7903d9f is located 1 bytes to the left of global variable 'B64DEC' defined in '/src/rnp/src/librepgp/stream-armor.cpp:80:22' (0x7ffff7903da0) of size 256
+[1m[0m[1m[32m0x7ffff7903d9f is located 32 bytes to the right of global variable '<string literal>' defined in '/src/rnp/src/librepgp/stream-armor.cpp:266:13' (0x7ffff7903d60) of size 31
+[1m[0m  '<string literal>' is ascii string 'premature end of armored input'
+SUMMARY: AddressSanitizer: global-buffer-overflow /src/rnp/src/librepgp/stream-armor.cpp:143:23 in armor_read_crc(pgp_source_t*)
+Shadow bytes around the buggy address:
+  0x10007ef18760: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m05[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m03[1m[0m
+  0x10007ef18770: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m05[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m
+  0x10007ef18780: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m06[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m
+  0x10007ef18790: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m01[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007ef187a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m01[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m07[1m[0m
+=>0x10007ef187b0: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m[[1m[31mf9[1m[0m][1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007ef187c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007ef187d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007ef187e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m02[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x10007ef187f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m06[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m07[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x10007ef18800: [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m02[1m[0m [1m[31mf9[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42485965

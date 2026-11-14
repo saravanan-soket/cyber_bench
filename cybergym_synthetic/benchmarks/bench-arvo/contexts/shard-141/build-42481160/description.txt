@@ -1,0 +1,39 @@
+ARVO id: 42481160
+Project: ffmpeg
+Fuzz target: ffmpeg_AV_CODEC_ID_WMALOSSLESS_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Index-out-of-bounds
+Language: c++
+Repo: https://git.ffmpeg.org/ffmpeg.git
+
+=== Crash report ===
+INFO: Seed: 2591212399
+INFO: Loaded 1 modules   (61441 inline 8-bit counters): 61441 [0xbffed0, 0xc0eed1), 
+INFO: Loaded 1 PC tables (61441 PCs): 61441 [0x828010,0x918020), 
+/out/ffmpeg_AV_CODEC_ID_WMALOSSLESS_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1mlibavcodec/wmalosslessdec.c:829:29:[1m[31m runtime error: [1m[0m[1mindex -1 out of bounds for type 'int [16384]'[1m[0m
+    #0 0x4d80fe in revert_acfilter /src/ffmpeg/libavcodec/wmalosslessdec.c:829:29
+    #1 0x4d456d in decode_subframe /src/ffmpeg/libavcodec/wmalosslessdec.c:974:13
+    #2 0x4d2e04 in decode_frame /src/ffmpeg/libavcodec/wmalosslessdec.c:1079:13
+    #3 0x4d2648 in decode_packet /src/ffmpeg/libavcodec/wmalosslessdec.c:1234:17
+    #4 0x4be78d in decode_simple_internal /src/ffmpeg/libavcodec/decode.c:432:15
+    #5 0x4be5c4 in decode_simple_receive_frame /src/ffmpeg/libavcodec/decode.c:628:15
+    #6 0x4b98c8 in decode_receive_frame_internal /src/ffmpeg/libavcodec/decode.c:646:15
+    #7 0x4b97dd in avcodec_send_packet /src/ffmpeg/libavcodec/decode.c:704:15
+    #8 0x4ba24d in compat_decode /src/ffmpeg/libavcodec/decode.c:840:15
+    #9 0x4b56db in LLVMFuzzerTestOneInput /src/ffmpeg/tools/target_dec_fuzzer.c:281:23
+    #10 0x443e61 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #11 0x42ea81 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #12 0x43473e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #13 0x45e8b2 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #14 0x7f9a8708c82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #15 0x407e38 in _start (/out/ffmpeg_AV_CODEC_ID_WMALOSSLESS_fuzzer+0x407e38)
+
+DEDUP_TOKEN: revert_acfilter--decode_subframe--decode_frame
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior libavcodec/wmalosslessdec.c:829:29 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42481160

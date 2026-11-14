@@ -1,0 +1,38 @@
+ARVO id: 42495278
+Project: skcms
+Fuzz target: iccprofile_info
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://skia.googlesource.com/skcms.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2994655833
+INFO: Loaded 1 modules   (1174 inline 8-bit counters): 1174 [0x886680, 0x886b16), 
+INFO: Loaded 1 PC tables (1174 PCs): 1174 [0x6365d8,0x63af38), 
+/out/iccprofile_info: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address 0x709000202020 (pc 0x7ffff7034a9e bp 0x7fffffffda60 sp 0x7fffffffda08 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7ffff7034a9e  (/lib/x86_64-linux-gnu/libc.so.6+0x16fa9e)
+    #1 0x4daa1c in MemcmpInterceptorCommon(void*, int (*)(void const*, void const*, unsigned long), void const*, void const*, unsigned long) /src/llvm-project/compiler-rt/lib/msan/../sanitizer_common/sanitizer_common_interceptors.inc:864:16
+    #2 0x4dad2e in memcmp /src/llvm-project/compiler-rt/lib/msan/../sanitizer_common/sanitizer_common_interceptors.inc:875:10
+    #3 0x45a94c in LooseMemeq /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:574:11
+    #4 0x45a94c in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:606:8
+    #5 0x4446e2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #6 0x44a52a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #7 0x476262 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #8 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #9 0x41f378 in _start (/out/iccprofile_info+0x41f378)
+
+DEDUP_TOKEN: MemcmpInterceptorCommon(void*, int (*)(void const*, void const*, unsigned long), void const*, void const*, unsigned long)--memcmp
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x16fa9e) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42495278

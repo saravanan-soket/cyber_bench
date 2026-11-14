@@ -1,0 +1,46 @@
+ARVO id: 42522551
+Project: arrow
+Fuzz target: arrow-ipc-stream-fuzz
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Object-size
+Language: c++
+Repo: https://github.com/apache/arrow.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3809411140
+INFO: Loaded 1 modules   (352095 inline 8-bit counters): 352095 [0x169e880, 0x16f47df), 
+INFO: Loaded 1 PC tables (352095 PCs): 352095 [0x16f47e0,0x1c53dd0), 
+/out/arrow-ipc-stream-fuzz: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m/src/arrow/cpp/src/arrow/util/ree_util.cc:107:7:[1m[31m runtime error: [1m[0m[1mload of address 0xb52200000000000e with insufficient space for an object of type 'short const'[1m[0m
+[1m0xb52200000000000e:[1m[30m note: [1m[0mpointer points here[1m[0m
+<memory cannot be printed>
+    #0 0xc3d3cd in arrow::Status arrow::ree_util::(anonymous namespace)::ValidateRunEndEncodedChildren<short>(arrow::RunEndEncodedType const&, long, std::__1::shared_ptr<arrow::ArrayData> const&, std::__1::shared_ptr<arrow::ArrayData> const&, long, long) /src/arrow/cpp/src/arrow/util/ree_util.cc:107:7
+    #1 0xc3c80c in arrow::ree_util::ValidateRunEndEncodedChildren(arrow::RunEndEncodedType const&, long, std::__1::shared_ptr<arrow::ArrayData> const&, std::__1::shared_ptr<arrow::ArrayData> const&, long, long) /src/arrow/cpp/src/arrow/util/ree_util.cc:125:14
+    #2 0xe46cd4 in arrow::Status arrow::internal::(anonymous namespace)::ValidateArrayImpl::ValidateRunEndEncoded<short>(arrow::RunEndEncodedType const&) /src/arrow/cpp/src/arrow/array/validate.cc:644:5
+    #3 0xe2bb36 in Visit /src/arrow/cpp/src/arrow/array/validate.cc:420:16
+    #4 0xe2bb36 in arrow::Status arrow::VisitTypeInline<arrow::internal::(anonymous namespace)::ValidateArrayImpl>(arrow::DataType const&, arrow::internal::(anonymous namespace)::ValidateArrayImpl*) /src/arrow/cpp/src/arrow/visit_type_inline.h:54:5
+    #5 0xe275ea in arrow::internal::(anonymous namespace)::ValidateArrayImpl::ValidateWithType(arrow::DataType const&) /src/arrow/cpp/src/arrow/array/validate.cc:134:12
+    #6 0xe247e2 in arrow::internal::(anonymous namespace)::ValidateArrayImpl::Validate() /src/arrow/cpp/src/arrow/array/validate.cc:122:12
+    #7 0xe251f6 in ValidateArrayFull /src/arrow/cpp/src/arrow/array/validate.cc:773:60
+    #8 0xe251f6 in arrow::internal::ValidateArrayFull(arrow::Array const&) /src/arrow/cpp/src/arrow/array/validate.cc:777:55
+    #9 0x8fd547 in arrow::(anonymous namespace)::ValidateBatch(arrow::RecordBatch const&, bool) /src/arrow/cpp/src/arrow/record_batch.cc:308:39
+    #10 0x8fde3c in arrow::RecordBatch::ValidateFull() const /src/arrow/cpp/src/arrow/record_batch.cc:324:10
+    #11 0x4dcd98 in arrow::ipc::internal::(anonymous namespace)::ValidateFuzzBatch(arrow::RecordBatch const&) /src/arrow/cpp/src/arrow/ipc/reader.cc:2493:19
+    #12 0x4dc79f in arrow::ipc::internal::FuzzIpcStream(unsigned char const*, long) /src/arrow/cpp/src/arrow/ipc/reader.cc:2517:11
+    #13 0x4c26e5 in LLVMFuzzerTestOneInput /src/arrow/cpp/src/arrow/ipc/stream_fuzz.cc:25:17
+    #14 0x428603 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #15 0x413d62 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #16 0x41960c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #17 0x442b42 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7f0a94c3c082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #19 0x409f2d in _start (/out/arrow-ipc-stream-fuzz+0x409f2d)
+
+DEDUP_TOKEN: arrow::Status arrow::ree_util::(anonymous namespace)::ValidateRunEndEncodedChildren<short>(arrow::RunEndEncodedType const&, long, std::__1::shared_ptr<arrow::ArrayData> const&, std::__1::shared_ptr<arrow::ArrayData> const&, long, long)--arrow::ree_util::ValidateRunEndEncodedChildren(arrow::RunEndEncodedType const&, long, std::__1::shared_ptr<arrow::ArrayData> const&, std::__1::shared_ptr<arrow::ArrayData> const&, long, long)--arrow::Status arrow::internal::(anonymous namespace)::ValidateArrayImpl::ValidateRunEndEncoded<short>(arrow::RunEndEncodedType const&)
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /src/arrow/cpp/src/arrow/util/ree_util.cc:107:7 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42522551

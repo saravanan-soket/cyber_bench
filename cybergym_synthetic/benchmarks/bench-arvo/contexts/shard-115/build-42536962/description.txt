@@ -1,0 +1,48 @@
+ARVO id: 42536962
+Project: capstonenext
+Fuzz target: fuzz_disasmnext
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/aquynh/capstone.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2048791680
+INFO: Loaded 1 modules   (40559 inline 8-bit counters): 40559 [0x555556b8d1a8, 0x555556b97017), 
+INFO: Loaded 1 PC tables (40559 PCs): 40559 [0x555556b97018,0x555556c35708), 
+/out/fuzz_disasmnext: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x555555a18cb8 in MCOperand_isImm /src/capstonenext/MCInst.c:113:2
+    #1 0x555555a46841 in add_cs_detail_general /src/capstonenext/arch/AArch64/AArch64Mapping.c:1344:7
+    #2 0x555555a46841 in AArch64_add_cs_detail /src/capstonenext/arch/AArch64/AArch64Mapping.c:2292:3
+    #3 0x555555cb1ea1 in add_cs_detail /src/capstonenext/arch/AArch64/AArch64Mapping.h:39:2
+    #4 0x555555cbd09f in printAlignedLabel /src/capstonenext/arch/AArch64/AArch64InstPrinter.c:2012:2
+    #5 0x555555ca5736 in printInst /src/capstonenext/arch/AArch64/AArch64InstPrinter.c:593:3
+    #6 0x555555a3e23c in AArch64_printer /src/capstonenext/arch/AArch64/AArch64Mapping.c:828:2
+    #7 0x555555a0f77d in cs_disasm /src/capstonenext/cs.c:1241:4
+    #8 0x555555a0c814 in LLVMFuzzerTestOneInput /src/capstonenext/suite/fuzz/fuzz_disasm.c:56:20
+    #9 0x5555559092d0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #10 0x5555558f3a64 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #11 0x5555558f94fa in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #12 0x5555559258f2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7ffff7c38082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #14 0x5555558ea53d in _start (/out/fuzz_disasmnext+0x39653d)
+
+DEDUP_TOKEN: MCOperand_isImm--add_cs_detail_general--AArch64_add_cs_detail
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mmci[1m[35m' in the stack frame[1m[0m
+    #0 0x555555a0f0f1 in cs_disasm /src/capstonenext/cs.c:1162:2
+
+DEDUP_TOKEN: cs_disasm
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/capstonenext/MCInst.c:113:2 in MCOperand_isImm
+Unique heap origins: 24
+Stack depot allocated bytes: 9764880
+Unique origin histories: 3
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42536962

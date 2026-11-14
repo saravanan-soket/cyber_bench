@@ -1,0 +1,162 @@
+ARVO id: 42515729
+Project: php-src
+Fuzz target: php-fuzz-tracing-jit
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-use-after-free READ 4
+Language: c++
+Repo: https://github.com/php/php-src.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/php-fuzz-tracing-jit[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-use-after-free on address 0x60300001b714 at pc 0x0000007a602d bp 0x7fffffffc060 sp 0x7fffffffc058
+[1m[0m[1m[34mREAD of size 4 at 0x60300001b714 thread T0[1m[0m
+SCARINESS: 45 (4-byte-read-heap-use-after-free)
+    #0 0x7a602c in timelib_error_container_dtor /src/php-src/ext/date/lib/timelib.c:159:26
+    #1 0x6d246b in update_errors_warnings /src/php-src/ext/date/php_date.c:2269:3
+    #2 0x6d246b in php_date_initialize /src/php-src/ext/date/php_date.c:2333:2
+    #3 0x6d51df in zim_DateTime___construct /src/php-src/ext/date/php_date.c:2516:2
+    #4 0xef0209 in execute_internal /src/php-src/Zend/zend_execute.c:3763:2
+    #5 0x12c0a30 in fuzzer_execute_internal /src/php-src/sapi/fuzzer/fuzzer-execute-common.h:95:2
+    #6 0xf976a9 in ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER /src/php-src/Zend/zend_vm_execute.h
+    #7 0x12c04f8 in fuzzer_execute_ex /src/php-src/sapi/fuzzer/fuzzer-execute-common.h:57:14
+    #8 0xe03aa3 in zend_call_function /src/php-src/Zend/zend_execute_API.c:928:3
+    #9 0xe05e9b in zend_call_known_function /src/php-src/Zend/zend_execute_API.c:1018:23
+    #10 0x1148620 in zend_call_known_instance_method /src/php-src/Zend/zend_API.h:749:2
+    #11 0x1148620 in zend_call_known_instance_method_with_0_params /src/php-src/Zend/zend_API.h:755:2
+    #12 0x1148620 in zend_objects_destroy_object /src/php-src/Zend/zend_objects.c:171:3
+    #13 0x115e0ad in zend_objects_store_del /src/php-src/Zend/zend_objects_API.c:184:4
+    #14 0xe438ad in rc_dtor_func /src/php-src/Zend/zend_variables.c:57:2
+    #15 0x109cb3b in zend_assign_to_variable /src/php-src/Zend/zend_execute.h:165:5
+    #16 0xf24d93 in ZEND_ASSIGN_SPEC_CV_VAR_RETVAL_UNUSED_HANDLER /src/php-src/Zend/zend_vm_execute.h:46946:10
+    #17 0x12c04f8 in fuzzer_execute_ex /src/php-src/sapi/fuzzer/fuzzer-execute-common.h:57:14
+    #18 0xe03aa3 in zend_call_function /src/php-src/Zend/zend_execute_API.c:928:3
+    #19 0xe05e9b in zend_call_known_function /src/php-src/Zend/zend_execute_API.c:1018:23
+    #20 0x1148620 in zend_call_known_instance_method /src/php-src/Zend/zend_API.h:749:2
+    #21 0x1148620 in zend_call_known_instance_method_with_0_params /src/php-src/Zend/zend_API.h:755:2
+    #22 0x1148620 in zend_objects_destroy_object /src/php-src/Zend/zend_objects.c:171:3
+    #23 0x115e0ad in zend_objects_store_del /src/php-src/Zend/zend_objects_API.c:184:4
+    #24 0xe43a9e in rc_dtor_func /src/php-src/Zend/zend_variables.c:57:2
+    #25 0xe43a9e in i_zval_ptr_dtor /src/php-src/Zend/zend_variables.h:44:4
+    #26 0xe43a9e in zval_ptr_dtor /src/php-src/Zend/zend_variables.c:84:2
+    #27 0xea49ff in _zend_hash_del_el_ex /src/php-src/Zend/zend_hash.c:1408:3
+    #28 0xeb2cc4 in _zend_hash_del_el /src/php-src/Zend/zend_hash.c:1435:2
+    #29 0xeb2cc4 in zend_hash_reverse_apply /src/php-src/Zend/zend_hash.c:2151:5
+    #30 0xdfa302 in shutdown_destructors /src/php-src/Zend/zend_execute_API.c:255:4
+    #31 0xe4c5f8 in zend_call_destructors /src/php-src/Zend/zend.c:1237:3
+    #32 0xc89a04 in php_request_shutdown /src/php-src/main/main.c:1820:3
+    #33 0x12c108d in fuzzer_request_shutdown /src/php-src/sapi/fuzzer/fuzzer-sapi.c:205:2
+    #34 0x12c172f in fuzzer_do_request_from_buffer /src/php-src/sapi/fuzzer/fuzzer-sapi.c:285:2
+    #35 0x12bfc4e in LLVMFuzzerTestOneInput /src/php-src/sapi/fuzzer/fuzzer-tracing-jit.c:34:2
+    #36 0x12c286b in main (/out/php-fuzz-tracing-jit+0x12c286b)
+    #37 0x7ffff7c32082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #38 0x60130d in _start (/out/php-fuzz-tracing-jit+0x60130d)
+
+DEDUP_TOKEN: timelib_error_container_dtor--update_errors_warnings--php_date_initialize
+[1m[32m0x60300001b714 is located 20 bytes inside of 24-byte region [0x60300001b700,0x60300001b718)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x6824a2 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3
+    #1 0xd7e63b in tracked_free /src/php-src/Zend/zend_alloc.c:2813:2
+    #2 0xd76e02 in _efree_custom /src/php-src/Zend/zend_alloc.c:2448:3
+    #3 0xd76e02 in _efree /src/php-src/Zend/zend_alloc.c:2568:3
+    #4 0x7a6008 in timelib_error_container_dtor /src/php-src/ext/date/lib/timelib.c:167:2
+    #5 0x6d2539 in update_errors_warnings /src/php-src/ext/date/php_date.c:2281:2
+    #6 0x6d2539 in php_date_initialize /src/php-src/ext/date/php_date.c:2333:2
+    #7 0x6d51df in zim_DateTime___construct /src/php-src/ext/date/php_date.c:2516:2
+    #8 0xef0209 in execute_internal /src/php-src/Zend/zend_execute.c:3763:2
+    #9 0x12c0a30 in fuzzer_execute_internal /src/php-src/sapi/fuzzer/fuzzer-execute-common.h:95:2
+    #10 0xf976a9 in ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER /src/php-src/Zend/zend_vm_execute.h
+    #11 0x12c04f8 in fuzzer_execute_ex /src/php-src/sapi/fuzzer/fuzzer-execute-common.h:57:14
+    #12 0xe03aa3 in zend_call_function /src/php-src/Zend/zend_execute_API.c:928:3
+    #13 0xe05e9b in zend_call_known_function /src/php-src/Zend/zend_execute_API.c:1018:23
+    #14 0x1148620 in zend_call_known_instance_method /src/php-src/Zend/zend_API.h:749:2
+    #15 0x1148620 in zend_call_known_instance_method_with_0_params /src/php-src/Zend/zend_API.h:755:2
+    #16 0x1148620 in zend_objects_destroy_object /src/php-src/Zend/zend_objects.c:171:3
+    #17 0x115e0ad in zend_objects_store_del /src/php-src/Zend/zend_objects_API.c:184:4
+    #18 0xe43a9e in rc_dtor_func /src/php-src/Zend/zend_variables.c:57:2
+    #19 0xe43a9e in i_zval_ptr_dtor /src/php-src/Zend/zend_variables.h:44:4
+    #20 0xe43a9e in zval_ptr_dtor /src/php-src/Zend/zend_variables.c:84:2
+    #21 0xea49ff in _zend_hash_del_el_ex /src/php-src/Zend/zend_hash.c:1408:3
+    #22 0xeb2cc4 in _zend_hash_del_el /src/php-src/Zend/zend_hash.c:1435:2
+    #23 0xeb2cc4 in zend_hash_reverse_apply /src/php-src/Zend/zend_hash.c:2151:5
+    #24 0xdfa302 in shutdown_destructors /src/php-src/Zend/zend_execute_API.c:255:4
+    #25 0xe4c5f8 in zend_call_destructors /src/php-src/Zend/zend.c:1237:3
+    #26 0xc89a04 in php_request_shutdown /src/php-src/main/main.c:1820:3
+    #27 0x12c108d in fuzzer_request_shutdown /src/php-src/sapi/fuzzer/fuzzer-sapi.c:205:2
+    #28 0x12c172f in fuzzer_do_request_from_buffer /src/php-src/sapi/fuzzer/fuzzer-sapi.c:285:2
+    #29 0x12bfc4e in LLVMFuzzerTestOneInput /src/php-src/sapi/fuzzer/fuzzer-tracing-jit.c:34:2
+    #30 0x12c286b in main (/out/php-fuzz-tracing-jit+0x12c286b)
+
+DEDUP_TOKEN: free--tracked_free--_efree_custom
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x682746 in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0xd74069 in tracked_malloc /src/php-src/Zend/zend_alloc.c:2794:14
+    #2 0xd76b21 in _malloc_custom /src/php-src/Zend/zend_alloc.c:2439:10
+    #3 0xd76b21 in _emalloc /src/php-src/Zend/zend_alloc.c:2558:10
+    #4 0x6ff3e7 in timelib_strtotime /src/php-src/ext/date/lib/parse_date.re:1930:14
+    #5 0x6d242f in php_date_initialize /src/php-src/ext/date/php_date.c:2329:19
+    #6 0x6d51df in zim_DateTime___construct /src/php-src/ext/date/php_date.c:2516:2
+    #7 0xef0209 in execute_internal /src/php-src/Zend/zend_execute.c:3763:2
+    #8 0x12c0a30 in fuzzer_execute_internal /src/php-src/sapi/fuzzer/fuzzer-execute-common.h:95:2
+    #9 0xf976a9 in ZEND_DO_FCALL_SPEC_RETVAL_UNUSED_HANDLER /src/php-src/Zend/zend_vm_execute.h
+    #10 0x12c04f8 in fuzzer_execute_ex /src/php-src/sapi/fuzzer/fuzzer-execute-common.h:57:14
+    #11 0xe03aa3 in zend_call_function /src/php-src/Zend/zend_execute_API.c:928:3
+    #12 0xe05e9b in zend_call_known_function /src/php-src/Zend/zend_execute_API.c:1018:23
+    #13 0x1148620 in zend_call_known_instance_method /src/php-src/Zend/zend_API.h:749:2
+    #14 0x1148620 in zend_call_known_instance_method_with_0_params /src/php-src/Zend/zend_API.h:755:2
+    #15 0x1148620 in zend_objects_destroy_object /src/php-src/Zend/zend_objects.c:171:3
+    #16 0x115e0ad in zend_objects_store_del /src/php-src/Zend/zend_objects_API.c:184:4
+    #17 0xe43a9e in rc_dtor_func /src/php-src/Zend/zend_variables.c:57:2
+    #18 0xe43a9e in i_zval_ptr_dtor /src/php-src/Zend/zend_variables.h:44:4
+    #19 0xe43a9e in zval_ptr_dtor /src/php-src/Zend/zend_variables.c:84:2
+    #20 0xea49ff in _zend_hash_del_el_ex /src/php-src/Zend/zend_hash.c:1408:3
+    #21 0xeb2cc4 in _zend_hash_del_el /src/php-src/Zend/zend_hash.c:1435:2
+    #22 0xeb2cc4 in zend_hash_reverse_apply /src/php-src/Zend/zend_hash.c:2151:5
+    #23 0xdfa302 in shutdown_destructors /src/php-src/Zend/zend_execute_API.c:255:4
+    #24 0xe4c5f8 in zend_call_destructors /src/php-src/Zend/zend.c:1237:3
+    #25 0xc89a04 in php_request_shutdown /src/php-src/main/main.c:1820:3
+    #26 0x12c108d in fuzzer_request_shutdown /src/php-src/sapi/fuzzer/fuzzer-sapi.c:205:2
+    #27 0x12c172f in fuzzer_do_request_from_buffer /src/php-src/sapi/fuzzer/fuzzer-sapi.c:285:2
+    #28 0x12bfc4e in LLVMFuzzerTestOneInput /src/php-src/sapi/fuzzer/fuzzer-tracing-jit.c:34:2
+    #29 0x12c286b in main (/out/php-fuzz-tracing-jit+0x12c286b)
+
+DEDUP_TOKEN: __interceptor_malloc--tracked_malloc--_malloc_custom
+SUMMARY: AddressSanitizer: heap-use-after-free /src/php-src/ext/date/lib/timelib.c:159:26 in timelib_error_container_dtor
+Shadow bytes around the buggy address:
+  0x0c067fffb690: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c067fffb6a0: [1m[0m01[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fffb6b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c067fffb6c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c067fffb6d0: [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x0c067fffb6e0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m[[1m[35mfd[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c067fffb6f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c067fffb700: [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fffb710: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c067fffb720: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c067fffb730: [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42515729

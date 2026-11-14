@@ -1,0 +1,92 @@
+ARVO id: 42501625
+Project: libavc
+Fuzz target: avc_dec_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 4
+Language: c++
+Repo: https://android.googlesource.com/platform/external/libavc
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3467132985
+INFO: Loaded 1 modules   (8823 inline 8-bit counters): 8823 [0x8395d90, 0x8398007), 
+INFO: Loaded 1 PC tables (8823 PCs): 8823 [0x8332430,0x83437e8), 
+/out/avc_dec_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==8==ERROR: AddressSanitizer: heap-buffer-overflow on address 0xf6e01e04 at pc 0x08280709 bp 0xffffcaa8 sp 0xffffcaa0
+[1m[0m[1m[34mREAD of size 4 at 0xf6e01e04 thread T0[1m[0m
+SCARINESS: 17 (4-byte-read-heap-buffer-overflow)
+    #0 0x8280708 in ih264d_parse_decode_slice /src/libavc/decoder/ih264d_parse_slice.c:1440:38
+    #1 0x8241492 in ih264d_parse_nal_unit /src/libavc/decoder/ih264d_parse_headers.c:1287:40
+    #2 0x81c2285 in ih264d_video_decode /src/libavc/decoder/ih264d_api.c:2374:15
+    #3 0x81cddfe in ih264d_api_function /src/libavc/decoder/ih264d_api.c:4177:26
+    #4 0x81b945e in Codec::decodeFrame(unsigned char const*, unsigned int, unsigned int*) /src/libavc/fuzzer/avc_dec_fuzzer.cpp:313:9
+    #5 0x81ba23d in LLVMFuzzerTestOneInput /src/libavc/fuzzer/avc_dec_fuzzer.cpp:362:18
+    #6 0x80a5ce5 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #7 0x80923ae in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #8 0x8097f89 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:859:9
+    #9 0x80be1d7 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0xf7c9fee4 in __libc_start_main (/lib32/libc.so.6+0x1eee4)
+    #11 0x806e935 in _start (/out/avc_dec_fuzzer+0x806e935)
+
+DEDUP_TOKEN: ih264d_parse_decode_slice--ih264d_parse_nal_unit--ih264d_video_decode
+[1m[32m0xf6e01e04 is located 4 bytes to the right of 3456-byte region [0xf6e01080,0xf6e01e00)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x8177b5c in posix_memalign /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:210:3
+    #1 0x81b6dd3 in iv_aligned_malloc(void*, int, int) /src/libavc/fuzzer/avc_dec_fuzzer.cpp:63:12
+    #2 0x825b577 in ih264d_allocate_dynamic_bufs /src/libavc/decoder/ih264d_utils.c:2086:14
+    #3 0x8259288 in ih264d_init_pic /src/libavc/decoder/ih264d_utils.c:873:15
+    #4 0x8276b17 in ih264d_start_of_pic /src/libavc/decoder/ih264d_parse_slice.c:341:11
+    #5 0x821d26e in ih264d_mark_err_slice_skip /src/libavc/decoder/ih264d_parse_pslice.c:1530:23
+    #6 0x827d686 in ih264d_parse_decode_slice /src/libavc/decoder/ih264d_parse_slice.c:1402:15
+    #7 0x8241492 in ih264d_parse_nal_unit /src/libavc/decoder/ih264d_parse_headers.c:1287:40
+    #8 0x81c2285 in ih264d_video_decode /src/libavc/decoder/ih264d_api.c:2374:15
+    #9 0x81cddfe in ih264d_api_function /src/libavc/decoder/ih264d_api.c:4177:26
+    #10 0x81b945e in Codec::decodeFrame(unsigned char const*, unsigned int, unsigned int*) /src/libavc/fuzzer/avc_dec_fuzzer.cpp:313:9
+    #11 0x81ba23d in LLVMFuzzerTestOneInput /src/libavc/fuzzer/avc_dec_fuzzer.cpp:362:18
+    #12 0x80a5ce5 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #13 0x80923ae in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #14 0x8097f89 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:859:9
+    #15 0x80be1d7 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0xf7c9fee4 in __libc_start_main (/lib32/libc.so.6+0x1eee4)
+
+DEDUP_TOKEN: posix_memalign--iv_aligned_malloc(void*, int, int)--ih264d_allocate_dynamic_bufs
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/libavc/decoder/ih264d_parse_slice.c:1440:38 in ih264d_parse_decode_slice
+Shadow bytes around the buggy address:
+  0x3edc0370: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3edc0380: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3edc0390: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3edc03a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3edc03b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x3edc03c0:[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3edc03d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3edc03e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3edc03f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3edc0400: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3edc0410: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42501625

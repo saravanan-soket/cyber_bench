@@ -1,0 +1,48 @@
+ARVO id: 42539733
+Project: imagemagick
+Fuzz target: encoder_label_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+WARNING: Failed to find function "__sanitizer_acquire_crash_state".
+INFO: Seed: 2211521382
+INFO: Loaded 1 modules   (157142 inline 8-bit counters): 157142 [0x29d1b58, 0x29f812e), 
+INFO: Loaded 1 PC tables (157142 PCs): 157142 [0x29f8130,0x2c5de90), 
+/out/encoder_label_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x7681fb in IsSVGCompliant /src/imagemagick/MagickCore/color.c:1473:7
+    #1 0x766cd2 in GetColorTuple /src/imagemagick/MagickCore/color.c:1585:29
+    #2 0x770273 in QueryColorname /src/imagemagick/MagickCore/color.c:2612:3
+    #3 0xac23a2 in InterpretImageProperties /src/imagemagick/MagickCore/property.c:3789:22
+    #4 0xe01d06 in ReadLABELImage /src/imagemagick/coders/label.c:127:9
+    #5 0x7ca609 in ReadImage /src/imagemagick/MagickCore/constitute.c:500:13
+    #6 0x58ae86 in Magick::Image::read(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4095:12
+    #7 0x4a216d in fuzzEncoderWithStringFilename(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, unsigned char const*, unsigned long, bool (*)(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&)) /src/imagemagick/Magick++/fuzz/encoder_utils.cc:15:11
+    #8 0x4a1d45 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_label_fuzzer.cc:19:10
+    #9 0x4eafd3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:528:13
+    #10 0x4a44e6 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #11 0x4b6a42 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #12 0x4a3621 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #13 0x7faa5381b82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #14 0x421ef8 in _start (/out/encoder_label_fuzzer+0x421ef8)
+
+DEDUP_TOKEN: IsSVGCompliant--GetColorTuple--QueryColorname
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mpixel[1m[35m' in the stack frame of function '[1m[32mQueryColorname[1m[35m'[1m[0m
+    #0 0x76ffc0 in QueryColorname /src/imagemagick/MagickCore/color.c:2593
+
+DEDUP_TOKEN: QueryColorname
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/imagemagick/MagickCore/color.c:1473:7 in IsSVGCompliant
+Unique heap origins: 832
+Stack depot allocated bytes: 117248
+Unique origin histories: 103
+History depot allocated bytes: 2472
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42539733

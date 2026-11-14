@@ -1,0 +1,63 @@
+ARVO id: 42503490
+Project: qt
+Fuzz target: qtsvg_svg_qsvgrenderer_render
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: git://code.qt.io/qt/qtsvg.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2122211006
+INFO: Loaded 1 modules   (356115 inline 8-bit counters): 356115 [0xb2faec0, 0xb351dd3), 
+INFO: Loaded 1 PC tables (356115 PCs): 356115 [0xb351dd4,0xb60966c), 
+/out/qtsvg_svg_qsvgrenderer_render: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+QStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-root'
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x0fffed80 (pc 0xf3c6bce9 bp 0xffacfa08 sp 0xffacf5c8 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0xf3c6bce9  (/lib/i386-linux-gnu/libc.so.6+0x127ce9)
+    #1 0x817d368 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #2 0x975dd59 in copyAppend /work/qtbase/include/QtCore/../../../../src/qt/qtbase/src/corelib/tools/qarraydataops.h:103:9
+    #3 0x975dd59 in QtPrivate::QCommonArrayOps<QPainterPath::Element>::growAppend(QPainterPath::Element const*, QPainterPath::Element const*) /work/qtbase/include/QtCore/../../../../src/qt/qtbase/src/corelib/tools/qarraydataops.h:944:15
+    #4 0x973b8a9 in append /work/qtbase/include/QtCore/../../../../src/qt/qtbase/src/corelib/tools/qlist.h:765:8
+    #5 0x973b8a9 in append /work/qtbase/include/QtCore/../../../../src/qt/qtbase/src/corelib/tools/qlist.h:408:9
+    #6 0x973b8a9 in operator+= /work/qtbase/include/QtCore/../../../../src/qt/qtbase/src/corelib/tools/qlist.h:633:47
+    #7 0x973b8a9 in QPainterPath::addPath(QPainterPath const&) /src/qt/qtbase/src/gui/painting/qpainterpath.cpp:1273:17
+    #8 0x97830bb in intersectPath /src/qt/qtbase/src/gui/painting/qpathclipper.cpp:2096:24
+    #9 0x97830bb in QPathClipper::intersect(QPainterPath const&, QRectF const&) /src/qt/qtbase/src/gui/painting/qpathclipper.cpp:2111:12
+    #10 0x977aedf in QPathClipper::clip(QPathClipper::Operation) /src/qt/qtbase/src/gui/painting/qpathclipper.cpp
+    #11 0x974e4e3 in QPainterPath::intersected(QPainterPath const&) const /src/qt/qtbase/src/gui/painting/qpainterpath.cpp:3243:20
+    #12 0xa104af8 in QOutlineMapper::clipElements(QPointF const*, QPainterPath::ElementType const*, int) /src/qt/qtbase/src/gui/painting/qoutlinemapper.cpp:394:37
+    #13 0xa102d7e in QOutlineMapper::endOutline() /src/qt/qtbase/src/gui/painting/qoutlinemapper.cpp:249:9
+    #14 0xa1041e7 in QOutlineMapper::convertPath(QVectorPath const&) /src/qt/qtbase/src/gui/painting/qoutlinemapper.cpp:190:5
+    #15 0x9653505 in QRasterPaintEngine::fill(QVectorPath const&, QBrush const&) /src/qt/qtbase/src/gui/painting/qpaintengine_raster.cpp:1764:36
+    #16 0x96a9475 in QPaintEngineEx::stroke(QVectorPath const&, QPen const&) /src/qt/qtbase/src/gui/painting/qpaintengineex.cpp:544:9
+    #17 0x964f612 in QRasterPaintEngine::stroke(QVectorPath const&, QPen const&) /src/qt/qtbase/src/gui/painting/qpaintengine_raster.cpp:1678:25
+    #18 0x96b1326 in QPaintEngineEx::draw(QVectorPath const&) /src/qt/qtbase/src/gui/painting/qpaintengineex.cpp:632:9
+    #19 0x96b7670 in QPaintEngineEx::drawPath(QPainterPath const&) /src/qt/qtbase/src/gui/painting/qpaintengineex.cpp:871:9
+    #20 0x96d39ca in QPainter::drawPath(QPainterPath const&) /src/qt/qtbase/src/gui/painting/qpainter.cpp
+    #21 0x909e1f9 in QSvgPath::draw(QPainter*, QSvgExtraStates&) /src/qt/qtsvg/src/svg/qsvggraphics.cpp:173:5
+    #22 0x8fbd65f in QSvgTinyDocument::draw(QPainter*, QRectF const&) /src/qt/qtsvg/src/svg/qsvgtinydocument.cpp:284:19
+    #23 0x8fc223e in QSvgTinyDocument::draw(QPainter*) /src/qt/qtsvg/src/svg/qsvgtinydocument.cpp:428:5
+    #24 0x8fb324c in QSvgRenderer::render(QPainter*) /src/qt/qtsvg/src/svg/qsvgrenderer.cpp:418:20
+    #25 0x81aefbe in LLVMFuzzerTestOneInput /src/qt/qtsvg/tests/libfuzzer/svg/qsvgrenderer/render/main.cpp:44:14
+    #26 0x80c6f2e in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #27 0x80b220e in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #28 0x80b80f5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #29 0x80e0ea7 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #30 0xf3b5c646 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x18646)
+    #31 0x808ca81 in _start (/out/qtsvg_svg_qsvgrenderer_render+0x808ca81)
+
+DEDUP_TOKEN: __asan_memcpy--copyAppend
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib/i386-linux-gnu/libc.so.6+0x127ce9) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42503490

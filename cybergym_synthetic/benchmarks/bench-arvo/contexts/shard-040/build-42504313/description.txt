@@ -1,0 +1,107 @@
+ARVO id: 42504313
+Project: arrow
+Fuzz target: parquet-arrow-fuzz
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Memcpy-param-overlap
+Language: c++
+Repo: https://github.com/apache/arrow.git
+
+=== Crash report ===
+Warning: AFL++ tools might need to set AFL_MAP_SIZE to 441639 to be able to run this instrumented program if this crashes!
+Reading 67299 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: memcpy-param-overlap: memory ranges [0x62400001b576,0x62410001b575) and [0x624000019524, 0x624100019523) overlap
+[1m[0mSCARINESS: 10 (memcpy-param-overlap)
+    #0 0x4d7e34 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #1 0xb2e81d in parquet::(anonymous namespace)::DeltaByteArrayDecoder::GetInternal(parquet::ByteArray*, int) /src/arrow/cpp/src/parquet/encoding.cc:2412:7
+    #2 0xb2f76f in parquet::(anonymous namespace)::DeltaByteArrayDecoder::DecodeArrowDense(int, int, unsigned char const*, long, parquet::EncodingTraits<parquet::PhysicalType<(parquet::Type::type)6> >::Accumulator*, int*) /src/arrow/cpp/src/parquet/encoding.cc:2437:28
+    #3 0xb1874a in parquet::(anonymous namespace)::DeltaByteArrayDecoder::DecodeArrow(int, int, unsigned char const*, long, parquet::EncodingTraits<parquet::PhysicalType<(parquet::Type::type)6> >::Accumulator*) /src/arrow/cpp/src/parquet/encoding.cc:2382:5
+    #4 0x984d05 in parquet::internal::(anonymous namespace)::ByteArrayChunkedRecordReader::ReadValuesSpaced(long, long) /src/arrow/cpp/src/parquet/column_reader.cc:1665:51
+    #5 0x960ca1 in parquet::internal::(anonymous namespace)::TypedRecordReader<parquet::PhysicalType<(parquet::Type::type)6> >::ReadRecordData(long) /src/arrow/cpp/src/parquet/column_reader.cc:1516:7
+    #6 0x929e38 in parquet::internal::(anonymous namespace)::TypedRecordReader<parquet::PhysicalType<(parquet::Type::type)6> >::ReadRecords(long) /src/arrow/cpp/src/parquet/column_reader.cc
+    #7 0x559532 in parquet::arrow::(anonymous namespace)::LeafReader::LoadBatch(long) /src/arrow/cpp/src/parquet/arrow/reader.cc:467:46
+    #8 0x552d2a in parquet::arrow::ColumnReaderImpl::NextBatch(long, std::__1::shared_ptr<arrow::ChunkedArray>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:108:5
+    #9 0x5c57a7 in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadColumn(int, std::__1::vector<int, std::__1::allocator<int> > const&, parquet::arrow::ColumnReader*, std::__1::shared_ptr<arrow::ChunkedArray>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:273:20
+    #10 0x633f52 in parquet::arrow::(anonymous namespace)::FileReaderImpl::DecodeRowGroups(std::__1::shared_ptr<parquet::arrow::(anonymous namespace)::FileReaderImpl>, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&, arrow::internal::Executor*)::$_4::operator()(unsigned long, std::__1::shared_ptr<parquet::arrow::ColumnReaderImpl>) const /src/arrow/cpp/src/parquet/arrow/reader.cc:1180:5
+    #11 0x62f92a in arrow::Future<std::__1::vector<std::__1::shared_ptr<arrow::ChunkedArray>, std::__1::allocator<std::__1::shared_ptr<arrow::ChunkedArray> > > > arrow::internal::OptionalParallelForAsync<parquet::arrow::(anonymous namespace)::FileReaderImpl::DecodeRowGroups(std::__1::shared_ptr<parquet::arrow::(anonymous namespace)::FileReaderImpl>, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&, arrow::internal::Executor*)::$_4&, std::__1::shared_ptr<parquet::arrow::ColumnReaderImpl>, std::__1::shared_ptr<arrow::ChunkedArray> >(bool, std::__1::vector<std::__1::shared_ptr<parquet::arrow::ColumnReaderImpl>, std::__1::allocator<std::__1::shared_ptr<parquet::arrow::ColumnReaderImpl> > >, parquet::arrow::(anonymous namespace)::FileReaderImpl::DecodeRowGroups(std::__1::shared_ptr<parquet::arrow::(anonymous namespace)::FileReaderImpl>, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&, arrow::internal::Executor*)::$_4&, arrow::internal::Executor*) /src/arrow/cpp/src/arrow/util/parallel.h:95:7
+    #12 0x62e351 in parquet::arrow::(anonymous namespace)::FileReaderImpl::DecodeRowGroups(std::__1::shared_ptr<parquet::arrow::(anonymous namespace)::FileReaderImpl>, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&, arrow::internal::Executor*) /src/arrow/cpp/src/parquet/arrow/reader.cc:1198:10
+    #13 0x530edb in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadRowGroups(std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::shared_ptr<arrow::Table>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:1159:14
+    #14 0x530267 in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadRowGroup(int, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::shared_ptr<arrow::Table>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:310:12
+    #15 0x53071e in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadRowGroup(int, std::__1::shared_ptr<arrow::Table>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:314:12
+    #16 0x519103 in parquet::arrow::internal::FuzzReader(std::__1::unique_ptr<parquet::arrow::FileReader, std::__1::default_delete<parquet::arrow::FileReader> >) /src/arrow/cpp/src/parquet/arrow/reader.cc:1282:37
+    #17 0x51a59f in parquet::arrow::internal::FuzzReader(unsigned char const*, long) /src/arrow/cpp/src/parquet/arrow/reader.cc:1299:10
+    #18 0x51248e in LLVMFuzzerTestOneInput /src/arrow/cpp/src/parquet/arrow/fuzz.cc:22:17
+    #19 0x512355 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:191:7
+    #20 0x5121c5 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #21 0x7ffff7c540b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #22 0x4578fd in _start (/out/parquet-arrow-fuzz+0x4578fd)
+
+DEDUP_TOKEN: __asan_memcpy--parquet::(anonymous namespace)::DeltaByteArrayDecoder::GetInternal(parquet::ByteArray*, int)--parquet::(anonymous namespace)::DeltaByteArrayDecoder::DecodeArrowDense(int, int, unsigned char const*, long, parquet::EncodingTraits<parquet::PhysicalType<(parquet::Type::type)6> >::Accumulator*, int*)
+[1m[32m0x62400001bfc0 is located 0 bytes to the right of 7872-byte region [0x62400001a100,0x62400001bfc0)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4d95e7 in posix_memalign /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:210:3
+    #1 0x1692ca1 in arrow::(anonymous namespace)::SystemAllocator::AllocateAligned(long, unsigned char**) /src/arrow/cpp/src/arrow/memory_pool.cc:213:24
+    #2 0x1695639 in arrow::(anonymous namespace)::SystemAllocator::ReallocateAligned(long, long, unsigned char**) /src/arrow/cpp/src/arrow/memory_pool.cc:230:14
+    #3 0x16922e5 in arrow::BaseMemoryPoolImpl<arrow::(anonymous namespace)::SystemAllocator>::Reallocate(long, long, unsigned char**) /src/arrow/cpp/src/arrow/memory_pool.cc:426:5
+    #4 0x169b6ff in arrow::PoolBuffer::Reserve(long) /src/arrow/cpp/src/arrow/memory_pool.cc:715:9
+    #5 0x169aa31 in arrow::PoolBuffer::Resize(long, bool) /src/arrow/cpp/src/arrow/memory_pool.cc:741:7
+    #6 0x567617 in arrow::ResizableBuffer::Resize(long) /src/arrow/cpp/src/arrow/buffer.h:421:12
+    #7 0xb2e69a in parquet::(anonymous namespace)::DeltaByteArrayDecoder::GetInternal(parquet::ByteArray*, int) /src/arrow/cpp/src/parquet/encoding.cc:2406:5
+    #8 0xb2f76f in parquet::(anonymous namespace)::DeltaByteArrayDecoder::DecodeArrowDense(int, int, unsigned char const*, long, parquet::EncodingTraits<parquet::PhysicalType<(parquet::Type::type)6> >::Accumulator*, int*) /src/arrow/cpp/src/parquet/encoding.cc:2437:28
+    #9 0xb1874a in parquet::(anonymous namespace)::DeltaByteArrayDecoder::DecodeArrow(int, int, unsigned char const*, long, parquet::EncodingTraits<parquet::PhysicalType<(parquet::Type::type)6> >::Accumulator*) /src/arrow/cpp/src/parquet/encoding.cc:2382:5
+    #10 0x984d05 in parquet::internal::(anonymous namespace)::ByteArrayChunkedRecordReader::ReadValuesSpaced(long, long) /src/arrow/cpp/src/parquet/column_reader.cc:1665:51
+    #11 0x960ca1 in parquet::internal::(anonymous namespace)::TypedRecordReader<parquet::PhysicalType<(parquet::Type::type)6> >::ReadRecordData(long) /src/arrow/cpp/src/parquet/column_reader.cc:1516:7
+    #12 0x929e38 in parquet::internal::(anonymous namespace)::TypedRecordReader<parquet::PhysicalType<(parquet::Type::type)6> >::ReadRecords(long) /src/arrow/cpp/src/parquet/column_reader.cc
+    #13 0x559532 in parquet::arrow::(anonymous namespace)::LeafReader::LoadBatch(long) /src/arrow/cpp/src/parquet/arrow/reader.cc:467:46
+    #14 0x552d2a in parquet::arrow::ColumnReaderImpl::NextBatch(long, std::__1::shared_ptr<arrow::ChunkedArray>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:108:5
+    #15 0x5c57a7 in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadColumn(int, std::__1::vector<int, std::__1::allocator<int> > const&, parquet::arrow::ColumnReader*, std::__1::shared_ptr<arrow::ChunkedArray>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:273:20
+    #16 0x633f52 in parquet::arrow::(anonymous namespace)::FileReaderImpl::DecodeRowGroups(std::__1::shared_ptr<parquet::arrow::(anonymous namespace)::FileReaderImpl>, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&, arrow::internal::Executor*)::$_4::operator()(unsigned long, std::__1::shared_ptr<parquet::arrow::ColumnReaderImpl>) const /src/arrow/cpp/src/parquet/arrow/reader.cc:1180:5
+    #17 0x62f92a in arrow::Future<std::__1::vector<std::__1::shared_ptr<arrow::ChunkedArray>, std::__1::allocator<std::__1::shared_ptr<arrow::ChunkedArray> > > > arrow::internal::OptionalParallelForAsync<parquet::arrow::(anonymous namespace)::FileReaderImpl::DecodeRowGroups(std::__1::shared_ptr<parquet::arrow::(anonymous namespace)::FileReaderImpl>, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&, arrow::internal::Executor*)::$_4&, std::__1::shared_ptr<parquet::arrow::ColumnReaderImpl>, std::__1::shared_ptr<arrow::ChunkedArray> >(bool, std::__1::vector<std::__1::shared_ptr<parquet::arrow::ColumnReaderImpl>, std::__1::allocator<std::__1::shared_ptr<parquet::arrow::ColumnReaderImpl> > >, parquet::arrow::(anonymous namespace)::FileReaderImpl::DecodeRowGroups(std::__1::shared_ptr<parquet::arrow::(anonymous namespace)::FileReaderImpl>, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&, arrow::internal::Executor*)::$_4&, arrow::internal::Executor*) /src/arrow/cpp/src/arrow/util/parallel.h:95:7
+    #18 0x62e351 in parquet::arrow::(anonymous namespace)::FileReaderImpl::DecodeRowGroups(std::__1::shared_ptr<parquet::arrow::(anonymous namespace)::FileReaderImpl>, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&, arrow::internal::Executor*) /src/arrow/cpp/src/parquet/arrow/reader.cc:1198:10
+    #19 0x530edb in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadRowGroups(std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::shared_ptr<arrow::Table>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:1159:14
+    #20 0x530267 in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadRowGroup(int, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::shared_ptr<arrow::Table>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:310:12
+    #21 0x53071e in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadRowGroup(int, std::__1::shared_ptr<arrow::Table>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:314:12
+    #22 0x519103 in parquet::arrow::internal::FuzzReader(std::__1::unique_ptr<parquet::arrow::FileReader, std::__1::default_delete<parquet::arrow::FileReader> >) /src/arrow/cpp/src/parquet/arrow/reader.cc:1282:37
+    #23 0x51a59f in parquet::arrow::internal::FuzzReader(unsigned char const*, long) /src/arrow/cpp/src/parquet/arrow/reader.cc:1299:10
+    #24 0x51248e in LLVMFuzzerTestOneInput /src/arrow/cpp/src/parquet/arrow/fuzz.cc:22:17
+    #25 0x512355 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:191:7
+
+DEDUP_TOKEN: posix_memalign--arrow::(anonymous namespace)::SystemAllocator::AllocateAligned(long, unsigned char**)--arrow::(anonymous namespace)::SystemAllocator::ReallocateAligned(long, long, unsigned char**)
+[1m[32m0x624000019f40 is located 0 bytes to the right of 7744-byte region [0x624000018100,0x624000019f40)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4d95e7 in posix_memalign /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:210:3
+    #1 0x1692ca1 in arrow::(anonymous namespace)::SystemAllocator::AllocateAligned(long, unsigned char**) /src/arrow/cpp/src/arrow/memory_pool.cc:213:24
+    #2 0x1695639 in arrow::(anonymous namespace)::SystemAllocator::ReallocateAligned(long, long, unsigned char**) /src/arrow/cpp/src/arrow/memory_pool.cc:230:14
+    #3 0x16922e5 in arrow::BaseMemoryPoolImpl<arrow::(anonymous namespace)::SystemAllocator>::Reallocate(long, long, unsigned char**) /src/arrow/cpp/src/arrow/memory_pool.cc:426:5
+    #4 0x169b6ff in arrow::PoolBuffer::Reserve(long) /src/arrow/cpp/src/arrow/memory_pool.cc:715:9
+    #5 0x169aa31 in arrow::PoolBuffer::Resize(long, bool) /src/arrow/cpp/src/arrow/memory_pool.cc:741:7
+    #6 0x567617 in arrow::ResizableBuffer::Resize(long) /src/arrow/cpp/src/arrow/buffer.h:421:12
+    #7 0xb1a096 in parquet::(anonymous namespace)::DeltaLengthByteArrayDecoder::Decode(parquet::ByteArray*, int) /src/arrow/cpp/src/parquet/encoding.cc:2280:5
+    #8 0xb2de85 in parquet::(anonymous namespace)::DeltaByteArrayDecoder::GetInternal(parquet::ByteArray*, int) /src/arrow/cpp/src/parquet/encoding.cc:2397:21
+    #9 0xb2f76f in parquet::(anonymous namespace)::DeltaByteArrayDecoder::DecodeArrowDense(int, int, unsigned char const*, long, parquet::EncodingTraits<parquet::PhysicalType<(parquet::Type::type)6> >::Accumulator*, int*) /src/arrow/cpp/src/parquet/encoding.cc:2437:28
+    #10 0xb1874a in parquet::(anonymous namespace)::DeltaByteArrayDecoder::DecodeArrow(int, int, unsigned char const*, long, parquet::EncodingTraits<parquet::PhysicalType<(parquet::Type::type)6> >::Accumulator*) /src/arrow/cpp/src/parquet/encoding.cc:2382:5
+    #11 0x984d05 in parquet::internal::(anonymous namespace)::ByteArrayChunkedRecordReader::ReadValuesSpaced(long, long) /src/arrow/cpp/src/parquet/column_reader.cc:1665:51
+    #12 0x960ca1 in parquet::internal::(anonymous namespace)::TypedRecordReader<parquet::PhysicalType<(parquet::Type::type)6> >::ReadRecordData(long) /src/arrow/cpp/src/parquet/column_reader.cc:1516:7
+    #13 0x929e38 in parquet::internal::(anonymous namespace)::TypedRecordReader<parquet::PhysicalType<(parquet::Type::type)6> >::ReadRecords(long) /src/arrow/cpp/src/parquet/column_reader.cc
+    #14 0x559532 in parquet::arrow::(anonymous namespace)::LeafReader::LoadBatch(long) /src/arrow/cpp/src/parquet/arrow/reader.cc:467:46
+    #15 0x552d2a in parquet::arrow::ColumnReaderImpl::NextBatch(long, std::__1::shared_ptr<arrow::ChunkedArray>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:108:5
+    #16 0x5c57a7 in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadColumn(int, std::__1::vector<int, std::__1::allocator<int> > const&, parquet::arrow::ColumnReader*, std::__1::shared_ptr<arrow::ChunkedArray>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:273:20
+    #17 0x633f52 in parquet::arrow::(anonymous namespace)::FileReaderImpl::DecodeRowGroups(std::__1::shared_ptr<parquet::arrow::(anonymous namespace)::FileReaderImpl>, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&, arrow::internal::Executor*)::$_4::operator()(unsigned long, std::__1::shared_ptr<parquet::arrow::ColumnReaderImpl>) const /src/arrow/cpp/src/parquet/arrow/reader.cc:1180:5
+    #18 0x62f92a in arrow::Future<std::__1::vector<std::__1::shared_ptr<arrow::ChunkedArray>, std::__1::allocator<std::__1::shared_ptr<arrow::ChunkedArray> > > > arrow::internal::OptionalParallelForAsync<parquet::arrow::(anonymous namespace)::FileReaderImpl::DecodeRowGroups(std::__1::shared_ptr<parquet::arrow::(anonymous namespace)::FileReaderImpl>, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&, arrow::internal::Executor*)::$_4&, std::__1::shared_ptr<parquet::arrow::ColumnReaderImpl>, std::__1::shared_ptr<arrow::ChunkedArray> >(bool, std::__1::vector<std::__1::shared_ptr<parquet::arrow::ColumnReaderImpl>, std::__1::allocator<std::__1::shared_ptr<parquet::arrow::ColumnReaderImpl> > >, parquet::arrow::(anonymous namespace)::FileReaderImpl::DecodeRowGroups(std::__1::shared_ptr<parquet::arrow::(anonymous namespace)::FileReaderImpl>, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&, arrow::internal::Executor*)::$_4&, arrow::internal::Executor*) /src/arrow/cpp/src/arrow/util/parallel.h:95:7
+    #19 0x62e351 in parquet::arrow::(anonymous namespace)::FileReaderImpl::DecodeRowGroups(std::__1::shared_ptr<parquet::arrow::(anonymous namespace)::FileReaderImpl>, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&, arrow::internal::Executor*) /src/arrow/cpp/src/parquet/arrow/reader.cc:1198:10
+    #20 0x530edb in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadRowGroups(std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::shared_ptr<arrow::Table>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:1159:14
+    #21 0x530267 in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadRowGroup(int, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::shared_ptr<arrow::Table>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:310:12
+    #22 0x53071e in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadRowGroup(int, std::__1::shared_ptr<arrow::Table>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:314:12
+    #23 0x519103 in parquet::arrow::internal::FuzzReader(std::__1::unique_ptr<parquet::arrow::FileReader, std::__1::default_delete<parquet::arrow::FileReader> >) /src/arrow/cpp/src/parquet/arrow/reader.cc:1282:37
+    #24 0x51a59f in parquet::arrow::internal::FuzzReader(unsigned char const*, long) /src/arrow/cpp/src/parquet/arrow/reader.cc:1299:10
+    #25 0x51248e in LLVMFuzzerTestOneInput /src/arrow/cpp/src/parquet/arrow/fuzz.cc:22:17
+    #26 0x512355 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:191:7
+
+DEDUP_TOKEN: posix_memalign--arrow::(anonymous namespace)::SystemAllocator::AllocateAligned(long, unsigned char**)--arrow::(anonymous namespace)::SystemAllocator::ReallocateAligned(long, long, unsigned char**)
+SUMMARY: AddressSanitizer: memcpy-param-overlap /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3 in __asan_memcpy
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42504313

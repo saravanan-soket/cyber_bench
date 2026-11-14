@@ -1,0 +1,44 @@
+ARVO id: 42495008
+Project: lxc
+Fuzz target: fuzz-lxc-config-read
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c
+Repo: https://github.com/lxc/lxc
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1310747231
+INFO: Loaded 1 modules   (26980 inline 8-bit counters): 26980 [0x8f9730, 0x900094), 
+INFO: Loaded 1 PC tables (26980 PCs): 26980 [0x900098,0x9696d8), 
+/out/fuzz-lxc-config-read: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0xfffffffffffffff7 (pc 0x7ffff6f49562 bp 0x7fffffffd740 sp 0x7fffffffd6d0 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7ffff6f49562 in free (/lib/x86_64-linux-gnu/libc.so.6+0x84562)
+    #1 0x500d33 in lxc_free_netdev /src/lxc/src/lxc/confile_utils.c:416:2
+    #2 0x500b0f in lxc_free_netdev_function /src/lxc/src/lxc/confile_utils.c:455:1
+    #3 0x500a37 in lxc_remove_nic_by_idx /src/lxc/src/lxc/confile_utils.c:472:1
+    #4 0x420acf in clr_config_net_nic /src/lxc/src/lxc/confile.c:5279:3
+    #5 0x4204bd in set_config_net_nic /src/lxc/src/lxc/confile.c:5239:10
+    #6 0x4f201e in parse_line /src/lxc/src/lxc/confile.c:2937:9
+    #7 0x426181 in lxc_file_for_each_line_mmap /src/lxc/src/lxc/parse.c:125:9
+    #8 0x4f1c29 in lxc_config_read /src/lxc/src/lxc/confile.c:3008:9
+    #9 0x4d422b in LLVMFuzzerTestOneInput /src/fuzz-lxc-config-read.c:36:2
+    #10 0x461cf3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #11 0x44bb52 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #12 0x45199a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #13 0x47d6d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #14 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #15 0x4267e8 in _start (/out/fuzz-lxc-config-read+0x4267e8)
+
+DEDUP_TOKEN: free--lxc_free_netdev--lxc_free_netdev_function
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x84562) in free
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42495008

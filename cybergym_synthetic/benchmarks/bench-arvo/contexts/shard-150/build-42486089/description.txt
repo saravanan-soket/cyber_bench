@@ -1,0 +1,59 @@
+ARVO id: 42486089
+Project: harfbuzz
+Fuzz target: hb-shape-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/harfbuzz/harfbuzz.git
+
+=== Crash report ===
+INFO: Seed: 3779678179
+INFO: Loaded 1 modules   (30498 inline 8-bit counters): 30498 [0xb71790, 0xb78eb2), 
+INFO: Loaded 1 PC tables (30498 PCs): 30498 [0xb78eb8,0xbf00d8), 
+/out/hb-shape-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0xfffffffffffffffa (pc 0x0000004a6423 bp 0xfffffffffffffffa sp 0x7fffffffcc60 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x4a6423 in __asan::Allocator::Reallocate(void*, unsigned long, __sanitizer::BufferedStackTrace*) /src/llvm-project/compiler-rt/lib/asan/asan_allocator.cpp:679:27
+    #1 0x4a6345 in __asan::asan_realloc(void*, unsigned long, __sanitizer::BufferedStackTrace*) /src/llvm-project/compiler-rt/lib/asan/asan_allocator.cpp:921:34
+    #2 0x51e4ba in realloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:165:10
+    #3 0x761381 in hb_realloc_impl /work/build/../../src/harfbuzz/src/failing-alloc.c:51:31
+    #4 0x64d7b3 in hb_vector_t<CFF::dict_val_t>::alloc(unsigned int) /work/build/../../src/harfbuzz/src/hb-vector.hh:202:28
+    #5 0x64d598 in hb_vector_t<CFF::dict_val_t>::resize(int) /work/build/../../src/harfbuzz/src/hb-vector.hh:219:10
+    #6 0x64d4b8 in hb_vector_t<CFF::dict_val_t>::push() /work/build/../../src/harfbuzz/src/hb-vector.hh:167:9
+    #7 0x64d446 in CFF::dict_val_t* hb_vector_t<CFF::dict_val_t>::push<CFF::dict_val_t const&>(CFF::dict_val_t const&) /work/build/../../src/harfbuzz/src/hb-vector.hh:174:15
+    #8 0x64d2ca in CFF::parsed_values_t<CFF::dict_val_t>::add_op(unsigned int, CFF::byte_str_ref_t const&, CFF::dict_val_t const&) /work/build/../../src/harfbuzz/src/hb-cff-interp-common.hh:568:23
+    #9 0x64d16a in CFF::cff1_private_dict_opset_t::process_op(unsigned int, CFF::interp_env_t<CFF::number_t>&, CFF::cff1_private_dict_values_base_t<CFF::dict_val_t>&) /work/build/../../src/harfbuzz/src/hb-ot-cff1-table.hh:897:13
+    #10 0x643c15 in CFF::dict_interpreter_t<CFF::cff1_private_dict_opset_t, CFF::cff1_private_dict_values_base_t<CFF::dict_val_t>, CFF::interp_env_t<CFF::number_t> >::interpret(CFF::cff1_private_dict_values_base_t<CFF::dict_val_t>&) /work/build/../../src/harfbuzz/src/hb-cff-interp-dict-common.hh:187:7
+    #11 0x640ecf in OT::cff1::accelerator_templ_t<CFF::cff1_private_dict_opset_t, CFF::cff1_private_dict_values_base_t<CFF::dict_val_t> >::init(hb_face_t*) /work/build/../../src/harfbuzz/src/hb-ot-cff1-table.hh:1132:6
+    #12 0x63fad2 in OT::cff1::accelerator_t::init(hb_face_t*) /work/build/../../src/harfbuzz/src/hb-ot-cff1-table.hh:1273:14
+    #13 0x63f9fa in hb_lazy_loader_t<OT::cff1_accelerator_t, hb_face_lazy_loader_t<OT::cff1_accelerator_t, 13u>, hb_face_t, 13u, OT::cff1_accelerator_t>::create(hb_face_t*) /work/build/../../src/harfbuzz/src/hb-machinery.hh:242:10
+    #14 0x63f948 in OT::cff1_accelerator_t* hb_data_wrapper_t<hb_face_t, 13u>::call_create<OT::cff1_accelerator_t, hb_face_lazy_loader_t<OT::cff1_accelerator_t, 13u> >() const /work/build/../../src/harfbuzz/src/hb-machinery.hh:147:42
+    #15 0x63f870 in hb_lazy_loader_t<OT::cff1_accelerator_t, hb_face_lazy_loader_t<OT::cff1_accelerator_t, 13u>, hb_face_t, 13u, OT::cff1_accelerator_t>::get_stored() const /work/build/../../src/harfbuzz/src/hb-machinery.hh:206:26
+    #16 0x63f7e0 in hb_lazy_loader_t<OT::cff1_accelerator_t, hb_face_lazy_loader_t<OT::cff1_accelerator_t, 13u>, hb_face_t, 13u, OT::cff1_accelerator_t>::get() const /work/build/../../src/harfbuzz/src/hb-machinery.hh:229:58
+    #17 0x63e3f0 in hb_lazy_loader_t<OT::cff1_accelerator_t, hb_face_lazy_loader_t<OT::cff1_accelerator_t, 13u>, hb_face_t, 13u, OT::cff1_accelerator_t>::operator->() const /work/build/../../src/harfbuzz/src/hb-machinery.hh:191:50
+    #18 0x623578 in hb_ot_get_glyph_extents(hb_font_t*, void*, unsigned int, hb_glyph_extents_t*, void*) /work/build/../../src/harfbuzz/src/hb-ot-font.cc:192:7
+    #19 0x5fdefc in hb_font_t::get_glyph_extents(unsigned int, hb_glyph_extents_t*) /work/build/../../src/harfbuzz/src/hb-font.hh:335:12
+    #20 0x5fde30 in hb_font_get_glyph_extents /work/build/../../src/harfbuzz/src/hb-font.cc:1015:16
+    #21 0x550d1a in test_font(hb_font_t*, unsigned int) /work/build/../../src/harfbuzz/test/fuzzing/../api/test-ot-face.c:61:3
+    #22 0x55088b in LLVMFuzzerTestOneInput /work/build/../../src/harfbuzz/test/fuzzing/hb-shape-fuzzer.cc:51:16
+    #23 0x457d21 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #24 0x458985 in fuzzer::Fuzzer::TryDetectingAMemoryLeak(unsigned char const*, unsigned long, bool) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:634:3
+    #25 0x4434ca in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:297:6
+    #26 0x4494ce in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #27 0x470ee2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #28 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #29 0x41e4f8 in _start (/out/hb-shape-fuzzer+0x41e4f8)
+
+DEDUP_TOKEN: __asan::Allocator::Reallocate(void*, unsigned long, __sanitizer::BufferedStackTrace*)--__asan::asan_realloc(void*, unsigned long, __sanitizer::BufferedStackTrace*)--realloc
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/llvm-project/compiler-rt/lib/asan/asan_allocator.cpp:679:27 in __asan::Allocator::Reallocate(void*, unsigned long, __sanitizer::BufferedStackTrace*)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42486089

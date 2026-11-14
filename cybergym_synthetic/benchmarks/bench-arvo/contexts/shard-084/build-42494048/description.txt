@@ -1,0 +1,47 @@
+ARVO id: 42494048
+Project: librawspeed
+Fuzz target: FiffParserFuzzer-GetDecoder-Decode
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/darktable-org/rawspeed.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/FiffParserFuzzer-GetDecoder-Decode < INPUT_FILE
+or
+  /out/FiffParserFuzzer-GetDecoder-Decode INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/FiffParserFuzzer-GetDecoder-Decode [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 212 bytes from /tmp/poc
+ASAN:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x7fa81d37fdc0 (pc 0x00000066c78a bp 0x7ffd1b7f93b0 sp 0x7ffd1b7f9280 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x66c789 in std::__1::array<rawspeed::HuffmanTable*, 2> rawspeed::AbstractLJpegDecompressor::getHuffmanTables<2>() const /src/librawspeed/src/librawspeed/decompressors/AbstractLJpegDecompressor.h:168:15
+    #1 0x66c789 in void rawspeed::Cr2Decompressor::decodeN_X_Y<2, 1, 1>() /src/librawspeed/src/librawspeed/decompressors/Cr2Decompressor.cpp:109
+    #2 0x668c10 in rawspeed::Cr2Decompressor::decodeScan() /src/librawspeed/src/librawspeed/decompressors/Cr2Decompressor.cpp:85:7
+    #3 0x6a8172 in rawspeed::AbstractLJpegDecompressor::decode() /src/librawspeed/src/librawspeed/decompressors/AbstractLJpegDecompressor.cpp:51:7
+    #4 0x5944b7 in rawspeed::Cr2Decoder::decodeOldFormat() /src/librawspeed/src/librawspeed/decoders/Cr2Decoder.cpp:91:7
+    #5 0x5981de in rawspeed::Cr2Decoder::decodeRawInternal() /src/librawspeed/src/librawspeed/decoders/Cr2Decoder.cpp:164:12
+    #6 0x5f513d in rawspeed::RawDecoder::decodeRaw() /src/librawspeed/src/librawspeed/decoders/RawDecoder.cpp:298:20
+    #7 0x55856e in LLVMFuzzerTestOneInput /src/librawspeed/fuzz/librawspeed/parsers/main.cpp:87:14
+    #8 0x6b159e in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:265:5
+    #9 0x6b1b2c in main /src/libfuzzer/afl/afl_driver.cpp:302:12
+    #10 0x7fa01d41082f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #11 0x45ef18 in _start (/out/FiffParserFuzzer-GetDecoder-Decode+0x45ef18)
+
+DEDUP_TOKEN: std::__1::array<rawspeed::HuffmanTable*, 2> rawspeed::AbstractLJpegDecompressor::getHuffmanTables<2>() const--void rawspeed::Cr2Decompressor::decodeN_X_Y<2, 1, 1>()--rawspeed::Cr2Decompressor::decodeScan()
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/librawspeed/src/librawspeed/decompressors/AbstractLJpegDecompressor.h:168:15 in std::__1::array<rawspeed::HuffmanTable*, 2> rawspeed::AbstractLJpegDecompressor::getHuffmanTables<2>() const
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42494048

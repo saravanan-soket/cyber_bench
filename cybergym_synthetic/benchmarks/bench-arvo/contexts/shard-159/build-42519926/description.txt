@@ -1,0 +1,39 @@
+ARVO id: 42519926
+Project: mupdf
+Fuzz target: pdf_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: git://git.ghostscript.com/mupdf.git
+
+=== Crash report ===
+INFO: Seed: 4281533844
+INFO: Loaded 1 modules   (66570 inline 8-bit counters): 66570 [0x38b82d8, 0x38c86e2), 
+INFO: Loaded 1 PC tables (66570 PCs): 66570 [0x3480da0,0x3584e40), 
+/out/pdf_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m[1m[31mUninitialized bytes in [1m[32m__interceptor_memcmp[1m[31m at offset 1 inside [0x7fffffffc6e0, 5)[1m[0m
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x7ae5a3 in pdf_load_version /src/mupdf/source/pdf/pdf-xref.c:593:6
+    #1 0x7a2b6d in pdf_init_document /src/mupdf/source/pdf/pdf-xref.c:1332:3
+    #2 0x7a1f73 in pdf_open_document_with_stream /src/mupdf/source/pdf/pdf-xref.c:2246:3
+    #3 0x49e691 in LLVMFuzzerTestOneInput /src/mupdf/source/fuzz/pdf_fuzzer.cc:31:24
+    #4 0x4e5556 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #5 0x49f9e1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #6 0x4b3c36 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #7 0x49eb21 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #8 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #9 0x41ffd8 in _start (/out/pdf_fuzzer+0x41ffd8)
+
+DEDUP_TOKEN: pdf_load_version--pdf_init_document--pdf_open_document_with_stream
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mbuf[1m[35m' in the stack frame of function '[1m[32mpdf_load_version[1m[35m'[1m[0m
+    #0 0x7ae400 in pdf_load_version /src/mupdf/source/pdf/pdf-xref.c:588
+
+DEDUP_TOKEN: pdf_load_version
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/mupdf/source/pdf/pdf-xref.c:593:6 in pdf_load_version
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42519926

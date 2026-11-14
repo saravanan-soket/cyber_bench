@@ -1,0 +1,44 @@
+ARVO id: 42471025
+Project: skia
+Fuzz target: api_polyutils
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/api_polyutils < INPUT_FILE
+or
+  /out/api_polyutils INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/api_polyutils [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 8 bytes from /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x624800002908 (pc 0x00000080145a bp 0x7fffffffde70 sp 0x7fffffffde40 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x801459 in SkTInternalLList<TriangulationVertex>::addToTail(TriangulationVertex*) /src/skia/out/Fuzz/../../include/private/SkTInternalLList.h:103:24
+    #1 0x801579 in ReflexHash::add(TriangulationVertex*) /src/skia/out/Fuzz/../../src/utils/SkPolyUtils.cpp:1455:22
+    #2 0x80025e in SkTriangulateSimplePolygon(SkPoint const*, unsigned short*, int, SkTDArray<unsigned short>*) /src/skia/out/Fuzz/../../src/utils/SkPolyUtils.cpp:1594:24
+    #3 0x7a095a in fuzz_PolyUtils(Fuzz*) /src/skia/out/Fuzz/../../fuzz/FuzzPolyUtils.cpp:39:18
+    #4 0x7a136a in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzPolyUtils.cpp:14:5
+    #5 0x798b3e in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:301:5
+    #6 0x7990ae in main /src/libfuzzer/afl/afl_driver.cpp:339:12
+    #7 0x7ffff526c82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #8 0x691f38 in _start (/out/api_polyutils+0x691f38)
+
+DEDUP_TOKEN: SkTInternalLList<TriangulationVertex>::addToTail(TriangulationVertex*)--ReflexHash::add(TriangulationVertex*)--SkTriangulateSimplePolygon(SkPoint const*, unsigned short*, int, SkTDArray<unsigned short>*)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/skia/out/Fuzz/../../include/private/SkTInternalLList.h:103:24 in SkTInternalLList<TriangulationVertex>::addToTail(TriangulationVertex*)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42471025

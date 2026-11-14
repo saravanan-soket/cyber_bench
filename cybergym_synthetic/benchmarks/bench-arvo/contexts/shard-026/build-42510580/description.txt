@@ -1,0 +1,93 @@
+ARVO id: 42510580
+Project: perfetto
+Fuzz target: unwinding_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Stack-buffer-overflow READ {*}
+Language: c++
+Repo: https://android.googlesource.com/platform/external/perfetto/
+
+=== Crash report ===
+INFO: Seed: 1238262718
+INFO: Loaded 1 modules   (49922 inline 8-bit counters): 49922 [0x555555f69738, 0x555555f75a3a), 
+INFO: Loaded 1 PC tables (49922 PCs): 49922 [0x555555f75a40,0x555556038a60), 
+/out/unwinding_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffff7f6f85f at pc 0x555555765497 bp 0x7fffffffd670 sp 0x7fffffffce38
+[1m[0m[1m[34mREAD of size 24 at 0x7ffff7f6f85f thread T0[1m[0m
+SCARINESS: 41 (multi-byte-read-stack-buffer-overflow)
+    #0 0x555555765496 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #1 0x555555a6ab4d in void unwindstack::Symbols::BuildRemapTable<Elf64_Sym>(unwindstack::Memory*) /work/build/../../src/perfetto/buildtools/android-core/libunwindstack/Symbols.cpp:108:7
+    #2 0x555555a69e47 in bool unwindstack::Symbols::GetName<Elf64_Sym>(unsigned long, unwindstack::Memory*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*, unsigned long*) /work/build/../../src/perfetto/buildtools/android-core/libunwindstack/Symbols.cpp:132:7
+    #3 0x555555a21f57 in bool unwindstack::ElfInterface::GetFunctionNameWithTemplate<Elf64_Sym>(unsigned long, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*, unsigned long*) /work/build/../../src/perfetto/buildtools/android-core/libunwindstack/ElfInterface.cpp:481:17
+    #4 0x555555a14480 in unwindstack::ElfInterface64::GetFunctionName(unsigned long, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*, unsigned long*) /work/build/../../src/perfetto/buildtools/android-core/libunwindstack/include/unwindstack/ElfInterface.h:228:26
+    #5 0x555555a0f3e0 in unwindstack::Elf::GetFunctionName(unsigned long, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*, unsigned long*) /work/build/../../src/perfetto/buildtools/android-core/libunwindstack/Elf.cpp:110:33
+    #6 0x555555a79a03 in unwindstack::Unwinder::Unwind(std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > const*, std::__1::vector<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, std::__1::allocator<std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > > > const*) /work/build/../../src/perfetto/buildtools/android-core/libunwindstack/Unwinder.cpp:264:17
+    #7 0x5555558e092b in perfetto::profiling::DoUnwind(perfetto::profiling::WireMessage*, perfetto::profiling::UnwindingMetadata*, perfetto::profiling::AllocRecord*) /work/build/../../src/perfetto/src/profiling/memory/unwinding.cc:169:14
+    #8 0x5555558e3a53 in perfetto::profiling::UnwindingWorker::HandleBuffer(perfetto::profiling::SharedRingBuffer::Buffer const&, perfetto::profiling::UnwindingWorker::ClientData*, int, perfetto::profiling::UnwindingWorker::Delegate*) /work/build/../../src/perfetto/src/profiling/memory/unwinding.cc:301:5
+    #9 0x55555583acc0 in perfetto::profiling::(anonymous namespace)::FuzzUnwinding(unsigned char const*, unsigned long) /work/build/../../src/perfetto/src/profiling/memory/unwinding_fuzzer.cc:52:3
+    #10 0x55555583a9a0 in LLVMFuzzerTestOneInput /work/build/../../src/perfetto/src/profiling/memory/unwinding_fuzzer.cc:63:10
+    #11 0x5555557dc8a6 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:559:15
+    #12 0x555555791c93 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:301:6
+    #13 0x55555579f7c3 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:801:9
+    #14 0x555555791307 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #15 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #16 0x5555556f1c08 in _start (/out/unwinding_fuzzer+0x19dc08)
+
+DEDUP_TOKEN: __asan_memcpy--void unwindstack::Symbols::BuildRemapTable<Elf64_Sym>(unwindstack::Memory*)--bool unwindstack::Symbols::GetName<Elf64_Sym>(unsigned long, unwindstack::Memory*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*, unsigned long*)
+[1m[32mAddress 0x7ffff7f6f85f is located in stack of thread T0 at offset 95 in frame[1m[0m
+[1m[0m    #0 0x555555a6a6ff in void unwindstack::Symbols::BuildRemapTable<Elf64_Sym>(unwindstack::Memory*) /work/build/../../src/perfetto/buildtools/android-core/libunwindstack/Symbols.cpp:92
+
+DEDUP_TOKEN: void unwindstack::Symbols::BuildRemapTable<Elf64_Sym>(unwindstack::Memory*)
+  This frame has 10 object(s):
+    [32, 56) 'addrs' (line 93)
+    [96, 1120) 'buffer' (line 100)[1m[32m <== Memory access at offset 95 partially underflows this variable[1m[0m
+    [1248, 1256) 'ref.tmp' (line 101)
+    [1280, 1288) 'ref.tmp6' (line 101)
+    [1312, 1336) 'sym' (line 107)
+    [1376, 1380) 'ref.tmp22' (line 111)
+    [1392, 1400) 'agg.tmp44'
+    [1424, 1432) 'ref.tmp45' (line 120)
+    [1456, 1464) 'agg.tmp62'
+    [1488, 1496) 'ref.tmp63' (line 120)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x10007efe5eb0: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m
+  0x10007efe5ec0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe5ed0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe5ee0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe5ef0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x10007efe5f00: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m[[1m[31mf2[1m[0m][1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe5f10: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe5f20: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe5f30: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe5f40: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efe5f50: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42510580

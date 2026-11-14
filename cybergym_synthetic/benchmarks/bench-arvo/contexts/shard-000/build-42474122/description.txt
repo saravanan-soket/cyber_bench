@@ -1,0 +1,41 @@
+ARVO id: 42474122
+Project: perfetto
+Fuzz target: trace_processor_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://android.googlesource.com/platform/external/perfetto/
+
+=== Crash report ===
+INFO: Seed: 3911438489
+INFO: Loaded 1 modules   (115152 inline 8-bit counters): 115152 [0x1308e20, 0x1324ff0), 
+INFO: Loaded 1 PC tables (115152 PCs): 115152 [0x1324ff0,0x14e6cf0), 
+/out/trace_processor_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==8==ERROR: AddressSanitizer: SEGV on unknown address 0x631000042b18 (pc 0x0000006bf794 bp 0x7fffffffdd10 sp 0x7fffffffdc40 T0)
+[1m[0m==8==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x6bf793 in perfetto::trace_processor::ProtoTraceParser::ParseTypedFtraceToRaw(unsigned int, long, unsigned int, unsigned int, perfetto::trace_processor::TraceBlobView) /work/build/../../src/perfetto/src/trace_processor/proto_trace_parser.cc:1284:24
+    #1 0x6be5f1 in perfetto::trace_processor::ProtoTraceParser::ParseFtracePacket(unsigned int, long, perfetto::trace_processor::TraceBlobView) /work/build/../../src/perfetto/src/trace_processor/proto_trace_parser.cc:678:7
+    #2 0x76f98c in perfetto::trace_processor::TraceSorter::SortAndExtractEventsBeyondWindow(long) /work/build/../../src/perfetto/src/trace_processor/trace_sorter.cc:138:21
+    #3 0x764c42 in perfetto::trace_processor::TraceProcessorImpl::NotifyEndOfFile() /work/build/../../src/perfetto/src/trace_processor/trace_processor_impl.cc:209:20
+    #4 0x5aeb3f in perfetto::trace_processor::FuzzTraceProcessor(unsigned char const*, unsigned long) /work/build/../../src/perfetto/src/trace_processor/trace_parsing_fuzzer.cc:34:14
+    #5 0x5af010 in LLVMFuzzerTestOneInput /work/build/../../src/perfetto/src/trace_processor/trace_parsing_fuzzer.cc:43:3
+    #6 0x564486 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:529:15
+    #7 0x525406 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:286:6
+    #8 0x530f33 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:715:9
+    #9 0x524a7c in main /src/libfuzzer/FuzzerMain.cpp:19:10
+    #10 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #11 0x420518 in _start (/out/trace_processor_fuzzer+0x420518)
+
+DEDUP_TOKEN: perfetto::trace_processor::ProtoTraceParser::ParseTypedFtraceToRaw(unsigned int, long, unsigned int, unsigned int, perfetto::trace_processor::TraceBlobView)--perfetto::trace_processor::ProtoTraceParser::ParseFtracePacket(unsigned int, long, perfetto::trace_processor::TraceBlobView)--perfetto::trace_processor::TraceSorter::SortAndExtractEventsBeyondWindow(long)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /work/build/../../src/perfetto/src/trace_processor/proto_trace_parser.cc:1284:24 in perfetto::trace_processor::ProtoTraceParser::ParseTypedFtraceToRaw(unsigned int, long, unsigned int, unsigned int, perfetto::trace_processor::TraceBlobView)
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42474122

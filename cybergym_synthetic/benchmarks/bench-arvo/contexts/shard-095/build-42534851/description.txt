@@ -1,0 +1,61 @@
+ARVO id: 42534851
+Project: ninja
+Fuzz target: fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/ninja-build/ninja
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3070314277
+INFO: Loaded 1 modules   (5957 inline 8-bit counters): 5957 [0x5644ae126518, 0x5644ae127c5d), 
+INFO: Loaded 1 PC tables (5957 PCs): 5957 [0x5644ae127c60,0x5644ae13f0b0), 
+/out/fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x5644adfadbdd in size /usr/local/bin/../include/c++/v1/string:1168:17
+    #1 0x5644adfadbdd in operator+<char, std::__1::char_traits<char>, std::__1::allocator<char> > /usr/local/bin/../include/c++/v1/string:4165:50
+    #2 0x5644adfadbdd in Lexer::Error(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*) /src/ninja/src/lexer.cc:40:19
+    #3 0x5644adfa7218 in ManifestParser::ParseRule(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*) /src/ninja/src/manifest_parser.cc:159:21
+    #4 0x5644adf9ee90 in ManifestParser::Parse(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*) /src/ninja/src/manifest_parser.cc:53:12
+    #5 0x5644adf9d787 in Parser::Load(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*, Lexer*) /src/ninja/src/parser.cc:37:10
+    #6 0x5644adf79b0a in LLVMFuzzerTestOneInput /src/ninja/misc/manifest_fuzzer.cc:37:9
+    #7 0x5644ade765d0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #8 0x5644ade60d64 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #9 0x5644ade667fa in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #10 0x5644ade92bf2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7f3a35f78082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 87b331c034a6458c64ce09c03939e947212e18ce)
+    #12 0x5644ade5783d in _start (/out/fuzzer+0x7783d)
+
+DEDUP_TOKEN: size--operator+<char, std::__1::char_traits<char>, std::__1::allocator<char> >--Lexer::Error(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x5644adf18dda in __msan_memcpy /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1733:3
+    #1 0x5644adfa71f3 in basic_string /usr/local/bin/../include/c++/v1/string:919:9
+    #2 0x5644adfa71f3 in operator+<char, std::__1::char_traits<char>, std::__1::allocator<char> > /usr/local/bin/../include/c++/v1/string:4242:12
+    #3 0x5644adfa71f3 in ManifestParser::ParseRule(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*) /src/ninja/src/manifest_parser.cc:159:57
+    #4 0x5644adf9ee90 in ManifestParser::Parse(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*) /src/ninja/src/manifest_parser.cc:53:12
+    #5 0x5644adf9d787 in Parser::Load(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*, Lexer*) /src/ninja/src/parser.cc:37:10
+    #6 0x5644adf79b0a in LLVMFuzzerTestOneInput /src/ninja/misc/manifest_fuzzer.cc:37:9
+    #7 0x5644ade765d0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #8 0x5644ade60d64 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #9 0x5644ade667fa in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #10 0x5644ade92bf2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7f3a35f78082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 87b331c034a6458c64ce09c03939e947212e18ce)
+
+DEDUP_TOKEN: __msan_memcpy--basic_string--operator+<char, std::__1::char_traits<char>, std::__1::allocator<char> >
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mref.tmp50[1m[35m' in the stack frame[1m[0m
+    #0 0x5644adfa71a9 in ManifestParser::ParseRule(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*) /src/ninja/src/manifest_parser.cc:159:27
+
+DEDUP_TOKEN: ManifestParser::ParseRule(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>*)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /usr/local/bin/../include/c++/v1/string:1168:17 in size
+Unique heap origins: 46
+Stack depot allocated bytes: 9764880
+Unique origin histories: 14
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42534851

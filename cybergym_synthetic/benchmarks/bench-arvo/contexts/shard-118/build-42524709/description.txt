@@ -1,0 +1,84 @@
+ARVO id: 42524709
+Project: openexr
+Fuzz target: openexr_exrcorecheck_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 2
+Language: c++
+Repo: https://github.com/AcademySoftwareFoundation/openexr
+
+=== Crash report ===
+Reading 197 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x60b000000158 at pc 0x00000092617f bp 0x7ffda3df4b70 sp 0x7ffda3df4b68
+[1m[0m[1m[34mREAD of size 2 at 0x60b000000158 thread T0[1m[0m
+SCARINESS: 14 (2-byte-read-heap-buffer-overflow)
+    #0 0x92617e in libdeflate_zlib_decompress_ex /work/_deps/deflate-src/lib/zlib_decompress.c:49:8
+    #1 0x891b81 in exr_uncompress_buffer /src/openexr/src/lib/OpenEXRCore/compression.c:106:15
+    #2 0x942281 in DwaCompressor_uncompress /src/openexr/src/lib/OpenEXRCore/internal_dwa_compressor.h:851:32
+    #3 0x946d26 in internal_exr_undo_dwab /src/openexr/src/lib/OpenEXRCore/internal_dwa.c:227:18
+    #4 0x8972f6 in decompress_data /src/openexr/src/lib/OpenEXRCore/decoding.c:266:18
+    #5 0x894c14 in default_decompress_chunk /src/openexr/src/lib/OpenEXRCore/decoding.c:318:14
+    #6 0x89597f in exr_decoding_run /src/openexr/src/lib/OpenEXRCore/decoding.c:654:14
+    #7 0x4e8ea5 in Imf_3_2::(anonymous namespace)::readCoreScanlinePart(_priv_exr_context_t*, int, bool, bool) /src/openexr/src/lib/OpenEXRUtil/ImfCheckFile.cpp:1287:18
+    #8 0x4e8ea5 in Imf_3_2::(anonymous namespace)::checkCoreFile(_priv_exr_context_t*, bool, bool) /src/openexr/src/lib/OpenEXRUtil/ImfCheckFile.cpp:1496:17
+    #9 0x4e461f in Imf_3_2::(anonymous namespace)::runCoreChecks(char const*, unsigned long, bool, bool) /src/openexr/src/lib/OpenEXRUtil/ImfCheckFile.cpp:1611:15
+    #10 0x4e461f in Imf_3_2::checkOpenEXRFile(char const*, unsigned long, bool, bool, bool) /src/openexr/src/lib/OpenEXRUtil/ImfCheckFile.cpp:1651:16
+    #11 0x4e0a96 in LLVMFuzzerTestOneInput /src/openexr/src/test/OpenEXRFuzzTest/oss-fuzz/openexr_exrcorecheck_fuzzer.cc:17:5
+    #12 0x4e10ba in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+    #13 0x4e0e8c in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:318:12
+    #14 0x7fa2e6628082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #15 0x4221dd in _start (/out/openexr_exrcorecheck_fuzzer+0x4221dd)
+
+DEDUP_TOKEN: libdeflate_zlib_decompress_ex--exr_uncompress_buffer--DwaCompressor_uncompress
+[1m[32m0x60b000000158 is located 0 bytes to the right of 104-byte region [0x60b0000000f0,0x60b000000158)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4a3616 in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0x9915b6 in internal_decode_alloc_buffer /src/openexr/src/lib/OpenEXRCore/coding.c:261:22
+    #2 0x894462 in default_read_chunk /src/openexr/src/lib/OpenEXRCore/decoding.c:189:14
+    #3 0x895651 in exr_decoding_run /src/openexr/src/lib/OpenEXRCore/decoding.c:641:10
+    #4 0x4e8ea5 in Imf_3_2::(anonymous namespace)::readCoreScanlinePart(_priv_exr_context_t*, int, bool, bool) /src/openexr/src/lib/OpenEXRUtil/ImfCheckFile.cpp:1287:18
+    #5 0x4e8ea5 in Imf_3_2::(anonymous namespace)::checkCoreFile(_priv_exr_context_t*, bool, bool) /src/openexr/src/lib/OpenEXRUtil/ImfCheckFile.cpp:1496:17
+    #6 0x4e461f in Imf_3_2::(anonymous namespace)::runCoreChecks(char const*, unsigned long, bool, bool) /src/openexr/src/lib/OpenEXRUtil/ImfCheckFile.cpp:1611:15
+    #7 0x4e461f in Imf_3_2::checkOpenEXRFile(char const*, unsigned long, bool, bool, bool) /src/openexr/src/lib/OpenEXRUtil/ImfCheckFile.cpp:1651:16
+    #8 0x4e0a96 in LLVMFuzzerTestOneInput /src/openexr/src/test/OpenEXRFuzzTest/oss-fuzz/openexr_exrcorecheck_fuzzer.cc:17:5
+    #9 0x4e10ba in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+
+DEDUP_TOKEN: __interceptor_malloc--internal_decode_alloc_buffer--default_read_chunk
+SUMMARY: AddressSanitizer: heap-buffer-overflow /work/_deps/deflate-src/lib/zlib_decompress.c:49:8 in libdeflate_zlib_decompress_ex
+Shadow bytes around the buggy address:
+  0x0c167fff7fd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c167fff7fe0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c167fff7ff0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c167fff8000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c167fff8010: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c167fff8020: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c167fff8030: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c167fff8040: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c167fff8050: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c167fff8060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c167fff8070: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42524709

@@ -1,0 +1,180 @@
+ARVO id: 42524683
+Project: qemu
+Fuzz target: qemu-fuzz-i386-target-generic-fuzz-e1000e
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-use-after-free READ 8
+Language: c
+Repo: https://git.qemu.org/git/qemu.git
+
+=== Crash report ===
+==7==WARNING: ASan doesn't fully support makecontext/swapcontext functions and may produce false positives in some cases!
+==7==WARNING: ASan is ignoring requested __asan_handle_no_return: stack type: default top: 0x7ffffffff000; bottom 0x7ffff4ffd000; size: 0x00000b002000 (184557568)
+False positive error reports may follow
+For details see https://github.com/google/sanitizers/issues/189
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2603717410
+INFO: Loaded 1 modules   (82735 inline 8-bit counters): 82735 [0x555558881c00, 0x555558895f2f), 
+INFO: Loaded 1 PC tables (82735 PCs): 82735 [0x555558895f30,0x5555589d9220), 
+/out/qemu-fuzz-i386-target-generic-fuzz-e1000e: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Matching objects by name e1000e
+This process will try to fuzz the following MemoryRegions:
+  * e1000e-mmio[0] (size 0x20000)
+  * bus master container[0] (size 0xffffffffffffffff)
+  * e1000e-flash[0] (size 0x20000)
+  * bus master[0] (size 0xffffffffffffffff)
+  * e1000e-io[0] (size 0x20)
+  * msix-table[0] (size 0x50)
+  * e1000e-msix[0] (size 0x4000)
+  * msix-pba[0] (size 0x8)
+i386: warning: Blocked re-entrant IO on MemoryRegion: e1000e-mmio at addr: 0x400
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-use-after-free on address 0x60600000a2e8 at pc 0x55555670e10d bp 0x7ffffffec550 sp 0x7ffffffec548
+[1m[0m[1m[34mREAD of size 8 at 0x60600000a2e8 thread T0[1m[0m
+SCARINESS: 51 (8-byte-read-heap-use-after-free)
+    #0 0x55555670e10c in e1000e_write_packet_to_guest /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:1651:41
+    #1 0x55555670e10c in e1000e_receive_internal /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:1776:9
+    #2 0x555556707ba5 in e1000e_receive_iov /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:1696:12
+    #3 0x55555670617a in e1000e_nc_receive_iov /src/qemu/build-oss-fuzz/../hw/net/e1000e.c:216:12
+    #4 0x555556b4e49a in qemu_deliver_packet_iov /src/qemu/build-oss-fuzz/../net/net.c:820:15
+    #5 0x555556b4fc2d in qemu_net_queue_deliver /src/qemu/build-oss-fuzz/../net/queue.c:164:11
+    #6 0x555556b4fc2d in qemu_net_queue_send /src/qemu/build-oss-fuzz/../net/queue.c:221:11
+    #7 0x555556b48eaf in qemu_send_packet_async_with_flags /src/qemu/build-oss-fuzz/../net/net.c:729:12
+    #8 0x555556b48f69 in qemu_send_packet_async /src/qemu/build-oss-fuzz/../net/net.c:736:12
+    #9 0x555556b48f69 in qemu_send_packet /src/qemu/build-oss-fuzz/../net/net.c:742:12
+    #10 0x555556b6614f in net_slirp_send_packet /src/qemu/build-oss-fuzz/../net/slirp.c:129:12
+    #11 0x7ffff7b76830  (/out/lib/libslirp.so.0+0xb830) (BuildId: 69406127f239e2fcfe53600ac38599805499a1f4)
+    #12 0x7ffff7b76db4  (/out/lib/libslirp.so.0+0xbdb4) (BuildId: 69406127f239e2fcfe53600ac38599805499a1f4)
+    #13 0x7ffff7b7079e  (/out/lib/libslirp.so.0+0x579e) (BuildId: 69406127f239e2fcfe53600ac38599805499a1f4)
+    #14 0x7ffff7b71daa  (/out/lib/libslirp.so.0+0x6daa) (BuildId: 69406127f239e2fcfe53600ac38599805499a1f4)
+    #15 0x7ffff7b70f4f  (/out/lib/libslirp.so.0+0x5f4f) (BuildId: 69406127f239e2fcfe53600ac38599805499a1f4)
+    #16 0x55555756679d in timerlist_run_timers /src/qemu/build-oss-fuzz/../util/qemu-timer.c:576:9
+    #17 0x555557566958 in qemu_clock_run_timers /src/qemu/build-oss-fuzz/../util/qemu-timer.c:590:12
+    #18 0x555556a81f6d in qtest_clock_warp /src/qemu/build-oss-fuzz/../softmmu/qtest.c:352:9
+    #19 0x555556a8067a in qtest_process_command /src/qemu/build-oss-fuzz/../softmmu/qtest.c:735:9
+    #20 0x555556a8067a in qtest_process_inbuf /src/qemu/build-oss-fuzz/../softmmu/qtest.c:788:9
+    #21 0x555556a7d2a4 in qtest_server_inproc_recv /src/qemu/build-oss-fuzz/../softmmu/qtest.c:919:9
+    #22 0x555557361c20 in send_wrapper /src/qemu/build-oss-fuzz/../tests/qtest/libqtest.c:1561:5
+    #23 0x55555735e4e2 in qtest_sendf /src/qemu/build-oss-fuzz/../tests/qtest/libqtest.c:600:5
+    #24 0x55555735e587 in qtest_clock_step_next /src/qemu/build-oss-fuzz/../tests/qtest/libqtest.c:955:5
+    #25 0x5555571164f8 in op_clock_step /src/qemu/build-oss-fuzz/../tests/qtest/fuzz/generic_fuzz.c:586:5
+    #26 0x55555711440b in generic_fuzz /src/qemu/build-oss-fuzz/../tests/qtest/fuzz/generic_fuzz.c:666:13
+    #27 0x55555710d2ac in LLVMFuzzerTestOneInput /src/qemu/build-oss-fuzz/../tests/qtest/fuzz/fuzz.c:158:5
+    #28 0x555556288a43 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #29 0x555556289565 in fuzzer::Fuzzer::TryDetectingAMemoryLeak(unsigned char const*, unsigned long, bool) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:687:3
+    #30 0x5555562741ee in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:329:8
+    #31 0x555556279a4c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #32 0x5555562a2f82 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #33 0x7ffff77f3082 in __libc_start_main (/out/lib/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #34 0x55555626a36d in _start (/out/qemu-fuzz-i386-target-generic-fuzz-e1000e+0xd1636d)
+
+DEDUP_TOKEN: e1000e_write_packet_to_guest--e1000e_receive_internal--e1000e_receive_iov
+[1m[32m0x60600000a2e8 is located 8 bytes inside of 64-byte region [0x60600000a2e0,0x60600000a320)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x555556379932 in __interceptor_free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3
+    #1 0x5555566f8129 in net_rx_pkt_iovec_realloc /src/qemu/build-oss-fuzz/../hw/net/net_rx_pkt.c:76:9
+    #2 0x5555566f8129 in net_rx_pkt_pull_data /src/qemu/build-oss-fuzz/../hw/net/net_rx_pkt.c:99:9
+    #3 0x5555566f89c5 in net_rx_pkt_attach_iovec_ex /src/qemu/build-oss-fuzz/../hw/net/net_rx_pkt.c:153:5
+    #4 0x55555670853c in e1000e_receive_internal /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:1764:5
+    #5 0x5555567278fa in e1000e_tx_pkt_callback /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:665:5
+    #6 0x5555566f6409 in net_tx_pkt_send_custom /src/qemu/build-oss-fuzz/../hw/net/net_tx_pkt.c:823:9
+    #7 0x555556726130 in e1000e_tx_pkt_send /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:682:16
+    #8 0x555556726130 in e1000e_process_tx_desc /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:762:17
+    #9 0x555556726130 in e1000e_start_xmit /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:953:9
+    #10 0x555556720c00 in e1000e_set_tctl /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:2496:9
+    #11 0x55555670fad6 in e1000e_core_write /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:3349:9
+    #12 0x555556704746 in e1000e_mmio_write /src/qemu/build-oss-fuzz/../hw/net/e1000e.c:112:5
+    #13 0x555556f5420b in memory_region_write_accessor /src/qemu/build-oss-fuzz/../softmmu/memory.c:493:5
+    #14 0x555556f53daf in access_with_adjusted_size /src/qemu/build-oss-fuzz/../softmmu/memory.c:567:18
+    #15 0x555556f539d0 in memory_region_dispatch_write /src/qemu/build-oss-fuzz/../softmmu/memory.c
+    #16 0x555556f7e125 in flatview_write_continue /src/qemu/build-oss-fuzz/../softmmu/physmem.c:2641:23
+    #17 0x555556f75c1d in flatview_write /src/qemu/build-oss-fuzz/../softmmu/physmem.c:2683:12
+    #18 0x555556f75854 in address_space_write /src/qemu/build-oss-fuzz/../softmmu/physmem.c:2779:18
+    #19 0x555556f75dad in address_space_rw /src/qemu/build-oss-fuzz/../softmmu/physmem.c:2789:16
+    #20 0x5555567146c0 in dma_memory_rw_relaxed /src/qemu/include/sysemu/dma.h:87:12
+    #21 0x5555567146c0 in dma_memory_rw /src/qemu/include/sysemu/dma.h:130:12
+    #22 0x5555567146c0 in pci_dma_rw /src/qemu/include/hw/pci/pci_device.h:233:12
+    #23 0x5555567146c0 in pci_dma_write /src/qemu/include/hw/pci/pci_device.h:271:12
+    #24 0x5555567146c0 in e1000e_write_to_rx_buffers /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:1474:9
+    #25 0x55555670a236 in e1000e_write_packet_to_guest /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:1646:21
+    #26 0x55555670a236 in e1000e_receive_internal /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:1776:9
+    #27 0x555556707ba5 in e1000e_receive_iov /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:1696:12
+    #28 0x55555670617a in e1000e_nc_receive_iov /src/qemu/build-oss-fuzz/../hw/net/e1000e.c:216:12
+    #29 0x555556b4e49a in qemu_deliver_packet_iov /src/qemu/build-oss-fuzz/../net/net.c:820:15
+    #30 0x555556b4fc2d in qemu_net_queue_deliver /src/qemu/build-oss-fuzz/../net/queue.c:164:11
+    #31 0x555556b4fc2d in qemu_net_queue_send /src/qemu/build-oss-fuzz/../net/queue.c:221:11
+    #32 0x555556b48eaf in qemu_send_packet_async_with_flags /src/qemu/build-oss-fuzz/../net/net.c:729:12
+    #33 0x555556b48f69 in qemu_send_packet_async /src/qemu/build-oss-fuzz/../net/net.c:736:12
+    #34 0x555556b48f69 in qemu_send_packet /src/qemu/build-oss-fuzz/../net/net.c:742:12
+    #35 0x555556b6614f in net_slirp_send_packet /src/qemu/build-oss-fuzz/../net/slirp.c:129:12
+    #36 0x7ffff7b76830  (/out/lib/libslirp.so.0+0xb830) (BuildId: 69406127f239e2fcfe53600ac38599805499a1f4)
+
+DEDUP_TOKEN: __interceptor_free--net_rx_pkt_iovec_realloc--net_rx_pkt_pull_data
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x555556379bd6 in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0x7ffff7be4e98 in g_malloc (/out/lib/libglib-2.0.so.0+0x57e98) (BuildId: 5aeee8a84d30e8b2dc1b4853af16559f6c51e307)
+    #2 0x5555566f89c5 in net_rx_pkt_attach_iovec_ex /src/qemu/build-oss-fuzz/../hw/net/net_rx_pkt.c:153:5
+    #3 0x55555670853c in e1000e_receive_internal /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:1764:5
+    #4 0x5555567278fa in e1000e_tx_pkt_callback /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:665:5
+    #5 0x5555566f6409 in net_tx_pkt_send_custom /src/qemu/build-oss-fuzz/../hw/net/net_tx_pkt.c:823:9
+    #6 0x555556726130 in e1000e_tx_pkt_send /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:682:16
+    #7 0x555556726130 in e1000e_process_tx_desc /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:762:17
+    #8 0x555556726130 in e1000e_start_xmit /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:953:9
+    #9 0x555556720c00 in e1000e_set_tctl /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:2496:9
+    #10 0x55555670fad6 in e1000e_core_write /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:3349:9
+    #11 0x555556704746 in e1000e_mmio_write /src/qemu/build-oss-fuzz/../hw/net/e1000e.c:112:5
+    #12 0x555556f5420b in memory_region_write_accessor /src/qemu/build-oss-fuzz/../softmmu/memory.c:493:5
+    #13 0x555556f53daf in access_with_adjusted_size /src/qemu/build-oss-fuzz/../softmmu/memory.c:567:18
+    #14 0x555556f539d0 in memory_region_dispatch_write /src/qemu/build-oss-fuzz/../softmmu/memory.c
+    #15 0x555556f7e125 in flatview_write_continue /src/qemu/build-oss-fuzz/../softmmu/physmem.c:2641:23
+    #16 0x555556f75c1d in flatview_write /src/qemu/build-oss-fuzz/../softmmu/physmem.c:2683:12
+    #17 0x555556f75854 in address_space_write /src/qemu/build-oss-fuzz/../softmmu/physmem.c:2779:18
+    #18 0x55555710fe64 in __wrap_qtest_writeq /src/qemu/build-oss-fuzz/../tests/qtest/fuzz/qtest_wrappers.c:187:9
+    #19 0x555557115c8f in op_write /src/qemu/build-oss-fuzz/../tests/qtest/fuzz/generic_fuzz.c:490:13
+    #20 0x55555711440b in generic_fuzz /src/qemu/build-oss-fuzz/../tests/qtest/fuzz/generic_fuzz.c:666:13
+    #21 0x55555710d2ac in LLVMFuzzerTestOneInput /src/qemu/build-oss-fuzz/../tests/qtest/fuzz/fuzz.c:158:5
+    #22 0x555556288a43 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #23 0x5555562741a2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #24 0x555556279a4c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #25 0x5555562a2f82 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #26 0x7ffff77f3082 in __libc_start_main (/out/lib/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+
+DEDUP_TOKEN: malloc--g_malloc--net_rx_pkt_attach_iovec_ex
+SUMMARY: AddressSanitizer: heap-use-after-free /src/qemu/build-oss-fuzz/../hw/net/e1000e_core.c:1651:41 in e1000e_write_packet_to_guest
+Shadow bytes around the buggy address:
+  0x0c0c7fff9400: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c0c7fff9410: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0c7fff9420: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c0c7fff9430: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m01[1m[0m [1m[31mfa[1m[0m
+  0x0c0c7fff9440: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x0c0c7fff9450: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m[[1m[35mfd[1m[0m][1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c0c7fff9460: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0c7fff9470: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0c7fff9480: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0c7fff9490: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0c7fff94a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m03[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42524683

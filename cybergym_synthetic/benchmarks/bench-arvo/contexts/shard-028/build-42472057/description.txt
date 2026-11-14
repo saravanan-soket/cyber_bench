@@ -1,0 +1,96 @@
+ARVO id: 42472057
+Project: skia
+Fuzz target: api_raster_n32_canvas
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Seed: 4147762036
+INFO: Loaded 1 modules   (212968 inline 8-bit counters): 212968 [0x4846e78, 0x487ae60), 
+INFO: Loaded 1 PC tables (212968 PCs): 212968 [0x487ae60,0x4bbace0), 
+/out/api_raster_n32_canvas: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0xa54ca7 in SkTestTypeface::getPath(unsigned short, SkPath*) /src/skia/out/Fuzz_mem_constraints/../../tools/fonts/SkTestTypeface.cpp:115:15
+    #1 0xa56acd in SkTestScalerContext::generatePath(unsigned short, SkPath*) /src/skia/out/Fuzz_mem_constraints/../../tools/fonts/SkTestTypeface.cpp:219:34
+    #2 0x10c14c2 in SkScalerContext::internalGetPath(SkPackedGlyphID, SkPath*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkScalerContext.cpp:562:10
+    #3 0x10c0080 in SkScalerContext::getMetrics(SkGlyph*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkScalerContext.cpp:161:41
+    #4 0xe5c2a5 in SkGlyphCache::allocateNewGlyph(SkPackedGlyphID, SkGlyphCache::MetricsType) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkGlyphCache.cpp:170:25
+    #5 0xe5af55 in SkGlyphCache::lookupByPackedGlyphID(SkPackedGlyphID, SkGlyphCache::MetricsType) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkGlyphCache.cpp:145:23
+    #6 0xe5b7da in SkGlyphCache::getGlyphIDMetrics(unsigned short) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkGlyphCache.cpp:115:19
+    #7 0xe370f0 in SkFont::measureText(void const*, unsigned long, SkTextEncoding, SkRect*) const /src/skia/out/Fuzz_mem_constraints/../../src/core/SkFont.cpp:324:25
+    #8 0x1140e4c in SkTextBlobBuilder::TightRunBounds(SkTextBlob::RunRecord const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkTextBlob.cpp:261:14
+    #9 0x1142725 in SkTextBlobBuilder::updateDeferredBounds() /src/skia/out/Fuzz_mem_constraints/../../src/core/SkTextBlob.cpp:356:24
+    #10 0x114068f in SkTextBlobBuilder::make() /src/skia/out/Fuzz_mem_constraints/../../src/core/SkTextBlob.cpp:555:11
+    #11 0x9b4f7e in make_fuzz_textblob(Fuzz*) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1023:28
+    #12 0x9a18bf in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1564:42
+    #13 0x9a5290 in fuzz_RasterN32Canvas(Fuzz*) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1646:5
+    #14 0x9d49bf in LLVMFuzzerTestOneInput /src/skia/out/Fuzz_mem_constraints/../../fuzz/oss_fuzz/FuzzRasterN32Canvas.cpp:17:5
+    #15 0x903f1b in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #16 0x8bbec6 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #17 0x8cccea in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #18 0x8baff1 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #19 0x7ffff567182f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #20 0x847338 in _start (/out/api_raster_n32_canvas+0x847338)
+
+DEDUP_TOKEN: SkTestTypeface::getPath(unsigned short, SkPath*)--SkTestScalerContext::generatePath(unsigned short, SkPath*)--SkScalerContext::internalGetPath(SkPackedGlyphID, SkPath*)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x10c1d11 in SkScalerContext::internalGetPath(SkPackedGlyphID, SkPath*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkScalerContext.cpp
+    #1 0x10c0080 in SkScalerContext::getMetrics(SkGlyph*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkScalerContext.cpp:161:41
+    #2 0xe5c2a5 in SkGlyphCache::allocateNewGlyph(SkPackedGlyphID, SkGlyphCache::MetricsType) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkGlyphCache.cpp:170:25
+    #3 0xe5af55 in SkGlyphCache::lookupByPackedGlyphID(SkPackedGlyphID, SkGlyphCache::MetricsType) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkGlyphCache.cpp:145:23
+    #4 0xe5b7da in SkGlyphCache::getGlyphIDMetrics(unsigned short) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkGlyphCache.cpp:115:19
+    #5 0xe370f0 in SkFont::measureText(void const*, unsigned long, SkTextEncoding, SkRect*) const /src/skia/out/Fuzz_mem_constraints/../../src/core/SkFont.cpp:324:25
+    #6 0x1140e4c in SkTextBlobBuilder::TightRunBounds(SkTextBlob::RunRecord const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkTextBlob.cpp:261:14
+    #7 0x1142725 in SkTextBlobBuilder::updateDeferredBounds() /src/skia/out/Fuzz_mem_constraints/../../src/core/SkTextBlob.cpp:356:24
+    #8 0x114068f in SkTextBlobBuilder::make() /src/skia/out/Fuzz_mem_constraints/../../src/core/SkTextBlob.cpp:555:11
+    #9 0x9b4f7e in make_fuzz_textblob(Fuzz*) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1023:28
+    #10 0x9a18bf in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1564:42
+    #11 0x9a5290 in fuzz_RasterN32Canvas(Fuzz*) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1646:5
+    #12 0x9d49bf in LLVMFuzzerTestOneInput /src/skia/out/Fuzz_mem_constraints/../../fuzz/oss_fuzz/FuzzRasterN32Canvas.cpp:17:5
+    #13 0x903f1b in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #14 0x8bbec6 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #15 0x8cccea in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #16 0x8baff1 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #17 0x7ffff567182f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: SkScalerContext::internalGetPath(SkPackedGlyphID, SkPath*)--SkScalerContext::getMetrics(SkGlyph*)--SkGlyphCache::allocateNewGlyph(SkPackedGlyphID, SkGlyphCache::MetricsType)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x8783cd in __msan_memcpy.part.51 /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:1490
+    #1 0xe6586a in SkTHashTable<SkGlyph, SkPackedGlyphID, SkGlyph::HashTraits>::uncheckedSet(SkGlyph&&) /src/skia/out/Fuzz_mem_constraints/../../include/private/SkTHash.h:162:24
+    #2 0xe5c648 in SkTHashTable<SkGlyph, SkPackedGlyphID, SkGlyph::HashTraits>::set(SkGlyph) /src/skia/out/Fuzz_mem_constraints/../../include/private/SkTHash.h:67:22
+    #3 0xe5c0fc in SkGlyphCache::allocateNewGlyph(SkPackedGlyphID, SkGlyphCache::MetricsType) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkGlyphCache.cpp:161:30
+    #4 0xe5af55 in SkGlyphCache::lookupByPackedGlyphID(SkPackedGlyphID, SkGlyphCache::MetricsType) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkGlyphCache.cpp:145:23
+    #5 0xe5b7da in SkGlyphCache::getGlyphIDMetrics(unsigned short) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkGlyphCache.cpp:115:19
+    #6 0xe370f0 in SkFont::measureText(void const*, unsigned long, SkTextEncoding, SkRect*) const /src/skia/out/Fuzz_mem_constraints/../../src/core/SkFont.cpp:324:25
+    #7 0x1140e4c in SkTextBlobBuilder::TightRunBounds(SkTextBlob::RunRecord const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkTextBlob.cpp:261:14
+    #8 0x1142725 in SkTextBlobBuilder::updateDeferredBounds() /src/skia/out/Fuzz_mem_constraints/../../src/core/SkTextBlob.cpp:356:24
+    #9 0x114068f in SkTextBlobBuilder::make() /src/skia/out/Fuzz_mem_constraints/../../src/core/SkTextBlob.cpp:555:11
+    #10 0x9b4f7e in make_fuzz_textblob(Fuzz*) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1023:28
+    #11 0x9a18bf in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1564:42
+    #12 0x9a5290 in fuzz_RasterN32Canvas(Fuzz*) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1646:5
+    #13 0x9d49bf in LLVMFuzzerTestOneInput /src/skia/out/Fuzz_mem_constraints/../../fuzz/oss_fuzz/FuzzRasterN32Canvas.cpp:17:5
+    #14 0x903f1b in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #15 0x8bbec6 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #16 0x8cccea in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #17 0x8baff1 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #18 0x7ffff567182f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: __msan_memcpy.part.51--SkTHashTable<SkGlyph, SkPackedGlyphID, SkGlyph::HashTraits>::uncheckedSet(SkGlyph&&)--SkTHashTable<SkGlyph, SkPackedGlyphID, SkGlyph::HashTraits>::set(SkGlyph)
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mad[1m[35m' in the stack frame of function '[1m[32m_ZN13SkStrikeCache39FindOrCreateStrikeWithNoDeviceExclusiveERK6SkFontRK7SkPaint[1m[35m'[1m[0m
+    #0 0x1127560 in SkStrikeCache::FindOrCreateStrikeWithNoDeviceExclusive(SkFont const&, SkPaint const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkStrikeCache.cpp:214
+
+DEDUP_TOKEN: SkStrikeCache::FindOrCreateStrikeWithNoDeviceExclusive(SkFont const&, SkPaint const&)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/skia/out/Fuzz_mem_constraints/../../tools/fonts/SkTestTypeface.cpp:115:15 in SkTestTypeface::getPath(unsigned short, SkPath*)
+Unique heap origins: 240
+Stack depot allocated bytes: 34992
+Unique origin histories: 55
+History depot allocated bytes: 1320
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42472057

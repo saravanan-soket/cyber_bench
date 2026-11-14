@@ -1,0 +1,105 @@
+ARVO id: 42498551
+Project: mruby
+Fuzz target: mruby_proto_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 4
+Language: c++
+Repo: https://github.com/mruby/mruby
+
+=== Crash report ===
+INFO: found LLVMFuzzerCustomMutator (0x558a30). Disabling -len_control by default.
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2333204075
+INFO: Loaded 1 modules   (21016 inline 8-bit counters): 21016 [0xcf00f8, 0xcf5310), 
+INFO: Loaded 1 PC tables (21016 PCs): 21016 [0x962068,0x9b41e8), 
+/out/mruby_proto_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6030000266e0 at pc 0x0000007432f6 bp 0x7fffffffcdf0 sp 0x7fffffffcde8
+[1m[0m[1m[34mREAD of size 4 at 0x6030000266e0 thread T0[1m[0m
+SCARINESS: 27 (4-byte-read-heap-buffer-overflow-far-from-bounds)
+    #0 0x7432f5 in mrb_vm_exec /src/mruby/src/vm.c:1141:23
+    #1 0x7243d1 in mrb_vm_run /src/mruby/src/vm.c:1040:12
+    #2 0x722373 in mrb_top_run /src/mruby/src/vm.c
+    #3 0x6dcd43 in mrb_load_exec /src/mruby/mrbgems/mruby-compiler/core/parse.y:6868:7
+    #4 0x6dd6dd in mrb_load_nstring_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6939:10
+    #5 0x6dd763 in mrb_load_string_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6951:10
+    #6 0x6dd792 in mrb_load_string /src/mruby/mrbgems/mruby-compiler/core/parse.y:6957:10
+    #7 0x558733 in FuzzRB(unsigned char const*, unsigned long) /src/mruby/oss-fuzz/mruby_proto_fuzzer.cpp:33:6
+    #8 0x55919c in TestOneProtoInput(ruby_fuzzer::Function const&) /src/mruby/oss-fuzz/mruby_proto_fuzzer.cpp:43:8
+    #9 0x558f48 in LLVMFuzzerTestOneInput /src/mruby/oss-fuzz/mruby_proto_fuzzer.cpp:40:1
+    #10 0x45a4d3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #11 0x445a42 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #12 0x44b77e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #13 0x475382 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #14 0x7ffff6ccb83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #15 0x420a58 in _start (/out/mruby_proto_fuzzer+0x420a58)
+
+DEDUP_TOKEN: mrb_vm_exec--mrb_vm_run--mrb_top_run
+[1m[32m0x6030000266e0 is located 984 bytes to the right of 24-byte region [0x6030000262f0,0x603000026308)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x524b13 in realloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:164:3
+    #1 0x6afe15 in mrb_default_allocf /src/mruby/src/state.c:68:12
+    #2 0x7139d3 in mrb_realloc_simple /src/mruby/src/gc.c:229:8
+    #3 0x713e02 in mrb_realloc /src/mruby/src/gc.c:243:8
+    #4 0x713ed5 in mrb_malloc /src/mruby/src/gc.c:259:10
+    #5 0x6bc957 in iv_new /src/mruby/src/variable.c:33:16
+    #6 0x6bc6e4 in mrb_obj_iv_set_force /src/mruby/src/variable.c:335:15
+    #7 0x6bce3a in mrb_obj_iv_set /src/mruby/src/variable.c:345:3
+    #8 0x6bd27a in mrb_iv_set /src/mruby/src/variable.c:392:5
+    #9 0x72baf8 in mrb_vm_exec /src/mruby/src/vm.c:1260:7
+    #10 0x7243d1 in mrb_vm_run /src/mruby/src/vm.c:1040:12
+    #11 0x722373 in mrb_top_run /src/mruby/src/vm.c
+    #12 0x6dcd43 in mrb_load_exec /src/mruby/mrbgems/mruby-compiler/core/parse.y:6868:7
+    #13 0x6dd6dd in mrb_load_nstring_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6939:10
+    #14 0x6dd763 in mrb_load_string_cxt /src/mruby/mrbgems/mruby-compiler/core/parse.y:6951:10
+    #15 0x6dd792 in mrb_load_string /src/mruby/mrbgems/mruby-compiler/core/parse.y:6957:10
+    #16 0x558733 in FuzzRB(unsigned char const*, unsigned long) /src/mruby/oss-fuzz/mruby_proto_fuzzer.cpp:33:6
+    #17 0x55919c in TestOneProtoInput(ruby_fuzzer::Function const&) /src/mruby/oss-fuzz/mruby_proto_fuzzer.cpp:43:8
+    #18 0x558f48 in LLVMFuzzerTestOneInput /src/mruby/oss-fuzz/mruby_proto_fuzzer.cpp:40:1
+    #19 0x45a4d3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #20 0x445a42 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #21 0x44b77e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #22 0x475382 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #23 0x7ffff6ccb83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: realloc--mrb_default_allocf--mrb_realloc_simple
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/mruby/src/vm.c:1141:23 in mrb_vm_exec
+Shadow bytes around the buggy address:
+  0x0c067fffcc80: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fffcc90: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fffcca0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fffccb0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fffccc0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x0c067fffccd0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fffcce0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fffccf0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fffcd00: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fffcd10: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fffcd20: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42498551

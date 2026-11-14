@@ -1,0 +1,37 @@
+ARVO id: 42522171
+Project: serenity
+Fuzz target: FuzzJPEGLoader
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Bad-cast
+Language: c++
+Repo: https://github.com/SerenityOS/serenity
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 458611946
+INFO: Loaded 1 modules   (34371 inline 8-bit counters): 34371 [0x776e08, 0x77f44b), 
+INFO: Loaded 1 PC tables (34371 PCs): 34371 [0x77f450,0x805880), 
+/out/FuzzJPEGLoader: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m/src/serenity/Meta/Lagom/../../AK/Format.h:298:30:[1m[31m runtime error: [1m[0m[1mmember call on address 0x7ffdfb360588 with insufficient space for an object of type 'AK::Array<AK::TypeErasedParameter, 0>'[1m[0m
+[1m0x7ffdfb360588:[1m[30m note: [1m[0mpointer points here[1m[0m
+ 00 00 00 00  d8 05 36 fb fd 7f 00 00  d8 05 36 fb fd 7f 00 00  00 00 00 00 00 00 00 00  40 06 36 fb
+[1m[32m              ^ [1m[0m
+    #0 0x4e6703 in Gfx::handle_color_transform(Gfx::JPEGLoadingContext const&, AK::Vector<Gfx::Macroblock, 0ul>&) /src/serenity/Userland/Libraries/LibGfx/JPEGLoader.cpp
+    #1 0x4e363d in Gfx::decode_jpeg(Gfx::JPEGLoadingContext&) /src/serenity/Userland/Libraries/LibGfx/JPEGLoader.cpp:1529:5
+    #2 0x4e309a in Gfx::JPEGImageDecoderPlugin::frame(unsigned long) /src/serenity/Userland/Libraries/LibGfx/JPEGLoader.cpp:1609:27
+    #3 0x4c1da9 in LLVMFuzzerTestOneInput /src/serenity/Meta/Lagom/Fuzzers/FuzzJPEGLoader.cpp:18:20
+    #4 0x427b83 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #5 0x4132e2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #6 0x418b8c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #7 0x4420c2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #8 0x7f423c580082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #9 0x4094ad in _start (/out/FuzzJPEGLoader+0x4094ad)
+
+DEDUP_TOKEN: Gfx::handle_color_transform(Gfx::JPEGLoadingContext const&, AK::Vector<Gfx::Macroblock, 0ul>&)--Gfx::decode_jpeg(Gfx::JPEGLoadingContext&)--Gfx::JPEGImageDecoderPlugin::frame(unsigned long)
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /src/serenity/Meta/Lagom/../../AK/Format.h:298:30 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42522171

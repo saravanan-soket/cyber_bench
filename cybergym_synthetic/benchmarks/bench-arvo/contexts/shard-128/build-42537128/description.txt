@@ -1,0 +1,45 @@
+ARVO id: 42537128
+Project: libtpms
+Fuzz target: fuzz
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/stefanberger/libtpms
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2625777277
+INFO: Loaded 1 modules   (28153 inline 8-bit counters): 28153 [0x5647bf6a0310, 0x5647bf6a7109), 
+INFO: Loaded 1 PC tables (28153 PCs): 28153 [0x5647bf6a7110,0x5647bf7150a0), 
+/out/fuzz: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x56480f65c850 (pc 0x5647bf4629b6 bp 0x7fffafdbea70 sp 0x7fffafdbea40 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x5647bf4629b6 in RuntimeCommandsCheckEnabled /src/libtpms/src/tpm2/RuntimeCommands.c:402:50
+    #1 0x5647bf4d2095 in CommandCodeToCommandIndex /src/libtpms/src/tpm2/CommandCodeAttributes.c:292:13
+    #2 0x5647bf4d13ec in CommandAuditSet /src/libtpms/src/tpm2/CommandAudit.c:129:34
+    #3 0x5647bf5570eb in TPM2_SetCommandCodeAuditStatus /src/libtpms/src/tpm2/AuditCommands.c:97:6
+    #4 0x5647bf539a9f in CommandDispatcher /src/libtpms/src/tpm2/CommandDispatcher.c
+    #5 0x5647bf535e66 in ExecuteCommand /src/libtpms/src/tpm2/ExecCommand.c:280:14
+    #6 0x5647bf51ae6d in _plat__RunCommand /src/libtpms/src/tpm2/RunCommand.c:95:5
+    #7 0x5647bf35603a in TPM2_Process /src/libtpms/src/tpm_tpm2_interface.c:224:5
+    #8 0x5647bf3425bc in LLVMFuzzerTestOneInput /src/libtpms/tests/fuzz.cc:115:11
+    #9 0x5647bf1f4d00 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #10 0x5647bf1df494 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #11 0x5647bf1e4f2a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #12 0x5647bf211322 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7eff6a07c082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #14 0x5647bf1d5f6d in _start (/out/fuzz+0x13df6d)
+
+DEDUP_TOKEN: RuntimeCommandsCheckEnabled--CommandCodeToCommandIndex--CommandAuditSet
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/libtpms/src/tpm2/RuntimeCommands.c:402:50 in RuntimeCommandsCheckEnabled
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42537128

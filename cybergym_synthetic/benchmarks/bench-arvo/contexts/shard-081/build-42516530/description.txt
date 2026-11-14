@@ -1,0 +1,107 @@
+ARVO id: 42516530
+Project: skia
+Fuzz target: api_raster_n32_canvas
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 8
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1707744160
+INFO: Loaded 1 modules   (379642 inline 8-bit counters): 379642 [0x3b951d0, 0x3bf1cca), 
+INFO: Loaded 1 PC tables (379642 PCs): 379642 [0x3bf1cd0,0x41bcc70), 
+/out/api_raster_n32_canvas: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x607000000930 at pc 0x0000008f3545 bp 0x7fffffffc3f0 sp 0x7fffffffc3e8
+[1m[0m[1m[34mREAD of size 8 at 0x607000000930 thread T0[1m[0m
+SCARINESS: 23 (8-byte-read-heap-buffer-overflow)
+    #0 0x8f3544 in Load /src/skia/out/Fuzz/../../include/private/SkVx.h:167:9
+    #1 0x8f3544 in SkRect::setBoundsCheck(SkPoint const*, int) /src/skia/out/Fuzz/../../src/core/SkRect.cpp:78:27
+    #2 0x1b42f3c in setBounds /src/skia/out/Fuzz/../../include/core/SkRect.h:893:21
+    #3 0x1b42f3c in compute_cubic_bounds /src/skia/out/Fuzz/../../src/core/SkEdgeClipper.cpp:402:7
+    #4 0x1b42f3c in SkEdgeClipper::clipCubic(SkPoint const*, SkRect const&) /src/skia/out/Fuzz/../../src/core/SkEdgeClipper.cpp:421:27
+    #5 0x1b44874 in SkEdgeClipper::ClipPath(SkPath const&, SkRect const&, bool, void (*)(SkEdgeClipper*, bool, void*), void*) /src/skia/out/Fuzz/../../src/core/SkEdgeClipper.cpp:595:29
+    #6 0x1b3b2c1 in SkEdgeBuilder::build(SkPath const&, SkIRect const*, bool) /src/skia/out/Fuzz/../../src/core/SkEdgeBuilder.cpp:308:9
+    #7 0x1b3c5d9 in SkEdgeBuilder::buildEdges(SkPath const&, SkIRect const*) /src/skia/out/Fuzz/../../src/core/SkEdgeBuilder.cpp:378:17
+    #8 0x94a760 in sk_fill_path(SkPath const&, SkIRect const&, SkBlitter*, int, int, int, bool) /src/skia/out/Fuzz/../../src/core/SkScan_Path.cpp:406:25
+    #9 0x1b8ffda in SkScan::SAAFillPath(SkPath const&, SkBlitter*, SkIRect const&, SkIRect const&, bool) /src/skia/out/Fuzz/../../src/core/SkScan_AntiPath.cpp:687:9
+    #10 0x1b9108f in SkScan::AntiFillPath(SkPath const&, SkRegion const&, SkBlitter*, bool) /src/skia/out/Fuzz/../../src/core/SkScan_AntiPath.cpp:793:9
+    #11 0x1abc400 in SkAAClip::Builder::blitPath(SkAAClip*, SkPath const&, bool) /src/skia/out/Fuzz/../../src/core/SkAAClip.cpp:835:9
+    #12 0x1ac0156 in SkAAClip::setPath(SkPath const&, SkIRect const&, bool) /src/skia/out/Fuzz/../../src/core/SkAAClip.cpp:1416:20
+    #13 0x8d0b47 in SkRasterClip::SkRasterClip(SkPath const&, SkIRect const&, bool) /src/skia/out/Fuzz/../../src/core/SkRasterClip.cpp:70:13
+    #14 0x8d2620 in SkRasterClip::op(SkPath const&, SkMatrix const&, SkClipOp, bool) /src/skia/out/Fuzz/../../src/core/SkRasterClip.cpp:199:25
+    #15 0x1ad4bc6 in clipPath /src/skia/out/Fuzz/../../src/core/SkRasterClipStack.h:64:29
+    #16 0x1ad4bc6 in SkBitmapDevice::onClipPath(SkPath const&, SkClipOp, bool) /src/skia/out/Fuzz/../../src/core/SkBitmapDevice.cpp:638:14
+    #17 0x6fd0ee in clipPath /src/skia/out/Fuzz/../../src/core/SkDevice.h:187:15
+    #18 0x6fd0ee in SkCanvas::onClipPath(SkPath const&, SkClipOp, SkCanvas::ClipEdgeStyle) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1587:24
+    #19 0x6fcc9a in SkCanvas::clipPath(SkPath const&, SkClipOp, bool) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1580:11
+    #20 0x560cb7 in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1166:25
+    #21 0x56662f in fuzz_RasterN32Canvas(Fuzz*) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1525:5
+    #22 0x57ad47 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzRasterN32Canvas.cpp:20:5
+    #23 0x46e993 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #24 0x45a3b2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #25 0x45fc5c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #26 0x4881b2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #27 0x7ffff7c55082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #28 0x45090d in _start (/out/api_raster_n32_canvas+0x45090d)
+
+DEDUP_TOKEN: Load--SkRect::setBoundsCheck(SkPoint const*, int)--setBounds
+[1m[32m0x607000000930 is located 0 bytes to the right of 80-byte region [0x6070000008e0,0x607000000930)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x529fdc in __interceptor_realloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:85:3
+    #1 0xc41448 in sk_realloc_throw(void*, unsigned long) /src/skia/out/Fuzz/../../src/ports/SkMemory_malloc.cpp:68:35
+    #2 0x97cc59 in SkTDStorage::shrinkToFit(unsigned long) /src/skia/out/Fuzz/../../src/core/SkTDArray.cpp:102:44
+    #3 0x8b3204 in shrinkToFit /src/skia/out/Fuzz/../../include/private/SkTDArray.h:269:18
+    #4 0x8b3204 in SkPath::shrinkToFit() /src/skia/out/Fuzz/../../src/core/SkPathRef.cpp:53:23
+    #5 0x5d7058 in ShrinkToFit /src/skia/out/Fuzz/../../src/core/SkPathPriv.h:122:15
+    #6 0x5d7058 in FuzzNicePath(Fuzz*, SkPath*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCommon.cpp:220:17
+    #7 0x55e98c in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1161:17
+    #8 0x56662f in fuzz_RasterN32Canvas(Fuzz*) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1525:5
+    #9 0x57ad47 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzRasterN32Canvas.cpp:20:5
+    #10 0x46e993 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #11 0x45a3b2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #12 0x45fc5c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #13 0x4881b2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #14 0x7ffff7c55082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+
+DEDUP_TOKEN: __interceptor_realloc--sk_realloc_throw(void*, unsigned long)--SkTDStorage::shrinkToFit(unsigned long)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/skia/out/Fuzz/../../include/private/SkVx.h:167:9 in Load
+Shadow bytes around the buggy address:
+  0x0c0e7fff80d0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c0e7fff80e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0e7fff80f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0e7fff8100: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c0e7fff8110: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c0e7fff8120: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0e7fff8130: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0e7fff8140: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0e7fff8150: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0e7fff8160: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0e7fff8170: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42516530

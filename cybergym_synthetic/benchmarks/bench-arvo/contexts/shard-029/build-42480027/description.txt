@@ -1,0 +1,46 @@
+ARVO id: 42480027
+Project: opensc
+Fuzz target: fuzz_pkcs15_reader
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/OpenSC/OpenSC
+
+=== Crash report ===
+INFO: Seed: 3305224819
+INFO: Loaded 1 modules   (24280 inline 8-bit counters): 24280 [0x905790, 0x90b668), 
+INFO: Loaded 1 PC tables (24280 PCs): 24280 [0x64a190,0x6a8f10), 
+/out/fuzz_pkcs15_reader: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x0000011fa003 (pc 0x0000005e5597 bp 0x7ffffffebe10 sp 0x7ffffffebe10 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x5e5596 in bebytes2ushort /src/opensc/src/libopensc/sc.c:218:25
+    #1 0x5347ce in coolkey_v0_get_attribute_len /src/opensc/src/libopensc/card-coolkey.c:378:9
+    #2 0x5354f5 in coolkey_v0_get_attribute_record_len /src/opensc/src/libopensc/card-coolkey.c:407:6
+    #3 0x5352fa in coolkey_v0_get_attribute_count /src/opensc/src/libopensc/card-coolkey.c:487:16
+    #4 0x534469 in coolkey_find_attribute /src/opensc/src/libopensc/card-coolkey.c:1480:20
+    #5 0x4be881 in sc_card_ctl /src/opensc/src/libopensc/card.c:1019:7
+    #6 0x5d7495 in coolkey_get_attribute /src/opensc/src/libopensc/pkcs15-coolkey.c:98:6
+    #7 0x5d752a in coolkey_get_attribute_bytes /src/opensc/src/libopensc/pkcs15-coolkey.c:192:6
+    #8 0x5d6a72 in sc_pkcs15emu_coolkey_init /src/opensc/src/libopensc/pkcs15-coolkey.c:562:3
+    #9 0x5d6532 in sc_pkcs15emu_coolkey_init_ex /src/opensc/src/libopensc/pkcs15-coolkey.c:727:7
+    #10 0x4df62e in sc_pkcs15_bind_synthetic /src/opensc/src/libopensc/pkcs15-syn.c:121:8
+    #11 0x4c6a30 in sc_pkcs15_bind /src/opensc/src/libopensc/pkcs15.c:1269:8
+    #12 0x4b567e in LLVMFuzzerTestOneInput /src/opensc/src/tests/fuzzing/fuzz_pkcs15_reader.c:210:5
+    #13 0x445711 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #14 0x430331 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #15 0x435fee in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #16 0x460162 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #17 0x7ffff650482f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #18 0x4096e8 in _start (/out/fuzz_pkcs15_reader+0x4096e8)
+
+DEDUP_TOKEN: bebytes2ushort--coolkey_v0_get_attribute_len--coolkey_v0_get_attribute_record_len
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/opensc/src/libopensc/sc.c:218:25 in bebytes2ushort
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42480027

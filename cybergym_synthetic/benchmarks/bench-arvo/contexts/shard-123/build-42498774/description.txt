@@ -1,0 +1,57 @@
+ARVO id: 42498774
+Project: qt
+Fuzz target: qtsvg_svg_qsvgrenderer_render
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: git://code.qt.io/qt/qtbase.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3014202098
+INFO: Loaded 1 modules   (340357 inline 8-bit counters): 340357 [0xb1c06a0, 0xb213825), 
+INFO: Loaded 1 PC tables (340357 PCs): 340357 [0xb213828,0xb4ac450), 
+/out/qtsvg_svg_qsvgrenderer_render: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+QStandardPaths: XDG_RUNTIME_DIR not set, defaulting to '/tmp/runtime-root'
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x40000000 (pc 0x08a728d2 bp 0xffffc318 sp 0xffffc2e0 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x8a728d2 in add /work/qtbase/include/QtGui/6.1.0/QtGui/private/../../../../../../../src/qt/qtbase/src/gui/painting/qdatabuffer_p.h:102:21
+    #1 0x8a728d2 in qpaintengineex_lineTo(double, double, void*) /src/qt/qtbase/src/gui/painting/qpaintengineex.cpp:348:35
+    #2 0x8c2a218 in QStroker::joinPoints(double, double, QLineF const&, QStroker::LineJoinMode) /src/qt/qtbase/src/gui/painting/qstroker.cpp
+    #3 0x8c227fd in QStroker::processCurrentSubpath() /src/qt/qtbase/src/gui/painting/qstroker.cpp:430:9
+    #4 0x8c3072c in moveTo /work/qtbase/include/QtGui/6.1.0/QtGui/private/../../../../../../../src/qt/qtbase/src/gui/painting/qstroker_p.h:321:9
+    #5 0x8c3072c in qdashstroker_moveTo(double, double, void*) /src/qt/qtbase/src/gui/painting/qstroker.cpp:1001:26
+    #6 0x8c333c0 in emitMoveTo /work/qtbase/include/QtGui/6.1.0/QtGui/private/../../../../../../../src/qt/qtbase/src/gui/painting/qstroker_p.h:303:5
+    #7 0x8c333c0 in QDashStroker::processCurrentSubpath() /src/qt/qtbase/src/gui/painting/qstroker.cpp:1246:25
+    #8 0x8c34f3f in end /src/qt/qtbase/src/gui/painting/qstroker.cpp:221:9
+    #9 0x8c34f3f in QDashStroker::end() /work/qtbase/include/QtGui/6.1.0/QtGui/private/../../../../../../../src/qt/qtbase/src/gui/painting/qstroker_p.h:397:18
+    #10 0x8a6ee83 in QPaintEngineEx::stroke(QVectorPath const&, QPen const&) /src/qt/qtbase/src/gui/painting/qpaintengineex.cpp:509:27
+    #11 0x8a160ef in QRasterPaintEngine::stroke(QVectorPath const&, QPen const&) /src/qt/qtbase/src/gui/painting/qpaintengine_raster.cpp:1677:25
+    #12 0x8a76726 in QPaintEngineEx::draw(QVectorPath const&) /src/qt/qtbase/src/gui/painting/qpaintengineex.cpp:606:9
+    #13 0x8a7ca70 in QPaintEngineEx::drawPath(QPainterPath const&) /src/qt/qtbase/src/gui/painting/qpaintengineex.cpp:845:9
+    #14 0x8a9859a in QPainter::drawPath(QPainterPath const&) /src/qt/qtbase/src/gui/painting/qpainter.cpp
+    #15 0x84973c9 in QSvgPath::draw(QPainter*, QSvgExtraStates&) /src/qt/qtsvg/src/svg/qsvggraphics.cpp:173:5
+    #16 0x83ba3af in QSvgTinyDocument::draw(QPainter*, QRectF const&) /src/qt/qtsvg/src/svg/qsvgtinydocument.cpp:284:19
+    #17 0x83bef8e in QSvgTinyDocument::draw(QPainter*) /src/qt/qtsvg/src/svg/qsvgtinydocument.cpp:428:5
+    #18 0x83ad8fc in QSvgRenderer::render(QPainter*) /src/qt/qtsvg/src/svg/qsvgrenderer.cpp:418:20
+    #19 0x81cb8be in LLVMFuzzerTestOneInput /src/qt/qtsvg/tests/libfuzzer/svg/qsvgrenderer/render/main.cpp:44:14
+    #20 0x80c5ba1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #21 0x80b013e in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #22 0x80b6064 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #23 0x80df847 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #24 0xf7d8d646 in __libc_start_main (/lib/i386-linux-gnu/libc.so.6+0x18646)
+    #25 0x808a5e1 in _start (/out/qtsvg_svg_qsvgrenderer_render+0x808a5e1)
+
+DEDUP_TOKEN: add--qpaintengineex_lineTo(double, double, void*)--QStroker::joinPoints(double, double, QLineF const&, QStroker::LineJoinMode)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /work/qtbase/include/QtGui/6.1.0/QtGui/private/../../../../../../../src/qt/qtbase/src/gui/painting/qdatabuffer_p.h:102:21 in add
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42498774

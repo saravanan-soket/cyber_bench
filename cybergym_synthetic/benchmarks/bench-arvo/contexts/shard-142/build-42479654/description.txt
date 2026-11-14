@@ -1,0 +1,39 @@
+ARVO id: 42479654
+Project: imagemagick
+Fuzz target: crop_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Index-out-of-bounds
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 3717865791
+INFO: Loaded 1 modules   (280029 inline 8-bit counters): 280029 [0x1a9f0b8, 0x1ae3695), 
+INFO: Loaded 1 PC tables (280029 PCs): 280029 [0x1ae3698,0x1f29468), 
+/out/crop_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1msrc/tables/colordata.cpp:1699:9:[1m[31m runtime error: [1m[0m[1mindex 3 out of bounds for type 'float [3]'[1m[0m
+    #0 0x10a1b3b in LibRaw::adobe_coeff(unsigned int, char const*, int) /src/libraw/src/tables/colordata.cpp:1699:37
+    #1 0x1027e88 in LibRaw::GetNormalizedModel() /src/libraw/src/metadata/normalize_model.cpp:1157:16
+    #2 0xfc1489 in LibRaw::identify() /src/libraw/src/metadata/identify.cpp:1071:3
+    #3 0xdf7301 in LibRaw::open_datastream(LibRaw_abstract_datastream*) /src/libraw/src/utils/open.cpp:376:5
+    #4 0xdf3b0b in LibRaw::open_file(char const*, long long) /src/libraw/src/utils/open.cpp:52:13
+    #5 0x76984b in ReadDNGImage /src/imagemagick/coders/dng.c:396:13
+    #6 0x5b52c8 in ReadImage /src/imagemagick/MagickCore/constitute.c:552:15
+    #7 0x5751e7 in BlobToImage /src/imagemagick/MagickCore/blob.c:497:9
+    #8 0x4c15bf in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4028:12
+    #9 0x4b767a in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/crop_fuzzer.cc:20:11
+    #10 0x4467b1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #11 0x4313d1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #12 0x43708e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #13 0x461202 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #14 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #15 0x40a788 in _start (/out/crop_fuzzer+0x40a788)
+
+DEDUP_TOKEN: LibRaw::adobe_coeff(unsigned int, char const*, int)--LibRaw::GetNormalizedModel()--LibRaw::identify()
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior src/tables/colordata.cpp:1699:9 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42479654

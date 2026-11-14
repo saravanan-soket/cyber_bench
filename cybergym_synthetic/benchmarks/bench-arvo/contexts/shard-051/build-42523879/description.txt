@@ -1,0 +1,61 @@
+ARVO id: 42523879
+Project: imagemagick
+Fuzz target: encoder_psd_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Negative-size-param
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/encoder_psd_fuzzer < INPUT_FILE
+or
+  /out/encoder_psd_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/encoder_psd_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 281 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: negative-size-param: (size=-41)
+[1m[0mSCARINESS: 10 (negative-size-param)
+    #0 0x4e0143 in __asan_memcpy /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cc:23
+    #1 0x71c59c in CopyMagickMemory /src/imagemagick/MagickCore/memory.c:726:23
+    #2 0x972b3c in RemoveResolutionFromResourceBlock /src/imagemagick/coders/psd.c:3033:16
+    #3 0x967547 in WritePSDImage /src/imagemagick/coders/psd.c:3503:7
+    #4 0x62f32e in WriteImage /src/imagemagick/MagickCore/constitute.c:1114:14
+    #5 0x62ff19 in WriteImages /src/imagemagick/MagickCore/constitute.c:1333:13
+    #6 0x5d4aa3 in ImagesToBlob /src/imagemagick/MagickCore/blob.c:2304:18
+    #7 0x5456df in Magick::Image::write(Magick::Blob*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4887:8
+    #8 0x51d44f in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:28:11
+    #9 0x51dbcf in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:279:5
+    #10 0x51e16f in main /src/libfuzzer/afl/afl_driver.cpp:316:12
+    #11 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x41d618 in _start (/out/encoder_psd_fuzzer+0x41d618)
+
+DEDUP_TOKEN: __asan_memcpy--CopyMagickMemory--RemoveResolutionFromResourceBlock
+[1m[32m0x62100003fe18 is located 280 bytes inside of 4335-byte region [0x62100003fd00,0x621000040def)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4e13d8 in malloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:88
+    #1 0x80daa3 in AcquireStringInfo /src/imagemagick/MagickCore/string.c:181:42
+    #2 0x80e2f8 in CloneStringInfo /src/imagemagick/MagickCore/string.c:329:14
+    #3 0x9674f5 in WritePSDImage /src/imagemagick/coders/psd.c:3500:19
+    #4 0x62f32e in WriteImage /src/imagemagick/MagickCore/constitute.c:1114:14
+    #5 0x62ff19 in WriteImages /src/imagemagick/MagickCore/constitute.c:1333:13
+    #6 0x5d4aa3 in ImagesToBlob /src/imagemagick/MagickCore/blob.c:2304:18
+    #7 0x5456df in Magick::Image::write(Magick::Blob*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4887:8
+    #8 0x51d44f in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:28:11
+    #9 0x51dbcf in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:279:5
+    #10 0x51e16f in main /src/libfuzzer/afl/afl_driver.cpp:316:12
+    #11 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: malloc--AcquireStringInfo--CloneStringInfo
+SUMMARY: AddressSanitizer: negative-size-param /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cc:23 in __asan_memcpy
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42523879

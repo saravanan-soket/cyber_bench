@@ -1,0 +1,45 @@
+ARVO id: 42522194
+Project: assimp
+Fuzz target: assimp_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/assimp/assimp.git
+
+=== Crash report ===
+Reading 45 bytes from /tmp/poc
+Info,  T0: Load $$$___magic___$$$.
+Exists
+Info,  T0: File extension not known, trying signature-based detection
+Info,  T0: Found a matching importer for this file format: OFF Importer.
+Info,  T0: Import root directory is './'
+Error, T0: OFF: Vertex index is out of range
+Error, T0: OFF: The number of faces in the header is incorrect
+Info,  T0: Entering post processing pipeline
+Info,  T0: TriangulateProcess finished. All polygons have been triangulated.
+Warn,  T0: Found 5 degenerated primitives
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x1000feead61d (pc 0x000001d1e03d bp 0x7fffffffda70 sp 0x7fffffffd740 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x1d1e03d in Assimp::SortByPTypeProcess::Execute(aiScene*) /src/assimp/code/PostProcessing/SortByPTypeProcess.cpp:183:17
+    #1 0x1be419d in Assimp::BaseProcess::ExecuteOnScene(Assimp::Importer*) /src/assimp/code/Common/BaseProcess.cpp:86:9
+    #2 0x567eca in Assimp::Importer::ApplyPostProcessing(unsigned int) /src/assimp/code/Common/Importer.cpp:855:22
+    #3 0x5626a3 in Assimp::Importer::ReadFile(char const*, unsigned int) /src/assimp/code/Common/Importer.cpp:765:13
+    #4 0x55c33c in Assimp::Importer::ReadFileFromMemory(void const*, unsigned long, unsigned int, char const*) /src/assimp/code/Common/Importer.cpp:507:9
+    #5 0x4e20cf in LLVMFuzzerTestOneInput /src/assimp/fuzz/assimp_fuzzer.cc:53:34
+    #6 0x4e1f6a in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+    #7 0x4e1d3c in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:318:12
+    #8 0x7ffff7c56082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #9 0x4230ed in _start (/out/assimp_fuzzer+0x4230ed)
+
+DEDUP_TOKEN: Assimp::SortByPTypeProcess::Execute(aiScene*)--Assimp::BaseProcess::ExecuteOnScene(Assimp::Importer*)--Assimp::Importer::ApplyPostProcessing(unsigned int)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/assimp/code/PostProcessing/SortByPTypeProcess.cpp:183:17 in Assimp::SortByPTypeProcess::Execute(aiScene*)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42522194

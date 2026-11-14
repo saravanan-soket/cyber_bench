@@ -1,0 +1,46 @@
+ARVO id: 372764172
+Project: poco
+Fuzz target: http_message_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/pocoproject/poco
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1029154395
+INFO: Loaded 1 modules   (32272 inline 8-bit counters): 32272 [0x5626c60b1610, 0x5626c60b9420), 
+INFO: Loaded 1 PC tables (32272 PCs): 32272 [0x5626c60b9420,0x5626c6137520), 
+/out/http_message_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x5626c5bc4e11 in Poco::Net::NTLMCredentials::parseChallengeMessage(unsigned char const*, unsigned long, Poco::Net::NTLMCredentials::ChallengeMessage&) /src/poco/Net/src/NTLMCredentials.cpp:218:6
+    #1 0x5626c5b8fa6c in Poco::Net::HTTPNTLMCredentials::createNTLMMessage(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&) /src/poco/Net/src/HTTPNTLMCredentials.cpp:154:8
+    #2 0x5626c5b8eaf0 in Poco::Net::HTTPNTLMCredentials::authenticate(Poco::Net::HTTPRequest&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&) /src/poco/Net/src/HTTPNTLMCredentials.cpp:92:28
+    #3 0x5626c5b6e3b2 in Poco::Net::HTTPCredentials::authenticate(Poco::Net::HTTPRequest&, Poco::Net::HTTPResponse const&) /src/poco/Net/src/HTTPCredentials.cpp:104:10
+    #4 0x5626c5b56d29 in LLVMFuzzerTestOneInput::$_2::operator()() const /src/http_message_fuzzer.cc:64:11
+    #5 0x5626c5b56d29 in void catchExceptions<LLVMFuzzerTestOneInput::$_2>(LLVMFuzzerTestOneInput::$_2 const&) /src/http_message_fuzzer.cc:30:5
+    #6 0x5626c5b56d29 in LLVMFuzzerTestOneInput /src/http_message_fuzzer.cc:55:3
+    #7 0x5626c5a53430 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #8 0x5626c5a3dbc4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #9 0x5626c5a4365a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #10 0x5626c5a6fa52 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7fd9c1a09082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #12 0x5626c5a3469d in _start (/out/http_message_fuzzer+0x12969d)
+
+DEDUP_TOKEN: Poco::Net::NTLMCredentials::parseChallengeMessage(unsigned char const*, unsigned long, Poco::Net::NTLMCredentials::ChallengeMessage&)--Poco::Net::HTTPNTLMCredentials::createNTLMMessage(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&)--Poco::Net::HTTPNTLMCredentials::authenticate(Poco::Net::HTTPRequest&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&)
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mtype[1m[35m' in the stack frame[1m[0m
+    #0 0x5626c5bc4293 in Poco::Net::NTLMCredentials::parseChallengeMessage(unsigned char const*, unsigned long, Poco::Net::NTLMCredentials::ChallengeMessage&) /src/poco/Net/src/NTLMCredentials.cpp:216:2
+
+DEDUP_TOKEN: Poco::Net::NTLMCredentials::parseChallengeMessage(unsigned char const*, unsigned long, Poco::Net::NTLMCredentials::ChallengeMessage&)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/poco/Net/src/NTLMCredentials.cpp:218:6 in Poco::Net::NTLMCredentials::parseChallengeMessage(unsigned char const*, unsigned long, Poco::Net::NTLMCredentials::ChallengeMessage&)
+Unique heap origins: 364
+Stack depot allocated bytes: 9764880
+Unique origin histories: 20
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/372764172

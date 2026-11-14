@@ -1,0 +1,51 @@
+ARVO id: 42486101
+Project: harfbuzz
+Fuzz target: hb-subset-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/harfbuzz/harfbuzz.git
+
+=== Crash report ===
+INFO: Seed: 494907546
+INFO: Loaded 1 modules   (47418 inline 8-bit counters): 47418 [0xdfeb20, 0xe0a45a), 
+INFO: Loaded 1 PC tables (47418 PCs): 47418 [0xe0a460,0xec3800), 
+/out/hb-subset-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x0000000fffdc (pc 0x0000009052b0 bp 0x7fffffffd390 sp 0x7fffffffd390 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x9052b0 in CFF::parsed_cs_op_t::set_skip() /work/build/../../src/harfbuzz/src/hb-subset-cff-common.hh:332:38
+    #1 0x9050f5 in CFF::parsed_cs_str_t::add_call_op(unsigned int, CFF::byte_str_ref_t const&, unsigned int) /work/build/../../src/harfbuzz/src/hb-subset-cff-common.hh:364:23
+    #2 0x903c5e in cff1_cs_opset_subr_subset_t::process_call_subr(unsigned int, CFF::cs_type_t, CFF::cff1_cs_interp_env_t&, CFF::subr_subset_param_t&, CFF::biased_subrs_t<CFF::Subrs<OT::IntType<unsigned short, 2u> > >&, hb_set_t*) /work/build/../../src/harfbuzz/src/hb-subset-cff1.cc:328:31
+    #3 0x90382d in cff1_cs_opset_subr_subset_t::process_op(unsigned int, CFF::cff1_cs_interp_env_t&, CFF::subr_subset_param_t&) /work/build/../../src/harfbuzz/src/hb-subset-cff1.cc
+    #4 0x902064 in CFF::cs_interpreter_t<CFF::cff1_cs_interp_env_t, cff1_cs_opset_subr_subset_t, CFF::subr_subset_param_t>::interpret(CFF::subr_subset_param_t&) /work/build/../../src/harfbuzz/src/hb-cff-interp-cs-common.hh:895:7
+    #5 0x8fb5d3 in CFF::subr_subsetter_t<cff1_subr_subsetter_t, CFF::Subrs<OT::IntType<unsigned short, 2u> >, OT::cff1::accelerator_subset_t const, CFF::cff1_cs_interp_env_t, cff1_cs_opset_subr_subset_t, 14u>::subset() /work/build/../../src/harfbuzz/src/hb-subset-cff-common.hh:622:11
+    #6 0x8f78f7 in cff_subset_plan::create(OT::cff1::accelerator_subset_t const&, hb_subset_plan_t*) /work/build/../../src/harfbuzz/src/hb-subset-cff1.cc:613:27
+    #7 0x8f6a52 in _hb_subset_cff1(OT::cff1::accelerator_subset_t const&, hb_subset_context_t*) /work/build/../../src/harfbuzz/src/hb-subset-cff1.cc:903:7
+    #8 0x8f52a7 in hb_subset_cff1(hb_subset_context_t*) /work/build/../../src/harfbuzz/src/hb-subset-cff1.cc:923:45
+    #9 0x81d343 in OT::cff1::subset(hb_subset_context_t*) const /work/build/../../src/harfbuzz/src/hb-ot-cff1-table.hh:1379:55
+    #10 0x7b1681 in bool _subset<OT::cff1 const>(hb_subset_plan_t*) /work/build/../../src/harfbuzz/src/hb-subset.cc:93:26
+    #11 0x7ac8ef in _subset_table(hb_subset_plan_t*, unsigned int) /work/build/../../src/harfbuzz/src/hb-subset.cc:209:31
+    #12 0x7ac30e in hb_subset /work/build/../../src/harfbuzz/src/hb-subset.cc:258:17
+    #13 0x550a2d in trySubset(hb_face_t*, unsigned int const*, int, bool, bool, bool) /work/build/../../src/harfbuzz/test/fuzzing/hb-subset-fuzzer.cc:36:23
+    #14 0x55083d in trySubset(hb_face_t*, unsigned int const*, int, unsigned char const*) /work/build/../../src/harfbuzz/test/fuzzing/hb-subset-fuzzer.cc:64:3
+    #15 0x55061a in LLVMFuzzerTestOneInput /work/build/../../src/harfbuzz/test/fuzzing/hb-subset-fuzzer.cc:88:3
+    #16 0x457d21 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #17 0x4434b2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #18 0x4494ce in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #19 0x470ee2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #20 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #21 0x41e4f8 in _start (/out/hb-subset-fuzzer+0x41e4f8)
+
+DEDUP_TOKEN: CFF::parsed_cs_op_t::set_skip()--CFF::parsed_cs_str_t::add_call_op(unsigned int, CFF::byte_str_ref_t const&, unsigned int)--cff1_cs_opset_subr_subset_t::process_call_subr(unsigned int, CFF::cs_type_t, CFF::cff1_cs_interp_env_t&, CFF::subr_subset_param_t&, CFF::biased_subrs_t<CFF::Subrs<OT::IntType<unsigned short, 2u> > >&, hb_set_t*)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /work/build/../../src/harfbuzz/src/hb-subset-cff-common.hh:332:38 in CFF::parsed_cs_op_t::set_skip()
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42486101

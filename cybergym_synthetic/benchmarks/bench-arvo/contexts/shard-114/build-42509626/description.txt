@@ -1,0 +1,51 @@
+ARVO id: 42509626
+Project: fluent-bit
+Fuzz target: flb-it-fuzz-config_random_fuzzer_OSSFUZZ
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-double-free
+Language: c++
+Repo: https://github.com/fluent/fluent-bit/
+
+=== Crash report ===
+Reading 790 bytes from /tmp/poc
+[1m[[0m2025/05/10 11:07:53[1m][0m [[91merror[0m] [build/src/CMakeFiles/fluent-bit-static.dir/compiler_depend.ts:234 errno=9] Bad file descriptor
+[1m[[0m2025/05/10 11:07:53[1m][0m [[91merror[0m] [multiline: java] error on mapping rules
+[1m[[0m2025/05/10 11:07:53[1m][0m [[91merror[0m] [multiline] could not init 'java' built-in parser
+[1m[[0m2025/05/10 11:07:53[1m][0m [1m[[93mWarning[97m][0m Config file warning '/tmp/libfuzzer.7':
+				at line 8: previous section did not have keys[0m
+[1m[[0m2025/05/10 11:07:53[1m][0m [[91merror[0m] [build/src/CMakeFiles/fluent-bit-static.dir/compiler_depend.ts:695 errno=9] Bad file descriptor
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: attempting double-free on 0x615000000580 in thread T0:
+[1m[0mSCARINESS: 42 (double-free)
+    #0 0x4d4db2 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:111:3
+    #1 0x7ffff7cb2ef2 in _IO_fclose (/lib/x86_64-linux-gnu/libc.so.6+0x81ef2)
+    #2 0x4a74cf in fclose /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:6305:13
+    #3 0x526543 in read_config /src/fluent-bit/src/config_format/flb_cf_fluentbit.c:707:9
+    #4 0x524a52 in flb_cf_fluentbit_create /src/fluent-bit/src/config_format/flb_cf_fluentbit.c:739:11
+    #5 0x523e89 in flb_cf_create_from_file /src/fluent-bit/src/config_format/flb_config_format.c:484:14
+    #6 0x532a4d in flb_parser_conf_file /src/fluent-bit/src/flb_parser.c:853:10
+    #7 0x50c3d0 in LLVMFuzzerTestOneInput /src/fluent-bit/tests/internal/fuzzers/config_random_fuzzer.c:45:5
+    #8 0x50c035 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:191:7
+    #9 0x50bea5 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #10 0x7ffff7c550b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x240b2)
+    #11 0x454a0d in _start (/out/flb-it-fuzz-config_random_fuzzer_OSSFUZZ+0x454a0d)
+
+DEDUP_TOKEN: free--_IO_fclose--fclose
+[1m[32m0x615000000580 is located 0 bytes inside of 472-byte region [0x615000000580,0x615000000758)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x4d4db2 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:111:3
+    #1 0x7ffff7cb2ef2 in _IO_fclose (/lib/x86_64-linux-gnu/libc.so.6+0x81ef2)
+
+DEDUP_TOKEN: free--_IO_fclose
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x4d501d in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:129:3
+    #1 0x7ffff7cb395d in fopen64 (/lib/x86_64-linux-gnu/libc.so.6+0x8295d)
+
+DEDUP_TOKEN: __interceptor_malloc--fopen64
+SUMMARY: AddressSanitizer: double-free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:111:3 in free
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42509626

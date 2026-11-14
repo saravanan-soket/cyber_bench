@@ -1,0 +1,99 @@
+ARVO id: 42473891
+Project: gdal
+Fuzz target: gdal_vector_translate_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-use-after-free READ 8
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/gdal_vector_translate_fuzzer < INPUT_FILE
+or
+  /out/gdal_vector_translate_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/gdal_vector_translate_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 64 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-use-after-free on address 0x60300000bef0 at pc 0x0000006226f2 bp 0x7fff6863d190 sp 0x7fff6863d188
+[1m[0m[1m[34mREAD of size 8 at 0x60300000bef0 thread T0[1m[0m
+SCARINESS: 51 (8-byte-read-heap-use-after-free)
+    #0 0x6226f1 in VSIFCloseL /src/gdal/gdal/port/cpl_vsil.cpp:934:39
+    #1 0x11c48dd in OGRDXFWriterDS::~OGRDXFWriterDS() /src/gdal/gdal/ogr/ogrsf_frmts/dxf/ogrdxfwriterds.cpp:112:9
+    #2 0x11c7a9c in OGRDXFWriterDS::~OGRDXFWriterDS() /src/gdal/gdal/ogr/ogrsf_frmts/dxf/ogrdxfwriterds.cpp:63:1
+    #3 0x52fc18 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_vector_translate_fuzzer.cpp:101:21
+    #4 0x5305df in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:279:5
+    #5 0x530b7f in main /src/libfuzzer/afl/afl_driver.cpp:316:12
+    #6 0x7f06aa4cd82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #7 0x427be8 in _start (/out/gdal_vector_translate_fuzzer+0x427be8)
+
+DEDUP_TOKEN: VSIFCloseL--OGRDXFWriterDS::~OGRDXFWriterDS()--OGRDXFWriterDS::~OGRDXFWriterDS()
+[1m[32m0x60300000bef0 is located 0 bytes inside of 32-byte region [0x60300000bef0,0x60300000bf10)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x52c120 in operator delete(void*) /src/llvm/projects/compiler-rt/lib/asan/asan_new_delete.cc:149
+    #1 0x6226cd in VSIFCloseL /src/gdal/gdal/port/cpl_vsil.cpp:936:5
+    #2 0x11c71a8 in OGRDXFWriterDS::TransferUpdateTrailer(_IO_FILE*) /src/gdal/gdal/ogr/ogrsf_frmts/dxf/ogrdxfwriterds.cpp:590:13
+    #3 0x11c488d in OGRDXFWriterDS::~OGRDXFWriterDS() /src/gdal/gdal/ogr/ogrsf_frmts/dxf/ogrdxfwriterds.cpp:100:13
+    #4 0x11c7a9c in OGRDXFWriterDS::~OGRDXFWriterDS() /src/gdal/gdal/ogr/ogrsf_frmts/dxf/ogrdxfwriterds.cpp:63:1
+    #5 0x52fc18 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_vector_translate_fuzzer.cpp:101:21
+    #6 0x5305df in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:279:5
+    #7 0x530b7f in main /src/libfuzzer/afl/afl_driver.cpp:316:12
+    #8 0x7f06aa4cd82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: operator delete(void*)--VSIFCloseL--OGRDXFWriterDS::TransferUpdateTrailer(_IO_FILE*)
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x52b3a8 in operator new(unsigned long) /src/llvm/projects/compiler-rt/lib/asan/asan_new_delete.cc:92
+    #1 0x619fb2 in VSIMemFilesystemHandler::Open(char const*, char const*, bool) /src/gdal/gdal/port/cpl_vsi_mem.cpp:568:30
+    #2 0x62259c in VSIFOpenExL /src/gdal/gdal/port/cpl_vsil.cpp:885:22
+    #3 0x11c801d in OGRDXFWriterDS::Open(char const*, char**) /src/gdal/gdal/ogr/ogrsf_frmts/dxf/ogrdxfwriterds.cpp:231:10
+    #4 0x11c41ae in OGRDXFDriverCreate(char const*, int, int, int, GDALDataType, char**) /src/gdal/gdal/ogr/ogrsf_frmts/dxf/ogrdxfdriver.cpp:112:15
+    #5 0x554671 in GDALDriver::Create(char const*, int, int, int, GDALDataType, char**) /src/gdal/gdal/gcore/gdaldriver.cpp:272:16
+    #6 0x7c130b in GDALVectorTranslate /src/gdal/gdal/apps/ogr2ogr_lib.cpp:2278:27
+    #7 0x52fbe7 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_vector_translate_fuzzer.cpp:97:39
+    #8 0x5305df in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:279:5
+    #9 0x530b7f in main /src/libfuzzer/afl/afl_driver.cpp:316:12
+    #10 0x7f06aa4cd82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: operator new(unsigned long)--VSIMemFilesystemHandler::Open(char const*, char const*, bool)--VSIFOpenExL
+SUMMARY: AddressSanitizer: heap-use-after-free /src/gdal/gdal/port/cpl_vsil.cpp:934:39 in VSIFCloseL
+Shadow bytes around the buggy address:
+  0x0c067fff9780: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff9790: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c067fff97a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c067fff97b0: [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff97c0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+=>0x0c067fff97d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[35mfd[1m[0m][1m[35mfd[1m[0m
+  0x0c067fff97e0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff97f0: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c067fff9800: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c067fff9810: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c067fff9820: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42473891

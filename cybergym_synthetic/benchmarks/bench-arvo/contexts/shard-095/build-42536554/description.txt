@@ -1,0 +1,90 @@
+ARVO id: 42536554
+Project: gdal
+Fuzz target: gdal_vector_translate_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 8
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/gdal_vector_translate_fuzzer < INPUT_FILE
+or
+  /out/gdal_vector_translate_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/gdal_vector_translate_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 188 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x602000009718 at pc 0x000001441e31 bp 0x7fffe1c2fca0 sp 0x7fffe1c2fc98
+[1m[0m[1m[34mREAD of size 8 at 0x602000009718 thread T0[1m[0m
+SCARINESS: 23 (8-byte-read-heap-buffer-overflow)
+    #0 0x1441e30 in SHPRewindObject /src/gdal/gdal/ogr/ogrsf_frmts/shape/./shpopen.c:2965:23
+    #1 0x14312c2 in SHPWriteOGRObject(SHPInfo*, int, OGRGeometry*, bool, OGRwkbGeometryType) /src/gdal/gdal/ogr/ogrsf_frmts/shape/shape2ogr.cpp:921:13
+    #2 0x142dc63 in SHPWriteOGRFeature(SHPInfo*, DBFInfo*, OGRFeatureDefn*, OGRFeature*, char const*, bool*, bool) /src/gdal/gdal/ogr/ogrsf_frmts/shape/shape2ogr.cpp:1437:13
+    #3 0x12ed1c9 in OGRShapeLayer::ICreateFeature(OGRFeature*) /src/gdal/gdal/ogr/ogrsf_frmts/shape/ogrshapelayer.cpp:1223:9
+    #4 0x7d9fca in LayerTranslator::Translate(OGRFeature*, TargetLayerInfo*, long long, long long*, long long&, int (*)(double, char const*, void*), void*, GDALVectorTranslateOptions*) /src/gdal/gdal/apps/ogr2ogr_lib.cpp:4684:29
+    #5 0x7c3355 in GDALVectorTranslate /src/gdal/gdal/apps/ogr2ogr_lib.cpp:3057:30
+    #6 0x52fbe7 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_vector_translate_fuzzer.cpp:97:39
+    #7 0x5305df in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:279:5
+    #8 0x530b7f in main /src/libfuzzer/afl/afl_driver.cpp:316:12
+    #9 0x7f3eb7f6982f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #10 0x427be8 in _start (/out/gdal_vector_translate_fuzzer+0x427be8)
+
+DEDUP_TOKEN: SHPRewindObject--SHPWriteOGRObject(SHPInfo*, int, OGRGeometry*, bool, OGRwkbGeometryType)--SHPWriteOGRFeature(SHPInfo*, DBFInfo*, OGRFeatureDefn*, OGRFeature*, char const*, bool*, bool)
+[1m[32m0x602000009718 is located 0 bytes to the right of 8-byte region [0x602000009710,0x602000009718)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4f39a8 in __interceptor_malloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:88
+    #1 0x1438c36 in SHPCreateObject /src/gdal/gdal/ogr/ogrsf_frmts/shape/./shpopen.c:1540:46
+    #2 0x1431298 in SHPWriteOGRObject(SHPInfo*, int, OGRGeometry*, bool, OGRwkbGeometryType) /src/gdal/gdal/ogr/ogrsf_frmts/shape/shape2ogr.cpp:918:13
+    #3 0x142dc63 in SHPWriteOGRFeature(SHPInfo*, DBFInfo*, OGRFeatureDefn*, OGRFeature*, char const*, bool*, bool) /src/gdal/gdal/ogr/ogrsf_frmts/shape/shape2ogr.cpp:1437:13
+    #4 0x12ed1c9 in OGRShapeLayer::ICreateFeature(OGRFeature*) /src/gdal/gdal/ogr/ogrsf_frmts/shape/ogrshapelayer.cpp:1223:9
+    #5 0x7d9fca in LayerTranslator::Translate(OGRFeature*, TargetLayerInfo*, long long, long long*, long long&, int (*)(double, char const*, void*), void*, GDALVectorTranslateOptions*) /src/gdal/gdal/apps/ogr2ogr_lib.cpp:4684:29
+    #6 0x7c3355 in GDALVectorTranslate /src/gdal/gdal/apps/ogr2ogr_lib.cpp:3057:30
+    #7 0x52fbe7 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_vector_translate_fuzzer.cpp:97:39
+    #8 0x5305df in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:279:5
+    #9 0x530b7f in main /src/libfuzzer/afl/afl_driver.cpp:316:12
+    #10 0x7f3eb7f6982f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: __interceptor_malloc--SHPCreateObject--SHPWriteOGRObject(SHPInfo*, int, OGRGeometry*, bool, OGRwkbGeometryType)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/gdal/gdal/ogr/ogrsf_frmts/shape/./shpopen.c:2965:23 in SHPRewindObject
+Shadow bytes around the buggy address:
+  0x0c047fff9290: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff92a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m06[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff92b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff92c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m06[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff92d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m
+=>0x0c047fff92e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff92f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff9300: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff9310: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff9320: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff9330: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42536554

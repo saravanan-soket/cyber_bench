@@ -1,0 +1,41 @@
+ARVO id: 42538711
+Project: imagemagick
+Fuzz target: encoder_mvg_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 2742612043
+INFO: Loaded 1 modules   (104449 inline 8-bit counters): 104449 [0x200cc38, 0x2026439), 
+INFO: Loaded 1 PC tables (104449 PCs): 104449 [0x2026440,0x21be450), 
+/out/encoder_mvg_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address 0x7f250fb18010 (pc 0x0000008374cc bp 0x7ffddc128ce0 sp 0x7ffddc128ca0 T7)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+    #0 0x8374cb in TracePoint /src/imagemagick/MagickCore/draw.c:1758:30
+    #1 0x838cac in TraceEllipse /src/imagemagick/MagickCore/draw.c:5549:5
+    #2 0x82a6da in DrawImage /src/imagemagick/MagickCore/draw.c:3222:9
+    #3 0xe58e95 in ReadMVGImage /src/imagemagick/coders/mvg.c:221:10
+    #4 0x7bce03 in ReadImage /src/imagemagick/MagickCore/constitute.c:500:13
+    #5 0x6e8c26 in BlobToImage /src/imagemagick/MagickCore/blob.c:469:13
+    #6 0x588359 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4015:12
+    #7 0x4a051c in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:43:11
+    #8 0x4e8653 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:517:13
+    #9 0x4a19d3 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #10 0x4b3f5f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #11 0x4a0b11 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f250fb3882f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #13 0x420148 in _start (/out/encoder_mvg_fuzzer+0x420148)
+
+DEDUP_TOKEN: TracePoint--TraceEllipse--DrawImage
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV /src/imagemagick/MagickCore/draw.c:1758:30 in TracePoint
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42538711

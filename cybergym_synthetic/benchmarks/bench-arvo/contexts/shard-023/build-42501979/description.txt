@@ -1,0 +1,45 @@
+ARVO id: 42501979
+Project: simdjson
+Fuzz target: fuzz_element
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/simdjson/simdjson.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 379367010
+INFO: Loaded 1 modules   (5254 inline 8-bit counters): 5254 [0x6c2278, 0x6c36fe), 
+INFO: Loaded 1 PC tables (5254 PCs): 5254 [0x6c3700,0x6d7f60), 
+/out/fuzz_element: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x5360ea in std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > std::__1::__pad_and_output<char, std::__1::char_traits<char> >(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, char const*, char const*, char const*, std::__1::ios_base&, char) /usr/local/bin/../include/c++/v1/locale:1397:9
+    #1 0x5e6bbb in std::__1::num_put<char, std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > >::do_put(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, std::__1::ios_base&, char, unsigned long) const (/out/fuzz_element+0x5e6bbb)
+    #2 0x5d7f31 in std::__1::basic_ostream<char, std::__1::char_traits<char> >::operator<<(unsigned long) (/out/fuzz_element+0x5d7f31)
+    #3 0x532e55 in simdjson::dom::document::dump_raw_tape(std::__1::basic_ostream<char, std::__1::char_traits<char> >&) const /src/simdjson/include/simdjson/dom/document-inl.h:64:6
+    #4 0x526657 in simdjson::dom::element::dump_raw_tape(std::__1::basic_ostream<char, std::__1::char_traits<char> >&) const /src/simdjson/include/simdjson/dom/element-inl.h:398:20
+    #5 0x526657 in LLVMFuzzerTestOneInput /src/simdjson/fuzz/fuzz_element.cpp:120:48
+    #6 0x456f33 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #7 0x443bd2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #8 0x4495fb in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #9 0x46f4a2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7ffff7c580b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #11 0x420ced in _start (/out/fuzz_element+0x420ced)
+
+DEDUP_TOKEN: std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > std::__1::__pad_and_output<char, std::__1::char_traits<char> >(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, char const*, char const*, char const*, std::__1::ios_base&, char)--std::__1::num_put<char, std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > >::do_put(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, std::__1::ios_base&, char, unsigned long) const--std::__1::basic_ostream<char, std::__1::char_traits<char> >::operator<<(unsigned long)
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mos[1m[35m' in the stack frame of function '[1m[32mLLVMFuzzerTestOneInput[1m[35m'[1m[0m
+    #0 0x525350 in LLVMFuzzerTestOneInput /src/simdjson/fuzz/fuzz_element.cpp:9
+
+DEDUP_TOKEN: LLVMFuzzerTestOneInput
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /usr/local/bin/../include/c++/v1/locale:1397:9 in std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > std::__1::__pad_and_output<char, std::__1::char_traits<char> >(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, char const*, char const*, char const*, std::__1::ios_base&, char)
+Unique heap origins: 37
+Stack depot allocated bytes: 2592
+Unique origin histories: 5
+History depot allocated bytes: 120
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42501979

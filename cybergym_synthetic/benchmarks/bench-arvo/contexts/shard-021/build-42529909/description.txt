@@ -1,0 +1,95 @@
+ARVO id: 42529909
+Project: opensc
+Fuzz target: fuzz_pkcs15_decode
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/OpenSC/OpenSC
+
+=== Crash report ===
+Reading 429 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x602000000514 at pc 0x0000008aa032 bp 0x7ffda59c35a0 sp 0x7ffda59c3598
+[1m[0m[1m[34mREAD of size 1 at 0x602000000514 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x8aa031 in iasecc_parse_acls /src/opensc/src/libopensc/iasecc-sdo.c:60:21
+    #1 0x8c16c6 in iasecc_parse_docp /src/opensc/src/libopensc/iasecc-sdo.c:636:7
+    #2 0x8b2977 in iasecc_sdo_parse_data /src/opensc/src/libopensc/iasecc-sdo.c:661:8
+    #3 0x8b1bb7 in iasecc_sdo_parse /src/opensc/src/libopensc/iasecc-sdo.c:769:8
+    #4 0x8861e6 in iasecc_sdo_get_tagged_data /src/opensc/src/libopensc/card-iasecc.c:2943:7
+    #5 0x883e77 in iasecc_sdo_get_data /src/opensc/src/libopensc/card-iasecc.c:2960:7
+    #6 0x8a6ca2 in iasecc_pin_get_policy /src/opensc/src/libopensc/card-iasecc.c:2162:7
+    #7 0x8a06bc in iasecc_pin_get_info /src/opensc/src/libopensc/card-iasecc.c:2234:7
+    #8 0x8791ef in iasecc_pin_cmd /src/opensc/src/libopensc/card-iasecc.c:2555:8
+    #9 0xba68f6 in sc_pin_cmd /src/opensc/src/libopensc/sec.c:212:7
+    #10 0xa34321 in sc_pkcs15emu_din_66291_init /src/opensc/src/libopensc/pkcs15-din-66291.c:71:23
+    #11 0xa336b1 in sc_pkcs15emu_din_66291_init_ex /src/opensc/src/libopensc/pkcs15-din-66291.c:255:23
+    #12 0x584c5b in sc_pkcs15_bind_synthetic /src/opensc/src/libopensc/pkcs15-syn.c:141:8
+    #13 0x52449d in sc_pkcs15_bind /src/opensc/src/libopensc/pkcs15.c:1341:8
+    #14 0x4dca1c in LLVMFuzzerTestOneInput /src/opensc/src/tests/fuzzing/fuzz_pkcs15_decode.c:78:2
+    #15 0x4dfcbd in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+    #16 0x4dfac8 in LLVMFuzzerRunDriver /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #17 0x4df688 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:300:10
+    #18 0x7fb7c357f082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: e678fe54a5d2c2092f8e47eb0b33105e380f7340)
+    #19 0x41fe2d in _start (/out/fuzz_pkcs15_decode+0x41fe2d)
+
+DEDUP_TOKEN: iasecc_parse_acls--iasecc_parse_docp--iasecc_sdo_parse_data
+[1m[32m0x602000000514 is located 0 bytes to the right of 4-byte region [0x602000000510,0x602000000514)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4a143e in __interceptor_calloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:77:3
+    #1 0x8c022c in iasecc_parse_get_tlv /src/opensc/src/libopensc/iasecc-sdo.c:430:15
+    #2 0x8c084c in iasecc_parse_docp /src/opensc/src/libopensc/iasecc-sdo.c:589:8
+    #3 0x8b2977 in iasecc_sdo_parse_data /src/opensc/src/libopensc/iasecc-sdo.c:661:8
+    #4 0x8b1bb7 in iasecc_sdo_parse /src/opensc/src/libopensc/iasecc-sdo.c:769:8
+    #5 0x8861e6 in iasecc_sdo_get_tagged_data /src/opensc/src/libopensc/card-iasecc.c:2943:7
+    #6 0x883e77 in iasecc_sdo_get_data /src/opensc/src/libopensc/card-iasecc.c:2960:7
+    #7 0x8a6ca2 in iasecc_pin_get_policy /src/opensc/src/libopensc/card-iasecc.c:2162:7
+    #8 0x8a06bc in iasecc_pin_get_info /src/opensc/src/libopensc/card-iasecc.c:2234:7
+    #9 0x8791ef in iasecc_pin_cmd /src/opensc/src/libopensc/card-iasecc.c:2555:8
+    #10 0xba68f6 in sc_pin_cmd /src/opensc/src/libopensc/sec.c:212:7
+    #11 0xa34321 in sc_pkcs15emu_din_66291_init /src/opensc/src/libopensc/pkcs15-din-66291.c:71:23
+    #12 0xa336b1 in sc_pkcs15emu_din_66291_init_ex /src/opensc/src/libopensc/pkcs15-din-66291.c:255:23
+    #13 0x584c5b in sc_pkcs15_bind_synthetic /src/opensc/src/libopensc/pkcs15-syn.c:141:8
+    #14 0x52449d in sc_pkcs15_bind /src/opensc/src/libopensc/pkcs15.c:1341:8
+    #15 0x4dca1c in LLVMFuzzerTestOneInput /src/opensc/src/tests/fuzzing/fuzz_pkcs15_decode.c:78:2
+    #16 0x4dfcbd in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+
+DEDUP_TOKEN: __interceptor_calloc--iasecc_parse_get_tlv--iasecc_parse_docp
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/opensc/src/libopensc/iasecc-sdo.c:60:21 in iasecc_parse_acls
+Shadow bytes around the buggy address:
+  0x0c047fff8050: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8070: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8080: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8090: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m01[1m[0m [1m[31mfa[1m[0m
+=>0x0c047fff80a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[0m04[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff80b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff80c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff80d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff80e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff80f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42529909

@@ -1,0 +1,43 @@
+ARVO id: 42523567
+Project: libraw
+Fuzz target: libraw_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/libraw/libraw
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2483140172
+INFO: Loaded 1 modules   (21901 inline 8-bit counters): 21901 [0x939c90, 0x93f21d), 
+INFO: Loaded 1 PC tables (21901 PCs): 21901 [0x819f20,0x86f7f0), 
+/out/libraw_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x7f053ebadf60 (pc 0x000000545c15 bp 0x7ffe2a1c1770 sp 0x7ffe2a1c0f30 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x545c15 in __sanitizer::internal_memmove(void*, void const*, unsigned long) /src/llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_libc.cpp:68:14
+    #1 0x52e945 in __asan_memmove /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:30:3
+    #2 0x5b292e in LibRaw_buffer_datastream::read(void*, unsigned long, unsigned long) /src/libraw/src/libraw_datastream.cpp:372:3
+    #3 0x620d04 in LibRaw::pana_data(int, unsigned int*) /src/libraw/src/decoders/decoders_dcraw.cpp:1096:5
+    #4 0x6227ff in LibRaw::panasonic_load_raw() /src/libraw/src/decoders/decoders_dcraw.cpp:1194:33
+    #5 0x5730a4 in LibRaw::unpack() /src/libraw/src/decoders/unpack.cpp:411:7
+    #6 0x56dc5f in LLVMFuzzerTestOneInput /src/libraw_fuzzer.cc:67:20
+    #7 0x43df33 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #8 0x429692 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #9 0x42ef3c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #10 0x458472 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7f050f2ad082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #12 0x41f85d in _start (/out/libraw_fuzzer+0x41f85d)
+
+DEDUP_TOKEN: __sanitizer::internal_memmove(void*, void const*, unsigned long)--__asan_memmove--LibRaw_buffer_datastream::read(void*, unsigned long, unsigned long)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_libc.cpp:68:14 in __sanitizer::internal_memmove(void*, void const*, unsigned long)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42523567

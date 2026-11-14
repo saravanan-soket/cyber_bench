@@ -1,0 +1,105 @@
+ARVO id: 42529377
+Project: skia
+Fuzz target: animated_image_decode
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 4
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Seed: 1578100251
+INFO: Loaded 1 modules   (86206 inline 8-bit counters): 86206 [0x15fb3a0, 0x161045e), 
+INFO: Loaded 1 PC tables (86206 PCs): 86206 [0x1610460,0x1761040), 
+/out/animated_image_decode: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6020000497f4 at pc 0x000000a9d12f bp 0x7fffffffd7b0 sp 0x7fffffffd7a8
+[1m[0m[1m[34mREAD of size 4 at 0x6020000497f4 thread T0[1m[0m
+SCARINESS: 17 (4-byte-read-heap-buffer-overflow)
+    #0 0xa9d12e in piex::GetFullCropDimension(piex::tiff_directory::TiffDirectory const&, unsigned int*, unsigned int*) /src/skia/out/Fuzz/../../third_party/externals/piex/src/tiff_parser.cc:604:17
+    #1 0xa9c858 in piex::GetFullDimension32(piex::tiff_directory::TiffDirectory const&, unsigned int*, unsigned int*) /src/skia/out/Fuzz/../../third_party/externals/piex/src/tiff_parser.cc:560:10
+    #2 0xa9d8ad in piex::(anonymous namespace)::FillPreviewImageData(piex::tiff_directory::TiffDirectory const&, piex::StreamInterface*, piex::PreviewImageData*) /src/skia/out/Fuzz/../../third_party/externals/piex/src/tiff_parser.cc:176:14
+    #3 0xa9d357 in piex::TiffParser::GetPreviewImageData(piex::TiffContent const&, piex::PreviewImageData*) /src/skia/out/Fuzz/../../third_party/externals/piex/src/tiff_parser.cc:627:15
+    #4 0xa8c208 in piex::(anonymous namespace)::GetPreviewData(std::__1::set<unsigned int, std::__1::less<unsigned int>, std::__1::allocator<unsigned int> > const&, unsigned int, unsigned int, piex::StreamInterface*, piex::TiffContent*, piex::PreviewImageData*) /src/skia/out/Fuzz/../../third_party/externals/piex/src/piex.cc:102:22
+    #5 0xa87e2e in piex::(anonymous namespace)::DngGetPreviewData(piex::StreamInterface*, piex::PreviewImageData*) /src/skia/out/Fuzz/../../third_party/externals/piex/src/piex.cc:423:8
+    #6 0xa87660 in piex::GetPreviewImageData(piex::StreamInterface*, piex::PreviewImageData*) /src/skia/out/Fuzz/../../third_party/externals/piex/src/piex.cc:671:14
+    #7 0x8d4691 in SkRawCodec::MakeFromStream(std::__1::unique_ptr<SkStream, std::__1::default_delete<SkStream> >, SkCodec::Result*) /src/skia/out/Fuzz/../../src/codec/SkRawCodec.cpp:652:31
+    #8 0x88f551 in SkCodec::MakeFromStream(std::__1::unique_ptr<SkStream, std::__1::default_delete<SkStream> >, SkCodec::Result*, SkPngChunkReader*) /src/skia/out/Fuzz/../../src/codec/SkCodec.cpp:109:16
+    #9 0x88b41a in SkAndroidCodec::MakeFromStream(std::__1::unique_ptr<SkStream, std::__1::default_delete<SkStream> >, SkPngChunkReader*) /src/skia/out/Fuzz/../../src/codec/SkAndroidCodec.cpp:82:18
+    #10 0x88bf54 in SkAndroidCodec::MakeFromData(sk_sp<SkData>, SkPngChunkReader*) /src/skia/out/Fuzz/../../src/codec/SkAndroidCodec.cpp:128:12
+    #11 0x70bf86 in FuzzAnimatedImage(sk_sp<SkData>) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAnimatedImage.cpp:16:18
+    #12 0x70c7dc in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAnimatedImage.cpp:44:5
+    #13 0x6b2b51 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #14 0x689eea in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #15 0x695728 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #16 0x68958c in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #17 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #18 0x591568 in _start (/out/animated_image_decode+0x591568)
+
+DEDUP_TOKEN: piex::GetFullCropDimension(piex::tiff_directory::TiffDirectory const&, unsigned int*, unsigned int*)--piex::GetFullDimension32(piex::tiff_directory::TiffDirectory const&, unsigned int*, unsigned int*)--piex::(anonymous namespace)::FillPreviewImageData(piex::tiff_directory::TiffDirectory const&, piex::StreamInterface*, piex::PreviewImageData*)
+[1m[32m0x6020000497f4 is located 4 bytes inside of 8-byte region [0x6020000497f0,0x6020000497f8)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x685178 in operator new(unsigned long) /src/llvm/projects/compiler-rt/lib/asan/asan_new_delete.cc:92
+    #1 0x8da909 in __allocate /usr/local/bin/../include/c++/v1/new:228:10
+    #2 0x8da909 in allocate /usr/local/bin/../include/c++/v1/memory:1793
+    #3 0x8da909 in allocate /usr/local/bin/../include/c++/v1/memory:1547
+    #4 0x8da909 in std::__1::vector<unsigned int, std::__1::allocator<unsigned int> >::allocate(unsigned long) /usr/local/bin/../include/c++/v1/vector:937
+    #5 0xa8e174 in std::__1::vector<unsigned int, std::__1::allocator<unsigned int> >::vector(unsigned long) /usr/local/bin/../include/c++/v1/vector:1080:9
+    #6 0xa9cdf5 in piex::GetFullCropDimension(piex::tiff_directory::TiffDirectory const&, unsigned int*, unsigned int*) /src/skia/out/Fuzz/../../third_party/externals/piex/src/tiff_parser.cc:600:32
+    #7 0xa9c858 in piex::GetFullDimension32(piex::tiff_directory::TiffDirectory const&, unsigned int*, unsigned int*) /src/skia/out/Fuzz/../../third_party/externals/piex/src/tiff_parser.cc:560:10
+    #8 0xa9d8ad in piex::(anonymous namespace)::FillPreviewImageData(piex::tiff_directory::TiffDirectory const&, piex::StreamInterface*, piex::PreviewImageData*) /src/skia/out/Fuzz/../../third_party/externals/piex/src/tiff_parser.cc:176:14
+    #9 0xa9d357 in piex::TiffParser::GetPreviewImageData(piex::TiffContent const&, piex::PreviewImageData*) /src/skia/out/Fuzz/../../third_party/externals/piex/src/tiff_parser.cc:627:15
+    #10 0xa8c208 in piex::(anonymous namespace)::GetPreviewData(std::__1::set<unsigned int, std::__1::less<unsigned int>, std::__1::allocator<unsigned int> > const&, unsigned int, unsigned int, piex::StreamInterface*, piex::TiffContent*, piex::PreviewImageData*) /src/skia/out/Fuzz/../../third_party/externals/piex/src/piex.cc:102:22
+    #11 0xa87e2e in piex::(anonymous namespace)::DngGetPreviewData(piex::StreamInterface*, piex::PreviewImageData*) /src/skia/out/Fuzz/../../third_party/externals/piex/src/piex.cc:423:8
+    #12 0xa87660 in piex::GetPreviewImageData(piex::StreamInterface*, piex::PreviewImageData*) /src/skia/out/Fuzz/../../third_party/externals/piex/src/piex.cc:671:14
+    #13 0x8d4691 in SkRawCodec::MakeFromStream(std::__1::unique_ptr<SkStream, std::__1::default_delete<SkStream> >, SkCodec::Result*) /src/skia/out/Fuzz/../../src/codec/SkRawCodec.cpp:652:31
+    #14 0x88f551 in SkCodec::MakeFromStream(std::__1::unique_ptr<SkStream, std::__1::default_delete<SkStream> >, SkCodec::Result*, SkPngChunkReader*) /src/skia/out/Fuzz/../../src/codec/SkCodec.cpp:109:16
+    #15 0x88b41a in SkAndroidCodec::MakeFromStream(std::__1::unique_ptr<SkStream, std::__1::default_delete<SkStream> >, SkPngChunkReader*) /src/skia/out/Fuzz/../../src/codec/SkAndroidCodec.cpp:82:18
+    #16 0x88bf54 in SkAndroidCodec::MakeFromData(sk_sp<SkData>, SkPngChunkReader*) /src/skia/out/Fuzz/../../src/codec/SkAndroidCodec.cpp:128:12
+    #17 0x70bf86 in FuzzAnimatedImage(sk_sp<SkData>) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAnimatedImage.cpp:16:18
+    #18 0x70c7dc in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAnimatedImage.cpp:44:5
+    #19 0x6b2b51 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #20 0x689eea in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #21 0x695728 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #22 0x68958c in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #23 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: operator new(unsigned long)--__allocate--allocate
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/skia/out/Fuzz/../../third_party/externals/piex/src/tiff_parser.cc:604:17 in piex::GetFullCropDimension(piex::tiff_directory::TiffDirectory const&, unsigned int*, unsigned int*)
+Shadow bytes around the buggy address:
+  0x0c04800012a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c04800012b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c04800012c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c04800012d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c04800012e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m
+=>0x0c04800012f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[0m04[1m[0m][1m[31mfa[1m[0m
+  0x0c0480001300: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0480001310: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0480001320: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0480001330: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0480001340: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42529377

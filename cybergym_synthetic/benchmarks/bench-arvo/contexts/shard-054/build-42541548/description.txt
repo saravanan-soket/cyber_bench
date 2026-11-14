@@ -1,0 +1,203 @@
+ARVO id: 42541548
+Project: mupdf
+Fuzz target: pdf_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: git://git.ghostscript.com/thirdparty-freetype2.git
+
+=== Crash report ===
+INFO: Seed: 1053923651
+INFO: Loaded 1 modules   (73914 inline 8-bit counters): 73914 [0x38ee588, 0x3900642), 
+INFO: Loaded 1 PC tables (73914 PCs): 73914 [0x349ce08,0x35bd9a8), 
+/out/pdf_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+error: cannot recognize version marker
+warning: trying to repair broken xref
+warning: repairing PDF document
+warning: object missing 'endobj' token
+warning: ... repeated 2 times ...
+warning: expected 'endobj' or 'stream' keyword (8 0 R)
+warning: unknown font format, guessing type1 or truetype.
+warning: premature end of data in flate filter
+warning: ... repeated 2 times ...
+warning: freetype advance glyph (gid 9): broken file
+warning: freetype advance glyph (gid 38): broken file
+warning: freetype advance glyph (gid 46): broken file
+warning: freetype advance glyph (gid 60): broken file
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x9f6427 in fz_maxi /src/mupdf/include/mupdf/fitz/geometry.h:89:10
+    #1 0x9e2eb4 in pdf_make_width_table /src/mupdf/source/pdf/pdf-font.c:1377:30
+    #2 0x9e144e in pdf_load_font /src/mupdf/source/pdf/pdf-font.c:1439:3
+    #3 0xa28b93 in load_font_or_hail_mary /src/mupdf/source/pdf/pdf-interpret.c:73:10
+    #4 0xa1dc7b in pdf_process_keyword /src/mupdf/source/pdf/pdf-interpret.c:660:11
+    #5 0xa18a31 in pdf_process_stream /src/mupdf/source/pdf/pdf-interpret.c:937:6
+    #6 0xa179ba in pdf_process_contents /src/mupdf/source/pdf/pdf-interpret.c:1031:3
+    #7 0xad156a in pdf_run_page_contents_with_usage /src/mupdf/source/pdf/pdf-run.c:87:3
+    #8 0xad0151 in pdf_run_page_contents /src/mupdf/source/pdf/pdf-run.c:116:3
+    #9 0x5bcfbb in fz_run_page_contents /src/mupdf/source/fitz/document.c:379:4
+    #10 0x5bd8f8 in fz_run_page /src/mupdf/source/fitz/document.c:411:2
+    #11 0x76c8ae in fz_new_pixmap_from_page /src/mupdf/source/fitz/util.c:237:3
+    #12 0x76cf07 in fz_new_pixmap_from_page_number /src/mupdf/source/fitz/util.c:261:9
+    #13 0x4a002f in LLVMFuzzerTestOneInput /src/mupdf/source/fuzz/pdf_fuzzer.cc:34:13
+    #14 0x4e7e93 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:517:13
+    #15 0x4a1213 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #16 0x4b379f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #17 0x4a0351 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #18 0x7f71f015a82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #19 0x41f9a8 in _start (/out/pdf_fuzzer+0x41f9a8)
+
+DEDUP_TOKEN: fz_maxi--pdf_make_width_table--pdf_load_font
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0xbf7ad5 in cff_get_advances /src/mupdf/thirdparty/freetype/src/cff/cffdrivr.c:268:20
+    #1 0xb9db3f in FT_Get_Advance /src/mupdf/thirdparty/freetype/src/base/ftadvanc.c:97:15
+    #2 0x9eff72 in ft_width /src/mupdf/source/pdf/pdf-font.c:299:10
+    #3 0x9df0c1 in pdf_load_simple_font_by_name /src/mupdf/source/pdf/pdf-font.c:918:39
+    #4 0x9e189c in pdf_load_font /src/mupdf/source/pdf/pdf-font.c:1435:15
+    #5 0xa28b93 in load_font_or_hail_mary /src/mupdf/source/pdf/pdf-interpret.c:73:10
+    #6 0xa1dc7b in pdf_process_keyword /src/mupdf/source/pdf/pdf-interpret.c:660:11
+    #7 0xa18a31 in pdf_process_stream /src/mupdf/source/pdf/pdf-interpret.c:937:6
+    #8 0xa179ba in pdf_process_contents /src/mupdf/source/pdf/pdf-interpret.c:1031:3
+    #9 0xad156a in pdf_run_page_contents_with_usage /src/mupdf/source/pdf/pdf-run.c:87:3
+    #10 0xad0151 in pdf_run_page_contents /src/mupdf/source/pdf/pdf-run.c:116:3
+    #11 0x5bcfbb in fz_run_page_contents /src/mupdf/source/fitz/document.c:379:4
+    #12 0x5bd8f8 in fz_run_page /src/mupdf/source/fitz/document.c:411:2
+    #13 0x76c8ae in fz_new_pixmap_from_page /src/mupdf/source/fitz/util.c:237:3
+    #14 0x76cf07 in fz_new_pixmap_from_page_number /src/mupdf/source/fitz/util.c:261:9
+    #15 0x4a002f in LLVMFuzzerTestOneInput /src/mupdf/source/fuzz/pdf_fuzzer.cc:34:13
+    #16 0x4e7e93 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:517:13
+    #17 0x4a1213 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #18 0x4b379f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #19 0x4a0351 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+
+DEDUP_TOKEN: cff_get_advances--FT_Get_Advance--ft_width
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0xbff99a in cff_slot_load /src/mupdf/thirdparty/freetype/src/cff/cffgload.c
+    #1 0xbf72f6 in cff_glyph_load /src/mupdf/thirdparty/freetype/src/cff/cffdrivr.c:177:13
+    #2 0xbf7992 in cff_get_advances /src/mupdf/thirdparty/freetype/src/cff/cffdrivr.c:264:15
+    #3 0xb9db3f in FT_Get_Advance /src/mupdf/thirdparty/freetype/src/base/ftadvanc.c:97:15
+    #4 0x9eff72 in ft_width /src/mupdf/source/pdf/pdf-font.c:299:10
+    #5 0x9df0c1 in pdf_load_simple_font_by_name /src/mupdf/source/pdf/pdf-font.c:918:39
+    #6 0x9e189c in pdf_load_font /src/mupdf/source/pdf/pdf-font.c:1435:15
+    #7 0xa28b93 in load_font_or_hail_mary /src/mupdf/source/pdf/pdf-interpret.c:73:10
+    #8 0xa1dc7b in pdf_process_keyword /src/mupdf/source/pdf/pdf-interpret.c:660:11
+    #9 0xa18a31 in pdf_process_stream /src/mupdf/source/pdf/pdf-interpret.c:937:6
+    #10 0xa179ba in pdf_process_contents /src/mupdf/source/pdf/pdf-interpret.c:1031:3
+    #11 0xad156a in pdf_run_page_contents_with_usage /src/mupdf/source/pdf/pdf-run.c:87:3
+    #12 0xad0151 in pdf_run_page_contents /src/mupdf/source/pdf/pdf-run.c:116:3
+    #13 0x5bcfbb in fz_run_page_contents /src/mupdf/source/fitz/document.c:379:4
+    #14 0x5bd8f8 in fz_run_page /src/mupdf/source/fitz/document.c:411:2
+    #15 0x76c8ae in fz_new_pixmap_from_page /src/mupdf/source/fitz/util.c:237:3
+    #16 0x76cf07 in fz_new_pixmap_from_page_number /src/mupdf/source/fitz/util.c:261:9
+    #17 0x4a002f in LLVMFuzzerTestOneInput /src/mupdf/source/fuzz/pdf_fuzzer.cc:34:13
+    #18 0x4e7e93 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:517:13
+    #19 0x4a1213 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+
+DEDUP_TOKEN: cff_slot_load--cff_glyph_load--cff_get_advances
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0xc04eff in cf2_setGlyphWidth /src/mupdf/thirdparty/freetype/src/cff/cf2ft.c:91:26
+    #1 0xc01d6c in cf2_decoder_parse_charstrings /src/mupdf/thirdparty/freetype/src/cff/cf2ft.c:399:7
+    #2 0xbfdf7a in cff_slot_load /src/mupdf/thirdparty/freetype/src/cff/cffgload.c:2866:17
+    #3 0xbf72f6 in cff_glyph_load /src/mupdf/thirdparty/freetype/src/cff/cffdrivr.c:177:13
+    #4 0xbf7992 in cff_get_advances /src/mupdf/thirdparty/freetype/src/cff/cffdrivr.c:264:15
+    #5 0xb9db3f in FT_Get_Advance /src/mupdf/thirdparty/freetype/src/base/ftadvanc.c:97:15
+    #6 0x9eff72 in ft_width /src/mupdf/source/pdf/pdf-font.c:299:10
+    #7 0x9df0c1 in pdf_load_simple_font_by_name /src/mupdf/source/pdf/pdf-font.c:918:39
+    #8 0x9e189c in pdf_load_font /src/mupdf/source/pdf/pdf-font.c:1435:15
+    #9 0xa28b93 in load_font_or_hail_mary /src/mupdf/source/pdf/pdf-interpret.c:73:10
+    #10 0xa1dc7b in pdf_process_keyword /src/mupdf/source/pdf/pdf-interpret.c:660:11
+    #11 0xa18a31 in pdf_process_stream /src/mupdf/source/pdf/pdf-interpret.c:937:6
+    #12 0xa179ba in pdf_process_contents /src/mupdf/source/pdf/pdf-interpret.c:1031:3
+    #13 0xad156a in pdf_run_page_contents_with_usage /src/mupdf/source/pdf/pdf-run.c:87:3
+    #14 0xad0151 in pdf_run_page_contents /src/mupdf/source/pdf/pdf-run.c:116:3
+    #15 0x5bcfbb in fz_run_page_contents /src/mupdf/source/fitz/document.c:379:4
+    #16 0x5bd8f8 in fz_run_page /src/mupdf/source/fitz/document.c:411:2
+    #17 0x76c8ae in fz_new_pixmap_from_page /src/mupdf/source/fitz/util.c:237:3
+    #18 0x76cf07 in fz_new_pixmap_from_page_number /src/mupdf/source/fitz/util.c:261:9
+    #19 0x4a002f in LLVMFuzzerTestOneInput /src/mupdf/source/fuzz/pdf_fuzzer.cc:34:13
+
+DEDUP_TOKEN: cf2_setGlyphWidth--cf2_decoder_parse_charstrings--cff_slot_load
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0xc04de5 in cf2_getGlyphOutline /src/mupdf/thirdparty/freetype/src/cff/cf2font.c:503:17
+    #1 0xc01cbc in cf2_decoder_parse_charstrings /src/mupdf/thirdparty/freetype/src/cff/cf2ft.c:395:16
+    #2 0xbfdf7a in cff_slot_load /src/mupdf/thirdparty/freetype/src/cff/cffgload.c:2866:17
+    #3 0xbf72f6 in cff_glyph_load /src/mupdf/thirdparty/freetype/src/cff/cffdrivr.c:177:13
+    #4 0xbf7992 in cff_get_advances /src/mupdf/thirdparty/freetype/src/cff/cffdrivr.c:264:15
+    #5 0xb9db3f in FT_Get_Advance /src/mupdf/thirdparty/freetype/src/base/ftadvanc.c:97:15
+    #6 0x9eff72 in ft_width /src/mupdf/source/pdf/pdf-font.c:299:10
+    #7 0x9df0c1 in pdf_load_simple_font_by_name /src/mupdf/source/pdf/pdf-font.c:918:39
+    #8 0x9e189c in pdf_load_font /src/mupdf/source/pdf/pdf-font.c:1435:15
+    #9 0xa28b93 in load_font_or_hail_mary /src/mupdf/source/pdf/pdf-interpret.c:73:10
+    #10 0xa1dc7b in pdf_process_keyword /src/mupdf/source/pdf/pdf-interpret.c:660:11
+    #11 0xa18a31 in pdf_process_stream /src/mupdf/source/pdf/pdf-interpret.c:937:6
+    #12 0xa179ba in pdf_process_contents /src/mupdf/source/pdf/pdf-interpret.c:1031:3
+    #13 0xad156a in pdf_run_page_contents_with_usage /src/mupdf/source/pdf/pdf-run.c:87:3
+    #14 0xad0151 in pdf_run_page_contents /src/mupdf/source/pdf/pdf-run.c:116:3
+    #15 0x5bcfbb in fz_run_page_contents /src/mupdf/source/fitz/document.c:379:4
+    #16 0x5bd8f8 in fz_run_page /src/mupdf/source/fitz/document.c:411:2
+    #17 0x76c8ae in fz_new_pixmap_from_page /src/mupdf/source/fitz/util.c:237:3
+    #18 0x76cf07 in fz_new_pixmap_from_page_number /src/mupdf/source/fitz/util.c:261:9
+    #19 0x4a002f in LLVMFuzzerTestOneInput /src/mupdf/source/fuzz/pdf_fuzzer.cc:34:13
+
+DEDUP_TOKEN: cf2_getGlyphOutline--cf2_decoder_parse_charstrings--cff_slot_load
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0xc0e4f0 in cf2_interpT2CharString /src/mupdf/thirdparty/freetype/src/cff/cf2intrp.c:1421:18
+    #1 0xc04a39 in cf2_getGlyphOutline /src/mupdf/thirdparty/freetype/src/cff/cf2font.c:472:7
+    #2 0xc01cbc in cf2_decoder_parse_charstrings /src/mupdf/thirdparty/freetype/src/cff/cf2ft.c:395:16
+    #3 0xbfdf7a in cff_slot_load /src/mupdf/thirdparty/freetype/src/cff/cffgload.c:2866:17
+    #4 0xbf72f6 in cff_glyph_load /src/mupdf/thirdparty/freetype/src/cff/cffdrivr.c:177:13
+    #5 0xbf7992 in cff_get_advances /src/mupdf/thirdparty/freetype/src/cff/cffdrivr.c:264:15
+    #6 0xb9db3f in FT_Get_Advance /src/mupdf/thirdparty/freetype/src/base/ftadvanc.c:97:15
+    #7 0x9eff72 in ft_width /src/mupdf/source/pdf/pdf-font.c:299:10
+    #8 0x9df0c1 in pdf_load_simple_font_by_name /src/mupdf/source/pdf/pdf-font.c:918:39
+    #9 0x9e189c in pdf_load_font /src/mupdf/source/pdf/pdf-font.c:1435:15
+    #10 0xa28b93 in load_font_or_hail_mary /src/mupdf/source/pdf/pdf-interpret.c:73:10
+    #11 0xa1dc7b in pdf_process_keyword /src/mupdf/source/pdf/pdf-interpret.c:660:11
+    #12 0xa18a31 in pdf_process_stream /src/mupdf/source/pdf/pdf-interpret.c:937:6
+    #13 0xa179ba in pdf_process_contents /src/mupdf/source/pdf/pdf-interpret.c:1031:3
+    #14 0xad156a in pdf_run_page_contents_with_usage /src/mupdf/source/pdf/pdf-run.c:87:3
+    #15 0xad0151 in pdf_run_page_contents /src/mupdf/source/pdf/pdf-run.c:116:3
+    #16 0x5bcfbb in fz_run_page_contents /src/mupdf/source/fitz/document.c:379:4
+    #17 0x5bd8f8 in fz_run_page /src/mupdf/source/fitz/document.c:411:2
+    #18 0x76c8ae in fz_new_pixmap_from_page /src/mupdf/source/fitz/util.c:237:3
+    #19 0x76cf07 in fz_new_pixmap_from_page_number /src/mupdf/source/fitz/util.c:261:9
+
+DEDUP_TOKEN: cf2_interpT2CharString--cf2_getGlyphOutline--cf2_decoder_parse_charstrings
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0xc18ef6 in cf2_stack_pushFixed /src/mupdf/thirdparty/freetype/src/cff/cf2stack.c:120:22
+    #1 0xc0d679 in cf2_interpT2CharString /src/mupdf/thirdparty/freetype/src/cff/cf2intrp.c
+    #2 0xc04a39 in cf2_getGlyphOutline /src/mupdf/thirdparty/freetype/src/cff/cf2font.c:472:7
+    #3 0xc01cbc in cf2_decoder_parse_charstrings /src/mupdf/thirdparty/freetype/src/cff/cf2ft.c:395:16
+    #4 0xbfdf7a in cff_slot_load /src/mupdf/thirdparty/freetype/src/cff/cffgload.c:2866:17
+    #5 0xbf72f6 in cff_glyph_load /src/mupdf/thirdparty/freetype/src/cff/cffdrivr.c:177:13
+    #6 0xbf7992 in cff_get_advances /src/mupdf/thirdparty/freetype/src/cff/cffdrivr.c:264:15
+    #7 0xb9db3f in FT_Get_Advance /src/mupdf/thirdparty/freetype/src/base/ftadvanc.c:97:15
+    #8 0x9eff72 in ft_width /src/mupdf/source/pdf/pdf-font.c:299:10
+    #9 0x9df0c1 in pdf_load_simple_font_by_name /src/mupdf/source/pdf/pdf-font.c:918:39
+    #10 0x9e189c in pdf_load_font /src/mupdf/source/pdf/pdf-font.c:1435:15
+    #11 0xa28b93 in load_font_or_hail_mary /src/mupdf/source/pdf/pdf-interpret.c:73:10
+    #12 0xa1dc7b in pdf_process_keyword /src/mupdf/source/pdf/pdf-interpret.c:660:11
+    #13 0xa18a31 in pdf_process_stream /src/mupdf/source/pdf/pdf-interpret.c:937:6
+    #14 0xa179ba in pdf_process_contents /src/mupdf/source/pdf/pdf-interpret.c:1031:3
+    #15 0xad156a in pdf_run_page_contents_with_usage /src/mupdf/source/pdf/pdf-run.c:87:3
+    #16 0xad0151 in pdf_run_page_contents /src/mupdf/source/pdf/pdf-run.c:116:3
+    #17 0x5bcfbb in fz_run_page_contents /src/mupdf/source/fitz/document.c:379:4
+    #18 0x5bd8f8 in fz_run_page /src/mupdf/source/fitz/document.c:411:2
+    #19 0x76c8ae in fz_new_pixmap_from_page /src/mupdf/source/fitz/util.c:237:3
+
+DEDUP_TOKEN: cf2_stack_pushFixed--cf2_interpT2CharString--cf2_getGlyphOutline
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mstorage[1m[35m' in the stack frame of function '[1m[32mcf2_interpT2CharString[1m[35m'[1m[0m
+    #0 0xc08010 in cf2_interpT2CharString /src/mupdf/thirdparty/freetype/src/cff/cf2intrp.c:431
+
+DEDUP_TOKEN: cf2_interpT2CharString
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/mupdf/include/mupdf/fitz/geometry.h:89:10 in fz_maxi
+Unique heap origins: 296
+Stack depot allocated bytes: 42824
+Unique origin histories: 18
+History depot allocated bytes: 432
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42541548

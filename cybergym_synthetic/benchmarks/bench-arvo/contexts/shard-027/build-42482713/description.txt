@@ -1,0 +1,44 @@
+ARVO id: 42482713
+Project: matio
+Fuzz target: matio_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/tbeu/matio.git
+
+=== Crash report ===
+INFO: Seed: 2961138286
+INFO: Loaded 1 modules   (11983 inline 8-bit counters): 11983 [0xc7eee8, 0xc81db7), 
+INFO: Loaded 1 PC tables (11983 PCs): 11983 [0x9b0680,0x9df370), 
+/out/matio_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m[1m[31mUninitialized bytes in [1m[32m__interceptor_strlen[1m[31m at offset 0 inside [0x702000005bc0, 25)[1m[0m
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x7ca485 in H5MM_xstrdup /build/hdf5-3JSo9x/hdf5-1.8.16+docs/debian/build/src/../../../src/H5MM.c:187
+    #1 0x7756d4 in H5E_push_stack /build/hdf5-3JSo9x/hdf5-1.8.16+docs/debian/build/src/../../../src/H5Eint.c:854
+    #2 0x775813 in H5E_printf_stack /build/hdf5-3JSo9x/hdf5-1.8.16+docs/debian/build/src/../../../src/H5Eint.c:764
+    #3 0x780930 in H5F_super_read /build/hdf5-3JSo9x/hdf5-1.8.16+docs/debian/build/src/../../../src/H5Fsuper.c:310
+    #4 0x77b762 in H5F_open /build/hdf5-3JSo9x/hdf5-1.8.16+docs/debian/build/src/../../../src/H5Fint.c:1086
+    #5 0x776f05 in H5Fopen /build/hdf5-3JSo9x/hdf5-1.8.16+docs/debian/build/src/../../../src/H5F.c:603
+    #6 0x5278e0 in Mat_Open /src/matio/src/mat.c:492:30
+    #7 0x52559d in LLVMFuzzerTestOneInput /src/matio_fuzzer.cc:30:18
+    #8 0x45afa1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:554:15
+    #9 0x4457d1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #10 0x44b4ee in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:775:9
+    #11 0x474e72 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #12 0x7ffff6ccb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #13 0x41ec78 in _start (/out/matio_fuzzer+0x41ec78)
+
+DEDUP_TOKEN: H5MM_xstrdup--H5E_push_stack--H5E_printf_stack
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x4d597d in malloc /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cpp:916:3
+    #1 0x7ffff6dc3a17 in __vasprintf_chk (/lib/x86_64-linux-gnu/libc.so.6+0x118a17)
+
+DEDUP_TOKEN: malloc--__vasprintf_chk
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /build/hdf5-3JSo9x/hdf5-1.8.16+docs/debian/build/src/../../../src/H5MM.c:187 in H5MM_xstrdup
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42482713

@@ -1,0 +1,72 @@
+ARVO id: 42504574
+Project: binutils-gdb
+Fuzz target: fuzz_objdump_safe
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Dynamic-stack-buffer-overflow READ 8
+Language: c++
+Repo: git://sourceware.org/git/binutils-gdb.git
+
+=== Crash report ===
+Reading 58 bytes from /tmp/poc
+BFD: /tmp/libfuzzer.7: recognised but unhandled machine type (0x0) in Import Library Format archive
+BFD: /tmp/libfuzzer.7: recognised but unhandled machine type (0x0) in Import Library Format archive
+BFD: /tmp/libfuzzer.7: recognised but unhandled machine type (0x0) in Import Library Format archive
+/tmp/libfuzzer.7: /tmp/libfuzzer.7: file format not recognized
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: dynamic-stack-buffer-overflow on address 0x7fffffffdb18 at pc 0x000000ca9df2 bp 0x7fffffffd970 sp 0x7fffffffd968
+[1m[0m[1m[34mREAD of size 8 at 0x7fffffffdb18 thread T0[1m[0m
+SCARINESS: 48 (8-byte-read-dynamic-stack-buffer-overflow-far-from-bounds)
+    #0 0xca9df1 in error_handler_internal /src/binutils-gdb/bfd/bfd.c:1341:16
+    #1 0xca2780 in _bfd_error_handler /src/binutils-gdb/bfd/bfd.c:1398:3
+    #2 0x1e58c59 in pe_ILF_object_p /src/binutils-gdb/bfd/./peicode.h:1236:7
+    #3 0x1e4f1f9 in pe_bfd_object_p /src/binutils-gdb/bfd/./peicode.h:1414:12
+    #4 0xcbfec8 in bfd_check_format_matches /src/binutils-gdb/bfd/format.c:344:17
+    #5 0x4e44ab in display_object_bfd /src/binutils-gdb/binutils/./fuzz_objdump.h:5207:7
+    #6 0x4e408c in display_any_bfd /src/binutils-gdb/binutils/./fuzz_objdump.h:5299:5
+    #7 0x4e0e1e in display_file /src/binutils-gdb/binutils/./fuzz_objdump.h:5320:3
+    #8 0x4e2abb in LLVMFuzzerTestOneInput /src/binutils-gdb/binutils/fuzz_objdump.c:80:3
+    #9 0x4d90b5 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:191:7
+    #10 0x4d8f25 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #11 0x7ffff7c580b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #12 0x41e65d in _start (/out/fuzz_objdump_safe+0x41e65d)
+
+DEDUP_TOKEN: error_handler_internal--_bfd_error_handler--pe_ILF_object_p
+[1m[32mAddress 0x7fffffffdb18 is located in stack of thread T0[1m[0m
+SUMMARY: AddressSanitizer: dynamic-stack-buffer-overflow /src/binutils-gdb/bfd/bfd.c:1341:16 in error_handler_internal
+Shadow bytes around the buggy address:
+  0x10007fff7b10: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007fff7b20: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007fff7b30: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007fff7b40: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007fff7b50: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[34mca[1m[0m [1m[34mca[1m[0m [1m[34mca[1m[0m [1m[34mca[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[34mcb[1m[0m [1m[34mcb[1m[0m [1m[34mcb[1m[0m [1m[34mcb[1m[0m [1m[34mcb[1m[0m
+=>0x10007fff7b60: [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m[[1m[34mcb[1m[0m][1m[34mcb[1m[0m [1m[34mcb[1m[0m [1m[34mcb[1m[0m [1m[34mcb[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007fff7b70: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007fff7b80: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007fff7b90: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007fff7ba0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007fff7bb0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42504574

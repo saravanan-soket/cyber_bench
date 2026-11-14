@@ -1,0 +1,50 @@
+ARVO id: 42527438
+Project: harfbuzz
+Fuzz target: hb-subset-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/harfbuzz/harfbuzz.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3681700307
+INFO: Loaded 1 modules   (92466 inline 8-bit counters): 92466 [0xedaa60, 0xef1392), 
+INFO: Loaded 1 PC tables (92466 PCs): 92466 [0xef1398,0x105a6b8), 
+/out/hb-subset-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x61d00001121b (pc 0x000000c18ede bp 0x7fff217ae3d0 sp 0x7fff217ae1e0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0xc18ede in operator unsigned short /work/build/../../src/harfbuzz/src/hb-algs.hh:137:56
+    #1 0xc18ede in operator unsigned int /work/build/../../src/harfbuzz/src/OT/name/../../hb-open-type.hh:68:109
+    #2 0xc18ede in has_data /work/build/../../src/harfbuzz/src/OT/Color/COLR/../../../hb-ot-var-common.hh:1629:35
+    #3 0xc18ede in OT::glyph_variations_t::create_from_glyphs_var_data(unsigned int, hb_array_t<OT::HBFixed<OT::IntType<short, 2u>, 14u> const>, hb_subset_plan_t const*, hb_hashmap_t<unsigned int, hb_array_t<char const>, false> const&) /work/build/../../src/harfbuzz/src/hb-ot-var-gvar-table.hh:95:29
+    #4 0xc167a3 in OT::gvar::decompile_glyph_variations(hb_subset_plan_t const*, OT::glyph_variations_t&) const /work/build/../../src/harfbuzz/src/hb-ot-var-gvar-table.hh:333:23
+    #5 0xc15755 in OT::gvar::instantiate(hb_subset_context_t*) const /work/build/../../src/harfbuzz/src/hb-ot-var-gvar-table.hh:385:10
+    #6 0xc1304b in OT::gvar::subset(hb_subset_context_t*) const /work/build/../../src/harfbuzz/src/hb-ot-var-gvar-table.hh:405:7
+    #7 0xc1161e in bool _try_subset<OT::gvar>(OT::gvar const*, hb_vector_t<char, false>*, hb_subset_context_t*) /work/build/../../src/harfbuzz/src/hb-subset.cc:280:24
+    #8 0x927e1d in _subset<const OT::gvar> /work/build/../../src/harfbuzz/src/hb-subset.cc:345:14
+    #9 0x927e1d in _subset_table /work/build/../../src/harfbuzz/src/hb-subset.cc:513:31
+    #10 0x927e1d in hb_subset_plan_execute_or_fail /work/build/../../src/harfbuzz/src/hb-subset.cc:671:12
+    #11 0x91f00d in hb_subset_or_fail /work/build/../../src/harfbuzz/src/hb-subset.cc:597:24
+    #12 0x56cbed in trySubset(hb_face_t*, unsigned int const*, int, unsigned int, hb_subset_input_t*) /work/build/../../src/harfbuzz/test/fuzzing/hb-subset-fuzzer.cc:26:23
+    #13 0x56c925 in LLVMFuzzerTestOneInput /work/build/../../src/harfbuzz/test/fuzzing/hb-subset-fuzzer.cc:124:5
+    #14 0x43de73 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #15 0x4295d2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #16 0x42ee7c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #17 0x4583b2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7fc5212c8082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #19 0x41f79d in _start (/out/hb-subset-fuzzer+0x41f79d)
+
+DEDUP_TOKEN: operator unsigned short--operator unsigned int--has_data
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /work/build/../../src/harfbuzz/src/hb-algs.hh:137:56 in operator unsigned short
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42527438

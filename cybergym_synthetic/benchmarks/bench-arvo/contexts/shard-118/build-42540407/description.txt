@@ -1,0 +1,46 @@
+ARVO id: 42540407
+Project: imagemagick
+Fuzz target: ping_dng_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 2906308142
+INFO: Loaded 1 modules   (152269 inline 8-bit counters): 152269 [0x28cf548, 0x28f4815), 
+INFO: Loaded 1 PC tables (152269 PCs): 152269 [0x28f4818,0x2b474e8), 
+/out/ping_dng_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m[1m[31mUninitialized bytes in [1m[32m__interceptor_strcmp[1m[31m at offset 0 inside [0x7ffc5d3b39a0, 1)[1m[0m
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x20dc7ea in LibRaw::parse_sinar_ia() /src/libraw/internal/dcraw_common.cpp:14837:10
+    #1 0x21011d5 in LibRaw::identify() /src/libraw/internal/dcraw_common.cpp:17949:5
+    #2 0x1f738a6 in LibRaw::open_datastream(LibRaw_abstract_datastream*) /src/libraw/src/libraw_cxx.cpp:2022:5
+    #3 0x1f6f021 in LibRaw::open_file(char const*, long long) /src/libraw/src/libraw_cxx.cpp:1060:13
+    #4 0x1fc6db3 in libraw_open_file /src/libraw/src/libraw_c_api.cpp:71:16
+    #5 0xd69cb7 in ReadDNGImage /src/imagemagick/coders/dng.c:301:13
+    #6 0x7c9ba9 in ReadImage /src/imagemagick/MagickCore/constitute.c:500:13
+    #7 0xbfd4dd in ReadStream /src/imagemagick/MagickCore/stream.c:1043:9
+    #8 0x70dafa in PingBlob /src/imagemagick/MagickCore/blob.c:3507:9
+    #9 0x5c1031 in Magick::Image::ping(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:3847:12
+    #10 0x4a212e in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/ping_fuzzer.cc:43:11
+    #11 0x4ea303 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:517:13
+    #12 0x4a3526 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #13 0x4b5a82 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #14 0x4a2661 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #15 0x7f39292a682f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #16 0x421d88 in _start (/out/ping_dng_fuzzer+0x421d88)
+
+DEDUP_TOKEN: LibRaw::parse_sinar_ia()--LibRaw::identify()--LibRaw::open_datastream(LibRaw_abstract_datastream*)
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mstr[1m[35m' in the stack frame of function '[1m[32m_ZN6LibRaw14parse_sinar_iaEv[1m[35m'[1m[0m
+    #0 0x20dc340 in LibRaw::parse_sinar_ia() /src/libraw/internal/dcraw_common.cpp:14824
+
+DEDUP_TOKEN: LibRaw::parse_sinar_ia()
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/libraw/internal/dcraw_common.cpp:14837:10 in LibRaw::parse_sinar_ia()
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42540407

@@ -1,0 +1,120 @@
+ARVO id: 42478409
+Project: libvips
+Fuzz target: sharpen_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 2
+Language: c++
+Repo: https://github.com/libvips/libvips
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/sharpen_fuzzer < INPUT_FILE
+or
+  /out/sharpen_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/sharpen_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 16695 bytes from /tmp/poc
+=================================================================
+[1m[31m==6==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x602000012291 at pc 0x000000434169 bp 0x7fffffffd5b0 sp 0x7fffffffcd50
+[1m[0m[1m[34mREAD of size 2 at 0x602000012291 thread T0[1m[0m
+SCARINESS: 14 (2-byte-read-heap-buffer-overflow)
+    #0 0x434168 in strncmp /src/llvm/projects/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:471:3
+    #1 0x860503 in exif_entry_get_value /src/libexif/libexif/exif-entry.c:1044:8
+    #2 0x70b267 in vips_exif_to_s /src/libvips/libvips/foreign/exif.c:314:3
+    #3 0x70abd7 in vips_exif_attach_entry /src/libvips/libvips/foreign/exif.c:354:2
+    #4 0x855917 in exif_content_foreach_entry /src/libexif/libexif/exif-content.c:225:3
+    #5 0x85ae9c in exif_data_foreach_content /src/libexif/libexif/exif-data.c:1151:3
+    #6 0x708ab1 in vips__exif_parse /src/libvips/libvips/foreign/exif.c:511:2
+    #7 0x575710 in vips_image_set /src/libvips/libvips/iofuncs/header.c:1032:7
+    #8 0x5769dd in vips_image_set_blob /src/libvips/libvips/iofuncs/header.c:1434:2
+    #9 0x71bafa in read_jpeg_header /src/libvips/libvips/foreign/jpeg2vips.c:521:5
+    #10 0x71ab6c in vips__jpeg_read /src/libvips/libvips/foreign/jpeg2vips.c:846:7
+    #11 0x71af62 in vips__jpeg_read_buffer /src/libvips/libvips/foreign/jpeg2vips.c:1067:6
+    #12 0x71ea3d in vips_foreign_load_jpeg_buffer_header /src/libvips/libvips/foreign/jpegload.c:261:6
+    #13 0x711855 in vips_foreign_load_build /src/libvips/libvips/foreign/foreign.c:951:3
+    #14 0x71e238 in vips_foreign_load_jpeg_build /src/libvips/libvips/foreign/jpegload.c:113:6
+    #15 0x585173 in vips_object_build /src/libvips/libvips/iofuncs/object.c:367:6
+    #16 0x77e055 in vips_cache_operation_buildp /src/libvips/libvips/iofuncs/cache.c:866:7
+    #17 0x59170f in vips_call_required_optional /src/libvips/libvips/iofuncs/operation.c:880:6
+    #18 0x595214 in vips_call_by_name /src/libvips/libvips/iofuncs/operation.c:920:11
+    #19 0x5955be in vips_call_split_option_string /src/libvips/libvips/iofuncs/operation.c:1039:11
+    #20 0x57a6e2 in vips_image_new_from_buffer /src/libvips/libvips/iofuncs/image.c:2158:11
+    #21 0x4cac1a in LLVMFuzzerTestOneInput /src/libvips/fuzz/sharpen_fuzzer.cc:16:16
+    #22 0xbd062e in ExecuteFilesOnyByOne /src/libfuzzer/afl/afl_driver.cpp:216:5
+    #23 0xbd062e in main /src/libfuzzer/afl/afl_driver.cpp:253:12
+    #24 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #25 0x420398 in _start (/out/sharpen_fuzzer+0x420398)
+
+DEDUP_TOKEN: strncmp--exif_entry_get_value--vips_exif_to_s
+[1m[32m0x602000012291 is located 0 bytes to the right of 1-byte region [0x602000012290,0x602000012291)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x498952 in calloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cpp:154:3
+    #1 0x858cc4 in exif_data_alloc /src/libexif/libexif/exif-data.c:78:6
+    #2 0x85beab in exif_data_load_data_entry /src/libexif/libexif/exif-data.c:201:16
+    #3 0x857992 in exif_data_load_data_content /src/libexif/libexif/exif-data.c:514:8
+    #4 0x857004 in exif_data_load_data /src/libexif/libexif/exif-data.c:955:2
+    #5 0x708cab in vips_exif_load_data_without_fix /src/libvips/libvips/foreign/exif.c:171:2
+    #6 0x708a0f in vips__exif_parse /src/libvips/libvips/foreign/exif.c:482:13
+    #7 0x575710 in vips_image_set /src/libvips/libvips/iofuncs/header.c:1032:7
+    #8 0x5769dd in vips_image_set_blob /src/libvips/libvips/iofuncs/header.c:1434:2
+    #9 0x71bafa in read_jpeg_header /src/libvips/libvips/foreign/jpeg2vips.c:521:5
+    #10 0x71ab6c in vips__jpeg_read /src/libvips/libvips/foreign/jpeg2vips.c:846:7
+    #11 0x71af62 in vips__jpeg_read_buffer /src/libvips/libvips/foreign/jpeg2vips.c:1067:6
+    #12 0x71ea3d in vips_foreign_load_jpeg_buffer_header /src/libvips/libvips/foreign/jpegload.c:261:6
+    #13 0x711855 in vips_foreign_load_build /src/libvips/libvips/foreign/foreign.c:951:3
+    #14 0x71e238 in vips_foreign_load_jpeg_build /src/libvips/libvips/foreign/jpegload.c:113:6
+    #15 0x585173 in vips_object_build /src/libvips/libvips/iofuncs/object.c:367:6
+    #16 0x77e055 in vips_cache_operation_buildp /src/libvips/libvips/iofuncs/cache.c:866:7
+    #17 0x59170f in vips_call_required_optional /src/libvips/libvips/iofuncs/operation.c:880:6
+    #18 0x595214 in vips_call_by_name /src/libvips/libvips/iofuncs/operation.c:920:11
+    #19 0x5955be in vips_call_split_option_string /src/libvips/libvips/iofuncs/operation.c:1039:11
+    #20 0x57a6e2 in vips_image_new_from_buffer /src/libvips/libvips/iofuncs/image.c:2158:11
+    #21 0x4cac1a in LLVMFuzzerTestOneInput /src/libvips/fuzz/sharpen_fuzzer.cc:16:16
+    #22 0xbd062e in ExecuteFilesOnyByOne /src/libfuzzer/afl/afl_driver.cpp:216:5
+    #23 0xbd062e in main /src/libfuzzer/afl/afl_driver.cpp:253:12
+    #24 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: calloc--exif_data_alloc--exif_data_load_data_entry
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm/projects/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:471:3 in strncmp
+Shadow bytes around the buggy address:
+  0x0c047fffa400: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fffa410: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m06[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m
+  0x0c047fffa420: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+  0x0c047fffa430: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m07[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m06[1m[0m [1m[31mfa[1m[0m
+  0x0c047fffa440: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c047fffa450: [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[0m01[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+  0x0c047fffa460: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m
+  0x0c047fffa470: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fffa480: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fffa490: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c047fffa4a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==6==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42478409

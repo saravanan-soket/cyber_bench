@@ -1,0 +1,53 @@
+ARVO id: 42470994
+Project: harfbuzz
+Fuzz target: hb-shape-fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/harfbuzz/harfbuzz.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/hb-shape-fuzzer < INPUT_FILE
+or
+  /out/hb-shape-fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/hb-shape-fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 194 bytes from /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==8==ERROR: AddressSanitizer: SEGV on unknown address 0x611007dffc95 (pc 0x0000005c67e6 bp 0x7fffffffda30 sp 0x7fffffffda20 T0)
+[1m[0m==8==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x5c67e5 in BEInt<int, 4>::operator int() const /src/harfbuzz/src/./hb-machinery.hh:711:13
+    #1 0x5ea412 in AAT::KerxSubTableFormat6::get_kerning(unsigned int, unsigned int, unsigned int) const /src/harfbuzz/src/./hb-aat-layout-kerx-table.hh:246:14
+    #2 0x5e9e43 in hb_kern_machine_t<AAT::KerxSubTableFormat6::accelerator_t>::kern(hb_font_t*, hb_buffer_t*, unsigned int) const /src/harfbuzz/src/./hb-ot-kern-table.hh:73:35
+    #3 0x5e99cf in AAT::KerxSubTableFormat6::apply(AAT::hb_aat_apply_context_t*) const /src/harfbuzz/src/./hb-aat-layout-kerx-table.hh:272:13
+    #4 0x5e75d4 in AAT::hb_aat_apply_context_t::return_t AAT::KerxTable::dispatch<AAT::hb_aat_apply_context_t>(AAT::hb_aat_apply_context_t*) const /src/harfbuzz/src/./hb-aat-layout-kerx-table.hh:363:15
+    #5 0x5d265e in AAT::kerx::apply(AAT::hb_aat_apply_context_t*) const /src/harfbuzz/src/./hb-aat-layout-kerx-table.hh:434:14
+    #6 0x5d239d in hb_aat_layout_position(hb_ot_shape_plan_t*, hb_font_t*, hb_buffer_t*) /src/harfbuzz/src/hb-aat-layout.cc:107:8
+    #7 0x586d44 in hb_ot_position_complex(hb_ot_shape_context_t const*) /src/harfbuzz/src/hb-ot-shape.cc:838:5
+    #8 0x5831b0 in hb_ot_position(hb_ot_shape_context_t const*) /src/harfbuzz/src/hb-ot-shape.cc:872:3
+    #9 0x581087 in hb_ot_shape_internal(hb_ot_shape_context_t*) /src/harfbuzz/src/hb-ot-shape.cc:953:3
+    #10 0x580b6a in _hb_ot_shape /src/harfbuzz/src/hb-ot-shape.cc:980:3
+    #11 0x567c16 in hb_shape_plan_execute /src/harfbuzz/src/./hb-shaper-list.hh:42:1
+    #12 0x566618 in hb_shape_full /src/harfbuzz/src/hb-shape.cc:141:19
+    #13 0x5301d7 in LLVMFuzzerTestOneInput /src/harfbuzz/./test/fuzzing/hb-shape-fuzzer.cc:20:5
+    #14 0x53076e in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:301:5
+    #15 0x530cde in main /src/libfuzzer/afl/afl_driver.cpp:339:12
+    #16 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #17 0x41cd18 in _start (/out/hb-shape-fuzzer+0x41cd18)
+
+DEDUP_TOKEN: BEInt<int, 4>::operator int() const--AAT::KerxSubTableFormat6::get_kerning(unsigned int, unsigned int, unsigned int) const--hb_kern_machine_t<AAT::KerxSubTableFormat6::accelerator_t>::kern(hb_font_t*, hb_buffer_t*, unsigned int) const
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/harfbuzz/src/./hb-machinery.hh:711:13 in BEInt<int, 4>::operator int() const
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42470994

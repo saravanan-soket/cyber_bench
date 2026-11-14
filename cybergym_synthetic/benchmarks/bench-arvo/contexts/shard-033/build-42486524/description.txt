@@ -1,0 +1,66 @@
+ARVO id: 42486524
+Project: skia
+Fuzz target: sksl2pipeline
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Seed: 1117659708
+INFO: Loaded 1 modules   (199462 inline 8-bit counters): 199462 [0x3949ec8, 0x397a9ee), 
+INFO: Loaded 1 PC tables (199462 PCs): 199462 [0x397a9f0,0x3c85c50), 
+/out/sksl2pipeline: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0xd10639 in std::__1::__hash_iterator<std::__1::__hash_node<int, void*>*> std::__1::__hash_table<int, std::__1::hash<int>, std::__1::equal_to<int>, std::__1::allocator<int> >::find<int>(int const&) /usr/local/bin/../include/c++/v1/__hash_table:2463:31
+    #1 0xc7b98a in std::__1::unordered_set<int, std::__1::hash<int>, std::__1::equal_to<int>, std::__1::allocator<int> >::find(int const&) /usr/local/bin/../include/c++/v1/unordered_set:679:69
+    #2 0xc69751 in SkSL::IRGenerator::convertSwitch(SkSL::ASTNode const&) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:632:28
+    #3 0xc64457 in SkSL::IRGenerator::convertSingleStatement(SkSL::ASTNode const&) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:205:26
+    #4 0xc6e5a5 in SkSL::IRGenerator::convertStatement(SkSL::ASTNode const&) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:237:47
+    #5 0xc64dbb in SkSL::IRGenerator::convertBlock(SkSL::ASTNode const&) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:258:54
+    #6 0xc8a546 in SkSL::IRGenerator::convertFunction(SkSL::ASTNode const&) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:1015:45
+    #7 0xcd0056 in SkSL::IRGenerator::convertProgram(SkSL::Program::Kind, char const*, unsigned long, std::__1::vector<std::__1::unique_ptr<SkSL::ProgramElement, std::__1::default_delete<SkSL::ProgramElement> >, std::__1::allocator<std::__1::unique_ptr<SkSL::ProgramElement, std::__1::default_delete<SkSL::ProgramElement> > > >*) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:3189:23
+    #8 0xbb71bc in SkSL::Compiler::convertProgram(SkSL::Program::Kind, SkSL::String, SkSL::Program::Settings const&) /src/skia/out/Fuzz/../../src/sksl/SkSLCompiler.cpp:1606:19
+    #9 0x8d250b in FuzzSKSL2Pipeline(sk_sp<SkData>) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSKSL2Pipeline.cpp:18:55
+    #10 0x8d300d in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSKSL2Pipeline.cpp:36:5
+    #11 0x81ef51 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:559:15
+    #12 0x80aa22 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:301:6
+    #13 0x8109bd in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:801:9
+    #14 0x837472 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0x7ffff3d2b83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #16 0x7e55a8 in _start (/out/sksl2pipeline+0x7e55a8)
+
+DEDUP_TOKEN: std::__1::__hash_iterator<std::__1::__hash_node<int, void*>*> std::__1::__hash_table<int, std::__1::hash<int>, std::__1::equal_to<int>, std::__1::allocator<int> >::find<int>(int const&)--std::__1::unordered_set<int, std::__1::hash<int>, std::__1::equal_to<int>, std::__1::allocator<int> >::find(int const&)--SkSL::IRGenerator::convertSwitch(SkSL::ASTNode const&)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0xc6a36a in SkSL::IRGenerator::convertSwitch(SkSL::ASTNode const&) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:632:33
+    #1 0xc64457 in SkSL::IRGenerator::convertSingleStatement(SkSL::ASTNode const&) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:205:26
+    #2 0xc6e5a5 in SkSL::IRGenerator::convertStatement(SkSL::ASTNode const&) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:237:47
+    #3 0xc64dbb in SkSL::IRGenerator::convertBlock(SkSL::ASTNode const&) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:258:54
+    #4 0xc8a546 in SkSL::IRGenerator::convertFunction(SkSL::ASTNode const&) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:1015:45
+    #5 0xcd0056 in SkSL::IRGenerator::convertProgram(SkSL::Program::Kind, char const*, unsigned long, std::__1::vector<std::__1::unique_ptr<SkSL::ProgramElement, std::__1::default_delete<SkSL::ProgramElement> >, std::__1::allocator<std::__1::unique_ptr<SkSL::ProgramElement, std::__1::default_delete<SkSL::ProgramElement> > > >*) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:3189:23
+    #6 0xbb71bc in SkSL::Compiler::convertProgram(SkSL::Program::Kind, SkSL::String, SkSL::Program::Settings const&) /src/skia/out/Fuzz/../../src/sksl/SkSLCompiler.cpp:1606:19
+    #7 0x8d250b in FuzzSKSL2Pipeline(sk_sp<SkData>) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSKSL2Pipeline.cpp:18:55
+    #8 0x8d300d in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSKSL2Pipeline.cpp:36:5
+    #9 0x81ef51 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:559:15
+    #10 0x80aa22 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:301:6
+    #11 0x8109bd in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:801:9
+    #12 0x837472 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7ffff3d2b83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: SkSL::IRGenerator::convertSwitch(SkSL::ASTNode const&)--SkSL::IRGenerator::convertSingleStatement(SkSL::ASTNode const&)--SkSL::IRGenerator::convertStatement(SkSL::ASTNode const&)
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mv[1m[35m' in the stack frame of function '[1m[32m_ZN4SkSL11IRGenerator13convertSwitchERKNS_7ASTNodeE[1m[35m'[1m[0m
+    #0 0xc68870 in SkSL::IRGenerator::convertSwitch(SkSL::ASTNode const&) /src/skia/out/Fuzz/../../src/sksl/SkSLIRGenerator.cpp:595
+
+DEDUP_TOKEN: SkSL::IRGenerator::convertSwitch(SkSL::ASTNode const&)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /usr/local/bin/../include/c++/v1/__hash_table:2463:31 in std::__1::__hash_iterator<std::__1::__hash_node<int, void*>*> std::__1::__hash_table<int, std::__1::hash<int>, std::__1::equal_to<int>, std::__1::allocator<int> >::find<int>(int const&)
+Unique heap origins: 1851
+Stack depot allocated bytes: 286624
+Unique origin histories: 429
+History depot allocated bytes: 10296
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42486524

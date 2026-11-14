@@ -1,0 +1,76 @@
+ARVO id: 42509269
+Project: opus
+Fuzz target: opus_projection_encoder_fuzzer_fixed
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://gitlab.xiph.org/xiph/opus.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 442701692
+INFO: Loaded 1 modules   (10056 inline 8-bit counters): 10056 [0x74d30a, 0x74fa52), 
+INFO: Loaded 1 PC tables (10056 PCs): 10056 [0x6d9300,0x700780), 
+/out/opus_projection_encoder_fuzzer_fixed: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m[1m[31mUninitialized bytes in [1m[32mMemcmpInterceptorCommon[1m[31m at offset 4520 inside [0x7ffcfcc6f888, 7192)[1m[0m
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x4d899d in memcmp /src/llvm-project/compiler-rt/lib/msan/../sanitizer_common/sanitizer_common_interceptors.inc:892:10
+    #1 0x620faf in silk_VAD_GetSA_Q8_sse4_1 /src/opus/silk/x86/VAD_sse4_1.c:284:5
+    #2 0x6023bf in silk_encode_do_VAD_FIX /src/opus/silk/fixed/encode_frame_FIX.c:55:5
+    #3 0x5e7684 in silk_Encode /src/opus/silk/enc_API.c:439:21
+    #4 0x540975 in opus_encode_native /src/opus/src/opus_encoder.c:1837:15
+    #5 0x55e0bc in opus_multistream_encode_native /src/opus/src/opus_multistream_encoder.c:987:13
+    #6 0x52c8f7 in opus_projection_encode /src/opus/src/opus_projection_encoder.c:348:10
+    #7 0x52a68d in LLVMFuzzerTestOneInput /src/opus/tests/opus_projection_encoder_fuzzer.cc:91:9
+    #8 0x4551c2 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #9 0x440d72 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x4465dc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #11 0x46ef72 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7fd9eef090b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x240b2)
+    #13 0x41f4bd in _start (/out/opus_projection_encoder_fuzzer_fixed+0x41f4bd)
+
+DEDUP_TOKEN: memcmp--silk_VAD_GetSA_Q8_sse4_1--silk_encode_do_VAD_FIX
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x4ce399 in __msan_memcpy /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1584:3
+    #1 0x61f004 in silk_VAD_GetSA_Q8_sse4_1 /src/opus/silk/x86/VAD_sse4_1.c:70:5
+    #2 0x6023bf in silk_encode_do_VAD_FIX /src/opus/silk/fixed/encode_frame_FIX.c:55:5
+    #3 0x5e7684 in silk_Encode /src/opus/silk/enc_API.c:439:21
+    #4 0x540975 in opus_encode_native /src/opus/src/opus_encoder.c:1837:15
+    #5 0x55e0bc in opus_multistream_encode_native /src/opus/src/opus_multistream_encoder.c:987:13
+    #6 0x52c8f7 in opus_projection_encode /src/opus/src/opus_projection_encoder.c:348:10
+    #7 0x52a68d in LLVMFuzzerTestOneInput /src/opus/tests/opus_projection_encoder_fuzzer.cc:91:9
+    #8 0x4551c2 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #9 0x440d72 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x4465dc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #11 0x46ef72 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7fd9eef090b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x240b2)
+
+DEDUP_TOKEN: __msan_memcpy--silk_VAD_GetSA_Q8_sse4_1--silk_encode_do_VAD_FIX
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x4ce399 in __msan_memcpy /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1584:3
+    #1 0x609766 in silk_find_pred_coefs_FIX /src/opus/silk/fixed/find_pred_coefs_FIX.c:143:5
+    #2 0x602e29 in silk_encode_frame_FIX /src/opus/silk/fixed/encode_frame_FIX.c:155:9
+    #3 0x5e6ae6 in silk_Encode /src/opus/silk/enc_API.c:499:33
+    #4 0x540975 in opus_encode_native /src/opus/src/opus_encoder.c:1837:15
+    #5 0x55e0bc in opus_multistream_encode_native /src/opus/src/opus_multistream_encoder.c:987:13
+    #6 0x52c8f7 in opus_projection_encode /src/opus/src/opus_projection_encoder.c:348:10
+    #7 0x52a68d in LLVMFuzzerTestOneInput /src/opus/tests/opus_projection_encoder_fuzzer.cc:91:9
+    #8 0x4551c2 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #9 0x440d72 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x4465dc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #11 0x46ef72 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7fd9eef090b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x240b2)
+
+DEDUP_TOKEN: __msan_memcpy--silk_find_pred_coefs_FIX--silk_encode_frame_FIX
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mNLSF_Q15[1m[35m' in the stack frame of function '[1m[32msilk_find_pred_coefs_FIX[1m[35m'[1m[0m
+    #0 0x607d40 in silk_find_pred_coefs_FIX /src/opus/silk/fixed/find_pred_coefs_FIX.c:42
+
+DEDUP_TOKEN: silk_find_pred_coefs_FIX
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/llvm-project/compiler-rt/lib/msan/../sanitizer_common/sanitizer_common_interceptors.inc:892:10 in memcmp
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42509269

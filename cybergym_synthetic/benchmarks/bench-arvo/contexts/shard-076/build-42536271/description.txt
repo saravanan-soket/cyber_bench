@@ -1,0 +1,44 @@
+ARVO id: 42536271
+Project: wamr
+Fuzz target: wasm_mutator_fuzz
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c
+Repo: https://github.com/bytecodealliance/wasm-micro-runtime
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1741063280
+INFO: Loaded 1 modules   (9306 inline 8-bit counters): 9306 [0x564b0e4c5ae8, 0x564b0e4c7f42), 
+INFO: Loaded 1 PC tables (9306 PCs): 9306 [0x564b0e4c7f48,0x564b0e4ec4e8), 
+/out/wasm_mutator_fuzz: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x7f71bcef7ff8 (pc 0x564b0e30c758 bp 0x7ffd830a3810 sp 0x7ffd830a3600 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x564b0e30c758 in load_native_symbol_section /src/wamr/core/iwasm/aot/aot_loader.c:682:47
+    #1 0x564b0e2f8149 in load_custom_section /src/wamr/core/iwasm/aot/aot_loader.c:892:18
+    #2 0x564b0e2e9d46 in load_from_sections /src/wamr/core/iwasm/aot/aot_loader.c:3710:22
+    #3 0x564b0e2ed8f9 in load /src/wamr/core/iwasm/aot/aot_loader.c:4111:11
+    #4 0x564b0e2ed0ca in aot_load_from_aot_file /src/wamr/core/iwasm/aot/aot_loader.c:4156:10
+    #5 0x564b0e2b910d in wasm_runtime_load_ex /src/wamr/core/iwasm/common/wasm_runtime_common.c:1365:45
+    #6 0x564b0e2b95c3 in wasm_runtime_load /src/wamr/core/iwasm/common/wasm_runtime_common.c:1398:12
+    #7 0x564b0e2b6da3 in LLVMFuzzerTestOneInput /src/wamr/tests/fuzz/wasm-mutator-fuzz/wasm_mutator_fuzz.cc:34:9
+    #8 0x564b0e169670 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #9 0x564b0e153e04 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #10 0x564b0e15989a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #11 0x564b0e185c92 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f6ec0a0f082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+    #13 0x564b0e14a8dd in _start (/out/wasm_mutator_fuzz+0x908dd)
+
+DEDUP_TOKEN: load_native_symbol_section--load_custom_section--load_from_sections
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/wamr/core/iwasm/aot/aot_loader.c:682:47 in load_native_symbol_section
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42536271

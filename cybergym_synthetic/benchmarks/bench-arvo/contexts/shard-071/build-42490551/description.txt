@@ -1,0 +1,72 @@
+ARVO id: 42490551
+Project: selinux
+Fuzz target: secilc-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c
+Repo: https://github.com/SELinuxProject/selinux
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4069995860
+INFO: Loaded 1 modules   (14419 inline 8-bit counters): 14419 [0x9b6178, 0x9b99cb), 
+INFO: Loaded 1 PC tables (14419 PCs): 14419 [0x9b99d0,0x9f1f00), 
+/out/secilc-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Failed to find sensitivity
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x70fd0b in cil_reset_classperms_list /src/selinux/libsepol/src/../cil/src/cil_reset_ast.c:67:6
+    #1 0x70d875 in cil_reset_classpermission /src/selinux/libsepol/src/../cil/src/cil_reset_ast.c:55:2
+    #2 0x70fdf9 in cil_reset_classperms_set /src/selinux/libsepol/src/../cil/src/cil_reset_ast.c:60:2
+    #3 0x70fc69 in cil_reset_classperms_list /src/selinux/libsepol/src/../cil/src/cil_reset_ast.c:75:4
+    #4 0x70d875 in cil_reset_classpermission /src/selinux/libsepol/src/../cil/src/cil_reset_ast.c:55:2
+    #5 0x70d199 in __cil_reset_node /src/selinux/libsepol/src/../cil/src/cil_reset_ast.c:423:3
+    #6 0x63dca1 in cil_tree_walk_core /src/selinux/libsepol/src/../cil/src/cil_tree.c:272:9
+    #7 0x63e40e in cil_tree_walk /src/selinux/libsepol/src/../cil/src/cil_tree.c:316:7
+    #8 0x63df18 in cil_tree_walk_core /src/selinux/libsepol/src/../cil/src/cil_tree.c:284:9
+    #9 0x63e40e in cil_tree_walk /src/selinux/libsepol/src/../cil/src/cil_tree.c:316:7
+    #10 0x70f8fd in cil_reset_ast /src/selinux/libsepol/src/../cil/src/cil_reset_ast.c:585:7
+    #11 0x636911 in cil_resolve_ast /src/selinux/libsepol/src/../cil/src/cil_resolve_ast.c:4008:9
+    #12 0x54b7dc in cil_compile /src/selinux/libsepol/src/../cil/src/cil.c:550:7
+    #13 0x525314 in LLVMFuzzerTestOneInput /src/secilc-fuzzer.c:59:6
+    #14 0x459b31 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #15 0x4438c2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #16 0x449c05 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #17 0x473ab2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #19 0x41e7d8 in _start (/out/secilc-fuzzer+0x41e7d8)
+
+DEDUP_TOKEN: cil_reset_classperms_list--cil_reset_classpermission--cil_reset_classperms_set
+  [1m[35mUninitialized value was created by a heap deallocation[1m[0m
+    #0 0x4ce669 in free /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:222:3
+    #1 0x59881b in cil_destroy_classpermission /src/selinux/libsepol/src/../cil/src/cil_build_ast.c:806:2
+    #2 0x54c4a8 in cil_destroy_data /src/selinux/libsepol/src/../cil/src/cil.c:678:3
+    #3 0x63da3a in cil_tree_node_destroy /src/selinux/libsepol/src/../cil/src/cil_tree.c:235:4
+    #4 0x63d647 in cil_tree_children_destroy /src/selinux/libsepol/src/../cil/src/cil_tree.c
+    #5 0x635bdf in __cil_resolve_ast_last_child_helper /src/selinux/libsepol/src/../cil/src/cil_resolve_ast.c:3855:4
+    #6 0x63e505 in cil_tree_walk /src/selinux/libsepol/src/../cil/src/cil_tree.c:322:8
+    #7 0x63df18 in cil_tree_walk_core /src/selinux/libsepol/src/../cil/src/cil_tree.c:284:9
+    #8 0x63e40e in cil_tree_walk /src/selinux/libsepol/src/../cil/src/cil_tree.c:316:7
+    #9 0x63df18 in cil_tree_walk_core /src/selinux/libsepol/src/../cil/src/cil_tree.c:284:9
+    #10 0x63e40e in cil_tree_walk /src/selinux/libsepol/src/../cil/src/cil_tree.c:316:7
+    #11 0x636114 in cil_resolve_ast /src/selinux/libsepol/src/../cil/src/cil_resolve_ast.c:3926:8
+    #12 0x54b7dc in cil_compile /src/selinux/libsepol/src/../cil/src/cil.c:550:7
+    #13 0x525314 in LLVMFuzzerTestOneInput /src/secilc-fuzzer.c:59:6
+    #14 0x459b31 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #15 0x4438c2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #16 0x449c05 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #17 0x473ab2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: free--cil_destroy_classpermission--cil_destroy_data
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/selinux/libsepol/src/../cil/src/cil_reset_ast.c:67:6 in cil_reset_classperms_list
+Unique heap origins: 458
+Stack depot allocated bytes: 52488
+Unique origin histories: 2
+History depot allocated bytes: 48
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42490551

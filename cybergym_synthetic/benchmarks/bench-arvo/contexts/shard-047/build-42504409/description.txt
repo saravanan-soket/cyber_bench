@@ -1,0 +1,94 @@
+ARVO id: 42504409
+Project: harfbuzz
+Fuzz target: hb-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/harfbuzz/harfbuzz.git
+
+=== Crash report ===
+INFO: Seed: 4143628822
+INFO: Loaded 1 modules   (10584 guards): 10584 [0xbb5e88, 0xbc03e8), 
+/out/hb-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x57ff7d in hb_buffer_t::_unsafe_to_break_set_mask(hb_glyph_info_t*, unsigned int, unsigned int, unsigned int) /src/harfbuzz/src/./hb-buffer-private.hh:323:11
+    #1 0x6c85d8 in apply_stch(hb_ot_shape_plan_t const*, hb_buffer_t*, hb_font_t*) /src/harfbuzz/src/hb-ot-shape-complex-arabic.cc:563:10
+    #2 0x6c0ff9 in postprocess_glyphs_arabic(hb_ot_shape_plan_t const*, hb_buffer_t*, hb_font_t*) /src/harfbuzz/src/hb-ot-shape-complex-arabic.cc:609:3
+    #3 0x6af660 in hb_ot_shape_internal(hb_ot_shape_context_t*) /src/harfbuzz/src/hb-ot-shape.cc:855:5
+    #4 0x6aed32 in _hb_ot_shape /src/harfbuzz/src/hb-ot-shape.cc:876:3
+    #5 0x5ad244 in hb_shape_plan_execute /src/harfbuzz/src/./hb-shaper-list.hh:43:1
+    #6 0x5aa639 in hb_shape_full /src/harfbuzz/src/hb-shape.cc:132:19
+    #7 0x49ba5b in LLVMFuzzerTestOneInput /src/harfbuzz/./test/fuzzing/hb-fuzzer.cc:30:5
+    #8 0x4d6a36 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:499:13
+    #9 0x49cd4c in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #10 0x4b1055 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:690:9
+    #11 0x49bea1 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #12 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #13 0x41ea68 in _start (/out/hb-fuzzer+0x41ea68)
+
+DEDUP_TOKEN: hb_buffer_t::_unsafe_to_break_set_mask(hb_glyph_info_t*, unsigned int, unsigned int, unsigned int)--apply_stch(hb_ot_shape_plan_t const*, hb_buffer_t*, hb_font_t*)--postprocess_glyphs_arabic(hb_ot_shape_plan_t const*, hb_buffer_t*, hb_font_t*)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x57fb56 in hb_buffer_t::_unsafe_to_break_find_min_cluster(hb_glyph_info_t const*, unsigned int, unsigned int, unsigned int) const /src/harfbuzz/src/./hb-buffer-private.hh:314:15
+    #1 0x571557 in hb_buffer_t::unsafe_to_break_impl(unsigned int, unsigned int) /src/harfbuzz/src/hb-buffer.cc:646:13
+    #2 0x6c85d8 in apply_stch(hb_ot_shape_plan_t const*, hb_buffer_t*, hb_font_t*) /src/harfbuzz/src/hb-ot-shape-complex-arabic.cc:563:10
+    #3 0x6c0ff9 in postprocess_glyphs_arabic(hb_ot_shape_plan_t const*, hb_buffer_t*, hb_font_t*) /src/harfbuzz/src/hb-ot-shape-complex-arabic.cc:609:3
+    #4 0x6af660 in hb_ot_shape_internal(hb_ot_shape_context_t*) /src/harfbuzz/src/hb-ot-shape.cc:855:5
+    #5 0x6aed32 in _hb_ot_shape /src/harfbuzz/src/hb-ot-shape.cc:876:3
+    #6 0x5ad244 in hb_shape_plan_execute /src/harfbuzz/src/./hb-shaper-list.hh:43:1
+    #7 0x5aa639 in hb_shape_full /src/harfbuzz/src/hb-shape.cc:132:19
+    #8 0x49ba5b in LLVMFuzzerTestOneInput /src/harfbuzz/./test/fuzzing/hb-fuzzer.cc:30:5
+    #9 0x4d6a36 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:499:13
+    #10 0x49cd4c in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #11 0x4b1055 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:690:9
+    #12 0x49bea1 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #13 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: hb_buffer_t::_unsafe_to_break_find_min_cluster(hb_glyph_info_t const*, unsigned int, unsigned int, unsigned int) const--hb_buffer_t::unsafe_to_break_impl(unsigned int, unsigned int)--apply_stch(hb_ot_shape_plan_t const*, hb_buffer_t*, hb_font_t*)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x44f4d5 in realloc /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:861
+    #1 0x569f5f in hb_buffer_t::enlarge(unsigned int) /src/harfbuzz/src/hb-buffer.cc:138:34
+    #2 0x57f2b5 in hb_buffer_t::ensure(unsigned int) /src/harfbuzz/src/./hb-buffer-private.hh:267:56
+    #3 0x56a6fe in hb_buffer_t::make_room_for(unsigned int, unsigned int) /src/harfbuzz/src/hb-buffer.cc:161:7
+    #4 0x56c7d9 in hb_buffer_t::output_glyph(unsigned int) /src/harfbuzz/src/hb-buffer.cc:375:7
+    #5 0x68aff8 in OT::Sequence::apply(OT::hb_apply_context_t*) const /src/harfbuzz/src/./hb-ot-layout-gsub-table.hh:302:10
+    #6 0x68abca in OT::MultipleSubstFormat1::apply(OT::hb_apply_context_t*) const /src/harfbuzz/src/./hb-ot-layout-gsub-table.hh:375:5
+    #7 0x606b1d in apply_forward(OT::hb_apply_context_t*, hb_ot_layout_lookup_accelerator_t const&, hb_auto_array_t<hb_get_subtables_context_t::hb_applicable_t> const&) /src/harfbuzz/src/hb-ot-layout.cc:1118:27
+    #8 0x5f426b in void apply_string<GSUBProxy>(OT::hb_apply_context_t*, GSUBProxy::Lookup const&, hb_ot_layout_lookup_accelerator_t const&) /src/harfbuzz/src/hb-ot-layout.cc:1186:11
+    #9 0x60e16a in void hb_ot_map_t::apply<GSUBProxy>(GSUBProxy const&, hb_ot_shape_plan_t const*, hb_font_t*, hb_buffer_t*) const /src/harfbuzz/src/hb-ot-layout.cc:1227:7
+    #10 0x5f3c95 in hb_ot_map_t::substitute(hb_ot_shape_plan_t const*, hb_font_t*, hb_buffer_t*) const /src/harfbuzz/src/hb-ot-layout.cc:1244:3
+    #11 0x6af55d in hb_ot_shape_internal(hb_ot_shape_context_t*) /src/harfbuzz/src/hb-ot-shape.cc:849:3
+    #12 0x6aed32 in _hb_ot_shape /src/harfbuzz/src/hb-ot-shape.cc:876:3
+    #13 0x5ad244 in hb_shape_plan_execute /src/harfbuzz/src/./hb-shaper-list.hh:43:1
+    #14 0x5aa639 in hb_shape_full /src/harfbuzz/src/hb-shape.cc:132:19
+    #15 0x49ba5b in LLVMFuzzerTestOneInput /src/harfbuzz/./test/fuzzing/hb-fuzzer.cc:30:5
+    #16 0x4d6a36 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:499:13
+    #17 0x49cd4c in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #18 0x4b1055 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:690:9
+    #19 0x49bea1 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+
+DEDUP_TOKEN: realloc--hb_buffer_t::enlarge(unsigned int)--hb_buffer_t::ensure(unsigned int)
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x44f4d5 in realloc /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:861
+    #1 0x569f5f in hb_buffer_t::enlarge(unsigned int) /src/harfbuzz/src/hb-buffer.cc:138:34
+    #2 0x57f2b5 in hb_buffer_t::ensure(unsigned int) /src/harfbuzz/src/./hb-buffer-private.hh:267:56
+    #3 0x5777a4 in void hb_buffer_add_utf<hb_utf32_t<true> >(hb_buffer_t*, hb_utf32_t<true>::codepoint_t const*, int, unsigned int, int) /src/harfbuzz/src/hb-buffer.cc:1527:11
+    #4 0x49ba10 in LLVMFuzzerTestOneInput /src/harfbuzz/./test/fuzzing/hb-fuzzer.cc:28:5
+    #5 0x4d6a36 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:499:13
+    #6 0x49cd4c in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #7 0x4b1055 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:690:9
+    #8 0x49bea1 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #9 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: realloc--hb_buffer_t::enlarge(unsigned int)--hb_buffer_t::ensure(unsigned int)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/harfbuzz/src/./hb-buffer-private.hh:323:11 in hb_buffer_t::_unsafe_to_break_set_mask(hb_glyph_info_t*, unsigned int, unsigned int, unsigned int)
+Unique heap origins: 83
+Stack depot allocated bytes: 9152
+Unique origin histories: 18
+History depot allocated bytes: 432
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42504409

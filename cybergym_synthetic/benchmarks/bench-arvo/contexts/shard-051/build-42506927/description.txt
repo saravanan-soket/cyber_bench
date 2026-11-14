@@ -1,0 +1,65 @@
+ARVO id: 42506927
+Project: ghostpdl
+Fuzz target: gstoraster_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://cgit.ghostscript.com/ghostpdl.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 749801317
+INFO: Loaded 3 modules   (182523 inline 8-bit counters): 13708 [0x7faeabeb59e0, 0x7faeabeb8f6c), 959 [0x7faeabf16a40, 0x7faeabf16dff), 167856 [0x2d97c90, 0x2dc0c40), 
+INFO: Loaded 3 PC tables (182523 PCs): 13708 [0x7faeabeb8f70,0x7faeabeee830), 959 [0x7faeabf16e00,0x7faeabf1a9f0), 167856 [0x24c5430,0x2754f30), 
+/out/gstoraster_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x00013fff8001 (pc 0x000000ebd5c4 bp 0x7ffc945cba80 sp 0x7ffc945cba30 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0xebd5c4 in pdfi_countdown_impl /src/ghostpdl/./pdf/pdf_stack.h:56:18
+    #1 0xebd5c4 in pdfi_free_array /src/ghostpdl/./pdf/pdf_array.c:34:13
+    #2 0x1004e79 in pdfi_free_object /src/ghostpdl/./pdf/pdf_obj.c:257:13
+    #3 0xeb1c9e in pdfi_countdown_impl /src/ghostpdl/./pdf/pdf_stack.h:83:13
+    #4 0xeb1c9e in pdfi_free_dict /src/ghostpdl/./pdf/pdf_dict.c:40:13
+    #5 0x1004c7b in pdfi_free_object /src/ghostpdl/./pdf/pdf_obj.c:260:13
+    #6 0xf75bd3 in pdfi_countdown_impl /src/ghostpdl/./pdf/pdf_stack.h:83:13
+    #7 0xf75bd3 in pdfi_free_font_type1 /src/ghostpdl/./pdf/pdf_font1.c:783:5
+    #8 0xf68175 in pdfi_free_font /src/ghostpdl/./pdf/pdf_font.c:1330:20
+    #9 0x1004c8f in pdfi_free_object /src/ghostpdl/./pdf/pdf_obj.c:272:13
+    #10 0xea69ee in pdfi_countdown_impl /src/ghostpdl/./pdf/pdf_stack.h:83:13
+    #11 0xea69ee in pdfi_clear_context /src/ghostpdl/./pdf/ghostpdf.c:1919:13
+    #12 0xeaff63 in pdfi_free_context /src/ghostpdl/./pdf/ghostpdf.c:1953:5
+    #13 0xe98f51 in zPDFclose /src/ghostpdl/./psi/zpdfops.c:603:16
+    #14 0xcffd1b in interp /src/ghostpdl/./psi/interp.c:1725:40
+    #15 0xcffd1b in gs_call_interp /src/ghostpdl/./psi/interp.c:522:12
+    #16 0xcffd1b in gs_interpret /src/ghostpdl/./psi/interp.c:479:12
+    #17 0x56912a in gs_main_interpret /src/ghostpdl/./psi/imain.c:257:12
+    #18 0x56912a in gs_main_run_string_end /src/ghostpdl/./psi/imain.c:945:12
+    #19 0x56912a in gs_main_run_string_with_length /src/ghostpdl/./psi/imain.c:889:12
+    #20 0x5645d2 in gs_main_run_string /src/ghostpdl/./psi/imain.c:870:12
+    #21 0x101dad1 in run_string /src/ghostpdl/./psi/imainarg.c:1166:12
+    #22 0x1019b09 in swproc /src/ghostpdl/./psi/imainarg.c:367:20
+    #23 0x10169ee in gs_main_init_with_args01 /src/ghostpdl/./psi/imainarg.c:224:24
+    #24 0x101d859 in gs_main_init_with_args /src/ghostpdl/./psi/imainarg.c:289:16
+    #25 0xce8394 in psapi_init_with_args /src/ghostpdl/./psi/psapi.c:281:12
+    #26 0x560ae0 in gsapi_init_with_args /src/ghostpdl/./psi/iapi.c:247:12
+    #27 0x55fcb0 in gs_to_raster_fuzz /src/gstoraster_fuzzer.cc:97:8
+    #28 0x55fcb0 in LLVMFuzzerTestOneInput /src/gstoraster_fuzzer.cc:114:2
+    #29 0x457fb3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #30 0x443802 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #31 0x44937c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #32 0x4723b2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #33 0x7faeab8b10b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #34 0x4209fd in _start (/out/gstoraster_fuzzer+0x4209fd)
+
+DEDUP_TOKEN: pdfi_countdown_impl--pdfi_free_array--pdfi_free_object
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/ghostpdl/./pdf/pdf_stack.h:56:18 in pdfi_countdown_impl
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42506927

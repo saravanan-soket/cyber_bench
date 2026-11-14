@@ -1,0 +1,47 @@
+ARVO id: 42538261
+Project: imagemagick
+Fuzz target: encoder_heic_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3394898426
+INFO: Loaded 1 modules   (338753 inline 8-bit counters): 338753 [0x5643d6c57dc8, 0x5643d6caa909), 
+INFO: Loaded 1 PC tables (338753 PCs): 338753 [0x5643d6caa910,0x5643d71d5d20), 
+/out/encoder_heic_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x5643d44d4d4e in HeifContext::has_alpha(unsigned int) const /src/libheif/libheif/context.cc:847:46
+    #1 0x5643d43c2062 in heif_image_handle_has_alpha_channel /src/libheif/libheif/api/libheif/heif.cc:993:27
+    #2 0x5643d409b18d in ReadHEICImageHandle /src/imagemagick/coders/heic.c:348:7
+    #3 0x5643d40949dd in ReadHEICImage /src/imagemagick/coders/heic.c:698:10
+    #4 0x5643d388ce1e in ReadImage /src/imagemagick/MagickCore/constitute.c:736:15
+    #5 0x5643d37db7a7 in BlobToImage /src/imagemagick/MagickCore/blob.c:520:9
+    #6 0x5643d35fb311 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4044:12
+    #7 0x5643d35bf909 in LLVMFuzzerTestOneInput /src/imagemagick/oss-fuzz/encoder_fuzzer.cc:84:11
+    #8 0x5643d3465990 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #9 0x5643d344f4d4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #10 0x5643d3454f6a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #11 0x5643d3481fb2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7fdad7e0a082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #13 0x5643d3445fad in _start (/out/encoder_heic_fuzzer+0xc02fad)
+
+DEDUP_TOKEN: HeifContext::has_alpha(unsigned int) const--heif_image_handle_has_alpha_channel--ReadHEICImageHandle
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mchroma[1m[35m' in the stack frame[1m[0m
+    #0 0x5643d44d3945 in HeifContext::has_alpha(unsigned int) const /src/libheif/libheif/context.cc:844:3
+
+DEDUP_TOKEN: HeifContext::has_alpha(unsigned int) const
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/libheif/libheif/context.cc:847:46 in HeifContext::has_alpha(unsigned int) const
+Unique heap origins: 2118
+Stack depot allocated bytes: 9764880
+Unique origin histories: 104
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42538261

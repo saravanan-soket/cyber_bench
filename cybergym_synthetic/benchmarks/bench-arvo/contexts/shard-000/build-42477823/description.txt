@@ -1,0 +1,91 @@
+ARVO id: 42477823
+Project: libhevc
+Fuzz target: hevc_dec_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://android.googlesource.com/platform/external/libhevc
+
+=== Crash report ===
+INFO: Seed: 3054233674
+INFO: Loaded 1 modules   (9788 inline 8-bit counters): 9788 [0x83f0740, 0x83f2d7c), 
+INFO: Loaded 1 PC tables (9788 PCs): 9788 [0x83895e4,0x839c7c4), 
+/out/hevc_dec_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==8==ERROR: AddressSanitizer: heap-buffer-overflow on address 0xea203788 at pc 0x081d6825 bp 0xffc26a28 sp 0xffc26a20
+[1m[0m[1m[34mREAD of size 1 at 0xea203788 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x81d6824 in ihevcd_parse_coding_unit /src/libhevc/decoder/ihevcd_parse_slice.c:1406:37
+    #1 0x81d8ccd in ihevcd_parse_coding_quadtree /src/libhevc/decoder/ihevcd_parse_slice.c:1872:15
+    #2 0x81d8bf3 in ihevcd_parse_coding_quadtree /src/libhevc/decoder/ihevcd_parse_slice.c:1829:15
+    #3 0x81d8bf3 in ihevcd_parse_coding_quadtree /src/libhevc/decoder/ihevcd_parse_slice.c:1829:15
+    #4 0x81dd879 in ihevcd_parse_slice_data /src/libhevc/decoder/ihevcd_parse_slice.c:2730:19
+    #5 0x81bbdb9 in ihevcd_nal_unit /src/libhevc/decoder/ihevcd_nal.c:406:27
+    #6 0x81b7e83 in ihevcd_decode /src/libhevc/decoder/ihevcd_decode.c:650:15
+    #7 0x81b346d in ihevcd_cxa_api_function /src/libhevc/decoder/ihevcd_api.c:3587:19
+    #8 0x81a2b89 in Codec::decodeFrame(unsigned char const*, unsigned int, unsigned int*) /src/libhevc/fuzzer/hevc_dec_fuzzer.cpp:290:9
+    #9 0x81a33e1 in LLVMFuzzerTestOneInput /src/libhevc/fuzzer/hevc_dec_fuzzer.cpp:334:18
+    #10 0x80a6a76 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:554:15
+    #11 0x8092ef3 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #12 0x8098503 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:775:9
+    #13 0x80bcb67 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #14 0xef35d636 in __libc_start_main (/lib32/libc.so.6+0x18636)
+    #15 0x806de58 in _start (/out/hevc_dec_fuzzer+0x806de58)
+
+DEDUP_TOKEN: ihevcd_parse_coding_unit--ihevcd_parse_coding_quadtree--ihevcd_parse_coding_quadtree
+[1m[32m0xea203788 is located 0 bytes to the right of 8-byte region [0xea203780,0xea203788)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x816c54a in memalign /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cpp:178:3
+    #1 0x81a0969 in iv_aligned_malloc(void*, int, int) /src/libhevc/fuzzer/hevc_dec_fuzzer.cpp:53:10
+    #2 0x81ab6aa in ihevcd_allocate_dynamic_bufs /src/libhevc/decoder/ihevcd_api.c:1564:14
+    #3 0x81b822b in ihevcd_decode /src/libhevc/decoder/ihevcd_decode.c:716:19
+    #4 0x81b346d in ihevcd_cxa_api_function /src/libhevc/decoder/ihevcd_api.c:3587:19
+    #5 0x81a2276 in Codec::decodeHeader(unsigned char const*, unsigned int) /src/libhevc/fuzzer/hevc_dec_fuzzer.cpp:247:11
+    #6 0x81a336b in LLVMFuzzerTestOneInput /src/libhevc/fuzzer/hevc_dec_fuzzer.cpp:327:10
+    #7 0x80a6a76 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:554:15
+    #8 0x8092ef3 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #9 0x8098503 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:775:9
+    #10 0x80bcb67 in main /src/llvm/projects/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #11 0xef35d636 in __libc_start_main (/lib32/libc.so.6+0x18636)
+
+DEDUP_TOKEN: memalign--iv_aligned_malloc(void*, int, int)--ihevcd_allocate_dynamic_bufs
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/libhevc/decoder/ihevcd_parse_slice.c:1406:37 in ihevcd_parse_coding_unit
+Shadow bytes around the buggy address:
+  0x3d4406a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3d4406b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3d4406c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3d4406d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3d4406e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+=>0x3d4406f0: [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3d440700: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3d440710: [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3d440720: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3d440730: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3d440740: [1m[0m04[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==8==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42477823

@@ -1,0 +1,89 @@
+ARVO id: 42472013
+Project: skia
+Fuzz target: animated_image_decode
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Seed: 1164296441
+INFO: Loaded 1 modules   (164720 inline 8-bit counters): 164720 [0x22201f0, 0x2248560), 
+INFO: Loaded 1 PC tables (164720 PCs): 164720 [0x2248560,0x24cbc60), 
+/out/animated_image_decode: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x62c000007244 at pc 0x000000e6a792 bp 0x7fffffffdc00 sp 0x7fffffffdbf8
+[1m[0m[1m[34mREAD of size 1 at 0x62c000007244 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0xe6a791 in swizzle_index_to_n32(void*, unsigned char const*, int, int, int, int, unsigned int const*) /src/skia/out/Fuzz/../../src/codec/SkSwizzler.cpp:240:30
+    #1 0xe6d603 in SkSwizzler::swizzle(void*, unsigned char const*) /src/skia/out/Fuzz/../../src/codec/SkSwizzler.cpp:1235:5
+    #2 0x9c4a14 in SkWuffsCodec::onIncrementalDecode(int*) /src/skia/out/Fuzz/../../src/codec/SkWuffsCodec.cpp:546:28
+    #3 0x95be4b in SkCodec::getPixels(SkImageInfo const&, void*, unsigned long, SkCodec::Options const*) /src/skia/out/Fuzz/../../src/codec/SkCodec.cpp:362:33
+    #4 0x94e9fb in SkAnimatedImage::decodeNextFrame() /src/skia/out/Fuzz/../../src/android/SkAnimatedImage.cpp:289:36
+    #5 0x8d2663 in FuzzAnimatedImage(sk_sp<SkData>) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAnimatedImage.cpp:34:15
+    #6 0x8d2d9c in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAnimatedImage.cpp:42:5
+    #7 0x871205 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #8 0x846a2d in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #9 0x852276 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #10 0x8460ac in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff52fb83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #12 0x73f418 in _start (/out/animated_image_decode+0x73f418)
+
+DEDUP_TOKEN: swizzle_index_to_n32(void*, unsigned char const*, int, int, int, int, unsigned int const*)--SkSwizzler::swizzle(void*, unsigned char const*)--SkWuffsCodec::onIncrementalDecode(int*)
+[1m[32m0x62c000007244 is located 0 bytes to the right of 28740-byte region [0x62c000000200,0x62c000007244)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x80cb6f in __interceptor_malloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:146
+    #1 0x966438 in sk_malloc_flags(unsigned long, unsigned int) /src/skia/out/Fuzz/../../src/ports/SkMemory_malloc.cpp:71:13
+    #2 0x9c734c in SkWuffsCodec_MakeFromStream(std::__1::unique_ptr<SkStream, std::__1::default_delete<SkStream> >, SkCodec::Result*) /src/skia/out/Fuzz/../../src/codec/SkWuffsCodec.cpp:901:56
+    #3 0x95969d in SkCodec::MakeFromStream(std::__1::unique_ptr<SkStream, std::__1::default_delete<SkStream> >, SkCodec::Result*, SkPngChunkReader*) /src/skia/out/Fuzz/../../src/codec/SkCodec.cpp:110:24
+    #4 0x951126 in SkAndroidCodec::MakeFromStream(std::__1::unique_ptr<SkStream, std::__1::default_delete<SkStream> >, SkPngChunkReader*) /src/skia/out/Fuzz/../../src/codec/SkAndroidCodec.cpp:80:18
+    #5 0x951fa7 in SkAndroidCodec::MakeFromData(sk_sp<SkData>, SkPngChunkReader*) /src/skia/out/Fuzz/../../src/codec/SkAndroidCodec.cpp:121:12
+    #6 0x8d252c in FuzzAnimatedImage(sk_sp<SkData>) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAnimatedImage.cpp:15:18
+    #7 0x8d2d9c in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAnimatedImage.cpp:42:5
+    #8 0x871205 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #9 0x846a2d in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #10 0x852276 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #11 0x8460ac in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #12 0x7ffff52fb83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: __interceptor_malloc--sk_malloc_flags(unsigned long, unsigned int)--SkWuffsCodec_MakeFromStream(std::__1::unique_ptr<SkStream, std::__1::default_delete<SkStream> >, SkCodec::Result*)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/skia/out/Fuzz/../../src/codec/SkSwizzler.cpp:240:30 in swizzle_index_to_n32(void*, unsigned char const*, int, int, int, int, unsigned int const*)
+Shadow bytes around the buggy address:
+  0x0c587fff8df0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c587fff8e00: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c587fff8e10: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c587fff8e20: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c587fff8e30: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c587fff8e40: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m04[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c587fff8e50: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c587fff8e60: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c587fff8e70: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c587fff8e80: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c587fff8e90: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42472013

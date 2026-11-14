@@ -1,0 +1,69 @@
+ARVO id: 42525996
+Project: imagemagick
+Fuzz target: encoder_wpg_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2850093484
+INFO: Loaded 1 modules   (313291 inline 8-bit counters): 313291 [0x4957008, 0x49a37d3), 
+INFO: Loaded 1 PC tables (313291 PCs): 313291 [0x49a37d8,0x4e6b488), 
+/out/encoder_wpg_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0xd3791f in PushColormapIndex /src/imagemagick/MagickCore/image.c:3885:7
+    #1 0xd3791f in SyncImage /src/imagemagick/MagickCore/image.c:3942:13
+    #2 0xaeabe4 in sRGBTransformImage /src/imagemagick/MagickCore/colorspace.c:634:15
+    #3 0xaeabe4 in TransformImageColorspace /src/imagemagick/MagickCore/colorspace.c:1636:7
+    #4 0xeb9160 in SetGrayscaleImage /src/imagemagick/MagickCore/quantize.c:3805:12
+    #5 0xeb9160 in QuantizeImage /src/imagemagick/MagickCore/quantize.c:3160:12
+    #6 0xa52e2b in SetImageType /src/imagemagick/MagickCore/attribute.c:2199:18
+    #7 0x163bc27 in WriteWPGImage /src/imagemagick/coders/wpg.c:1870:10
+    #8 0xb541ba in WriteImage /src/imagemagick/MagickCore/constitute.c:1344:16
+    #9 0xa65877 in ImageToBlob /src/imagemagick/MagickCore/blob.c:2082:18
+    #10 0xa69bdf in ImagesToBlob /src/imagemagick/MagickCore/blob.c:2471:14
+    #11 0x81f320 in Magick::Image::write(Magick::Blob*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4925:8
+    #12 0x784494 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:76:11
+    #13 0x61ac33 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #14 0x605742 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #15 0x60afec in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #16 0x635172 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7f028d10f082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #18 0x5fb90d in _start (/out/encoder_wpg_fuzzer+0x5fb90d)
+
+DEDUP_TOKEN: PushColormapIndex--SyncImage--sRGBTransformImage
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x6b9075 in __interceptor_posix_memalign /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:159:3
+    #1 0xdb5b9c in AcquireAlignedMemory_POSIX /src/imagemagick/MagickCore/memory.c:299:7
+    #2 0xdb5b9c in AcquireAlignedMemory /src/imagemagick/MagickCore/memory.c:377:10
+    #3 0xaa683c in OpenPixelCache /src/imagemagick/MagickCore/cache.c:3755:46
+    #4 0xaae351 in GetImagePixelCache /src/imagemagick/MagickCore/cache.c:1783:18
+    #5 0xab7884 in SyncImagePixelCache /src/imagemagick/MagickCore/cache.c:5521:28
+    #6 0xd32b99 in SetImageStorageClass /src/imagemagick/MagickCore/image.c:2617:10
+    #7 0xae5270 in AcquireImageColormap /src/imagemagick/MagickCore/colormap.c:152:10
+    #8 0x1635638 in ReadWPGImage /src/imagemagick/coders/wpg.c:1254:24
+    #9 0xb4c10a in ReadImage /src/imagemagick/MagickCore/constitute.c:731:15
+    #10 0xa56f7a in BlobToImage /src/imagemagick/MagickCore/blob.c:477:13
+    #11 0x7c7fdf in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4044:12
+    #12 0x784435 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:66:11
+    #13 0x61ac33 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #14 0x605742 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #15 0x60afec in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #16 0x635172 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7f028d10f082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+
+DEDUP_TOKEN: __interceptor_posix_memalign--AcquireAlignedMemory_POSIX--AcquireAlignedMemory
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/imagemagick/MagickCore/image.c:3885:7 in PushColormapIndex
+Unique heap origins: 1096
+Stack depot allocated bytes: 9764880
+Unique origin histories: 23
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42525996

@@ -1,0 +1,106 @@
+ARVO id: 42530554
+Project: radare2
+Fuzz target: ia_fuzz
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Stack-buffer-overflow WRITE 11
+Language: c++
+Repo: https://github.com/radareorg/radare2
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2996746534
+INFO: Loaded 1 modules   (263950 inline 8-bit counters): 263950 [0x2d336e0, 0x2d73dee), 
+INFO: Loaded 1 PC tables (263950 PCs): 263950 [0x2d73df0,0x317aed0), 
+/out/ia_fuzz: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[35mWARN:[0m mach0_header 4 = cmdsize<1. (0x38000615 vs 0x10ead)
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7fbf855c05e8 at pc 0x000000530c0e bp 0x7ffe124b2f00 sp 0x7ffe124b26d0
+[1m[0m[1m[34mWRITE of size 11 at 0x7fbf855c05e8 thread T0[1m[0m
+SCARINESS: 60 (multi-byte-write-stack-buffer-overflow)
+    #0 0x530c0d in __asan_memset /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:26:3
+    #1 0x14cefde in io_memory_read /src/radare2/libr/io/io_memory.c:82:2
+    #2 0x14aad34 in r_io_plugin_read /src/radare2/libr/io/io_plugin.c:162:9
+    #3 0x14b3371 in r_io_desc_read /src/radare2/libr/io/io_desc.c:205:12
+    #4 0x14cd812 in r_io_fd_read /src/radare2/libr/io/io_fd.c:24:15
+    #5 0xd2ef21 in buf_io_read /src/radare2/libr/util/./buf_io.c:72:9
+    #6 0xd27750 in buf_read /src/radare2/libr/util/buf.c:51:9
+    #7 0xd27750 in r_buf_read /src/radare2/libr/util/buf.c:469:11
+    #8 0xd27750 in r_buf_read_at /src/radare2/libr/util/buf.c:620:6
+    #9 0x849f70 in iterate_list_of_lists /src/radare2/libr/../libr/bin/p/../format/objc/mach0_classes.c:688:7
+    #10 0x83d07a in get_method_list_of_lists /src/radare2/libr/../libr/bin/p/../format/objc/mach0_classes.c:1083:2
+    #11 0x83d07a in get_class_ro_t /src/radare2/libr/../libr/bin/p/../format/objc/mach0_classes.c:1338:4
+    #12 0x83ae64 in get_class_t /src/radare2/libr/../libr/bin/p/../format/objc/mach0_classes.c:1451:2
+    #13 0x83fbe9 in parse_classes /src/radare2/libr/../libr/bin/p/../format/objc/mach0_classes.c:1826:3
+    #14 0x7fa971 in classes /src/radare2/libr/../libr/bin/p/bin_mach0.c:656:9
+    #15 0x6ea419 in r_bin_object_set_items /src/radare2/libr/bin/bobj.c:392:21
+    #16 0x6e8ffb in r_bin_object_new /src/radare2/libr/bin/bobj.c:182:2
+    #17 0x6dfb82 in r_bin_file_new_from_buffer /src/radare2/libr/bin/bfile.c:613:19
+    #18 0x6b8c2e in r_bin_open_buf /src/radare2/libr/bin/bin.c:310:8
+    #19 0x6b81a6 in r_bin_open_io /src/radare2/libr/bin/bin.c:376:13
+    #20 0x125360e in cmd_open_bin /src/radare2/libr/core/./cmd_open.inc.c:273:6
+    #21 0x116bfd6 in cmd_open /src/radare2/libr/core/./cmd_open.inc.c:2133:3
+    #22 0x133f70e in r_cmd_call /src/radare2/libr/core/cmd_api.c:520:11
+    #23 0x11bcaeb in r_core_cmd_subst_i /src/radare2/libr/core/cmd.c:5051:8
+    #24 0x11b522a in r_core_cmd_subst /src/radare2/libr/core/cmd.c:3858:10
+    #25 0x1113586 in run_cmd_depth /src/radare2/libr/core/cmd.c:5999:9
+    #26 0x110894f in r_core_cmd /src/radare2/libr/core/cmd.c:6092:8
+    #27 0x10e7e11 in r_core_cmd0 /src/radare2/libr/core/cmd.c:6266:9
+    #28 0x56ea42 in LLVMFuzzerTestOneInput /src/radare2/targets/ia_fuzz.cc:13:2
+    #29 0x440403 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #30 0x42bb62 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #31 0x43140c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #32 0x45a942 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #33 0x7fbf85b39082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: e678fe54a5d2c2092f8e47eb0b33105e380f7340)
+    #34 0x421d2d in _start (/out/ia_fuzz+0x421d2d)
+
+DEDUP_TOKEN: __asan_memset--io_memory_read--r_io_plugin_read
+[1m[32mAddress 0x7fbf855c05e8 is located in stack of thread T0 at offset 104 in frame[1m[0m
+[1m[0m    #0 0x84979f in iterate_list_of_lists /src/radare2/libr/../libr/bin/p/../format/objc/mach0_classes.c:623
+
+DEDUP_TOKEN: iterate_list_of_lists
+  This frame has 4 object(s):
+    [32, 36) 'offset' (line 630)
+    [48, 52) 'left' (line 630)
+    [64, 72) 'tmp' (line 637)
+    [96, 104) 'entry80' (line 674)[1m[32m <== Memory access at offset 104 overflows this variable[1m[0m
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:26:3 in __asan_memset
+Shadow bytes around the buggy address:
+  0x0ff870ab0060: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0ff870ab0070: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0ff870ab0080: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0ff870ab0090: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0ff870ab00a0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+=>0x0ff870ab00b0: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m04[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m[[1m[31mf3[1m[0m][1m[31mf3[1m[0m [1m[31mf3[1m[0m
+  0x0ff870ab00c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0ff870ab00d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0ff870ab00e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0ff870ab00f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0ff870ab0100: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42530554

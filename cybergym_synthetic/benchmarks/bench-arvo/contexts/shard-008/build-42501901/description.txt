@@ -1,0 +1,45 @@
+ARVO id: 42501901
+Project: assimp
+Fuzz target: assimp_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/assimp/assimp.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2033635210
+INFO: Loaded 1 modules   (212902 inline 8-bit counters): 212902 [0x1549750, 0x157d6f6), 
+INFO: Loaded 1 PC tables (212902 PCs): 212902 [0x157d6f8,0x18bd158), 
+/out/assimp_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Info,  T0: Load $$$___magic___$$$.
+Info,  T0: Found a matching importer for this file format: Quake Mesh / 3D GameStudio Mesh Importer.
+Info,  T0: Import root directory is './'
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x00003ab66000 (pc 0x0000007453b7 bp 0x7fff06243b00 sp 0x7fff06243ab0 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7453b7 in Assimp::MDLImporter::ParseTextureColorData(unsigned char const*, unsigned int, unsigned int*, aiTexture*) /src/assimp/code/AssetLib/MDL/MDLMaterialLoader.cpp:315:38
+    #1 0x746249 in Assimp::MDLImporter::CreateTexture_3DGS_MDL5(unsigned char const*, unsigned int, unsigned int*) /src/assimp/code/AssetLib/MDL/MDLMaterialLoader.cpp:409:9
+    #2 0x7300e0 in Assimp::MDLImporter::InternReadFile_3DGS_MDL345() /src/assimp/code/AssetLib/MDL/MDLLoader.cpp:612:13
+    #3 0x72d5ac in Assimp::MDLImporter::InternReadFile(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, aiScene*, Assimp::IOSystem*) /src/assimp/code/AssetLib/MDL/MDLLoader.cpp:232:13
+    #4 0x4f442b in Assimp::BaseImporter::ReadFile(Assimp::Importer*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, Assimp::IOSystem*) /src/assimp/code/Common/BaseImporter.cpp:111:9
+    #5 0x513081 in Assimp::Importer::ReadFile(char const*, unsigned int) /src/assimp/code/Common/Importer.cpp:675:30
+    #6 0x511e9f in Assimp::Importer::ReadFileFromMemory(void const*, unsigned long, unsigned int, char const*) /src/assimp/code/Common/Importer.cpp:512:5
+    #7 0x4b5701 in LLVMFuzzerTestOneInput /src/assimp/fuzz/assimp_fuzzer.cc:53:34
+    #8 0x441d93 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #9 0x42d6f2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x43316d in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #11 0x45c0e2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f9d69c260b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #13 0x40a8fd in _start (/out/assimp_fuzzer+0x40a8fd)
+
+DEDUP_TOKEN: Assimp::MDLImporter::ParseTextureColorData(unsigned char const*, unsigned int, unsigned int*, aiTexture*)--Assimp::MDLImporter::CreateTexture_3DGS_MDL5(unsigned char const*, unsigned int, unsigned int*)--Assimp::MDLImporter::InternReadFile_3DGS_MDL345()
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/assimp/code/AssetLib/MDL/MDLMaterialLoader.cpp:315:38 in Assimp::MDLImporter::ParseTextureColorData(unsigned char const*, unsigned int, unsigned int*, aiTexture*)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42501901

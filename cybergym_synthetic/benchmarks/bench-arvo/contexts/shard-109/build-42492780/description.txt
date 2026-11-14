@@ -1,0 +1,44 @@
+ARVO id: 42492780
+Project: serenity
+Fuzz target: FuzzBMPLoader
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Bad-cast
+Language: c++
+Repo: https://github.com/SerenityOS/serenity
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3594075405
+INFO: Loaded 1 modules   (15359 inline 8-bit counters): 15359 [0x80e3f8, 0x811ff7), 
+INFO: Loaded 1 PC tables (15359 PCs): 15359 [0x811ff8,0x84dfe8), 
+/out/FuzzBMPLoader: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m../../../AK/Format.h:227:30:[1m[31m runtime error: [1m[0m[1mmember call on address 0x7fffffffd798 with insufficient space for an object of type 'AK::Array<AK::TypeErasedParameter, 0>'[1m[0m
+[1m0x7fffffffd798:[1m[30m note: [1m[0mpointer points here[1m[0m
+ 00 00 00 00  20 c1 7b 9e c6 d6 fe 7e  50 f9 4d 00 00 00 00 00  88 2c 6f 2a 9d 12 bb b0  40 d8 ff ff
+[1m[32m              ^ [1m[0m
+    #0 0x4dfac1 in AK::VariadicFormatParams<>::VariadicFormatParams() /src/serenity/Meta/Lagom/build/../../../AK/Format.h:227:30
+    #1 0x4dfac1 in void AK::dbgln<true>(AK::StringView) /src/serenity/Meta/Lagom/build/../../../AK/Format.h:399:24
+    #2 0x4dfac1 in void AK::dbgln<true>(char const*) /src/serenity/Meta/Lagom/build/../../../AK/Format.h:402:67
+    #3 0x4dfac1 in Gfx::uncompress_bmp_rle_data(Gfx::BMPLoadingContext&, AK::ByteBuffer&)::$_6::operator()() const /src/serenity/Userland/Libraries/LibGfx/BMPLoader.cpp:1051:17
+    #4 0x4dfac1 in AK::Function<AK::Optional<unsigned int> ()>::CallableWrapper<Gfx::uncompress_bmp_rle_data(Gfx::BMPLoadingContext&, AK::ByteBuffer&)::$_6>::call() const /src/serenity/Meta/Lagom/build/../../../AK/Function.h:104:24
+    #5 0x4ddb9c in AK::Function<AK::Optional<unsigned int> ()>::operator()() const /src/serenity/Meta/Lagom/build/../../../AK/Function.h:58:36
+    #6 0x4dbc64 in Gfx::uncompress_bmp_rle_data(Gfx::BMPLoadingContext&, AK::ByteBuffer&) /src/serenity/Userland/Libraries/LibGfx/BMPLoader.cpp:1134:31
+    #7 0x4d54c9 in Gfx::decode_bmp_pixel_data(Gfx::BMPLoadingContext&) /src/serenity/Userland/Libraries/LibGfx/BMPLoader.cpp:1219:14
+    #8 0x4d3621 in Gfx::load_bmp_impl(unsigned char const*, unsigned long) /src/serenity/Userland/Libraries/LibGfx/BMPLoader.cpp:1342:10
+    #9 0x4d39ca in Gfx::load_bmp_from_memory(unsigned char const*, unsigned long) /src/serenity/Userland/Libraries/LibGfx/BMPLoader.cpp:202:19
+    #10 0x4d2c74 in LLVMFuzzerTestOneInput /src/serenity/Meta/Lagom/build/../Fuzzers/FuzzBMPLoader.cpp:32:5
+    #11 0x460ab3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #12 0x44a972 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #13 0x45076d in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #14 0x47bf22 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #16 0x425308 in _start (/out/FuzzBMPLoader+0x425308)
+
+DEDUP_TOKEN: AK::VariadicFormatParams<>::VariadicFormatParams()--void AK::dbgln<true>(AK::StringView)--void AK::dbgln<true>(char const*)
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior ../../../AK/Format.h:227:30 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42492780

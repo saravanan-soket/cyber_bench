@@ -1,0 +1,60 @@
+ARVO id: 42538772
+Project: imagemagick
+Fuzz target: encoder_ptif_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 4226833871
+INFO: Loaded 1 modules   (74937 inline 8-bit counters): 74937 [0x1aa4270, 0x1ab6729), 
+INFO: Loaded 1 PC tables (74937 PCs): 74937 [0x168f958,0x17b44e8), 
+/out/encoder_ptif_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0xb5975a in PerceptibleReciprocal /src/imagemagick/./MagickCore/pixel-accessor.h:225:7
+    #1 0xb1e9ab in ImportQuantumPixels /src/imagemagick/MagickCore/quantum-import.c:4289:15
+    #2 0x1081ccd in ReadTIFFImage /src/imagemagick/coders/tiff.c:1819:18
+    #3 0x7baeda in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #4 0x6e8a16 in BlobToImage /src/imagemagick/MagickCore/blob.c:469:13
+    #5 0x588149 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4015:12
+    #6 0x4a030c in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:43:11
+    #7 0x4e8443 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:517:13
+    #8 0x4a17c3 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #9 0x4b3d4f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #10 0x4a0901 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7f4a2ffe282f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x41ff38 in _start (/out/encoder_ptif_fuzzer+0x41ff38)
+
+DEDUP_TOKEN: PerceptibleReciprocal--ImportQuantumPixels--ReadTIFFImage
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x469cc4 in __interceptor_posix_memalign /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:165
+    #1 0x9d3f4f in AcquireAlignedMemory /src/imagemagick/MagickCore/memory.c:266:7
+    #2 0x727557 in OpenPixelCache /src/imagemagick/MagickCore/cache.c:3545:46
+    #3 0x72e068 in GetImagePixelCache /src/imagemagick/MagickCore/cache.c:1665:18
+    #4 0x710f8e in QueueAuthenticPixelCacheNexus /src/imagemagick/MagickCore/cache.c:3950:28
+    #5 0x72eb43 in QueueAuthenticPixels /src/imagemagick/MagickCore/cache.c:4120:10
+    #6 0x1081c0b in ReadTIFFImage /src/imagemagick/coders/tiff.c:1816:13
+    #7 0x7baeda in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #8 0x6e8a16 in BlobToImage /src/imagemagick/MagickCore/blob.c:469:13
+    #9 0x588149 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4015:12
+    #10 0x4a030c in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:43:11
+    #11 0x4e8443 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:517:13
+    #12 0x4a17c3 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #13 0x4b3d4f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #14 0x4a0901 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #15 0x7f4a2ffe282f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: __interceptor_posix_memalign--AcquireAlignedMemory--OpenPixelCache
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/imagemagick/./MagickCore/pixel-accessor.h:225:7 in PerceptibleReciprocal
+Unique heap origins: 667
+Stack depot allocated bytes: 93464
+Unique origin histories: 7
+History depot allocated bytes: 168
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42538772

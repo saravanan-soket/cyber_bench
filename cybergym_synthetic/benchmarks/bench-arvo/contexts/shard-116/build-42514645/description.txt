@@ -1,0 +1,49 @@
+ARVO id: 42514645
+Project: duckdb
+Fuzz target: parse_fuzz_test
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/duckdb/duckdb
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4269956167
+INFO: Loaded 1 modules   (760802 inline 8-bit counters): 760802 [0x305fed0, 0x3119ab2), 
+INFO: Loaded 1 PC tables (760802 PCs): 760802 [0x3119ab8,0x3cb58d8), 
+/out/parse_fuzz_test: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x7ff2678145c0 (pc 0x7ff233ba8a84 bp 0x7fff23626e40 sp 0x7fff23626de8 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7ff233ba8a84  (/lib/x86_64-linux-gnu/libc.so.6+0x18ba84)
+    #1 0x23be08f in std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__init(char const*, unsigned long) (/out/parse_fuzz_test+0x23be08f)
+    #2 0x10b2e7f in basic_string /usr/local/bin/../include/c++/v1/string:1908:5
+    #3 0x10b2e7f in duckdb::string_t::GetString() const /src/duckdb/src/include/duckdb/common/types/string_type.hpp:76:10
+    #4 0x10f707d in duckdb::Vector::GetValueInternal(duckdb::Vector const&, unsigned long) /src/duckdb/src/common/types/vector.cpp:523:20
+    #5 0x10f885b in duckdb::Vector::GetValue(duckdb::Vector const&, unsigned long) /src/duckdb/src/common/types/vector.cpp:565:15
+    #6 0x10bc291 in GetValue /src/duckdb/src/common/types/vector.cpp:574:9
+    #7 0x10bc291 in duckdb::ColumnDataRow::GetValue(unsigned long) const /src/duckdb/src/common/types/column_data_collection.cpp:99:34
+    #8 0x665bf8 in duckdb::MaterializedQueryResult::ToString() /src/duckdb/src/main/materialized_query_result.cpp:30:20
+    #9 0x64fa76 in duckdb::ClientContext::VerifyQuery(duckdb::ClientContextLock&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::unique_ptr<duckdb::SQLStatement, std::__1::default_delete<duckdb::SQLStatement> >) /src/duckdb/src/main/client_context.cpp:1084:49
+    #10 0x64ac21 in duckdb::ClientContext::PendingStatementOrPreparedStatementInternal(duckdb::ClientContextLock&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, std::__1::unique_ptr<duckdb::SQLStatement, std::__1::default_delete<duckdb::SQLStatement> >, std::__1::shared_ptr<duckdb::PreparedStatementData>&, duckdb::PendingQueryParameters) /src/duckdb/src/main/client_context.cpp:600:13
+    #11 0x64cb47 in duckdb::ClientContext::PendingQueryInternal(duckdb::ClientContextLock&, std::__1::unique_ptr<duckdb::SQLStatement, std::__1::default_delete<duckdb::SQLStatement> >, duckdb::PendingQueryParameters, bool) /src/duckdb/src/main/client_context.cpp:804:10
+    #12 0x653e6c in duckdb::ClientContext::Query(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, bool) /src/duckdb/src/main/client_context.cpp:740:24
+    #13 0x65ef76 in duckdb::Connection::Query(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/duckdb/src/main/connection.cpp:74:25
+    #14 0x4b73e0 in LLVMFuzzerTestOneInput /src/duckdb/./test/ossfuzz/parse_fuzz_test.cpp:15:21
+    #15 0x441343 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #16 0x42cfd2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #17 0x43281c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #18 0x45b412 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #19 0x7ff233a41082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #20 0x40b7fd in _start (/out/parse_fuzz_test+0x40b7fd)
+
+DEDUP_TOKEN: std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::__init(char const*, unsigned long)--basic_string
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x18ba84) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42514645

@@ -1,0 +1,65 @@
+ARVO id: 42535039
+Project: ghostpdl
+Fuzz target: gs_device_tiffsep1_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://cgit.ghostscript.com/ghostpdl.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3730591744
+INFO: Loaded 3 modules   (227163 inline 8-bit counters): 14423 [0x7faa331add20, 0x7faa331b1577), 959 [0x7faa3320fa40, 0x7faa3320fdff), 211781 [0x560aa6ef41d0, 0x560aa6f27d15), 
+INFO: Loaded 3 PC tables (227163 PCs): 14423 [0x7faa331b1578,0x7faa331e9ae8), 959 [0x7faa3320fe00,0x7faa332139f0), 211781 [0x560aa6f27d18,0x560aa7263168), 
+/out/gs_device_tiffsep1_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x532000031790 (pc 0x560aa44df2e8 bp 0x7ffcf8a97580 sp 0x7ffcf8a97420 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x560aa44df2e8 in mem_planar_put_image_slow /src/ghostpdl/./base/gdevmpla.c:350:22
+    #1 0x560aa41593b9 in pdf14_put_blended_image_cmykspot /src/ghostpdl/./base/gdevp14.c:3431:16
+    #2 0x560aa41593b9 in pdf14_cmykspot_put_image /src/ghostpdl/./base/gdevp14.c:3591:12
+    #3 0x560aa414a7d6 in gx_update_pdf14_compositor /src/ghostpdl/./base/gdevp14.c:6185:28
+    #4 0x560aa4f7d3f4 in apply_composite /src/ghostpdl/./base/gxclrast.c:3110:12
+    #5 0x560aa4f7d3f4 in execute_compositor_queue /src/ghostpdl/./base/gxclrast.c:402:16
+    #6 0x560aa4f6c9aa in clist_playback_band /src/ghostpdl/./base/gxclrast.c:1759:48
+    #7 0x560aa41b9323 in clist_playback_file_bands /src/ghostpdl/./base/gxclread.c:1060:16
+    #8 0x560aa41bd9f2 in clist_render_rectangle /src/ghostpdl/./base/gxclread.c:994:16
+    #9 0x560aa41bcdf9 in clist_rasterize_lines /src/ghostpdl/./base/gxclread.c:882:20
+    #10 0x560aa41bbf3b in clist_get_bits_rectangle /src/ghostpdl/./base/gxclread.c:771:12
+    #11 0x560aa451e0ba in tiffsep1_print_page /src/ghostpdl/./devices/gdevtsep.c:2595:20
+    #12 0x560aa418c12b in gx_default_print_page_copies /src/ghostpdl/./base/gdevprn.c:1165:12
+    #13 0x560aa418b306 in gdev_prn_output_page_aux /src/ghostpdl/./base/gdevprn.c:1067:27
+    #14 0x560aa45ad20d in gs_output_page /src/ghostpdl/./base/gsdevice.c:207:17
+    #15 0x560aa4aa4f27 in zoutputpage /src/ghostpdl/./psi/zdevice.c:502:12
+    #16 0x560aa49de245 in do_call_operator /src/ghostpdl/./psi/interp.c:91:12
+    #17 0x560aa49d2c1b in interp /src/ghostpdl/./psi/interp.c:1380:28
+    #18 0x560aa49d2c1b in gs_call_interp /src/ghostpdl/./psi/interp.c:531:12
+    #19 0x560aa49d2c1b in gs_interpret /src/ghostpdl/./psi/interp.c:488:12
+    #20 0x560aa4089dbf in gs_main_interpret /src/ghostpdl/./psi/imain.c:257:12
+    #21 0x560aa4089dbf in gs_main_run_string_end /src/ghostpdl/./psi/imain.c:945:12
+    #22 0x560aa4089dbf in gs_main_run_string_with_length /src/ghostpdl/./psi/imain.c:889:12
+    #23 0x560aa4d32cf2 in run_string /src/ghostpdl/./psi/imainarg.c:1170:12
+    #24 0x560aa4d2ed64 in swproc /src/ghostpdl/./psi/imainarg.c:368:20
+    #25 0x560aa4d2bc11 in gs_main_init_with_args01 /src/ghostpdl/./psi/imainarg.c:224:24
+    #26 0x560aa4d32a78 in gs_main_init_with_args /src/ghostpdl/./psi/imainarg.c:290:16
+    #27 0x560aa408046c in fuzz_gs_device(unsigned char const*, unsigned long, int, char const*, char const*, int) /src/gs_fuzzlib.h:139:8
+    #28 0x560aa408098b in LLVMFuzzerTestOneInput /src/gs_device_tiffsep1_fuzzer.cc:24:2
+    #29 0x560aa3f32860 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #30 0x560aa3f1cff4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #31 0x560aa3f22a8a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #32 0x560aa3f4ee82 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #33 0x7faa32b7f082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 87b331c034a6458c64ce09c03939e947212e18ce)
+    #34 0x560aa3f13acd in _start (/out/gs_device_tiffsep1_fuzzer+0x748acd)
+
+DEDUP_TOKEN: mem_planar_put_image_slow--pdf14_put_blended_image_cmykspot--pdf14_cmykspot_put_image
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/ghostpdl/./base/gdevmpla.c:350:22 in mem_planar_put_image_slow
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42535039

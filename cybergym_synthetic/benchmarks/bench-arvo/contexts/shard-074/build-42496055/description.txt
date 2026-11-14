@@ -1,0 +1,47 @@
+ARVO id: 42496055
+Project: imagemagick
+Fuzz target: ping_jpe_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 587180518
+INFO: Loaded 1 modules   (191500 inline 8-bit counters): 191500 [0x2880670, 0x28af27c), 
+INFO: Loaded 1 PC tables (191500 PCs): 191500 [0x28af280,0x2b9b340), 
+/out/ping_jpe_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==8==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x13886ee in JPEGDestroyDecompress /src/imagemagick/coders/jpeg.c:957:9
+    #1 0x1381852 in ReadJPEGImage_ /src/imagemagick/coders/jpeg.c:1113:5
+    #2 0x1380f06 in ReadJPEGImage /src/imagemagick/coders/jpeg.c:1559:10
+    #3 0xa6aade in ReadImage /src/imagemagick/MagickCore/constitute.c:563:15
+    #4 0xe979ff in ReadStream /src/imagemagick/MagickCore/stream.c:1081:9
+    #5 0x9ae375 in PingBlob /src/imagemagick/MagickCore/blob.c:3647:13
+    #6 0x7549a2 in Magick::Image::ping(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:3860:12
+    #7 0x6f73ed in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/ping_fuzzer.cc:44:11
+    #8 0x5aff83 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #9 0x599142 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #10 0x59ef8a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #11 0x5cb8c2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #13 0x573e28 in _start (/out/ping_jpe_fuzzer+0x573e28)
+
+DEDUP_TOKEN: JPEGDestroyDecompress--ReadJPEGImage_--ReadJPEGImage
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mjpeg_info[1m[35m' in the stack frame of function '[1m[32mReadJPEGImage[1m[35m'[1m[0m
+    #0 0x1380e30 in ReadJPEGImage /src/imagemagick/coders/jpeg.c:1555
+
+DEDUP_TOKEN: ReadJPEGImage
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/imagemagick/coders/jpeg.c:957:9 in JPEGDestroyDecompress
+Unique heap origins: 671
+Stack depot allocated bytes: 95360
+Unique origin histories: 30
+History depot allocated bytes: 720
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42496055

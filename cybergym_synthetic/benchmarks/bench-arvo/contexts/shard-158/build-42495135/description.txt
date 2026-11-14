@@ -1,0 +1,122 @@
+ARVO id: 42495135
+Project: libvips
+Fuzz target: webpsave_buffer_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/libvips/libvips
+
+=== Crash report ===
+Warning: AFL++ tools will need to set AFL_MAP_SIZE to 80576 to be able to run this instrumented program!
+======================= INFO =========================
+This binary is built for afl++.
+To run the target function on individual input(s) execute this:
+  /out/webpsave_buffer_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] -- /out/webpsave_buffer_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: INT_MAX)
+======================================================
+Running LLVMFuzzerInitialize ...
+continue...
+Reading 71 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x62a000005249 at pc 0x000000fb2f81 bp 0x7ffff33fae30 sp 0x7ffff33fae28
+[1m[0m[1m[34mREAD of size 1 at 0x62a000005249 thread T2 (worker)[1m[0m
+SCARINESS: 22 (1-byte-read-heap-buffer-overflow-far-from-bounds)
+    #0 0xfb2f80 in lzw_decode /src/libvips/libvips/foreign/libnsgif/lzw.c:362:45
+    #1 0xfaab16 in gif_internal_decode_frame /src/libvips/libvips/foreign/libnsgif/libnsgif.c:914:47
+    #2 0xfa82c6 in gif_decode_frame /src/libvips/libvips/foreign/libnsgif/libnsgif.c:1198:16
+    #3 0xafb9e9 in vips_foreign_load_nsgif_generate /src/libvips/libvips/foreign/nsgifload.c:414:13
+    #4 0x546279 in vips_region_generate /src/libvips/libvips/iofuncs/region.c:1597:6
+    #5 0x548603 in vips_region_prepare_to_generate /src/libvips/libvips/iofuncs/region.c:1722:6
+    #6 0x547597 in vips_region_prepare_to /src/libvips/libvips/iofuncs/region.c:1839:7
+    #7 0x9940b2 in vips_tile_cache_gen /src/libvips/libvips/conversion/tilecache.c:681:14
+    #8 0x998ae7 in vips_line_cache_gen /src/libvips/libvips/conversion/tilecache.c:910:10
+    #9 0x546279 in vips_region_generate /src/libvips/libvips/iofuncs/region.c:1597:6
+    #10 0x5383ce in vips_region_fill /src/libvips/libvips/iofuncs/region.c:882:7
+    #11 0x545984 in vips_region_prepare /src/libvips/libvips/iofuncs/region.c:1666:7
+    #12 0x981598 in vips_sequential_generate /src/libvips/libvips/conversion/sequential.c:167:6
+    #13 0x546279 in vips_region_generate /src/libvips/libvips/iofuncs/region.c:1597:6
+    #14 0x5383ce in vips_region_fill /src/libvips/libvips/iofuncs/region.c:882:7
+    #15 0x545984 in vips_region_prepare /src/libvips/libvips/iofuncs/region.c:1666:7
+    #16 0x4e3b76 in vips_image_write_gen /src/libvips/libvips/iofuncs/image.c:2585:6
+    #17 0x546279 in vips_region_generate /src/libvips/libvips/iofuncs/region.c:1597:6
+    #18 0x548603 in vips_region_prepare_to_generate /src/libvips/libvips/iofuncs/region.c:1722:6
+    #19 0x547288 in vips_region_prepare_to /src/libvips/libvips/iofuncs/region.c:1861:8
+    #20 0x578f8b in sink_memory_area_work_fn /src/libvips/libvips/iofuncs/sinkmemory.c:266:11
+    #21 0x59f7b5 in vips_thread_work_unit /src/libvips/libvips/iofuncs/threadpool.c:662:6
+    #22 0x59e545 in vips_thread_main_loop /src/libvips/libvips/iofuncs/threadpool.c:685:3
+    #23 0x5998ef in vips_thread_run /src/libvips/libvips/iofuncs/threadpool.c:194:11
+    #24 0x1bb931e in g_thread_proxy (/out/webpsave_buffer_fuzzer+0x1bb931e)
+    #25 0x7ffff78b86b9 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x76b9)
+    #26 0x7ffff6fcc4dc in clone (/lib/x86_64-linux-gnu/libc.so.6+0x1074dc)
+
+DEDUP_TOKEN: lzw_decode--gif_internal_decode_frame--gif_decode_frame
+[1m[32m0x62a000005249 is located 9 bytes to the right of 20544-byte region [0x62a000000200,0x62a000005240)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x49ac8d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0xfb0fa8 in lzw_context_create /src/libvips/libvips/foreign/libnsgif/lzw.c:91:22
+    #2 0xfa3e4f in gif_initialise /src/libvips/libvips/foreign/libnsgif/libnsgif.c:993:34
+    #3 0xaf9487 in vips_foreign_load_nsgif_header /src/libvips/libvips/foreign/nsgifload.c:326:11
+    #4 0xad8400 in vips_foreign_load_build /src/libvips/libvips/foreign/foreign.c:1084:3
+    #5 0xafd255 in vips_foreign_load_nsgif_buffer_build /src/libvips/libvips/foreign/nsgifload.c:683:6
+    #6 0x4fe9c6 in vips_object_build /src/libvips/libvips/iofuncs/object.c:367:6
+    #7 0xca5387 in vips_cache_operation_buildp /src/libvips/libvips/iofuncs/cache.c:910:7
+    #8 0x521132 in vips_call_required_optional /src/libvips/libvips/iofuncs/operation.c:880:6
+    #9 0x52ab68 in vips_call_by_name /src/libvips/libvips/iofuncs/operation.c:920:11
+    #10 0x52b1ae in vips_call_split_option_string /src/libvips/libvips/iofuncs/operation.c:1039:11
+    #11 0x4dd6eb in vips_image_new_from_buffer /src/libvips/libvips/iofuncs/image.c:2148:11
+    #12 0x4ce7d7 in LLVMFuzzerTestOneInput /src/libvips/fuzz/webpsave_buffer_fuzzer.cc:20:16
+    #13 0x18fc923 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:185:7
+    #14 0x18fc923 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:247:12
+
+DEDUP_TOKEN: malloc--lzw_context_create--gif_initialise
+Thread T2 (worker) created by T1 (worker) here:
+    #0 0x48500a in pthread_create /src/llvm-project/compiler-rt/lib/asan/asan_interceptors.cpp:214:3
+    #1 0x1bd6066 in g_system_thread_new (/out/webpsave_buffer_fuzzer+0x1bd6066)
+
+DEDUP_TOKEN: pthread_create--g_system_thread_new
+Thread T1 (worker) created by T0 here:
+    #0 0x48500a in pthread_create /src/llvm-project/compiler-rt/lib/asan/asan_interceptors.cpp:214:3
+    #1 0x1bd6066 in g_system_thread_new (/out/webpsave_buffer_fuzzer+0x1bd6066)
+
+DEDUP_TOKEN: pthread_create--g_system_thread_new
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/libvips/libvips/foreign/libnsgif/lzw.c:362:45 in lzw_decode
+Shadow bytes around the buggy address:
+  0x0c547fff89f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c547fff8a00: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c547fff8a10: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c547fff8a20: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c547fff8a30: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c547fff8a40: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c547fff8a50: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c547fff8a60: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c547fff8a70: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c547fff8a80: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c547fff8a90: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42495135

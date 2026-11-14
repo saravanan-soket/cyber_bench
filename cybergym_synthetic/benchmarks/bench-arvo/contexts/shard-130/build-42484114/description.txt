@@ -1,0 +1,37 @@
+ARVO id: 42484114
+Project: rdkit
+Fuzz target: mol_data_stream_to_mol_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Bad-cast
+Language: c++
+Repo: https://github.com/rdkit/rdkit.git
+
+=== Crash report ===
+INFO: Seed: 1864150322
+INFO: Loaded 1 modules   (80490 inline 8-bit counters): 80490 [0xd7cd40, 0xd907aa), 
+INFO: Loaded 1 PC tables (80490 PCs): 80490 [0xd907b0,0xecae50), 
+/out/mol_data_stream_to_mol_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m/src/rdkit/Code/GraphMol/FileParsers/MolFileParser.cpp:157:21:[1m[31m runtime error: [1m[0m[1mdowncast of address 0x000001832da0 which does not point to an object of type 'RDKit::ATOM_EQUALS_QUERY' (aka 'EqualityQuery<int, const RDKit::Atom *, true>')[1m[0m
+[1m0x000001832da0:[1m[30m note: [1m[0mobject is of type 'Queries::AndQuery<int, RDKit::Atom const*, true>'[1m[0m
+ 00 00 00 00  78 2e c2 00 00 00 00 00  00 00 00 00 00 00 00 00  0e 41 74 6f 6d 41 6e 64  00 00 00 00
+[1m[32m              ^~~~~~~~~~~~~~~~~~~~~~~[1m[0m
+              vptr for 'Queries::AndQuery<int, RDKit::Atom const*, true>'
+    #0 0x4ebd4d in RDKit::(anonymous namespace)::completeMolQueries(RDKit::RWMol*, int) /src/rdkit/Code/GraphMol/FileParsers/MolFileParser.cpp:157:21
+    #1 0x4e9d3c in RDKit::FileParserUtils::finishMolProcessing(RDKit::RWMol*, bool, bool, bool) /src/rdkit/Code/GraphMol/FileParsers/MolFileParser.cpp:2745:5
+    #2 0x4ed6dc in RDKit::MolDataStreamToMol(std::__1::basic_istream<char, std::__1::char_traits<char> >*, unsigned int&, bool, bool, bool) /src/rdkit/Code/GraphMol/FileParsers/MolFileParser.cpp:2971:5
+    #3 0x4cb45b in LLVMFuzzerTestOneInput /src/rdkit/Code/Fuzz/mol_data_stream_to_mol_fuzzer.cc:35:18
+    #4 0x45cf61 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #5 0x448292 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #6 0x44e3ee in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #7 0x4762b2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #8 0x7ffff6ccb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #9 0x422988 in _start (/out/mol_data_stream_to_mol_fuzzer+0x422988)
+
+DEDUP_TOKEN: RDKit::(anonymous namespace)::completeMolQueries(RDKit::RWMol*, int)--RDKit::FileParserUtils::finishMolProcessing(RDKit::RWMol*, bool, bool, bool)--RDKit::MolDataStreamToMol(std::__1::basic_istream<char, std::__1::char_traits<char> >*, unsigned int&, bool, bool, bool)
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /src/rdkit/Code/GraphMol/FileParsers/MolFileParser.cpp:157:21 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42484114

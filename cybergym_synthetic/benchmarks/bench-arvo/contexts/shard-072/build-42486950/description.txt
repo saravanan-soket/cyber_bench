@@ -1,0 +1,44 @@
+ARVO id: 42486950
+Project: skia
+Fuzz target: sksl2spirv
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Seed: 498563546
+INFO: Loaded 1 modules   (195111 inline 8-bit counters): 195111 [0x365e908, 0x368e32f), 
+INFO: Loaded 1 PC tables (195111 PCs): 195111 [0x368e330,0x39885a0), 
+/out/sksl2spirv: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address (pc 0x000000c2f601 bp 0x7fffffffcf30 sp 0x7fffffffcf00 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Dissassemble the provided pc to learn which register was used.
+    #0 0xc2f601 in std::__1::default_delete<SkSL::Statement>::operator()(SkSL::Statement*) const /usr/local/bin/../include/c++/v1/memory:2262:5
+    #1 0xb863fc in std::__1::unique_ptr<SkSL::Statement, std::__1::default_delete<SkSL::Statement> >::reset(SkSL::Statement*) /usr/local/bin/../include/c++/v1/memory:2517:7
+    #2 0xbc6e4c in std::__1::unique_ptr<SkSL::Statement, std::__1::default_delete<SkSL::Statement> >::operator=(std::__1::unique_ptr<SkSL::Statement, std::__1::default_delete<SkSL::Statement> >&&) /usr/local/bin/../include/c++/v1/memory:2436:5
+    #3 0xb85d27 in SkSL::BasicBlock::Node::setStatement(std::__1::unique_ptr<SkSL::Statement, std::__1::default_delete<SkSL::Statement> >) /src/skia/out/Fuzz/../../src/sksl/SkSLCFGGenerator.h:53:25
+    #4 0xb89338 in SkSL::Compiler::scanCFG(SkSL::FunctionDefinition&) /src/skia/out/Fuzz/../../src/sksl/SkSLCompiler.cpp:1376:30
+    #5 0xb8f855 in SkSL::Compiler::optimize(SkSL::Program&) /src/skia/out/Fuzz/../../src/sksl/SkSLCompiler.cpp:1543:23
+    #6 0xb92f83 in SkSL::Compiler::toSPIRV(SkSL::Program&, SkSL::OutputStream&) /src/skia/out/Fuzz/../../src/sksl/SkSLCompiler.cpp:1611:16
+    #7 0xb93a83 in SkSL::Compiler::toSPIRV(SkSL::Program&, SkSL::String*) /src/skia/out/Fuzz/../../src/sksl/SkSLCompiler.cpp:1644:25
+    #8 0x8ab504 in FuzzSKSL2SPIRV(sk_sp<SkData>) /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSKSL2SPIRV.cpp:24:31
+    #9 0x8abe7e in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzSKSL2SPIRV.cpp:36:5
+    #10 0x7fa2d1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #11 0x7e5d62 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #12 0x7ebd8e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #13 0x8128b2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #14 0x7ffff3dd682f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #15 0x7c0748 in _start (/out/sksl2spirv+0x7c0748)
+
+DEDUP_TOKEN: std::__1::default_delete<SkSL::Statement>::operator()(SkSL::Statement*) const--std::__1::unique_ptr<SkSL::Statement, std::__1::default_delete<SkSL::Statement> >::reset(SkSL::Statement*)--std::__1::unique_ptr<SkSL::Statement, std::__1::default_delete<SkSL::Statement> >::operator=(std::__1::unique_ptr<SkSL::Statement, std::__1::default_delete<SkSL::Statement> >&&)
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV /usr/local/bin/../include/c++/v1/memory:2262:5 in std::__1::default_delete<SkSL::Statement>::operator()(SkSL::Statement*) const
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42486950

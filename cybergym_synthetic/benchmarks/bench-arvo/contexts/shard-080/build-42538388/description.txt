@@ -1,0 +1,44 @@
+ARVO id: 42538388
+Project: imagemagick
+Fuzz target: encoder_heic_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 2697096009
+INFO: Loaded 1 modules   (68579 inline 8-bit counters): 68579 [0x14fc1f0, 0x150cdd3), 
+INFO: Loaded 1 PC tables (68579 PCs): 68579 [0xff9450,0x1105280), 
+/out/encoder_heic_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x000000040400 (pc 0x000000aaf9e3 bp 0x7ffcc1804fd0 sp 0x7ffcc1804fa0 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0xaaf9e2 in ParseInfeAtom /src/imagemagick/coders/heic.c:500:26
+    #1 0xaaf1eb in ParseAtom /src/imagemagick/coders/heic.c:675:16
+    #2 0xaaec25 in ParseFullBox /src/imagemagick/coders/heic.c:304:12
+    #3 0xaacbe9 in ParseRootAtom /src/imagemagick/coders/heic.c:764:18
+    #4 0xaab626 in ReadHEICImage /src/imagemagick/coders/heic.c:1122:9
+    #5 0x6c0d46 in ReadImage /src/imagemagick/MagickCore/constitute.c:497:13
+    #6 0x65ed94 in BlobToImage /src/imagemagick/MagickCore/blob.c:469:13
+    #7 0x5b17f2 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4015:12
+    #8 0x525dbe in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:43:11
+    #9 0x54f9a1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:517:13
+    #10 0x526b7a in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #11 0x53242b in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #12 0x52621c in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #13 0x7fd36818a82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #14 0x41e0b8 in _start (/out/encoder_heic_fuzzer+0x41e0b8)
+
+DEDUP_TOKEN: ParseInfeAtom--ParseAtom--ParseFullBox
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/imagemagick/coders/heic.c:500:26 in ParseInfeAtom
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42538388

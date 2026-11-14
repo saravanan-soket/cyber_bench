@@ -1,0 +1,46 @@
+ARVO id: 42501952
+Project: flatbuffers
+Fuzz target: parser_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/google/flatbuffers
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2262413476
+INFO: Loaded 1 modules   (18163 inline 8-bit counters): 18163 [0x665198, 0x66988b), 
+INFO: Loaded 1 PC tables (18163 PCs): 18163 [0x669890,0x6b07c0), 
+/out/parser_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x479fc2 in std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::~basic_string() /usr/local/bin/../include/c++/v1/string:2267:9
+    #1 0x479fc2 in flatbuffers::Parser::StartEnum(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, bool, flatbuffers::EnumDef**) /src/flatbuffers/src/idl_parser.cpp:2789:1
+    #2 0x47343c in flatbuffers::Parser::ParseEnum(bool, flatbuffers::EnumDef**, char const*) /src/flatbuffers/src/idl_parser.cpp:2294:3
+    #3 0x4aa7eb in flatbuffers::Parser::DoParse(char const*, char const**, char const*, char const*) /src/flatbuffers/src/idl_parser.cpp:3390:7
+    #4 0x49f1ff in flatbuffers::Parser::ParseRoot(char const*, char const**, char const*) /src/flatbuffers/src/idl_parser.cpp:3190:3
+    #5 0x467ab9 in flatbuffers::Parser::Parse(char const*, char const**, char const*) /src/flatbuffers/src/idl_parser.cpp:3160:10
+    #6 0x3ca467 in LLVMFuzzerTestOneInput /src/flatbuffers/tests/fuzzer/flatbuffers_parser_fuzzer.cc:47:10
+    #7 0x2d9d33 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #8 0x2c5d82 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #9 0x2cb7ab in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #10 0x2f22a2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff7c580b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #12 0x2a2e9d in _start (/out/parser_fuzzer+0x2a2e9d)
+
+DEDUP_TOKEN: std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::~basic_string()--flatbuffers::Parser::StartEnum(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, bool, flatbuffers::EnumDef**)--flatbuffers::Parser::ParseEnum(bool, flatbuffers::EnumDef**, char const*)
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mqualified_name[1m[35m' in the stack frame of function '[1m[32m_ZN11flatbuffers6Parser9StartEnumERKNSt3__112basic_stringIcNS1_11char_traitsIcEENS1_9allocatorIcEEEEbPPNS_7EnumDefE[1m[35m'[1m[0m
+    #0 0x4795b0 in flatbuffers::Parser::StartEnum(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, bool, flatbuffers::EnumDef**) /src/flatbuffers/src/idl_parser.cpp:2774
+
+DEDUP_TOKEN: flatbuffers::Parser::StartEnum(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, bool, flatbuffers::EnumDef**)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /usr/local/bin/../include/c++/v1/string:2267:9 in std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >::~basic_string()
+Unique heap origins: 80
+Stack depot allocated bytes: 7008
+Unique origin histories: 32
+History depot allocated bytes: 768
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42501952

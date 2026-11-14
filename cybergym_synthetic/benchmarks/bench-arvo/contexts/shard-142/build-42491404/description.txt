@@ -1,0 +1,43 @@
+ARVO id: 42491404
+Project: c-blosc2
+Fuzz target: decompress_frame_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/Blosc/c-blosc2.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/decompress_frame_fuzzer < INPUT_FILE
+or
+  /out/decompress_frame_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/decompress_frame_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 119 bytes from /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x60bfcb00cf1e (pc 0x00000057d4de bp 0x7fffffffddd0 sp 0x7fffffffdd00 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x57d4de in frame_get_metalayers /src/c-blosc2/blosc/frame.c:1074:25
+    #1 0x57e23e in blosc2_frame_to_schunk /src/c-blosc2/blosc/frame.c:1254:8
+    #2 0x56fdb5 in blosc2_schunk_open_sframe /src/c-blosc2/blosc/schunk.c:263:27
+    #3 0x4fe4ba in LLVMFuzzerTestOneInput /src/c-blosc2/tests/fuzz/fuzz_decompress_frame.c:23:27
+    #4 0x4fea9e in ExecuteFilesOnyByOne /src/libfuzzer/afl/afl_driver.cpp:207:5
+    #5 0x4fea9e in main /src/libfuzzer/afl/afl_driver.cpp:244:12
+    #6 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #7 0x4508e8 in _start (/out/decompress_frame_fuzzer+0x4508e8)
+
+DEDUP_TOKEN: frame_get_metalayers--blosc2_frame_to_schunk--blosc2_schunk_open_sframe
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/c-blosc2/blosc/frame.c:1074:25 in frame_get_metalayers
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42491404

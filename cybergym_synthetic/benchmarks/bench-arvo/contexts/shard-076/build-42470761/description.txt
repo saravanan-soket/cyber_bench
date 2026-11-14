@@ -1,0 +1,64 @@
+ARVO id: 42470761
+Project: imagemagick
+Fuzz target: encoder_png_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Seed: 901081731
+INFO: Loaded 1 modules   (159179 inline 8-bit counters): 159179 [0x2a7a048, 0x2aa0e13), 
+INFO: Loaded 1 PC tables (159179 PCs): 159179 [0x2aa0e18,0x2d0eac8), 
+/out/encoder_png_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x134d56a in png_do_pack /src/libpng/pngwtran.c:48:20
+    #1 0x134c253 in png_do_write_transformations /src/libpng/pngwtran.c:537:7
+    #2 0x1340438 in png_write_row /src/libpng/pngwrite.c:862:7
+    #3 0x115ae2b in WriteOnePNGImage /src/imagemagick/coders/png.c:11631:17
+    #4 0x10f77f6 in WritePNGImage /src/imagemagick/coders/png.c:12721:10
+    #5 0x7e36d8 in WriteImage /src/imagemagick/MagickCore/constitute.c:1164:16
+    #6 0x712924 in ImageToBlob /src/imagemagick/MagickCore/blob.c:2025:18
+    #7 0x716af7 in ImagesToBlob /src/imagemagick/MagickCore/blob.c:2413:14
+    #8 0x5e165d in Magick::Image::write(Magick::Blob*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4910:8
+    #9 0x4a5a8a in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:56:11
+    #10 0x4edb46 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:570:15
+    #11 0x4a6f26 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #12 0x4b79ab in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #13 0x4a6051 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #14 0x7f2b166bb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #15 0x422368 in _start (/out/encoder_png_fuzzer+0x422368)
+
+DEDUP_TOKEN: png_do_pack--png_do_write_transformations--png_write_row
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x462a20 in __interceptor_malloc /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:910
+    #1 0x12c063b in png_malloc_base /src/libpng/pngmem.c:91:17
+    #2 0x12c0446 in png_malloc /src/libpng/pngmem.c:179:10
+    #3 0x135d8ff in png_write_start_row /src/libpng/pngwutil.c:1925:23
+    #4 0x133fe14 in png_write_row /src/libpng/pngwrite.c:754:7
+    #5 0x115ae2b in WriteOnePNGImage /src/imagemagick/coders/png.c:11631:17
+    #6 0x10f77f6 in WritePNGImage /src/imagemagick/coders/png.c:12721:10
+    #7 0x7e36d8 in WriteImage /src/imagemagick/MagickCore/constitute.c:1164:16
+    #8 0x712924 in ImageToBlob /src/imagemagick/MagickCore/blob.c:2025:18
+    #9 0x716af7 in ImagesToBlob /src/imagemagick/MagickCore/blob.c:2413:14
+    #10 0x5e165d in Magick::Image::write(Magick::Blob*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4910:8
+    #11 0x4a5a8a in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:56:11
+    #12 0x4edb46 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:570:15
+    #13 0x4a6f26 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #14 0x4b79ab in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #15 0x4a6051 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #16 0x7f2b166bb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: __interceptor_malloc--png_malloc_base--png_malloc
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/libpng/pngwtran.c:48:20 in png_do_pack
+Unique heap origins: 1030
+Stack depot allocated bytes: 140408
+Unique origin histories: 14
+History depot allocated bytes: 336
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42470761

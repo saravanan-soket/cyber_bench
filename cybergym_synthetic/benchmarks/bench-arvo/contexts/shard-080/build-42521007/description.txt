@@ -1,0 +1,80 @@
+ARVO id: 42521007
+Project: binutils-gdb
+Fuzz target: fuzz_nm
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-buffer-overflow WRITE 8
+Language: c++
+Repo: git://sourceware.org/git/binutils-gdb.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/fuzz_nm[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x621000013ed0 at pc 0x000000b9cba4 bp 0x7ffe9c867e50 sp 0x7ffe9c867e48
+[1m[0m[1m[34mWRITE of size 8 at 0x621000013ed0 thread T0[1m[0m
+SCARINESS: 52 (8-byte-write-heap-buffer-overflow-far-from-bounds)
+    #0 0xb9cba3 in _bfd_ecoff_slurp_symbol_table /src/binutils-gdb/bfd/ecoff.c:946:30
+    #1 0xb9dbb9 in _bfd_ecoff_canonicalize_symtab /src/binutils-gdb/bfd/ecoff.c:1002:9
+    #2 0x51dfdc in _bfd_generic_read_minisymbols /src/binutils-gdb/bfd/syms.c
+    #3 0x4e8b9a in fuzz2_display_rel_file /src/binutils-gdb/binutils/./ada_nm.h:84:14
+    #4 0x4ea73d in fuzz_display_file2 /src/binutils-gdb/binutils/./ada_nm.h:233:16
+    #5 0x4eb2ee in fuzz_preconditions /src/binutils-gdb/binutils/./ada_nm.h:268:12
+    #6 0x4eb2ee in LLVMFuzzerTestOneInput /src/binutils-gdb/binutils/fuzz_nm.c:43:7
+    #7 0x4dd52b in main (/out/fuzz_nm+0x4dd52b)
+    #8 0x7fed6cb18082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #9 0x41e73d in _start (/out/fuzz_nm+0x41e73d)
+
+DEDUP_TOKEN: _bfd_ecoff_slurp_symbol_table--_bfd_ecoff_canonicalize_symtab--_bfd_generic_read_minisymbols
+[1m[32m0x621000013ed0 is located 8 bytes to the right of 4552-byte region [0x621000012d00,0x621000013ec8)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x49fb76 in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0x127189c in _objalloc_alloc /src/binutils-gdb/libiberty/./objalloc.c:143:22
+    #2 0x517a25 in bfd_alloc /src/binutils-gdb/bfd/opncls.c:1029:9
+    #3 0xb9c22e in _bfd_ecoff_slurp_symbol_table /src/binutils-gdb/bfd/ecoff.c:883:36
+    #4 0xb9dbb9 in _bfd_ecoff_canonicalize_symtab /src/binutils-gdb/bfd/ecoff.c:1002:9
+    #5 0x51dfdc in _bfd_generic_read_minisymbols /src/binutils-gdb/bfd/syms.c
+    #6 0x4e8b9a in fuzz2_display_rel_file /src/binutils-gdb/binutils/./ada_nm.h:84:14
+    #7 0x4ea73d in fuzz_display_file2 /src/binutils-gdb/binutils/./ada_nm.h:233:16
+    #8 0x4eb2ee in fuzz_preconditions /src/binutils-gdb/binutils/./ada_nm.h:268:12
+    #9 0x4eb2ee in LLVMFuzzerTestOneInput /src/binutils-gdb/binutils/fuzz_nm.c:43:7
+    #10 0x4dd52b in main (/out/fuzz_nm+0x4dd52b)
+
+DEDUP_TOKEN: __interceptor_malloc--_objalloc_alloc--bfd_alloc
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/binutils-gdb/bfd/ecoff.c:946:30 in _bfd_ecoff_slurp_symbol_table
+Shadow bytes around the buggy address:
+  0x0c427fffa780: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c427fffa790: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c427fffa7a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c427fffa7b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c427fffa7c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c427fffa7d0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c427fffa7e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c427fffa7f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c427fffa800: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c427fffa810: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c427fffa820: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42521007

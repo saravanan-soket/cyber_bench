@@ -1,0 +1,79 @@
+ARVO id: 42513629
+Project: ghostpdl
+Fuzz target: gs_device_ps2write_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://cgit.ghostscript.com/ghostpdl.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3072931149
+INFO: Loaded 3 modules   (212293 inline 8-bit counters): 13708 [0x7ffff7f619e0, 0x7ffff7f64f6c), 959 [0x7ffff7fc2a40, 0x7ffff7fc2dff), 197626 [0x3606990, 0x3636d8a), 
+INFO: Loaded 3 PC tables (212293 PCs): 13708 [0x7ffff7f64f70,0x7ffff7f9a830), 959 [0x7ffff7fc2e00,0x7ffff7fc69f0), 197626 [0x28bf0f0,0x2bc3090), 
+/out/gs_device_ps2write_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x000000001000 (pc 0x000000f6b1fc bp 0x7fffffffba50 sp 0x7fffffffba20 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0xf6b1fc in names_string_ref /src/ghostpdl/./psi/iname.c:248:34
+    #1 0xeeb0b7 in zfont_glyph_name /src/ghostpdl/./psi/zbfont.c:141:5
+    #2 0x11281e9 in pdfi_ttf_glyph_name /src/ghostpdl/./pdf/pdf_fontTT.c:261:16
+    #3 0x9821ce in copy_glyph_type42 /src/ghostpdl/./devices/gxfcopy.c:1408:13
+    #4 0x97a91f in gs_copy_glyph_options /src/ghostpdl/./devices/gxfcopy.c:2391:12
+    #5 0x97aac4 in gs_copy_glyph_options /src/ghostpdl/./devices/gxfcopy.c:2403:16
+    #6 0x97bcef in gs_copy_glyph /src/ghostpdl/./devices/gxfcopy.c:2378:12
+    #7 0x97bcef in gs_copy_font_complete /src/ghostpdl/./devices/gxfcopy.c:2510:20
+    #8 0x14f85b3 in pdf_base_font_alloc /src/ghostpdl/./devices/vector/gdevpdtb.c:322:16
+    #9 0x9382a7 in pdf_font_descriptor_alloc /src/ghostpdl/./devices/vector/gdevpdtd.c:202:16
+    #10 0x95a3ff in pdf_make_font_resource /src/ghostpdl/./devices/vector/gdevpdtt.c:1583:17
+    #11 0x95e6f3 in pdf_obtain_font_resource_encoded /src/ghostpdl/./devices/vector/gdevpdtt.c:2117:24
+    #12 0x95c827 in pdf_obtain_font_resource /src/ghostpdl/./devices/vector/gdevpdtt.c:2223:12
+    #13 0x1504c1c in pdf_process_string /src/ghostpdl/./devices/vector/gdevpdte.c:837:12
+    #14 0x1504c1c in pdf_process_string_aux /src/ghostpdl/./devices/vector/gdevpdte.c:81:12
+    #15 0x151254b in process_plain_text /src/ghostpdl/./devices/vector/gdevpdte.c:1841:16
+    #16 0x96b935 in pdf_text_process /src/ghostpdl/./devices/vector/gdevpdtt.c:3722:16
+    #17 0xac50df in gs_text_process /src/ghostpdl/./base/gstext.c:670:12
+    #18 0x114b982 in pdfi_show_simple /src/ghostpdl/./pdf/pdf_text.c:445:16
+    #19 0x114b982 in pdfi_show_Tr_0 /src/ghostpdl/./pdf/pdf_text.c:460:12
+    #20 0x114618c in pdfi_show /src/ghostpdl/./pdf/pdf_text.c:842:24
+    #21 0x114913f in pdfi_TJ /src/ghostpdl/./pdf/pdf_text.c:1190:20
+    #22 0x104cfa2 in pdfi_interpret_stream_operator /src/ghostpdl/./pdf/pdf_int.c:1648:24
+    #23 0x104b416 in pdfi_interpret_content_stream /src/ghostpdl/./pdf/pdf_int.c:2101:24
+    #24 0x10ada4c in pdfi_process_page_contents /src/ghostpdl/./pdf/pdf_page.c:127:20
+    #25 0x10ada4c in pdfi_process_one_page /src/ghostpdl/./pdf/pdf_page.c:152:12
+    #26 0x10ada4c in pdfi_page_render /src/ghostpdl/./pdf/pdf_page.c:895:12
+    #27 0x100963a in zPDFdrawpage /src/ghostpdl/./psi/zpdfops.c:1074:24
+    #28 0xe7391b in interp /src/ghostpdl/./psi/interp.c:1725:40
+    #29 0xe7391b in gs_call_interp /src/ghostpdl/./psi/interp.c:522:12
+    #30 0xe7391b in gs_interpret /src/ghostpdl/./psi/interp.c:479:12
+    #31 0x567d8a in gs_main_interpret /src/ghostpdl/./psi/imain.c:257:12
+    #32 0x567d8a in gs_main_run_string_end /src/ghostpdl/./psi/imain.c:945:12
+    #33 0x567d8a in gs_main_run_string_with_length /src/ghostpdl/./psi/imain.c:889:12
+    #34 0x563232 in gs_main_run_string /src/ghostpdl/./psi/imain.c:870:12
+    #35 0x11a8701 in run_string /src/ghostpdl/./psi/imainarg.c:1169:12
+    #36 0x11a4709 in swproc /src/ghostpdl/./psi/imainarg.c:367:20
+    #37 0x11a15ee in gs_main_init_with_args01 /src/ghostpdl/./psi/imainarg.c:224:24
+    #38 0x11a8489 in gs_main_init_with_args /src/ghostpdl/./psi/imainarg.c:289:16
+    #39 0xe5bf74 in psapi_init_with_args /src/ghostpdl/./psi/psapi.c:281:12
+    #40 0x55f68c in gsapi_init_with_args /src/ghostpdl/./psi/iapi.c:253:12
+    #41 0x55e744 in fuzz_gs_device(unsigned char const*, unsigned long, int, char const*) /src/gs_fuzzlib.h:127:8
+    #42 0x55eb4a in LLVMFuzzerTestOneInput /src/gs_device_ps2write_fuzzer.cc:18:2
+    #43 0x456593 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #44 0x442222 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #45 0x447a6c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #46 0x470662 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #47 0x7ffff795b082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #48 0x420a4d in _start (/out/gs_device_ps2write_fuzzer+0x420a4d)
+
+DEDUP_TOKEN: names_string_ref--zfont_glyph_name--pdfi_ttf_glyph_name
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/ghostpdl/./psi/iname.c:248:34 in names_string_ref
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42513629

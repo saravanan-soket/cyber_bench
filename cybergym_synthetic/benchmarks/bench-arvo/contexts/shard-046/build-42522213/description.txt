@@ -1,0 +1,48 @@
+ARVO id: 42522213
+Project: imagemagick
+Fuzz target: encoder_tiff_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2122024109
+INFO: Loaded 1 modules   (324797 inline 8-bit counters): 324797 [0x4d02ea8, 0x4d52365), 
+INFO: Loaded 1 PC tables (324797 PCs): 324797 [0x4d52368,0x5246f38), 
+/out/encoder_tiff_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x19b5e1d in isCCITTCompression /src/libtiff/libtiff/tif_getimage.c:304:47
+    #1 0x19b5e1d in TIFFRGBAImageBegin /src/libtiff/libtiff/tif_getimage.c:398:21
+    #2 0x19b65e7 in TIFFReadRGBAImageOriented /src/libtiff/libtiff/tif_getimage.c:617:39
+    #3 0x19b6b20 in TIFFReadRGBAImage /src/libtiff/libtiff/tif_getimage.c:640:12
+    #4 0x17c2aeb in ReadTIFFImage /src/imagemagick/coders/tiff.c:2101:21
+    #5 0xb56dca in ReadImage /src/imagemagick/MagickCore/constitute.c:736:15
+    #6 0xa5c9ca in BlobToImage /src/imagemagick/MagickCore/blob.c:477:13
+    #7 0x7cd57f in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4044:12
+    #8 0x7899d6 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:66:11
+    #9 0x6201d3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #10 0x60ace2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #11 0x61058c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #12 0x63a712 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7fe2e45ad082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #14 0x600ead in _start (/out/encoder_tiff_fuzzer+0x600ead)
+
+DEDUP_TOKEN: isCCITTCompression--TIFFRGBAImageBegin--TIFFReadRGBAImageOriented
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mcompress.i[1m[35m' in the stack frame of function '[1m[32mTIFFRGBAImageBegin[1m[35m'[1m[0m
+    #0 0x19b02e0 in TIFFRGBAImageBegin /src/libtiff/libtiff/tif_getimage.c:312
+
+DEDUP_TOKEN: TIFFRGBAImageBegin
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/libtiff/libtiff/tif_getimage.c:304:47 in isCCITTCompression
+Unique heap origins: 920
+Stack depot allocated bytes: 9764880
+Unique origin histories: 27
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42522213

@@ -1,0 +1,42 @@
+ARVO id: 42505768
+Project: dnsmasq
+Fuzz target: fuzz_dhcp6
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c
+Repo: git://thekelleys.org.uk/dnsmasq.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3565788628
+INFO: Loaded 1 modules   (15834 inline 8-bit counters): 15834 [0x7e53c8, 0x7e91a2), 
+INFO: Loaded 1 PC tables (15834 PCs): 15834 [0x5584c8,0x596268), 
+/out/fuzz_dhcp6: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x00000adbf000 (pc 0x00000050eedd bp 0x7fff6d3fe630 sp 0x7fff6d3fe5f0 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x50eedd in opt6_find /src/dnsmasq/src/rfc3315.c
+    #1 0x50f160 in check_ia /src/dnsmasq/src/rfc3315.c:1580:16
+    #2 0x50c690 in dhcp6_no_relay /src/dnsmasq/src/rfc3315.c:937:11
+    #3 0x509d93 in dhcp6_maybe_relay /src/dnsmasq/src/rfc3315.c:250:13
+    #4 0x509867 in dhcp6_reply /src/dnsmasq/src/rfc3315.c:99:7
+    #5 0x4bd0f8 in dhcp6_packet /src/dnsmasq/src/dhcp6.c:246:14
+    #6 0x4b472b in FuzzDhcp /src/fuzz_dhcp6.c:44:3
+    #7 0x4b4857 in LLVMFuzzerTestOneInput /src/fuzz_dhcp6.c:73:3
+    #8 0x442223 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #9 0x42d792 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #10 0x4334ce in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #11 0x45d1a2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7fc6d15a383f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #13 0x408758 in _start (/out/fuzz_dhcp6+0x408758)
+
+DEDUP_TOKEN: opt6_find--check_ia--dhcp6_no_relay
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/dnsmasq/src/rfc3315.c in opt6_find
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42505768

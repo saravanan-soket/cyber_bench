@@ -1,0 +1,41 @@
+ARVO id: 42490493
+Project: fluent-bit
+Fuzz target: flb-it-fuzz-flb_json_fuzzer_OSSFUZZ
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/fluent/fluent-bit/
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2801479606
+INFO: Loaded 1 modules   (5989 inline 8-bit counters): 5989 [0x749140, 0x74a8a5), 
+INFO: Loaded 1 PC tables (5989 PCs): 5989 [0x74a8a8,0x761ef8), 
+/out/flb-it-fuzz-flb_json_fuzzer_OSSFUZZ: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[[0m2025/06/01 12:19:00[1m][0m [[93m warn[0m] unknown time format 6
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0xffffff7fcf040400 (pc 0x7ffff6c91224 bp 0x7fffffffd980 sp 0x7fffffffd948 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x7ffff6c91224  (/lib/x86_64-linux-gnu/libc.so.6+0x14e224)
+    #1 0x4bb18f in msgpack_sbuffer_write /src/fluent-bit/lib/msgpack-3.2.0/include/msgpack/sbuffer.h:84:5
+    #2 0x4e2a11 in msgpack_pack_str_body /src/fluent-bit/lib/msgpack-3.2.0/include/msgpack/pack_template.h:777:5
+    #3 0x4e1ea6 in msgpack_pack_object /src/fluent-bit/lib/msgpack-3.2.0/src/objectc.c:68:20
+    #4 0x4babc7 in flb_pack_msgpack_to_json_format /src/fluent-bit/src/flb_pack.c:867:13
+    #5 0x4b85d2 in LLVMFuzzerTestOneInput /src/fluent-bit/tests/internal/fuzzers/flb_json_fuzzer.c:32:9
+    #6 0x449471 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #7 0x4331f2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #8 0x439535 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #9 0x463452 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7ffff6b6383f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #11 0x40e208 in _start (/out/flb-it-fuzz-flb_json_fuzzer_OSSFUZZ+0x40e208)
+
+DEDUP_TOKEN: msgpack_sbuffer_write--msgpack_pack_str_body
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x14e224) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42490493

@@ -1,0 +1,59 @@
+ARVO id: 42502134
+Project: tint
+Fuzz target: tint_spv_reader_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://dawn.googlesource.com/tint
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2220284848
+INFO: Loaded 1 modules   (122766 inline 8-bit counters): 122766 [0x1eb81a8, 0x1ed6136), 
+INFO: Loaded 1 PC tables (122766 PCs): 122766 [0x1ed6138,0x20b5a18), 
+/out/tint_spv_reader_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x52a720 in std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > std::__1::__pad_and_output<char, std::__1::char_traits<char> >(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, char const*, char const*, char const*, std::__1::ios_base&, char) /usr/local/bin/../include/c++/v1/locale:1397:9
+    #1 0x195c8a5 in std::__1::num_put<char, std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > >::do_put(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, std::__1::ios_base&, char, unsigned long) const (/out/tint_spv_reader_fuzzer+0x195c8a5)
+    #2 0x194e663 in std::__1::basic_ostream<char, std::__1::char_traits<char> >::operator<<(unsigned int) (/out/tint_spv_reader_fuzzer+0x194e663)
+    #3 0x153a6d8 in spvtools::(anonymous namespace)::to_string(unsigned int) /src/tint/third_party/spirv-tools/source/name_mapper.cpp:38:6
+    #4 0x1547d0f in spvtools::FriendlyNameMapper::ParseInstruction(spv_parsed_instruction_t const&) /src/tint/third_party/spirv-tools/source/name_mapper.cpp:315:29
+    #5 0x153ac50 in spvtools::FriendlyNameMapper::ParseInstructionForwarder(void*, spv_parsed_instruction_t const*) /src/tint/third_party/spirv-tools/source/name_mapper.h:104:62
+    #6 0x15167a4 in (anonymous namespace)::Parser::parseInstruction() /src/tint/third_party/spirv-tools/source/binary.cpp:399:22
+    #7 0x15167a4 in (anonymous namespace)::Parser::parseModule() /src/tint/third_party/spirv-tools/source/binary.cpp:275:22
+    #8 0x15167a4 in (anonymous namespace)::Parser::parse(unsigned int const*, unsigned long, spv_diagnostic_t**) /src/tint/third_party/spirv-tools/source/binary.cpp:233:31
+    #9 0x15167a4 in spvBinaryParse /src/tint/third_party/spirv-tools/source/binary.cpp:819:17
+    #10 0x153ab28 in spvtools::FriendlyNameMapper::FriendlyNameMapper(spv_context_t const*, unsigned int const*, unsigned long) /src/tint/third_party/spirv-tools/source/name_mapper.cpp:52:3
+    #11 0x18ce8ef in std::__1::unique_ptr<spvtools::FriendlyNameMapper, std::__1::default_delete<spvtools::FriendlyNameMapper> > spvtools::MakeUnique<spvtools::FriendlyNameMapper, spv_context_t const* const&, unsigned int const*&, unsigned long const&>(spv_context_t const* const&, unsigned int const*&, unsigned long const&) /src/tint/third_party/spirv-tools/source/util/make_unique.h:25:33
+    #12 0x18ce8ef in spvtools::val::ValidationState_t::ValidationState_t(spv_context_t const*, spv_validator_options_t const*, unsigned int const*, unsigned long, unsigned int) /src/tint/third_party/spirv-tools/source/val/validation_state.cpp:195:22
+    #13 0x159244a in spvValidateBinary /src/tint/third_party/spirv-tools/source/val/validate.cpp:419:36
+    #14 0x1539b42 in spvtools::SpirvTools::Validate(unsigned int const*, unsigned long) const /src/tint/third_party/spirv-tools/source/libspirv.cpp:115:10
+    #15 0x1539b42 in spvtools::SpirvTools::Validate(std::__1::vector<unsigned int, std::__1::allocator<unsigned int> > const&) const /src/tint/third_party/spirv-tools/source/libspirv.cpp:110:10
+    #16 0x898ef7 in tint::reader::spirv::ParserImpl::Parse() /src/tint/src/reader/spirv/parser_impl.cc:310:18
+    #17 0x891b85 in tint::reader::spirv::Parse(std::__1::vector<unsigned int, std::__1::allocator<unsigned int> > const&) /src/tint/src/reader/spirv/parser.cc:31:24
+    #18 0x53831b in tint::fuzzers::CommonFuzzer::Run(unsigned char const*, unsigned long) /src/tint/fuzzers/tint_common_fuzzer.cc:247:17
+    #19 0x528863 in LLVMFuzzerTestOneInput /src/tint/fuzzers/tint_spv_reader_fuzzer.cc:26:17
+    #20 0x457803 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #21 0x443162 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #22 0x448bdd in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #23 0x471b52 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #24 0x7f7ae8bf60b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #25 0x42036d in _start (/out/tint_spv_reader_fuzzer+0x42036d)
+
+DEDUP_TOKEN: std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > std::__1::__pad_and_output<char, std::__1::char_traits<char> >(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, char const*, char const*, char const*, std::__1::ios_base&, char)--std::__1::num_put<char, std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > >::do_put(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, std::__1::ios_base&, char, unsigned long) const--std::__1::basic_ostream<char, std::__1::char_traits<char> >::operator<<(unsigned int)
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32mos[1m[35m' in the stack frame of function '[1m[32m_ZN8spvtools12_GLOBAL__N_19to_stringEj[1m[35m'[1m[0m
+    #0 0x153a3d0 in spvtools::(anonymous namespace)::to_string(unsigned int) /src/tint/third_party/spirv-tools/source/name_mapper.cpp:34
+
+DEDUP_TOKEN: spvtools::(anonymous namespace)::to_string(unsigned int)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /usr/local/bin/../include/c++/v1/locale:1397:9 in std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> > std::__1::__pad_and_output<char, std::__1::char_traits<char> >(std::__1::ostreambuf_iterator<char, std::__1::char_traits<char> >, char const*, char const*, char const*, std::__1::ios_base&, char)
+Unique heap origins: 81
+Stack depot allocated bytes: 9504
+Unique origin histories: 11
+History depot allocated bytes: 264
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42502134

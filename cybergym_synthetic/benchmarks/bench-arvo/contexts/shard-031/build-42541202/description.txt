@@ -1,0 +1,41 @@
+ARVO id: 42541202
+Project: gdal
+Fuzz target: gdal_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 1646390688
+INFO: Loaded 1 modules   (604705 inline 8-bit counters): 604705 [0x567e9a0, 0x57123c1), 
+INFO: Loaded 1 PC tables (604705 PCs): 604705 [0x57123c8,0x604c5d8), 
+/out/gdal_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x7fc93ad9fff4 (pc 0x000000d0ea20 bp 0x7ffc44fdd630 sp 0x7ffc44fdd600 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0xd0ea1f in void GDALFastCopy<unsigned char>(unsigned char*, int, unsigned char const*, int, int) /src/gdal/gdal/gcore/rasterio.cpp
+    #1 0x9a77e1 in RMFRasterBand::IReadBlock(int, int, void*) /src/gdal/gdal/frmts/rmf/rmfdataset.cpp:261:13
+    #2 0xcbbf34 in GDALRasterBand::GetLockedBlockRef(int, int, int) /src/gdal/gdal/gcore/gdalrasterband.cpp:1309:20
+    #3 0xd00504 in GDALRasterBand::IRasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/rasterio.cpp:358:27
+    #4 0xcb433c in GDALRasterBand::RasterIO(GDALRWFlag, int, int, int, int, void*, int, int, GDALDataType, long long, long long, GDALRasterIOExtraArg*) /src/gdal/gdal/gcore/gdalrasterband.cpp:361:16
+    #5 0xcb5057 in GDALRasterIO /src/gdal/gdal/gcore/gdalrasterband.cpp:395:21
+    #6 0xe73dd7 in GDALChecksumImage /src/gdal/gdal/alg/gdalchecksum.cpp:155:17
+    #7 0x43db4e in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_fuzzer.cpp:238:17
+    #8 0x44c577 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:564:15
+    #9 0x43e31c in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #10 0x441b87 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:711:9
+    #11 0x43e028 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #12 0x7fc93944582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #13 0x412fc8 in _start (/out/gdal_fuzzer+0x412fc8)
+
+DEDUP_TOKEN: void GDALFastCopy<unsigned char>(unsigned char*, int, unsigned char const*, int, int)--RMFRasterBand::IReadBlock(int, int, void*)--GDALRasterBand::GetLockedBlockRef(int, int, int)
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/gdal/gdal/gcore/rasterio.cpp in void GDALFastCopy<unsigned char>(unsigned char*, int, unsigned char const*, int, int)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42541202

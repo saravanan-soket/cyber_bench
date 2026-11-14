@@ -1,0 +1,67 @@
+ARVO id: 42512154
+Project: systemd
+Fuzz target: fuzz-network-parser
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-double-free
+Language: c++
+Repo: https://github.com/systemd/systemd
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/fuzz-network-parser[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: attempting double-free on 0x6030000002e0 in thread T0:
+[1m[0mSCARINESS: 42 (double-free)
+    #0 0x4aa4d2 in __interceptor_free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:111:3
+    #1 0x7ffff788204f in nft_set_context_free_many /work/build/../../src/systemd/src/shared/firewall-util-nft.c:1259:9
+    #2 0x7ffff78827c3 in config_parse_nft_set_context /work/build/../../src/systemd/src/shared/firewall-util-nft.c:1313:17
+    #3 0x4ff239 in config_parse_dhcp_pd_nft_set_context /work/build/../../src/systemd/src/network/networkd-network.c:1369:16
+    #4 0x7ffff7824667 in next_assignment /work/build/../../src/systemd/src/shared/conf-parser.c:151:24
+    #5 0x7ffff7824667 in parse_line /work/build/../../src/systemd/src/shared/conf-parser.c:258:16
+    #6 0x7ffff7823530 in config_parse /work/build/../../src/systemd/src/shared/conf-parser.c:401:21
+    #7 0x7ffff7825484 in config_parse_many_files /work/build/../../src/systemd/src/shared/conf-parser.c:501:21
+    #8 0x7ffff7825aca in config_parse_many /work/build/../../src/systemd/src/shared/conf-parser.c:605:16
+    #9 0x4f79e1 in network_load_one /work/build/../../src/systemd/src/network/networkd-network.c:492:13
+    #10 0x4e3dbb in LLVMFuzzerTestOneInput /work/build/../../src/systemd/src/network/fuzz-network-parser.c:26:16
+    #11 0x70a76b in main (/out/fuzz-network-parser+0x70a76b)
+    #12 0x7ffff71e0082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #13 0x42b43d in _start (/out/fuzz-network-parser+0x42b43d)
+
+DEDUP_TOKEN: __interceptor_free--nft_set_context_free_many--config_parse_nft_set_context
+[1m[32m0x6030000002e0 is located 0 bytes inside of 24-byte region [0x6030000002e0,0x6030000002f8)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x4aa4d2 in __interceptor_free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:111:3
+    #1 0x7ffff788204f in nft_set_context_free_many /work/build/../../src/systemd/src/shared/firewall-util-nft.c:1259:9
+    #2 0x7ffff78827c3 in config_parse_nft_set_context /work/build/../../src/systemd/src/shared/firewall-util-nft.c:1313:17
+    #3 0x4ff239 in config_parse_dhcp_pd_nft_set_context /work/build/../../src/systemd/src/network/networkd-network.c:1369:16
+    #4 0x7ffff7824667 in next_assignment /work/build/../../src/systemd/src/shared/conf-parser.c:151:24
+    #5 0x7ffff7824667 in parse_line /work/build/../../src/systemd/src/shared/conf-parser.c:258:16
+    #6 0x7ffff7823530 in config_parse /work/build/../../src/systemd/src/shared/conf-parser.c:401:21
+    #7 0x7ffff7825484 in config_parse_many_files /work/build/../../src/systemd/src/shared/conf-parser.c:501:21
+    #8 0x7ffff7825aca in config_parse_many /work/build/../../src/systemd/src/shared/conf-parser.c:605:16
+    #9 0x4f79e1 in network_load_one /work/build/../../src/systemd/src/network/networkd-network.c:492:13
+    #10 0x4e3dbb in LLVMFuzzerTestOneInput /work/build/../../src/systemd/src/network/fuzz-network-parser.c:26:16
+    #11 0x70a76b in main (/out/fuzz-network-parser+0x70a76b)
+
+DEDUP_TOKEN: __interceptor_free--nft_set_context_free_many--config_parse_nft_set_context
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x4aacba in __interceptor_reallocarray /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:155:3
+    #1 0x7ffff7882690 in config_parse_nft_set_context /work/build/../../src/systemd/src/shared/firewall-util-nft.c:1342:21
+    #2 0x4ff239 in config_parse_dhcp_pd_nft_set_context /work/build/../../src/systemd/src/network/networkd-network.c:1369:16
+    #3 0x7ffff7824667 in next_assignment /work/build/../../src/systemd/src/shared/conf-parser.c:151:24
+    #4 0x7ffff7824667 in parse_line /work/build/../../src/systemd/src/shared/conf-parser.c:258:16
+    #5 0x7ffff7823530 in config_parse /work/build/../../src/systemd/src/shared/conf-parser.c:401:21
+    #6 0x7ffff7825484 in config_parse_many_files /work/build/../../src/systemd/src/shared/conf-parser.c:501:21
+    #7 0x7ffff7825aca in config_parse_many /work/build/../../src/systemd/src/shared/conf-parser.c:605:16
+    #8 0x4f79e1 in network_load_one /work/build/../../src/systemd/src/network/networkd-network.c:492:13
+    #9 0x4e3dbb in LLVMFuzzerTestOneInput /work/build/../../src/systemd/src/network/fuzz-network-parser.c:26:16
+    #10 0x70a76b in main (/out/fuzz-network-parser+0x70a76b)
+
+DEDUP_TOKEN: __interceptor_reallocarray--config_parse_nft_set_context--config_parse_dhcp_pd_nft_set_context
+SUMMARY: AddressSanitizer: double-free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:111:3 in __interceptor_free
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42512154

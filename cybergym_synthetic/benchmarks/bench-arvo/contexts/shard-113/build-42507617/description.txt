@@ -1,0 +1,65 @@
+ARVO id: 42507617
+Project: harfbuzz
+Fuzz target: hb-subset-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/harfbuzz/harfbuzz.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2292988010
+INFO: Loaded 1 modules   (68672 inline 8-bit counters): 68672 [0xeedc49, 0xefe889), 
+INFO: Loaded 1 PC tables (68672 PCs): 68672 [0xefe890,0x100ac90), 
+/out/hb-subset-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0xa2cde6 in graph_t::update_distances() /work/build/../../src/harfbuzz/src/hb-repacker.hh:907:13
+    #1 0xa1e972 in graph_t::sort_shortest_distance() /work/build/../../src/harfbuzz/src/hb-repacker.hh:328:5
+    #2 0xa12823 in hb_resolve_overflows(hb_vector_t<hb_serialize_context_t::object_t*> const&, unsigned int, unsigned int) /work/build/../../src/harfbuzz/src/hb-repacker.hh:1236:16
+    #3 0x9f59df in _repack /work/build/../../src/harfbuzz/src/hb-subset.cc:107:23
+    #4 0x9f59df in _subset<const OT::GPOS> /work/build/../../src/harfbuzz/src/hb-subset.cc:202:26
+    #5 0x9f59df in _subset_table /work/build/../../src/harfbuzz/src/hb-subset.cc:316:31
+    #6 0x9f59df in hb_subset_or_fail /work/build/../../src/harfbuzz/src/hb-subset.cc:363:17
+    #7 0x528d37 in trySubset(hb_face_t*, unsigned int const*, int, unsigned int) /work/build/../../src/harfbuzz/test/fuzzing/hb-subset-fuzzer.cc:26:23
+    #8 0x5289d0 in LLVMFuzzerTestOneInput /work/build/../../src/harfbuzz/test/fuzzing/hb-subset-fuzzer.cc:79:5
+    #9 0x4550d3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #10 0x440d12 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #11 0x44656c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #12 0x46f372 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7ffff7c580b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #14 0x41f4cd in _start (/out/hb-subset-fuzzer+0x41f4cd)
+
+DEDUP_TOKEN: graph_t::update_distances()--graph_t::sort_shortest_distance()--hb_resolve_overflows(hb_vector_t<hb_serialize_context_t::object_t*> const&, unsigned int, unsigned int)
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x4d57bd in __interceptor_malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:911:3
+    #1 0x5baab1 in hb_malloc_impl /work/build/../../src/harfbuzz/src/failing-alloc.c:45:31
+    #2 0xa24c87 in graph_t::vertex_t* hb_vector_t<graph_t::vertex_t>::realloc_vector<graph_t::vertex_t, (void*)0>(unsigned int) /work/build/../../src/harfbuzz/src/hb-vector.hh:214:32
+    #3 0xa24701 in alloc /work/build/../../src/harfbuzz/src/hb-vector.hh:309:19
+    #4 0xa24701 in hb_vector_t<graph_t::vertex_t>::resize(int) /work/build/../../src/harfbuzz/src/hb-vector.hh:326:10
+    #5 0xa17435 in graph_t::sort_kahn() /work/build/../../src/harfbuzz/src/hb-repacker.hh:277:9
+    #6 0xa127c4 in hb_resolve_overflows(hb_vector_t<hb_serialize_context_t::object_t*> const&, unsigned int, unsigned int) /work/build/../../src/harfbuzz/src/hb-repacker.hh:1230:16
+    #7 0x9f59df in _repack /work/build/../../src/harfbuzz/src/hb-subset.cc:107:23
+    #8 0x9f59df in _subset<const OT::GPOS> /work/build/../../src/harfbuzz/src/hb-subset.cc:202:26
+    #9 0x9f59df in _subset_table /work/build/../../src/harfbuzz/src/hb-subset.cc:316:31
+    #10 0x9f59df in hb_subset_or_fail /work/build/../../src/harfbuzz/src/hb-subset.cc:363:17
+    #11 0x528d37 in trySubset(hb_face_t*, unsigned int const*, int, unsigned int) /work/build/../../src/harfbuzz/test/fuzzing/hb-subset-fuzzer.cc:26:23
+    #12 0x5289d0 in LLVMFuzzerTestOneInput /work/build/../../src/harfbuzz/test/fuzzing/hb-subset-fuzzer.cc:79:5
+    #13 0x4550d3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #14 0x440d12 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #15 0x44656c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #16 0x46f372 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7ffff7c580b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+
+DEDUP_TOKEN: __interceptor_malloc--hb_malloc_impl--graph_t::vertex_t* hb_vector_t<graph_t::vertex_t>::realloc_vector<graph_t::vertex_t, (void*)0>(unsigned int)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /work/build/../../src/harfbuzz/src/hb-repacker.hh:907:13 in graph_t::update_distances()
+Unique heap origins: 201
+Stack depot allocated bytes: 1638400
+Unique origin histories: 8
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42507617

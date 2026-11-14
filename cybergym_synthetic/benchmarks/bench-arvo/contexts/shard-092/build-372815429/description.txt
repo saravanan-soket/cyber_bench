@@ -1,0 +1,40 @@
+ARVO id: 372815429
+Project: mruby
+Fuzz target: mruby_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/mruby/mruby
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 609492449
+INFO: Loaded 1 modules   (29117 inline 8-bit counters): 29117 [0x55555593a4e0, 0x55555594169d), 
+INFO: Loaded 1 PC tables (29117 PCs): 29117 [0x5555559416a0,0x5555559b3270), 
+/out/mruby_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x5555557d3efc (pc 0x55555575dbdf bp 0x7fffffffb220 sp 0x7fffffffb1c0 T7)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+    #0 0x55555575dbdf in mrb_bint_2comp /src/mruby/mrbgems/mruby-bigint/core/bigint.c:1898:11
+    #1 0x555555816434 in mrb_str_format /src/mruby/mrbgems/mruby-sprintf/src/sprintf.c:605:23
+    #2 0x555555814942 in mrb_f_sprintf /src/mruby/mrbgems/mruby-sprintf/src/sprintf.c:1133:12
+    #3 0x5555557b3e43 in mrb_vm_exec /src/mruby/src/vm.c
+    #4 0x55555576d471 in mrb_load_exec /src/mruby/mrbgems/mruby-compiler/core/parse.y:6911:7
+    #5 0x555555734821 in LLVMFuzzerTestOneInput /src/mruby/oss-fuzz/mruby_fuzzer.c:14:5
+    #6 0x555555696db0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #7 0x555555682025 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #8 0x555555687abf in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #9 0x5555556b2d62 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7ffff7c38082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #11 0x55555567a20d in _start (/out/mruby_fuzzer+0x12620d)
+
+DEDUP_TOKEN: mrb_bint_2comp--mrb_str_format--mrb_f_sprintf
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/mruby/mrbgems/mruby-bigint/core/bigint.c:1898:11 in mrb_bint_2comp
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/372815429

@@ -1,0 +1,106 @@
+ARVO id: 42530069
+Project: matio
+Fuzz target: matio_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ {*}
+Language: c++
+Repo: https://github.com/tbeu/matio.git
+
+=== Crash report ===
+Reading 12566 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6100000000f8 at pc 0x00000048a756 bp 0x7ffc545c8350 sp 0x7ffc545c7b18
+[1m[0m[1m[34mREAD of size 125 at 0x6100000000f8 thread T0[1m[0m
+SCARINESS: 26 (multi-byte-read-heap-buffer-overflow)
+    #0 0x48a755 in strdup /src/llvm-project/compiler-rt/lib/asan/asan_interceptors.cpp:438:5
+    #1 0x9c77dd in H5MM_strdup /src/hdf5/src/H5MM.c:143:30
+    #2 0x8f791e in H5G__stab_get_name_by_idx_cb /src/hdf5/src/H5Gstab.c:657:24
+    #3 0x8e4da1 in H5G__node_by_idx /src/hdf5/src/H5Gnode.c:1032:13
+    #4 0x1010478 in H5B__iterate_helper /src/hdf5/src/H5B.c:1131:25
+    #5 0x100ffb8 in H5B_iterate /src/hdf5/src/H5B.c:1170:22
+    #6 0x8f7257 in H5G__stab_get_name_by_idx /src/hdf5/src/H5Gstab.c:720:9
+    #7 0x8ed253 in H5G_obj_get_name_by_idx /src/hdf5/src/H5Gobj.c:782:13
+    #8 0x9a71b1 in H5L__get_name_by_idx_cb /src/hdf5/src/H5Lint.c:1929:9
+    #9 0x8fcfd1 in H5G__traverse_real /src/hdf5/src/H5Gtraverse.c:735:9
+    #10 0x8fa3a5 in H5G_traverse /src/hdf5/src/H5Gtraverse.c:815:9
+    #11 0x9a6ef5 in H5L__get_name_by_idx /src/hdf5/src/H5Lint.c:1974:9
+    #12 0xf5d8b5 in H5VL__native_link_get /src/hdf5/src/H5VLnative_link.c:280:17
+    #13 0xf27765 in H5VL__link_get /src/hdf5/src/H5VLcallback.c:5381:9
+    #14 0xf27765 in H5VL_link_get /src/hdf5/src/H5VLcallback.c:5413:9
+    #15 0x99b275 in H5Lget_name_by_idx /src/hdf5/src/H5L.c:1552:9
+    #16 0x4f6027 in Mat_CalcDir73 /src/matio/src/mat73.c:3352:28
+    #17 0x4e17d3 in Mat_GetDir /src/matio/src/mat.c:771:23
+    #18 0x4dd0c0 in MatioRead(char const*) /src/matio/ossfuzz/./matio_wrap.h:33:18
+    #19 0x4dd402 in LLVMFuzzerTestOneInput /src/matio/ossfuzz/./matio_fuzzer.cpp:30:12
+    #20 0x4ddf4d in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+    #21 0x4ddd58 in LLVMFuzzerRunDriver /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #22 0x4dd918 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:300:10
+    #23 0x7f0ed61da082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: e678fe54a5d2c2092f8e47eb0b33105e380f7340)
+    #24 0x41e74d in _start (/out/matio_fuzzer+0x41e74d)
+
+DEDUP_TOKEN: strdup--H5MM_strdup--H5G__stab_get_name_by_idx_cb
+[1m[32m0x6100000000f8 is located 0 bytes to the right of 184-byte region [0x610000000040,0x6100000000f8)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x49fb86 in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0x89da9e in H5FL__malloc /src/hdf5/src/H5FL.c:231:30
+    #2 0x89da9e in H5FL_blk_malloc /src/hdf5/src/H5FL.c:848:40
+    #3 0x974cbb in H5HL__cache_datablock_deserialize /src/hdf5/src/H5HLcache.c:710:41
+    #4 0x7059d9 in H5C__load_entry /src/hdf5/src/H5Centry.c:1203:26
+    #5 0x7059d9 in H5C_protect /src/hdf5/src/H5Centry.c:3120:30
+    #6 0x6a54b6 in H5AC_protect /src/hdf5/src/H5AC.c:1276:26
+    #7 0x96e596 in H5HL_protect /src/hdf5/src/H5HL.c:338:40
+    #8 0x8f6df1 in H5G__stab_get_name_by_idx /src/hdf5/src/H5Gstab.c:696:25
+    #9 0x8ed253 in H5G_obj_get_name_by_idx /src/hdf5/src/H5Gobj.c:782:13
+    #10 0x9a71b1 in H5L__get_name_by_idx_cb /src/hdf5/src/H5Lint.c:1929:9
+    #11 0x8fcfd1 in H5G__traverse_real /src/hdf5/src/H5Gtraverse.c:735:9
+    #12 0x8fa3a5 in H5G_traverse /src/hdf5/src/H5Gtraverse.c:815:9
+    #13 0x9a6ef5 in H5L__get_name_by_idx /src/hdf5/src/H5Lint.c:1974:9
+    #14 0xf5d8b5 in H5VL__native_link_get /src/hdf5/src/H5VLnative_link.c:280:17
+    #15 0xf27765 in H5VL__link_get /src/hdf5/src/H5VLcallback.c:5381:9
+    #16 0xf27765 in H5VL_link_get /src/hdf5/src/H5VLcallback.c:5413:9
+    #17 0x99b275 in H5Lget_name_by_idx /src/hdf5/src/H5L.c:1552:9
+    #18 0x4f6027 in Mat_CalcDir73 /src/matio/src/mat73.c:3352:28
+    #19 0x4e17d3 in Mat_GetDir /src/matio/src/mat.c:771:23
+    #20 0x4dd0c0 in MatioRead(char const*) /src/matio/ossfuzz/./matio_wrap.h:33:18
+    #21 0x4dd402 in LLVMFuzzerTestOneInput /src/matio/ossfuzz/./matio_fuzzer.cpp:30:12
+    #22 0x4ddf4d in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:255:7
+
+DEDUP_TOKEN: __interceptor_malloc--H5FL__malloc--H5FL_blk_malloc
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/asan_interceptors.cpp:438:5 in strdup
+Shadow bytes around the buggy address:
+  0x0c207fff7fc0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c207fff7fd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c207fff7fe0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c207fff7ff0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c207fff8000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c207fff8010: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m]
+  0x0c207fff8020: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c207fff8030: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c207fff8040: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c207fff8050: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c207fff8060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42530069

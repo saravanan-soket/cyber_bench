@@ -1,0 +1,41 @@
+ARVO id: 42517865
+Project: fluent-bit
+Fuzz target: flb-it-fuzz-ctrace_fuzzer_OSSFUZZ
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/fluent/fluent-bit/
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3411323852
+INFO: Loaded 1 modules   (4962 inline 8-bit counters): 4962 [0x54f5d0, 0x550932), 
+INFO: Loaded 1 PC tables (4962 PCs): 4962 [0x550938,0x563f58), 
+/out/flb-it-fuzz-ctrace_fuzzer_OSSFUZZ: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x000001dd9820 (pc 0x0000004d5de0 bp 0x7fffffffd7b0 sp 0x7fffffffd790 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x4d5de0 in mpack_load_u8 /src/fluent-bit/lib/mpack-amalgamation-1.1/src/mpack/mpack.h:2689:21
+    #1 0x4d5de0 in mpack_parse_tag /src/fluent-bit/lib/mpack-amalgamation-1.1/src/mpack/mpack.c:3297:20
+    #2 0x4d5d1e in mpack_read_tag /src/fluent-bit/lib/mpack-amalgamation-1.1/src/mpack/mpack.c:3654:20
+    #3 0x4c6f7a in ctr_mpack_unpack_map /src/fluent-bit/lib/ctraces/src/ctr_mpack_utils.c:342:11
+    #4 0x4c1bcd in unpack_context /src/fluent-bit/lib/ctraces/src/ctr_decode_msgpack.c:628:12
+    #5 0x4c1bcd in ctr_decode_msgpack_create /src/fluent-bit/lib/ctraces/src/ctr_decode_msgpack.c:650:14
+    #6 0x4bf0a9 in LLVMFuzzerTestOneInput /src/fluent-bit/tests/internal/fuzzers/ctrace_fuzzer.c:8:5
+    #7 0x4261b3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #8 0x411912 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #9 0x4171bc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #10 0x4406f2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff7708082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #12 0x407add in _start (/out/flb-it-fuzz-ctrace_fuzzer_OSSFUZZ+0x407add)
+
+DEDUP_TOKEN: mpack_load_u8--mpack_parse_tag--mpack_read_tag
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/fluent-bit/lib/mpack-amalgamation-1.1/src/mpack/mpack.h:2689:21 in mpack_load_u8
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42517865

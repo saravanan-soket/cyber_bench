@@ -1,0 +1,58 @@
+ARVO id: 42503911
+Project: harfbuzz
+Fuzz target: hb-subset-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/harfbuzz/harfbuzz.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 379461122
+INFO: Loaded 1 modules   (68577 inline 8-bit counters): 68577 [0xc0b780, 0xc1c361), 
+INFO: Loaded 1 PC tables (68577 PCs): 68577 [0xc1c368,0xd28178), 
+/out/hb-subset-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x62a00101714b (pc 0x000000915479 bp 0x7ffc959a2650 sp 0x7ffc959a25f0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x915479 in operator unsigned char /work/build/../../src/harfbuzz/src/hb-algs.hh:94:45
+    #1 0x915479 in operator unsigned int /work/build/../../src/harfbuzz/src/hb-open-type.hh:67:84
+    #2 0x915479 in copy /work/build/../../src/harfbuzz/src/hb-ot-color-colr-table.hh:915:13
+    #3 0x915479 in _copy<OT::ClipBox> /work/build/../../src/harfbuzz/src/hb-serialize.hh:496:55
+    #4 0x915479 in copy<OT::ClipBox> /work/build/../../src/harfbuzz/src/hb-serialize.hh:512:12
+    #5 0x915479 in bool OT::OffsetTo<OT::ClipBox, OT::IntType<unsigned int, 3u>, true>::serialize_copy<>(hb_serialize_context_t*, OT::OffsetTo<OT::ClipBox, OT::IntType<unsigned int, 3u>, true> const&, void const*, unsigned int, hb_serialize_context_t::whence_t) /work/build/../../src/harfbuzz/src/hb-open-type.hh:387:19
+    #6 0x914c84 in serialize_copy /work/build/../../src/harfbuzz/src/hb-open-type.hh:396:12
+    #7 0x914c84 in copy /work/build/../../src/harfbuzz/src/hb-ot-color-colr-table.hh:949:23
+    #8 0x914c84 in _copy<OT::ClipRecord, const OT::ClipList *> /work/build/../../src/harfbuzz/src/hb-serialize.hh:496:55
+    #9 0x914c84 in copy<OT::ClipRecord, const OT::ClipList *> /work/build/../../src/harfbuzz/src/hb-serialize.hh:512:12
+    #10 0x914c84 in OT::ClipList::serialize_clip_records(hb_serialize_context_t*, hb_set_t const&, hb_map_t const&) const /work/build/../../src/harfbuzz/src/hb-ot-color-colr-table.hh:1011:15
+    #11 0x913520 in OT::ClipList::subset(hb_subset_context_t*) const /work/build/../../src/harfbuzz/src/hb-ot-color-colr-table.hh:1042:22
+    #12 0x8fd1e1 in _dispatch<OT::ClipList> /work/build/../../src/harfbuzz/src/hb-subset.hh:47:56
+    #13 0x8fd1e1 in dispatch<OT::ClipList> /work/build/../../src/harfbuzz/src/hb-subset.hh:54:39
+    #14 0x8fd1e1 in bool OT::OffsetTo<OT::ClipList, OT::IntType<unsigned int, 4u>, true>::serialize_subset<>(hb_subset_context_t*, OT::OffsetTo<OT::ClipList, OT::IntType<unsigned int, 4u>, true> const&, void const*) /work/build/../../src/harfbuzz/src/hb-open-type.hh:344:19
+    #15 0x8f9d2c in OT::COLR::subset(hb_subset_context_t*) const /work/build/../../src/harfbuzz/src/hb-ot-color-colr-table.hh:1492:26
+    #16 0x8ee375 in bool _try_subset<OT::COLR>(OT::COLR const*, hb_vector_t<char>*, unsigned int, hb_subset_context_t*) /work/build/../../src/harfbuzz/src/hb-subset.cc:134:24
+    #17 0x8777b0 in _subset<const OT::COLR> /work/build/../../src/harfbuzz/src/hb-subset.cc:189:14
+    #18 0x8777b0 in _subset_table /work/build/../../src/harfbuzz/src/hb-subset.cc:305:31
+    #19 0x8777b0 in hb_subset_or_fail /work/build/../../src/harfbuzz/src/hb-subset.cc:367:17
+    #20 0x55dea2 in trySubset(hb_face_t*, unsigned int const*, int, unsigned int) /work/build/../../src/harfbuzz/test/fuzzing/hb-subset-fuzzer.cc:26:23
+    #21 0x55db90 in LLVMFuzzerTestOneInput /work/build/../../src/harfbuzz/test/fuzzing/hb-subset-fuzzer.cc:66:3
+    #22 0x456b93 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #23 0x442442 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #24 0x447ef5 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #25 0x470bf2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #26 0x7fc43244e0b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #27 0x41f6dd in _start (/out/hb-subset-fuzzer+0x41f6dd)
+
+DEDUP_TOKEN: operator unsigned char--operator unsigned int--copy
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /work/build/../../src/harfbuzz/src/hb-algs.hh:94:45 in operator unsigned char
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42503911

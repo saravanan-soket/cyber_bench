@@ -1,0 +1,61 @@
+ARVO id: 42517808
+Project: ghostpdl
+Fuzz target: gs_device_pdfwrite_opts_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://cgit.ghostscript.com/ghostpdl.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1219193498
+INFO: Loaded 3 modules   (222478 inline 8-bit counters): 13672 [0x7ffff7f619e0, 0x7ffff7f64f48), 959 [0x7ffff7fc2a40, 0x7ffff7fc2dff), 207847 [0x37fff10, 0x3832af7), 
+INFO: Loaded 3 PC tables (222478 PCs): 13672 [0x7ffff7f64f48,0x7ffff7f9a5c8), 959 [0x7ffff7fc2e00,0x7ffff7fc69f0), 207847 [0x2a6cd90,0x2d98c00), 
+/out/gs_device_pdfwrite_opts_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x62a000404d20 (pc 0x0000017431a8 bp 0x7fffffffc490 sp 0x7fffffffc440 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x17431a8 in Ins_MSIRP /src/ghostpdl/./base/ttinterp.c
+    #1 0x1737b7f in RunIns /src/ghostpdl/./base/ttinterp.c:5084:7
+    #2 0x166e6b6 in Instance_Reset /src/ghostpdl/./base/ttobjs.c:831:15
+    #3 0x165c437 in TT_Set_Instance_CharSizes /src/ghostpdl/./base/ttfmain.c:138:12
+    #4 0x165e1aa in ttfFont__Open /src/ghostpdl/./base/ttfmain.c:348:12
+    #5 0x127133d in ttfFont__Open_aux /src/ghostpdl/./base/gxttfb.c:448:12
+    #6 0xc35dc3 in gx_attach_tt_interpreter /src/ghostpdl/./base/gxccman.c:249:12
+    #7 0xc36cc0 in gx_add_fm_pair /src/ghostpdl/./base/gxccman.c:355:20
+    #8 0xc31f1a in gx_lookup_fm_pair /src/ghostpdl/./base/gxccache.c:140:12
+    #9 0x1266a28 in gs_type42_glyph_outline /src/ghostpdl/./base/gstype42.c:1351:12
+    #10 0xa98994 in gs_default_glyph_info /src/ghostpdl/./base/gsfont.c:1061:12
+    #11 0x126c18e in gs_type42_glyph_info_by_gid /src/ghostpdl/./base/gstype42.c:1388:16
+    #12 0x1267028 in gs_type42_glyph_info /src/ghostpdl/./base/gstype42.c:1459:12
+    #13 0x92318a in pdf_compute_font_descriptor /src/ghostpdl/./devices/vector/gdevpdtd.c:469:16
+    #14 0x9251b4 in pdf_finish_FontDescriptor /src/ghostpdl/./devices/vector/gdevpdtd.c:649:17
+    #15 0x95d370 in pdf_finish_resources /src/ghostpdl/./devices/vector/gdevpdtw.c:684:24
+    #16 0x810b57 in pdf_close /src/ghostpdl/./devices/vector/gdevpdf.c:2785:13
+    #17 0xa74b44 in gs_closedevice /src/ghostpdl/./base/gsdevice.c:786:16
+    #18 0x579783 in gs_main_finit /src/ghostpdl/./psi/imain.c:1351:20
+    #19 0x57aaf2 in gs_to_exit_with_code /src/ghostpdl/./psi/imain.c:1434:12
+    #20 0x57aaf2 in gs_to_exit /src/ghostpdl/./psi/imain.c:1439:12
+    #21 0xe71e33 in psapi_exit /src/ghostpdl/./psi/psapi.c:517:5
+    #22 0x56f09a in gsapi_exit /src/ghostpdl/./psi/iapi.c:440:12
+    #23 0x56dd9b in fuzz_gs_device(unsigned char const*, unsigned long, int, char const*, char const*, int) /src/gs_fuzzlib.h:144:8
+    #24 0x56e1d5 in LLVMFuzzerTestOneInput /src/gs_device_pdfwrite_opts_fuzzer.cc:25:2
+    #25 0x43f1c3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #26 0x42a922 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #27 0x4301cc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #28 0x459702 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #29 0x7ffff7962082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #30 0x420aed in _start (/out/gs_device_pdfwrite_opts_fuzzer+0x420aed)
+
+DEDUP_TOKEN: Ins_MSIRP--RunIns--Instance_Reset
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/ghostpdl/./base/ttinterp.c in Ins_MSIRP
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42517808

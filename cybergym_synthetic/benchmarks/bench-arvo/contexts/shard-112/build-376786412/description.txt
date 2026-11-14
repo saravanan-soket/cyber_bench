@@ -1,0 +1,76 @@
+ARVO id: 376786412
+Project: imagemagick
+Fuzz target: encoder_jxl_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3307921988
+INFO: Loaded 1 modules   (305275 inline 8-bit counters): 305275 [0x468ede8, 0x46d9663), 
+INFO: Loaded 1 PC tables (305275 PCs): 305275 [0x46d9668,0x4b81e18), 
+/out/encoder_jxl_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0xe2257e in ScaleQuantumToChar /src/imagemagick/./MagickCore/quantum.h:118:29
+    #1 0xe2257e in ExportCharPixel /src/imagemagick/MagickCore/pixel.c:591:16
+    #2 0xe2257e in ExportImagePixels /src/imagemagick/MagickCore/pixel.c:2102:14
+    #3 0x16dd907 in WriteJXLImage /src/imagemagick/coders/jxl.c
+    #4 0xb4c0fa in WriteImage /src/imagemagick/MagickCore/constitute.c:1344:16
+    #5 0xa5d797 in ImageToBlob /src/imagemagick/MagickCore/blob.c:2082:18
+    #6 0xa61aff in ImagesToBlob /src/imagemagick/MagickCore/blob.c:2471:14
+    #7 0x817aa0 in Magick::Image::write(Magick::Blob*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&) /src/imagemagick/Magick++/lib/Image.cpp:4925:8
+    #8 0x77cc14 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:76:11
+    #9 0x6133b3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #10 0x5fdec2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #11 0x60376c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #12 0x62d8f2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7f960074a082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #14 0x5f408d in _start (/out/encoder_jxl_fuzzer+0x5f408d)
+
+DEDUP_TOKEN: ScaleQuantumToChar--ExportCharPixel--ExportImagePixels
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0xe3b1f2 in SetPixelBlue /src/imagemagick/./MagickCore/pixel-accessor.h:713:53
+    #1 0xe3b1f2 in ImportCharPixel /src/imagemagick/MagickCore/pixel.c:2638:11
+    #2 0xe3b1f2 in ImportImagePixels /src/imagemagick/MagickCore/pixel.c:4268:14
+    #3 0x16d9853 in ReadJXLImage /src/imagemagick/coders/jxl.c:491:16
+    #4 0xb4404a in ReadImage /src/imagemagick/MagickCore/constitute.c:731:15
+    #5 0xa4ee9a in BlobToImage /src/imagemagick/MagickCore/blob.c:477:13
+    #6 0x7c075f in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4044:12
+    #7 0x77cbb5 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:66:11
+    #8 0x6133b3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #9 0x5fdec2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x60376c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #11 0x62d8f2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f960074a082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+
+DEDUP_TOKEN: SetPixelBlue--ImportCharPixel--ImportImagePixels
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x6b7c40 in __interceptor_malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:895:3
+    #1 0xdae1c1 in AcquireMagickMemory /src/imagemagick/MagickCore/memory.c:558:10
+    #2 0xdae1c1 in AcquireQuantumMemory /src/imagemagick/MagickCore/memory.c:676:10
+    #3 0x16d8ef6 in ReadJXLImage /src/imagemagick/coders/jxl.c:461:23
+    #4 0xb4404a in ReadImage /src/imagemagick/MagickCore/constitute.c:731:15
+    #5 0xa4ee9a in BlobToImage /src/imagemagick/MagickCore/blob.c:477:13
+    #6 0x7c075f in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4044:12
+    #7 0x77cbb5 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:66:11
+    #8 0x6133b3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #9 0x5fdec2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x60376c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #11 0x62d8f2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f960074a082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+
+DEDUP_TOKEN: __interceptor_malloc--AcquireMagickMemory--AcquireQuantumMemory
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/imagemagick/./MagickCore/quantum.h:118:29 in ScaleQuantumToChar
+Unique heap origins: 2217
+Stack depot allocated bytes: 9764880
+Unique origin histories: 89
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/376786412

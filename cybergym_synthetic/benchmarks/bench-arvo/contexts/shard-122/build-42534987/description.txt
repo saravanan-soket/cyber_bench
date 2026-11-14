@@ -1,0 +1,44 @@
+ARVO id: 42534987
+Project: ndpi
+Fuzz target: fuzz_ds_domain_classify
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/ntop/nDPI.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1744633313
+INFO: Loaded 1 modules   (21486 inline 8-bit counters): 21486 [0x555555bcaa20, 0x555555bcfe0e), 
+INFO: Loaded 1 PC tables (21486 PCs): 21486 [0x555555bcfe10,0x555555c23cf0), 
+/out/fuzz_ds_domain_classify: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m[1m[31mUninitialized bytes in [1m[32mstrlen[1m[31m at offset 23 inside [0x70300008e200, 24)[1m[0m
+[1m[31m==8==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x55555580a97c in ndpi_domain_classify_hostname /src/ndpi/src/lib/ndpi_domain_classify.c:159:13
+    #1 0x555555808c65 in LLVMFuzzerTestOneInput /src/ndpi/fuzz/fuzz_ds_domain_classify.cpp:55:5
+    #2 0x555555704400 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #3 0x5555556eeb94 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #4 0x5555556f462a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #5 0x555555720a22 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #6 0x7ffff7c38082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 87b331c034a6458c64ce09c03939e947212e18ce)
+    #7 0x5555556e566d in _start (/out/fuzz_ds_domain_classify+0x19166d)
+
+DEDUP_TOKEN: ndpi_domain_classify_hostname--LLVMFuzzerTestOneInput--fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long)
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x555555806779 in operator new(unsigned long) /src/llvm-project/compiler-rt/lib/msan/msan_new_delete.cpp:45:35
+    #1 0x555555a2e633 in std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::operator=(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&) (/out/fuzz_ds_domain_classify+0x4da633)
+    #2 0x555555704400 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #3 0x5555556eeb94 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #4 0x5555556f462a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #5 0x555555720a22 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #6 0x7ffff7c38082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 87b331c034a6458c64ce09c03939e947212e18ce)
+
+DEDUP_TOKEN: operator new(unsigned long)--std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>>::operator=(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char>> const&)--fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/ndpi/src/lib/ndpi_domain_classify.c:159:13 in ndpi_domain_classify_hostname
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42534987

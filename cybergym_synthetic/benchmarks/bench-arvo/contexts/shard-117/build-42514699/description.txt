@@ -1,0 +1,40 @@
+ARVO id: 42514699
+Project: lcms
+Fuzz target: cms_profile_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/mm2/Little-CMS.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 445152084
+INFO: Loaded 1 modules   (7657 inline 8-bit counters): 7657 [0x6dbcd9, 0x6ddac2), 
+INFO: Loaded 1 PC tables (7657 PCs): 7657 [0x66af90,0x688e20), 
+/out/cms_profile_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address 0x718000010000 (pc 0x00000053e2ab bp 0x7ffc04071180 sp 0x7ffc040710e0 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x53e2ab in _cmsWriteUInt16Array /src/lcms/src/cmsplugin.c:289:40
+    #1 0x593de5 in Type_LUT16_Write /src/lcms/src/cmstypes.c:2291:18
+    #2 0x533b41 in SaveTags /src/lcms/src/cmsio0.c:1305:18
+    #3 0x531d3d in cmsSaveProfileToIOhandler /src/lcms/src/cmsio0.c:1378:10
+    #4 0x5340fd in cmsSaveProfileToFile /src/lcms/src/cmsio0.c:1419:11
+    #5 0x526f49 in LLVMFuzzerTestOneInput /src/cms_profile_fuzzer.c:45:5
+    #6 0x455093 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #7 0x440d22 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #8 0x44656c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #9 0x46f162 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7f758cf7e082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #11 0x41f54d in _start (/out/cms_profile_fuzzer+0x41f54d)
+
+DEDUP_TOKEN: _cmsWriteUInt16Array--Type_LUT16_Write--SaveTags
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV /src/lcms/src/cmsplugin.c:289:40 in _cmsWriteUInt16Array
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42514699

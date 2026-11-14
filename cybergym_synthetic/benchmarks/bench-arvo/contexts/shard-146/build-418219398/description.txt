@@ -1,0 +1,81 @@
+ARVO id: 418219398
+Project: imagemagick
+Fuzz target: encoder_heic_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2797078264
+INFO: Loaded 1 modules   (349788 inline 8-bit counters): 349788 [0x555a7fbb0590, 0x555a7fc05bec), 
+INFO: Loaded 1 PC tables (349788 PCs): 349788 [0x555a7fc05bf0,0x555a8015c1b0), 
+/out/encoder_heic_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x555a7d3a2c8f in min<unsigned char, std::__1::__less<void, void> > /usr/local/bin/../include/c++/v1/__algorithm/min.h:30:10
+    #1 0x555a7d3a2c8f in min<unsigned char> /usr/local/bin/../include/c++/v1/__algorithm/min.h:36:10
+    #2 0x555a7d3a2c8f in heif_encoding_options_copy /src/libheif/libheif/api/libheif/heif_encoding.cc:614:21
+    #3 0x555a7d49169f in ImageItem_Grid::ImageItem_Grid(HeifContext*, unsigned int) /src/libheif/libheif/image-items/grid.cc:159:3
+    #4 0x555a7d42da40 in construct_at<ImageItem_Grid, HeifContext *&, unsigned int &, ImageItem_Grid *> /usr/local/bin/../include/c++/v1/__memory/construct_at.h:41:46
+    #5 0x555a7d42da40 in __construct_at<ImageItem_Grid, HeifContext *&, unsigned int &, ImageItem_Grid *> /usr/local/bin/../include/c++/v1/__memory/construct_at.h:49:10
+    #6 0x555a7d42da40 in construct<ImageItem_Grid, HeifContext *&, unsigned int &, void, void> /usr/local/bin/../include/c++/v1/__memory/allocator_traits.h:305:5
+    #7 0x555a7d42da40 in __shared_ptr_emplace<HeifContext *&, unsigned int &, std::__1::allocator<ImageItem_Grid>, 0> /usr/local/bin/../include/c++/v1/__memory/shared_ptr.h:265:5
+    #8 0x555a7d42da40 in allocate_shared<ImageItem_Grid, std::__1::allocator<ImageItem_Grid>, HeifContext *&, unsigned int &, void> /usr/local/bin/../include/c++/v1/__memory/shared_ptr.h:823:51
+    #9 0x555a7d42da40 in std::__1::shared_ptr<ImageItem_Grid> std::__1::make_shared[abi:ne180100]<ImageItem_Grid, HeifContext*&, unsigned int&, void>(HeifContext*&, unsigned int&) /usr/local/bin/../include/c++/v1/__memory/shared_ptr.h:831:10
+    #10 0x555a7d42c4d6 in ImageItem::alloc_for_infe_box(HeifContext*, std::__1::shared_ptr<Box_infe> const&) /src/libheif/libheif/image-items/image_item.cc:185:12
+    #11 0x555a7d323406 in HeifContext::interpret_heif_file_images() /src/libheif/libheif/context.cc:466:18
+    #12 0x555a7d31bacb in HeifContext::interpret_heif_file() /src/libheif/libheif/context.cc:431:17
+    #13 0x555a7d31c534 in HeifContext::read_from_file(char const*) /src/libheif/libheif/context.cc:185:10
+    #14 0x555a7d3b70d3 in heif_context_read_from_file /src/libheif/libheif/api/libheif/heif_context.cc:60:29
+    #15 0x555a7ce69143 in ReadHEICImage /src/imagemagick/coders/heic.c:737:9
+    #16 0x555a7c663494 in ReadImage /src/imagemagick/MagickCore/constitute.c:736:15
+    #17 0x555a7c5a9f3f in BlobToImage /src/imagemagick/MagickCore/blob.c:520:9
+    #18 0x555a7c3d4471 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4049:12
+    #19 0x555a7c3a9fc2 in LLVMFuzzerTestOneInput /src/imagemagick/oss-fuzz/encoder_fuzzer.cc:84:11
+    #20 0x555a7c241ce0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #21 0x555a7c22c305 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #22 0x555a7c231d9f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #23 0x555a7c25dc92 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #24 0x7f9ef89a2082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+    #25 0x555a7c2244ed in _start (/out/encoder_heic_fuzzer+0xc744ed)
+
+DEDUP_TOKEN: min<unsigned char, std::__1::__less<void, void> >--min<unsigned char>--heif_encoding_options_copy
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x555a7c3a871c in operator new(unsigned long) /src/llvm-project/compiler-rt/lib/msan/msan_new_delete.cpp:51:35
+    #1 0x555a7d42d9cd in __libcpp_operator_new<unsigned long> /usr/local/bin/../include/c++/v1/new:271:10
+    #2 0x555a7d42d9cd in __libcpp_allocate /usr/local/bin/../include/c++/v1/new:295:10
+    #3 0x555a7d42d9cd in allocate /usr/local/bin/../include/c++/v1/__memory/allocator.h:125:32
+    #4 0x555a7d42d9cd in allocate /usr/local/bin/../include/c++/v1/__memory/allocator_traits.h:269:16
+    #5 0x555a7d42d9cd in __allocation_guard<std::__1::allocator<ImageItem_Grid> > /usr/local/bin/../include/c++/v1/__memory/allocation_guard.h:56:16
+    #6 0x555a7d42d9cd in allocate_shared<ImageItem_Grid, std::__1::allocator<ImageItem_Grid>, HeifContext *&, unsigned int &, void> /usr/local/bin/../include/c++/v1/__memory/shared_ptr.h:822:46
+    #7 0x555a7d42d9cd in std::__1::shared_ptr<ImageItem_Grid> std::__1::make_shared[abi:ne180100]<ImageItem_Grid, HeifContext*&, unsigned int&, void>(HeifContext*&, unsigned int&) /usr/local/bin/../include/c++/v1/__memory/shared_ptr.h:831:10
+    #8 0x555a7d42c4d6 in ImageItem::alloc_for_infe_box(HeifContext*, std::__1::shared_ptr<Box_infe> const&) /src/libheif/libheif/image-items/image_item.cc:185:12
+    #9 0x555a7d323406 in HeifContext::interpret_heif_file_images() /src/libheif/libheif/context.cc:466:18
+    #10 0x555a7d31bacb in HeifContext::interpret_heif_file() /src/libheif/libheif/context.cc:431:17
+    #11 0x555a7d31c534 in HeifContext::read_from_file(char const*) /src/libheif/libheif/context.cc:185:10
+    #12 0x555a7d3b70d3 in heif_context_read_from_file /src/libheif/libheif/api/libheif/heif_context.cc:60:29
+    #13 0x555a7ce69143 in ReadHEICImage /src/imagemagick/coders/heic.c:737:9
+    #14 0x555a7c663494 in ReadImage /src/imagemagick/MagickCore/constitute.c:736:15
+    #15 0x555a7c5a9f3f in BlobToImage /src/imagemagick/MagickCore/blob.c:520:9
+    #16 0x555a7c3d4471 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4049:12
+    #17 0x555a7c3a9fc2 in LLVMFuzzerTestOneInput /src/imagemagick/oss-fuzz/encoder_fuzzer.cc:84:11
+    #18 0x555a7c241ce0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #19 0x555a7c22c305 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #20 0x555a7c231d9f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #21 0x555a7c25dc92 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #22 0x7f9ef89a2082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0323ab4806bee6f846d9ad4bccfc29afdca49a58)
+
+DEDUP_TOKEN: operator new(unsigned long)--__libcpp_operator_new<unsigned long>--__libcpp_allocate
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/libheif/libheif/api/libheif/heif_encoding.cc:614:21 in heif_encoding_options_copy
+Unique heap origins: 1832
+Stack depot allocated bytes: 9764880
+Unique origin histories: 85
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/418219398

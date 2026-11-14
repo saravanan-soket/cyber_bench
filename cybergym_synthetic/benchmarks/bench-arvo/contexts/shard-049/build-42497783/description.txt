@@ -1,0 +1,248 @@
+ARVO id: 42497783
+Project: libjxl
+Fuzz target: djxl_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/libjxl/libjxl.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2400985300
+INFO: Loaded 1 modules   (30598 inline 8-bit counters): 30598 [0x55555636cd98, 0x55555637451e), 
+INFO: Loaded 1 PC tables (30598 PCs): 30598 [0x555556374520,0x5555563ebd80), 
+/out/djxl_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==6==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x55555586d3a0 in jxl::N_AVX2::FloatToU32(float const*, unsigned int*, unsigned long, float, unsigned long) /src/libjxl/lib/jxl/dec_external_image.cc:61:9
+    #1 0x555555883399 in operator() /src/libjxl/lib/jxl/dec_external_image.cc:447:13
+    #2 0x555555883399 in jxl::ThreadPool::RunCallState<jxl::ConvertToExternal(jxl::ImageBundle const&, unsigned long, bool, unsigned long, JxlEndianness, unsigned long, jxl::ThreadPool*, void*, unsigned long, void (*)(void*, unsigned long, unsigned long, unsigned long, void const*), void*, jxl::Orientation)::$_5, jxl::ConvertToExternal(jxl::ImageBundle const&, unsigned long, bool, unsigned long, JxlEndianness, unsigned long, jxl::ThreadPool*, void*, unsigned long, void (*)(void*, unsigned long, unsigned long, unsigned long, void const*), void*, jxl::Orientation)::$_6>::CallDataFunc(void*, unsigned int, unsigned long) /src/libjxl/lib/jxl/base/data_parallel.h:88:14
+    #3 0x555555e697d3 in RunRange /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:137:7
+    #4 0x555555e697d3 in jpegxl::ThreadParallelRunner::ThreadFunc(jpegxl::ThreadParallelRunner*, int) /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:167:9
+    #5 0x555555e6c49a in __invoke<void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int> /usr/local/bin/../include/c++/v1/type_traits:3679:1
+    #6 0x555555e6c49a in __thread_execute<std::unique_ptr<std::__thread_struct>, void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int, 2, 3> /usr/local/bin/../include/c++/v1/thread:280:5
+    #7 0x555555e6c49a in void* std::__1::__thread_proxy<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(jpegxl::ThreadParallelRunner*, int), jpegxl::ThreadParallelRunner*, unsigned int> >(void*) /usr/local/bin/../include/c++/v1/thread:291:5
+    #8 0x7ffff78b86b9 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x76b9)
+    #9 0x7ffff6fcc51c in clone (/lib/x86_64-linux-gnu/libc.so.6+0x10751c)
+
+DEDUP_TOKEN: jxl::N_AVX2::FloatToU32(float const*, unsigned int*, unsigned long, float, unsigned long)--operator()--jxl::ThreadPool::RunCallState<jxl::ConvertToExternal(jxl::ImageBundle const&, unsigned long, bool, unsigned long, JxlEndianness, unsigned long, jxl::ThreadPool*, void*, unsigned long, void (*)(void*, unsigned long, unsigned long, unsigned long, void const*), void*, jxl::Orientation)::$_5, jxl::ConvertToExternal(jxl::ImageBundle const&, unsigned long, bool, unsigned long, JxlEndianness, unsigned long, jxl::ThreadPool*, void*, unsigned long, void (*)(void*, unsigned long, unsigned long, unsigned long, void const*), void*, jxl::Orientation)::$_6>::CallDataFunc(void*, unsigned int, unsigned long)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x55555587a096 in operator() /src/libjxl/lib/jxl/dec_external_image.cc:157:24
+    #1 0x55555587a096 in jxl::ThreadPool::RunCallState<jxl::Status (unsigned long), void jxl::(anonymous namespace)::UndoOrientation<float>(jxl::Orientation, jxl::Plane<float> const&, jxl::Plane<float>&, jxl::ThreadPool*)::'lambda1'(int, int)>::CallDataFunc(void*, unsigned int, unsigned long) /src/libjxl/lib/jxl/base/data_parallel.h:88:14
+    #2 0x555555e697d3 in RunRange /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:137:7
+    #3 0x555555e697d3 in jpegxl::ThreadParallelRunner::ThreadFunc(jpegxl::ThreadParallelRunner*, int) /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:167:9
+    #4 0x555555e6c49a in __invoke<void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int> /usr/local/bin/../include/c++/v1/type_traits:3679:1
+    #5 0x555555e6c49a in __thread_execute<std::unique_ptr<std::__thread_struct>, void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int, 2, 3> /usr/local/bin/../include/c++/v1/thread:280:5
+    #6 0x555555e6c49a in void* std::__1::__thread_proxy<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(jpegxl::ThreadParallelRunner*, int), jpegxl::ThreadParallelRunner*, unsigned int> >(void*) /usr/local/bin/../include/c++/v1/thread:291:5
+    #7 0x7ffff78b86b9 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x76b9)
+
+DEDUP_TOKEN: operator()--jxl::ThreadPool::RunCallState<jxl::Status (unsigned long), void jxl::(anonymous namespace)::UndoOrientation<float>(jxl::Orientation, jxl::Plane<float> const&, jxl::Plane<float>&, jxl::ThreadPool*)::'lambda1'(int, int)>::CallDataFunc(void*, unsigned int, unsigned long)--RunRange
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x555555afcf82 in StoreU /src/libjxl/third_party/highway/hwy/ops/x86_256-inl.h:1406:3
+    #1 0x555555afcf82 in Upsample<2, 2> /src/libjxl/lib/jxl/dec_upsample.cc:226:11
+    #2 0x555555afcf82 in jxl::N_AVX2::UpsampleRect(unsigned long, float const*, jxl::Plane<float> const&, jxl::Rect const&, jxl::Plane<float>*, jxl::Rect const&, long, unsigned long, float*, unsigned long) /src/libjxl/lib/jxl/dec_upsample.cc:245:7
+    #3 0x555555b30861 in UpsampleRect /src/libjxl/lib/jxl/dec_upsample.cc:336:3
+    #4 0x555555b30861 in jxl::Upsampler::UpsampleRect(jxl::Image3<float> const&, jxl::Rect const&, jxl::Image3<float>*, jxl::Rect const&, long, unsigned long, float*) const /src/libjxl/lib/jxl/dec_upsample.cc:347:5
+    #5 0x555555ac6700 in jxl::FinalizeImageRect(jxl::Image3<float>*, jxl::Rect const&, std::__1::vector<std::__1::pair<jxl::Plane<float>*, jxl::Rect>, std::__1::allocator<std::__1::pair<jxl::Plane<float>*, jxl::Rect> > > const&, jxl::PassesDecoderState*, unsigned long, jxl::ImageBundle*, jxl::Rect const&) /src/libjxl/lib/jxl/dec_reconstruct.cc:950:24
+    #6 0x555555ada445 in operator() /src/libjxl/lib/jxl/dec_reconstruct.cc:1160:12
+    #7 0x555555ada445 in jxl::ThreadPool::RunCallState<jxl::FinalizeFrameDecoding(jxl::ImageBundle*, jxl::PassesDecoderState*, jxl::ThreadPool*, bool, bool)::$_9, jxl::FinalizeFrameDecoding(jxl::ImageBundle*, jxl::PassesDecoderState*, jxl::ThreadPool*, bool, bool)::$_10>::CallDataFunc(void*, unsigned int, unsigned long) /src/libjxl/lib/jxl/base/data_parallel.h:88:14
+    #8 0x555555e697d3 in RunRange /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:137:7
+    #9 0x555555e697d3 in jpegxl::ThreadParallelRunner::ThreadFunc(jpegxl::ThreadParallelRunner*, int) /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:167:9
+    #10 0x555555e6c49a in __invoke<void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int> /usr/local/bin/../include/c++/v1/type_traits:3679:1
+    #11 0x555555e6c49a in __thread_execute<std::unique_ptr<std::__thread_struct>, void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int, 2, 3> /usr/local/bin/../include/c++/v1/thread:280:5
+    #12 0x555555e6c49a in void* std::__1::__thread_proxy<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(jpegxl::ThreadParallelRunner*, int), jpegxl::ThreadParallelRunner*, unsigned int> >(void*) /usr/local/bin/../include/c++/v1/thread:291:5
+    #13 0x7ffff78b86b9 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x76b9)
+
+DEDUP_TOKEN: StoreU--Upsample<2, 2>--jxl::N_AVX2::UpsampleRect(unsigned long, float const*, jxl::Plane<float> const&, jxl::Rect const&, jxl::Plane<float>*, jxl::Rect const&, long, unsigned long, float*, unsigned long)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x555555afd110 in Store /src/libjxl/third_party/highway/hwy/ops/x86_256-inl.h:1393:3
+    #1 0x555555afd110 in Upsample<2, 2> /src/libjxl/lib/jxl/dec_upsample.cc:214:9
+    #2 0x555555afd110 in jxl::N_AVX2::UpsampleRect(unsigned long, float const*, jxl::Plane<float> const&, jxl::Rect const&, jxl::Plane<float>*, jxl::Rect const&, long, unsigned long, float*, unsigned long) /src/libjxl/lib/jxl/dec_upsample.cc:245:7
+    #3 0x555555b30861 in UpsampleRect /src/libjxl/lib/jxl/dec_upsample.cc:336:3
+    #4 0x555555b30861 in jxl::Upsampler::UpsampleRect(jxl::Image3<float> const&, jxl::Rect const&, jxl::Image3<float>*, jxl::Rect const&, long, unsigned long, float*) const /src/libjxl/lib/jxl/dec_upsample.cc:347:5
+    #5 0x555555ac6700 in jxl::FinalizeImageRect(jxl::Image3<float>*, jxl::Rect const&, std::__1::vector<std::__1::pair<jxl::Plane<float>*, jxl::Rect>, std::__1::allocator<std::__1::pair<jxl::Plane<float>*, jxl::Rect> > > const&, jxl::PassesDecoderState*, unsigned long, jxl::ImageBundle*, jxl::Rect const&) /src/libjxl/lib/jxl/dec_reconstruct.cc:950:24
+    #6 0x555555ada445 in operator() /src/libjxl/lib/jxl/dec_reconstruct.cc:1160:12
+    #7 0x555555ada445 in jxl::ThreadPool::RunCallState<jxl::FinalizeFrameDecoding(jxl::ImageBundle*, jxl::PassesDecoderState*, jxl::ThreadPool*, bool, bool)::$_9, jxl::FinalizeFrameDecoding(jxl::ImageBundle*, jxl::PassesDecoderState*, jxl::ThreadPool*, bool, bool)::$_10>::CallDataFunc(void*, unsigned int, unsigned long) /src/libjxl/lib/jxl/base/data_parallel.h:88:14
+    #8 0x555555e697d3 in RunRange /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:137:7
+    #9 0x555555e697d3 in jpegxl::ThreadParallelRunner::ThreadFunc(jpegxl::ThreadParallelRunner*, int) /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:167:9
+    #10 0x555555e6c49a in __invoke<void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int> /usr/local/bin/../include/c++/v1/type_traits:3679:1
+    #11 0x555555e6c49a in __thread_execute<std::unique_ptr<std::__thread_struct>, void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int, 2, 3> /usr/local/bin/../include/c++/v1/thread:280:5
+    #12 0x555555e6c49a in void* std::__1::__thread_proxy<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(jpegxl::ThreadParallelRunner*, int), jpegxl::ThreadParallelRunner*, unsigned int> >(void*) /usr/local/bin/../include/c++/v1/thread:291:5
+    #13 0x7ffff78b86b9 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x76b9)
+
+DEDUP_TOKEN: Store--Upsample<2, 2>--jxl::N_AVX2::UpsampleRect(unsigned long, float const*, jxl::Plane<float> const&, jxl::Rect const&, jxl::Plane<float>*, jxl::Rect const&, long, unsigned long, float*, unsigned long)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x5555555a76a9 in __msan_memcpy /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1558:3
+    #1 0x555555afbca5 in Upsample<2, 2> /src/libjxl/lib/jxl/dec_upsample.cc:189:9
+    #2 0x555555afbca5 in jxl::N_AVX2::UpsampleRect(unsigned long, float const*, jxl::Plane<float> const&, jxl::Rect const&, jxl::Plane<float>*, jxl::Rect const&, long, unsigned long, float*, unsigned long) /src/libjxl/lib/jxl/dec_upsample.cc:245:7
+    #3 0x555555b30861 in UpsampleRect /src/libjxl/lib/jxl/dec_upsample.cc:336:3
+    #4 0x555555b30861 in jxl::Upsampler::UpsampleRect(jxl::Image3<float> const&, jxl::Rect const&, jxl::Image3<float>*, jxl::Rect const&, long, unsigned long, float*) const /src/libjxl/lib/jxl/dec_upsample.cc:347:5
+    #5 0x555555ac6700 in jxl::FinalizeImageRect(jxl::Image3<float>*, jxl::Rect const&, std::__1::vector<std::__1::pair<jxl::Plane<float>*, jxl::Rect>, std::__1::allocator<std::__1::pair<jxl::Plane<float>*, jxl::Rect> > > const&, jxl::PassesDecoderState*, unsigned long, jxl::ImageBundle*, jxl::Rect const&) /src/libjxl/lib/jxl/dec_reconstruct.cc:950:24
+    #6 0x555555ada445 in operator() /src/libjxl/lib/jxl/dec_reconstruct.cc:1160:12
+    #7 0x555555ada445 in jxl::ThreadPool::RunCallState<jxl::FinalizeFrameDecoding(jxl::ImageBundle*, jxl::PassesDecoderState*, jxl::ThreadPool*, bool, bool)::$_9, jxl::FinalizeFrameDecoding(jxl::ImageBundle*, jxl::PassesDecoderState*, jxl::ThreadPool*, bool, bool)::$_10>::CallDataFunc(void*, unsigned int, unsigned long) /src/libjxl/lib/jxl/base/data_parallel.h:88:14
+    #8 0x555555e697d3 in RunRange /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:137:7
+    #9 0x555555e697d3 in jpegxl::ThreadParallelRunner::ThreadFunc(jpegxl::ThreadParallelRunner*, int) /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:167:9
+    #10 0x555555e6c49a in __invoke<void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int> /usr/local/bin/../include/c++/v1/type_traits:3679:1
+    #11 0x555555e6c49a in __thread_execute<std::unique_ptr<std::__thread_struct>, void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int, 2, 3> /usr/local/bin/../include/c++/v1/thread:280:5
+    #12 0x555555e6c49a in void* std::__1::__thread_proxy<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(jpegxl::ThreadParallelRunner*, int), jpegxl::ThreadParallelRunner*, unsigned int> >(void*) /usr/local/bin/../include/c++/v1/thread:291:5
+    #13 0x7ffff78b86b9 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x76b9)
+
+DEDUP_TOKEN: __msan_memcpy--Upsample<2, 2>--jxl::N_AVX2::UpsampleRect(unsigned long, float const*, jxl::Plane<float> const&, jxl::Rect const&, jxl::Plane<float>*, jxl::Rect const&, long, unsigned long, float*, unsigned long)
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x5555555ae15d in malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:901:3
+    #1 0x5555557fb166 in jxl::CacheAligned::Allocate(unsigned long, unsigned long) /src/libjxl/lib/jxl/base/cache_aligned.cc:85:21
+    #2 0x555555694601 in Allocate /src/libjxl/lib/jxl/base/cache_aligned.h:43:12
+    #3 0x555555694601 in AllocateArray /src/libjxl/lib/jxl/base/cache_aligned.h:61:29
+    #4 0x555555694601 in jxl::PlaneBase::PlaneBase(unsigned long, unsigned long, unsigned long) /src/libjxl/lib/jxl/image.cc:92:14
+    #5 0x5555558bd243 in Plane /src/libjxl/lib/jxl/image.h:147:9
+    #6 0x5555558bd243 in Image3 /src/libjxl/lib/jxl/image.h:324:17
+    #7 0x5555558bd243 in construct<jxl::Image3<float>, unsigned long, unsigned long> /usr/local/bin/../include/c++/v1/memory:886:28
+    #8 0x5555558bd243 in construct<jxl::Image3<float>, unsigned long, unsigned long, void> /usr/local/bin/../include/c++/v1/__memory/allocator_traits.h:288:13
+    #9 0x5555558bd243 in void std::__1::vector<jxl::Image3<float>, std::__1::allocator<jxl::Image3<float> > >::__emplace_back_slow_path<unsigned long, unsigned long>(unsigned long&&, unsigned long&&) /usr/local/bin/../include/c++/v1/vector:1667:5
+    #10 0x5555558b5d78 in emplace_back<unsigned long, unsigned long> /usr/local/bin/../include/c++/v1/vector:1687:9
+    #11 0x5555558b5d78 in jxl::PassesDecoderState::EnsureStorage(unsigned long) /src/libjxl/lib/jxl/dec_cache.h:176:34
+    #12 0x555555ad7bb5 in operator() /src/libjxl/lib/jxl/dec_reconstruct.cc:1104:18
+    #13 0x555555ad7bb5 in jxl::ThreadPool::RunCallState<jxl::FinalizeFrameDecoding(jxl::ImageBundle*, jxl::PassesDecoderState*, jxl::ThreadPool*, bool, bool)::$_9, jxl::FinalizeFrameDecoding(jxl::ImageBundle*, jxl::PassesDecoderState*, jxl::ThreadPool*, bool, bool)::$_10>::CallInitFunc(void*, unsigned long) /src/libjxl/lib/jxl/base/data_parallel.h:80:14
+    #14 0x555555e6834f in jpegxl::ThreadParallelRunner::Runner(void*, void*, int (*)(void*, unsigned long), void (*)(void*, unsigned int, unsigned long), unsigned int, unsigned int) /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:64:13
+    #15 0x555555acf481 in Run<(lambda at /src/libjxl/lib/jxl/dec_reconstruct.cc:1103:35), (lambda at /src/libjxl/lib/jxl/dec_reconstruct.cc:1123:31)> /src/libjxl/lib/jxl/base/data_parallel.h:51:12
+    #16 0x555555acf481 in RunOnPool<(lambda at /src/libjxl/lib/jxl/dec_reconstruct.cc:1103:35), (lambda at /src/libjxl/lib/jxl/dec_reconstruct.cc:1123:31)> /src/libjxl/lib/jxl/base/data_parallel.h:122:17
+    #17 0x555555acf481 in jxl::FinalizeFrameDecoding(jxl::ImageBundle*, jxl::PassesDecoderState*, jxl::ThreadPool*, bool, bool) /src/libjxl/lib/jxl/dec_reconstruct.cc:1167:5
+    #18 0x5555558a6458 in jxl::FrameDecoder::Flush() /src/libjxl/lib/jxl/dec_frame.cc:817:3
+    #19 0x555555894c55 in jxl::FrameDecoder::FinalizeFrame() /src/libjxl/lib/jxl/dec_frame.cc:849:3
+    #20 0x555555620c9a in jxl::(anonymous namespace)::JxlDecoderProcessInternal(JxlDecoderStruct*, unsigned char const*, unsigned long) /src/libjxl/lib/jxl/decode.cc:1150:30
+    #21 0x555555617396 in JxlDecoderProcessInput /src/libjxl/lib/jxl/decode.cc:1548:14
+    #22 0x555555601420 in DecodeJpegXl /src/libjxl/tools/djxl_fuzzer.cc:164:31
+    #23 0x555555601420 in TestOneInput /src/libjxl/tools/djxl_fuzzer.cc:475:3
+    #24 0x555555601420 in LLVMFuzzerTestOneInput /src/libjxl/tools/djxl_fuzzer.cc:485:10
+    #25 0x555555532a83 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #26 0x55555551df22 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #27 0x555555523bce in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #28 0x55555554d7e2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #29 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: malloc--jxl::CacheAligned::Allocate(unsigned long, unsigned long)--Allocate
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/libjxl/lib/jxl/dec_external_image.cc:61:9 in jxl::N_AVX2::FloatToU32(float const*, unsigned int*, unsigned long, float, unsigned long)
+[1m[31m==6==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x55555586d3a0 in jxl::N_AVX2::FloatToU32(float const*, unsigned int*, unsigned long, float, unsigned long) /src/libjxl/lib/jxl/dec_external_image.cc:61:9
+    #1 0x555555883399 in operator() /src/libjxl/lib/jxl/dec_external_image.cc:447:13
+    #2 0x555555883399 in jxl::ThreadPool::RunCallState<jxl::ConvertToExternal(jxl::ImageBundle const&, unsigned long, bool, unsigned long, JxlEndianness, unsigned long, jxl::ThreadPool*, void*, unsigned long, void (*)(void*, unsigned long, unsigned long, unsigned long, void const*), void*, jxl::Orientation)::$_5, jxl::ConvertToExternal(jxl::ImageBundle const&, unsigned long, bool, unsigned long, JxlEndianness, unsigned long, jxl::ThreadPool*, void*, unsigned long, void (*)(void*, unsigned long, unsigned long, unsigned long, void const*), void*, jxl::Orientation)::$_6>::CallDataFunc(void*, unsigned int, unsigned long) /src/libjxl/lib/jxl/base/data_parallel.h:88:14
+    #3 0x555555e697d3 in RunRange /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:137:7
+    #4 0x555555e697d3 in jpegxl::ThreadParallelRunner::ThreadFunc(jpegxl::ThreadParallelRunner*, int) /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:167:9
+    #5 0x555555e6c49a in __invoke<void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int> /usr/local/bin/../include/c++/v1/type_traits:3679:1
+    #6 0x555555e6c49a in __thread_execute<std::unique_ptr<std::__thread_struct>, void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int, 2, 3> /usr/local/bin/../include/c++/v1/thread:280:5
+    #7 0x555555e6c49a in void* std::__1::__thread_proxy<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(jpegxl::ThreadParallelRunner*, int), jpegxl::ThreadParallelRunner*, unsigned int> >(void*) /usr/local/bin/../include/c++/v1/thread:291:5
+    #8 0x7ffff78b86b9 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x76b9)
+    #9 0x7ffff6fcc51c in clone (/lib/x86_64-linux-gnu/libc.so.6+0x10751c)
+
+DEDUP_TOKEN: jxl::N_AVX2::FloatToU32(float const*, unsigned int*, unsigned long, float, unsigned long)--operator()--jxl::ThreadPool::RunCallState<jxl::ConvertToExternal(jxl::ImageBundle const&, unsigned long, bool, unsigned long, JxlEndianness, unsigned long, jxl::ThreadPool*, void*, unsigned long, void (*)(void*, unsigned long, unsigned long, unsigned long, void const*), void*, jxl::Orientation)::$_5, jxl::ConvertToExternal(jxl::ImageBundle const&, unsigned long, bool, unsigned long, JxlEndianness, unsigned long, jxl::ThreadPool*, void*, unsigned long, void (*)(void*, unsigned long, unsigned long, unsigned long, void const*), void*, jxl::Orientation)::$_6>::CallDataFunc(void*, unsigned int, unsigned long)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x55555587a096 in operator() /src/libjxl/lib/jxl/dec_external_image.cc:157:24
+    #1 0x55555587a096 in jxl::ThreadPool::RunCallState<jxl::Status (unsigned long), void jxl::(anonymous namespace)::UndoOrientation<float>(jxl::Orientation, jxl::Plane<float> const&, jxl::Plane<float>&, jxl::ThreadPool*)::'lambda1'(int, int)>::CallDataFunc(void*, unsigned int, unsigned long) /src/libjxl/lib/jxl/base/data_parallel.h:88:14
+    #2 0x555555e697d3 in RunRange /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:137:7
+    #3 0x555555e697d3 in jpegxl::ThreadParallelRunner::ThreadFunc(jpegxl::ThreadParallelRunner*, int) /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:167:9
+    #4 0x555555e6c49a in __invoke<void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int> /usr/local/bin/../include/c++/v1/type_traits:3679:1
+    #5 0x555555e6c49a in __thread_execute<std::unique_ptr<std::__thread_struct>, void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int, 2, 3> /usr/local/bin/../include/c++/v1/thread:280:5
+    #6 0x555555e6c49a in void* std::__1::__thread_proxy<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(jpegxl::ThreadParallelRunner*, int), jpegxl::ThreadParallelRunner*, unsigned int> >(void*) /usr/local/bin/../include/c++/v1/thread:291:5
+    #7 0x7ffff78b86b9 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x76b9)
+
+DEDUP_TOKEN: operator()--jxl::ThreadPool::RunCallState<jxl::Status (unsigned long), void jxl::(anonymous namespace)::UndoOrientation<float>(jxl::Orientation, jxl::Plane<float> const&, jxl::Plane<float>&, jxl::ThreadPool*)::'lambda1'(int, int)>::CallDataFunc(void*, unsigned int, unsigned long)--RunRange
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x555555afcf82 in StoreU /src/libjxl/third_party/highway/hwy/ops/x86_256-inl.h:1406:3
+    #1 0x555555afcf82 in Upsample<2, 2> /src/libjxl/lib/jxl/dec_upsample.cc:226:11
+    #2 0x555555afcf82 in jxl::N_AVX2::UpsampleRect(unsigned long, float const*, jxl::Plane<float> const&, jxl::Rect const&, jxl::Plane<float>*, jxl::Rect const&, long, unsigned long, float*, unsigned long) /src/libjxl/lib/jxl/dec_upsample.cc:245:7
+    #3 0x555555b30861 in UpsampleRect /src/libjxl/lib/jxl/dec_upsample.cc:336:3
+    #4 0x555555b30861 in jxl::Upsampler::UpsampleRect(jxl::Image3<float> const&, jxl::Rect const&, jxl::Image3<float>*, jxl::Rect const&, long, unsigned long, float*) const /src/libjxl/lib/jxl/dec_upsample.cc:347:5
+    #5 0x555555ac6700 in jxl::FinalizeImageRect(jxl::Image3<float>*, jxl::Rect const&, std::__1::vector<std::__1::pair<jxl::Plane<float>*, jxl::Rect>, std::__1::allocator<std::__1::pair<jxl::Plane<float>*, jxl::Rect> > > const&, jxl::PassesDecoderState*, unsigned long, jxl::ImageBundle*, jxl::Rect const&) /src/libjxl/lib/jxl/dec_reconstruct.cc:950:24
+    #6 0x555555ada445 in operator() /src/libjxl/lib/jxl/dec_reconstruct.cc:1160:12
+    #7 0x555555ada445 in jxl::ThreadPool::RunCallState<jxl::FinalizeFrameDecoding(jxl::ImageBundle*, jxl::PassesDecoderState*, jxl::ThreadPool*, bool, bool)::$_9, jxl::FinalizeFrameDecoding(jxl::ImageBundle*, jxl::PassesDecoderState*, jxl::ThreadPool*, bool, bool)::$_10>::CallDataFunc(void*, unsigned int, unsigned long) /src/libjxl/lib/jxl/base/data_parallel.h:88:14
+    #8 0x555555e697d3 in RunRange /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:137:7
+    #9 0x555555e697d3 in jpegxl::ThreadParallelRunner::ThreadFunc(jpegxl::ThreadParallelRunner*, int) /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:167:9
+    #10 0x555555e6c49a in __invoke<void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int> /usr/local/bin/../include/c++/v1/type_traits:3679:1
+    #11 0x555555e6c49a in __thread_execute<std::unique_ptr<std::__thread_struct>, void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int, 2, 3> /usr/local/bin/../include/c++/v1/thread:280:5
+    #12 0x555555e6c49a in void* std::__1::__thread_proxy<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(jpegxl::ThreadParallelRunner*, int), jpegxl::ThreadParallelRunner*, unsigned int> >(void*) /usr/local/bin/../include/c++/v1/thread:291:5
+    #13 0x7ffff78b86b9 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x76b9)
+
+DEDUP_TOKEN: StoreU--Upsample<2, 2>--jxl::N_AVX2::UpsampleRect(unsigned long, float const*, jxl::Plane<float> const&, jxl::Rect const&, jxl::Plane<float>*, jxl::Rect const&, long, unsigned long, float*, unsigned long)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x555555afd110 in Store /src/libjxl/third_party/highway/hwy/ops/x86_256-inl.h:1393:3
+    #1 0x555555afd110 in Upsample<2, 2> /src/libjxl/lib/jxl/dec_upsample.cc:214:9
+    #2 0x555555afd110 in jxl::N_AVX2::UpsampleRect(unsigned long, float const*, jxl::Plane<float> const&, jxl::Rect const&, jxl::Plane<float>*, jxl::Rect const&, long, unsigned long, float*, unsigned long) /src/libjxl/lib/jxl/dec_upsample.cc:245:7
+    #3 0x555555b30861 in UpsampleRect /src/libjxl/lib/jxl/dec_upsample.cc:336:3
+    #4 0x555555b30861 in jxl::Upsampler::UpsampleRect(jxl::Image3<float> const&, jxl::Rect const&, jxl::Image3<float>*, jxl::Rect const&, long, unsigned long, float*) const /src/libjxl/lib/jxl/dec_upsample.cc:347:5
+    #5 0x555555ac6700 in jxl::FinalizeImageRect(jxl::Image3<float>*, jxl::Rect const&, std::__1::vector<std::__1::pair<jxl::Plane<float>*, jxl::Rect>, std::__1::allocator<std::__1::pair<jxl::Plane<float>*, jxl::Rect> > > const&, jxl::PassesDecoderState*, unsigned long, jxl::ImageBundle*, jxl::Rect const&) /src/libjxl/lib/jxl/dec_reconstruct.cc:950:24
+    #6 0x555555ada445 in operator() /src/libjxl/lib/jxl/dec_reconstruct.cc:1160:12
+    #7 0x555555ada445 in jxl::ThreadPool::RunCallState<jxl::FinalizeFrameDecoding(jxl::ImageBundle*, jxl::PassesDecoderState*, jxl::ThreadPool*, bool, bool)::$_9, jxl::FinalizeFrameDecoding(jxl::ImageBundle*, jxl::PassesDecoderState*, jxl::ThreadPool*, bool, bool)::$_10>::CallDataFunc(void*, unsigned int, unsigned long) /src/libjxl/lib/jxl/base/data_parallel.h:88:14
+    #8 0x555555e697d3 in RunRange /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:137:7
+    #9 0x555555e697d3 in jpegxl::ThreadParallelRunner::ThreadFunc(jpegxl::ThreadParallelRunner*, int) /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:167:9
+    #10 0x555555e6c49a in __invoke<void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int> /usr/local/bin/../include/c++/v1/type_traits:3679:1
+    #11 0x555555e6c49a in __thread_execute<std::unique_ptr<std::__thread_struct>, void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int, 2, 3> /usr/local/bin/../include/c++/v1/thread:280:5
+    #12 0x555555e6c49a in void* std::__1::__thread_proxy<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(jpegxl::ThreadParallelRunner*, int), jpegxl::ThreadParallelRunner*, unsigned int> >(void*) /usr/local/bin/../include/c++/v1/thread:291:5
+    #13 0x7ffff78b86b9 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x76b9)
+
+DEDUP_TOKEN: Store--Upsample<2, 2>--jxl::N_AVX2::UpsampleRect(unsigned long, float const*, jxl::Plane<float> const&, jxl::Rect const&, jxl::Plane<float>*, jxl::Rect const&, long, unsigned long, float*, unsigned long)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x5555555a76a9 in __msan_memcpy /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1558:3
+    #1 0x555555afbca5 in Upsample<2, 2> /src/libjxl/lib/jxl/dec_upsample.cc:189:9
+    #2 0x555555afbca5 in jxl::N_AVX2::UpsampleRect(unsigned long, float const*, jxl::Plane<float> const&, jxl::Rect const&, jxl::Plane<float>*, jxl::Rect const&, long, unsigned long, float*, unsigned long) /src/libjxl/lib/jxl/dec_upsample.cc:245:7
+    #3 0x555555b30861 in UpsampleRect /src/libjxl/lib/jxl/dec_upsample.cc:336:3
+    #4 0x555555b30861 in jxl::Upsampler::UpsampleRect(jxl::Image3<float> const&, jxl::Rect const&, jxl::Image3<float>*, jxl::Rect const&, long, unsigned long, float*) const /src/libjxl/lib/jxl/dec_upsample.cc:347:5
+    #5 0x555555ac6700 in jxl::FinalizeImageRect(jxl::Image3<float>*, jxl::Rect const&, std::__1::vector<std::__1::pair<jxl::Plane<float>*, jxl::Rect>, std::__1::allocator<std::__1::pair<jxl::Plane<float>*, jxl::Rect> > > const&, jxl::PassesDecoderState*, unsigned long, jxl::ImageBundle*, jxl::Rect const&) /src/libjxl/lib/jxl/dec_reconstruct.cc:950:24
+    #6 0x555555ada445 in operator() /src/libjxl/lib/jxl/dec_reconstruct.cc:1160:12
+    #7 0x555555ada445 in jxl::ThreadPool::RunCallState<jxl::FinalizeFrameDecoding(jxl::ImageBundle*, jxl::PassesDecoderState*, jxl::ThreadPool*, bool, bool)::$_9, jxl::FinalizeFrameDecoding(jxl::ImageBundle*, jxl::PassesDecoderState*, jxl::ThreadPool*, bool, bool)::$_10>::CallDataFunc(void*, unsigned int, unsigned long) /src/libjxl/lib/jxl/base/data_parallel.h:88:14
+    #8 0x555555e697d3 in RunRange /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:137:7
+    #9 0x555555e697d3 in jpegxl::ThreadParallelRunner::ThreadFunc(jpegxl::ThreadParallelRunner*, int) /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:167:9
+    #10 0x555555e6c49a in __invoke<void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int> /usr/local/bin/../include/c++/v1/type_traits:3679:1
+    #11 0x555555e6c49a in __thread_execute<std::unique_ptr<std::__thread_struct>, void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int, 2, 3> /usr/local/bin/../include/c++/v1/thread:280:5
+    #12 0x555555e6c49a in void* std::__1::__thread_proxy<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(jpegxl::ThreadParallelRunner*, int), jpegxl::ThreadParallelRunner*, unsigned int> >(void*) /usr/local/bin/../include/c++/v1/thread:291:5
+    #13 0x7ffff78b86b9 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x76b9)
+
+DEDUP_TOKEN: __msan_memcpy--Upsample<2, 2>--jxl::N_AVX2::UpsampleRect(unsigned long, float const*, jxl::Plane<float> const&, jxl::Rect const&, jxl::Plane<float>*, jxl::Rect const&, long, unsigned long, float*, unsigned long)
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x5555555ae15d in malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:901:3
+    #1 0x5555557fb166 in jxl::CacheAligned::Allocate(unsigned long, unsigned long) /src/libjxl/lib/jxl/base/cache_aligned.cc:85:21
+    #2 0x555555694601 in Allocate /src/libjxl/lib/jxl/base/cache_aligned.h:43:12
+    #3 0x555555694601 in AllocateArray /src/libjxl/lib/jxl/base/cache_aligned.h:61:29
+    #4 0x555555694601 in jxl::PlaneBase::PlaneBase(unsigned long, unsigned long, unsigned long) /src/libjxl/lib/jxl/image.cc:92:14
+    #5 0x5555558bd243 in Plane /src/libjxl/lib/jxl/image.h:147:9
+    #6 0x5555558bd243 in Image3 /src/libjxl/lib/jxl/image.h:324:17
+    #7 0x5555558bd243 in construct<jxl::Image3<float>, unsigned long, unsigned long> /usr/local/bin/../include/c++/v1/memory:886:28
+    #8 0x5555558bd243 in construct<jxl::Image3<float>, unsigned long, unsigned long, void> /usr/local/bin/../include/c++/v1/__memory/allocator_traits.h:288:13
+    #9 0x5555558bd243 in void std::__1::vector<jxl::Image3<float>, std::__1::allocator<jxl::Image3<float> > >::__emplace_back_slow_path<unsigned long, unsigned long>(unsigned long&&, unsigned long&&) /usr/local/bin/../include/c++/v1/vector:1667:5
+    #10 0x5555558b5d78 in emplace_back<unsigned long, unsigned long> /usr/local/bin/../include/c++/v1/vector:1687:9
+    #11 0x5555558b5d78 in jxl::PassesDecoderState::EnsureStorage(unsigned long) /src/libjxl/lib/jxl/dec_cache.h:176:34
+    #12 0x555555ad7bb5 in operator() /src/libjxl/lib/jxl/dec_reconstruct.cc:1104:18
+    #13 0x555555ad7bb5 in jxl::ThreadPool::RunCallState<jxl::FinalizeFrameDecoding(jxl::ImageBundle*, jxl::PassesDecoderState*, jxl::ThreadPool*, bool, bool)::$_9, jxl::FinalizeFrameDecoding(jxl::ImageBundle*, jxl::PassesDecoderState*, jxl::ThreadPool*, bool, bool)::$_10>::CallInitFunc(void*, unsigned long) /src/libjxl/lib/jxl/base/data_parallel.h:80:14
+    #14 0x555555e6834f in jpegxl::ThreadParallelRunner::Runner(void*, void*, int (*)(void*, unsigned long), void (*)(void*, unsigned int, unsigned long), unsigned int, unsigned int) /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:64:13
+    #15 0x555555acf481 in Run<(lambda at /src/libjxl/lib/jxl/dec_reconstruct.cc:1103:35), (lambda at /src/libjxl/lib/jxl/dec_reconstruct.cc:1123:31)> /src/libjxl/lib/jxl/base/data_parallel.h:51:12
+    #16 0x555555acf481 in RunOnPool<(lambda at /src/libjxl/lib/jxl/dec_reconstruct.cc:1103:35), (lambda at /src/libjxl/lib/jxl/dec_reconstruct.cc:1123:31)> /src/libjxl/lib/jxl/base/data_parallel.h:122:17
+    #17 0x555555acf481 in jxl::FinalizeFrameDecoding(jxl::ImageBundle*, jxl::PassesDecoderState*, jxl::ThreadPool*, bool, bool) /src/libjxl/lib/jxl/dec_reconstruct.cc:1167:5
+    #18 0x5555558a6458 in jxl::FrameDecoder::Flush() /src/libjxl/lib/jxl/dec_frame.cc:817:3
+    #19 0x555555894c55 in jxl::FrameDecoder::FinalizeFrame() /src/libjxl/lib/jxl/dec_frame.cc:849:3
+    #20 0x555555620c9a in jxl::(anonymous namespace)::JxlDecoderProcessInternal(JxlDecoderStruct*, unsigned char const*, unsigned long) /src/libjxl/lib/jxl/decode.cc:1150:30
+    #21 0x555555617396 in JxlDecoderProcessInput /src/libjxl/lib/jxl/decode.cc:1548:14
+    #22 0x555555601420 in DecodeJpegXl /src/libjxl/tools/djxl_fuzzer.cc:164:31
+    #23 0x555555601420 in TestOneInput /src/libjxl/tools/djxl_fuzzer.cc:475:3
+    #24 0x555555601420 in LLVMFuzzerTestOneInput /src/libjxl/tools/djxl_fuzzer.cc:485:10
+    #25 0x555555532a83 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #26 0x55555551df22 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #27 0x555555523bce in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #28 0x55555554d7e2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #29 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: malloc--jxl::CacheAligned::Allocate(unsigned long, unsigned long)--Allocate
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/libjxl/lib/jxl/dec_external_image.cc:61:9 in jxl::N_AVX2::FloatToU32(float const*, unsigned int*, unsigned long, float, unsigned long)
+Unique heap origins: 1556
+Stack depot allocated bytes: 229320
+Unique origin histories: 166
+History depot allocated bytes: 3984
+Exiting
+Unique heap origins: 1556
+Stack depot allocated bytes: 229320
+Unique origin histories: 166
+History depot allocated bytes: 3984
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42497783

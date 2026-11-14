@@ -1,0 +1,107 @@
+ARVO id: 42471969
+Project: skia
+Fuzz target: api_mock_gpu_canvas
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-use-after-free READ 2
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Seed: 3625911168
+INFO: Loaded 1 modules   (203757 inline 8-bit counters): 203757 [0x32188c8, 0x324a4b5), 
+INFO: Loaded 1 PC tables (203757 PCs): 203757 [0x324a4b8,0x3566388), 
+/out/api_mock_gpu_canvas: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==6==ERROR: AddressSanitizer: heap-use-after-free on address 0x6080000000e8 at pc 0x000000ba30cc bp 0x7fffffffd650 sp 0x7fffffffd648
+[1m[0m[1m[34mREAD of size 2 at 0x6080000000e8 thread T0[1m[0m
+SCARINESS: 42 (2-byte-read-heap-use-after-free)
+    #0 0xba30cb in SkGlyphRun::eachGlyphToGlyphRun(std::__1::function<void (SkGlyphRun const&)>) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkGlyphRun.cpp:64:19
+    #1 0xb7ac43 in SkBaseDevice::drawGlyphRunRSXform(SkGlyphRun*, SkRSXform const*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkDevice.cpp:362:10
+    #2 0xb4e4ea in SkCanvas::onDrawTextRSXform(void const*, unsigned long, SkRSXform const*, SkRect const*, SkPaint const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkCanvas.cpp:2496:27
+    #3 0xb4fa52 in SkCanvas::drawTextRSXform(void const*, unsigned long, SkRSXform const*, SkRect const*, SkPaint const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkCanvas.cpp:2574:15
+    #4 0x9c4768 in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1557:25
+    #5 0x9cad0f in fuzz_ganesh(Fuzz*, GrContext*) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1756:5
+    #6 0x9cb039 in fuzz_MockGPUCanvas(Fuzz*) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1780:5
+    #7 0x9e24c6 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz_mem_constraints/../../fuzz/oss_fuzz/FuzzMockGPUCanvas.cpp:22:9
+    #8 0x963e55 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #9 0x93967d in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #10 0x944ec6 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #11 0x938cfc in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #12 0x7ffff52fb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #13 0x832068 in _start (/out/api_mock_gpu_canvas+0x832068)
+
+DEDUP_TOKEN: SkGlyphRun::eachGlyphToGlyphRun(std::__1::function<void (SkGlyphRun const&)>)--SkBaseDevice::drawGlyphRunRSXform(SkGlyphRun*, SkRSXform const*)--SkCanvas::onDrawTextRSXform(void const*, unsigned long, SkRSXform const*, SkRect const*, SkPaint const&)
+[1m[32m0x6080000000e8 is located 72 bytes inside of 88-byte region [0x6080000000a0,0x6080000000f8)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x8ff3f0 in __interceptor_free /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:124
+    #1 0x9c27e0 in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1569:13
+    #2 0x9cad0f in fuzz_ganesh(Fuzz*, GrContext*) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1756:5
+    #3 0x9cb039 in fuzz_MockGPUCanvas(Fuzz*) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1780:5
+    #4 0x9e24c6 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz_mem_constraints/../../fuzz/oss_fuzz/FuzzMockGPUCanvas.cpp:22:9
+    #5 0x963e55 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #6 0x93967d in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #7 0x944ec6 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #8 0x938cfc in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #9 0x7ffff52fb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: __interceptor_free--fuzz_canvas(Fuzz*, SkCanvas*, int)--fuzz_ganesh(Fuzz*, GrContext*)
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x8ffc2e in realloc /src/llvm/projects/compiler-rt/lib/asan/asan_malloc_linux.cc:165
+    #1 0xe589a8 in sk_realloc_throw(void*, unsigned long) /src/skia/out/Fuzz_mem_constraints/../../src/ports/SkMemory_malloc.cpp:57:35
+    #2 0xd3142d in SkAutoTMalloc<unsigned char>::realloc(unsigned long) /src/skia/out/Fuzz_mem_constraints/../../include/android/../private/SkTemplates.h:234:32
+    #3 0xd3130e in SkTextBlobBuilder::reserve(unsigned long) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkTextBlob.cpp:416:14
+    #4 0xd31c4a in SkTextBlobBuilder::allocInternal(SkPaint const&, SkTextBlob::GlyphPositioning, int, int, SkPoint, SkRect const*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkTextBlob.cpp:500:15
+    #5 0xd32808 in SkTextBlobBuilder::allocRunTextPos(SkPaint const&, int, int, SkString, SkRect const*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkTextBlob.cpp:587:11
+    #6 0xd326ff in SkTextBlobBuilder::allocRunPos(SkFont const&, int, SkRect const*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkTextBlob.cpp:558:18
+    #7 0x9cf68e in make_fuzz_textblob(Fuzz*) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1013:43
+    #8 0x9c2738 in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1563:42
+    #9 0x9cad0f in fuzz_ganesh(Fuzz*, GrContext*) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1756:5
+    #10 0x9cb039 in fuzz_MockGPUCanvas(Fuzz*) /src/skia/out/Fuzz_mem_constraints/../../fuzz/FuzzCanvas.cpp:1780:5
+    #11 0x9e24c6 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz_mem_constraints/../../fuzz/oss_fuzz/FuzzMockGPUCanvas.cpp:22:9
+    #12 0x963e55 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:571:15
+    #13 0x93967d in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #14 0x944ec6 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:713:9
+    #15 0x938cfc in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #16 0x7ffff52fb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: realloc--sk_realloc_throw(void*, unsigned long)--SkAutoTMalloc<unsigned char>::realloc(unsigned long)
+SUMMARY: AddressSanitizer: heap-use-after-free /src/skia/out/Fuzz_mem_constraints/../../src/core/SkGlyphRun.cpp:64:19 in SkGlyphRun::eachGlyphToGlyphRun(std::__1::function<void (SkGlyphRun const&)>)
+Shadow bytes around the buggy address:
+  0x0c107fff7fc0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c107fff7fd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c107fff7fe0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c107fff7ff0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c107fff8000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+=>0x0c107fff8010: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m[[1m[35mfd[1m[0m][1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c107fff8020: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c107fff8030: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c107fff8040: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c107fff8050: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c107fff8060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==6==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42471969

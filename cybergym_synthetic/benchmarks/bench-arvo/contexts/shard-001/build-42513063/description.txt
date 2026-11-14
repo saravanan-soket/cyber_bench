@@ -1,0 +1,44 @@
+ARVO id: 42513063
+Project: libvpx
+Fuzz target: dvpx_dec_fuzzer_vp9
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://chromium.googlesource.com/webm/libvpx
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1130611556
+INFO: Loaded 1 modules   (9117 inline 8-bit counters): 9117 [0x9f0f8e, 0x9f332b), 
+INFO: Loaded 1 PC tables (9117 PCs): 9117 [0x97e1a0,0x9a1b70), 
+/out/vpx_dec_fuzzer_vp9: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address (pc 0x0000004cb45a bp 0x7fffffffd900 sp 0x7fffffffd0b0 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+    #0 0x4cb45a in __msan::MsanDeallocate(__sanitizer::StackTrace*, void*) /src/llvm-project/compiler-rt/lib/msan/msan_allocator.cpp:200:21
+    #1 0x4cf4f4 in free /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:225:3
+    #2 0x5acc04 in free_seg_map /src/libvpx/vp9/common/vp9_alloccommon.c:65:5
+    #3 0x5acc04 in vp9_free_context_buffers /src/libvpx/vp9/common/vp9_alloccommon.c:106:3
+    #4 0x5acc04 in vp9_remove_common /src/libvpx/vp9/common/vp9_alloccommon.c:169:3
+    #5 0x58551c in vp9_decoder_remove /src/libvpx/vp9/decoder/vp9_decoder.c:248:3
+    #6 0x52a8bc in decoder_destroy /src/libvpx/vp9/vp9_dx_iface.c:61:5
+    #7 0x529939 in vpx_codec_destroy /src/libvpx/vpx/src/vpx_codec.c:73:5
+    #8 0x52717b in LLVMFuzzerTestOneInput /src/libvpx/examples/vpx_dec_fuzzer.cc:123:3
+    #9 0x455003 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #10 0x440c92 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #11 0x4464dc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #12 0x46f0d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7ffff7c56082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #14 0x41f4bd in _start (/out/vpx_dec_fuzzer_vp9+0x41f4bd)
+
+DEDUP_TOKEN: __msan::MsanDeallocate(__sanitizer::StackTrace*, void*)--free--free_seg_map
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV /src/llvm-project/compiler-rt/lib/msan/msan_allocator.cpp:200:21 in __msan::MsanDeallocate(__sanitizer::StackTrace*, void*)
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42513063

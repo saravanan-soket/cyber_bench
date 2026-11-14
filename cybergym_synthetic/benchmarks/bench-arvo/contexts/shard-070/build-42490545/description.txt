@@ -1,0 +1,47 @@
+ARVO id: 42490545
+Project: selinux
+Fuzz target: secilc-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN WRITE
+Language: c
+Repo: https://github.com/SELinuxProject/selinux
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3383125195
+INFO: Loaded 1 modules   (22343 inline 8-bit counters): 22343 [0x8a3ad8, 0x8a921f), 
+INFO: Loaded 1 PC tables (22343 PCs): 22343 [0x8a9220,0x900690), 
+/out/secilc-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Failed to resolve validatetrans statement at fuzz:1
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x000000516ff0 (pc 0x0000004c0173 bp 0x7fffffffd9c0 sp 0x7fffffffd9a0 T7)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+    #0 0x4c0173 in cil_destroy_data /src/selinux/libsepol/src/../cil/src/cil.c:915:8
+    #1 0x4f6a33 in cil_list_item_destroy /src/selinux/libsepol/src/../cil/src/cil_list.c:92:3
+    #2 0x4f6971 in cil_list_destroy /src/selinux/libsepol/src/../cil/src/cil_list.c:71:4
+    #3 0x4f694e in cil_list_destroy /src/selinux/libsepol/src/../cil/src/cil_list.c:68:4
+    #4 0x4e5f8a in cil_destroy_validatetrans /src/selinux/libsepol/src/../cil/src/cil_build_ast.c:4041:2
+    #5 0x4c0120 in cil_destroy_data /src/selinux/libsepol/src/../cil/src/cil.c:837:3
+    #6 0x51aad1 in cil_tree_node_destroy /src/selinux/libsepol/src/../cil/src/cil_tree.c
+    #7 0x51a9d7 in cil_tree_children_destroy /src/selinux/libsepol/src/../cil/src/cil_tree.c
+    #8 0x51a8d8 in cil_tree_subtree_destroy /src/selinux/libsepol/src/../cil/src/cil_tree.c:172:2
+    #9 0x51a87c in cil_tree_destroy /src/selinux/libsepol/src/../cil/src/cil_tree.c:165:2
+    #10 0x4bee12 in cil_db_destroy /src/selinux/libsepol/src/../cil/src/cil.c:453:2
+    #11 0x4b2d6a in LLVMFuzzerTestOneInput /src/secilc-fuzzer.c:83:2
+    #12 0x4425a1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #13 0x42c332 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #14 0x432675 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #15 0x45c522 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #17 0x407248 in _start (/out/secilc-fuzzer+0x407248)
+
+DEDUP_TOKEN: cil_destroy_data--cil_list_item_destroy--cil_list_destroy
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/selinux/libsepol/src/../cil/src/cil.c:915:8 in cil_destroy_data
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42490545

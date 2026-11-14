@@ -1,0 +1,124 @@
+ARVO id: 42523045
+Project: qemu
+Fuzz target: qemu-fuzz-i386-target-generic-fuzz-virtio-9p-synth
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Stack-use-after-return READ 8
+Language: c
+Repo: https://git.qemu.org/git/qemu.git
+
+=== Crash report ===
+==6==WARNING: ASan doesn't fully support makecontext/swapcontext functions and may produce false positives in some cases!
+==6==WARNING: ASan is ignoring requested __asan_handle_no_return: stack type: default top: 0x7fffb5052000; bottom 0x7f439e5fd000; size: 0x00bc16a55000 (807833784320)
+False positive error reports may follow
+For details see https://github.com/google/sanitizers/issues/189
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 159683555
+INFO: Loaded 1 modules   (76783 inline 8-bit counters): 76783 [0x555c38383b60, 0x555c3839674f), 
+INFO: Loaded 1 PC tables (76783 PCs): 76783 [0x555c38396750,0x555c384c2640), 
+/out/qemu-fuzz-i386-target-generic-fuzz-virtio-9p-synth: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Matching objects by name virtio*
+This process will try to fuzz the following MemoryRegions:
+  * msix-table[0] (size 0x20)
+  * virtio-pci-device-virtio-9p[0] (size 0x1000)
+  * virtio-pci[0] (size 0x4000)
+  * virtio-pci-isr-virtio-9p[0] (size 0x1000)
+  * virtio-9p-pci-msix[0] (size 0x1000)
+  * bus master[0] (size 0xffffffffffffffff)
+  * virtio-pci[1] (size 0x20)
+  * virtio-pci-common-virtio-9p[0] (size 0x1000)
+  * msix-pba[0] (size 0x8)
+  * bus master container[0] (size 0xffffffffffffffff)
+  * virtio-pci-notify-pio-virtio-9p[0] (size 0x4)
+  * virtio-pci-notify-virtio-9p[0] (size 0x1000)
+=================================================================
+[1m[31m==6==ERROR: AddressSanitizer: stack-use-after-return on address 0x7f43a0569c48 at pc 0x555c36162992 bp 0x7f437155de20 sp 0x7f437155de18
+[1m[0m[1m[34mREAD of size 8 at 0x7f43a0569c48 thread T4[1m[0m
+SCARINESS: 61 (8-byte-read-stack-use-after-return)
+    #0 0x555c36162991 in v9fs_co_renameat /src/qemu/build-oss-fuzz/../hw/9pfs/cofs.c:298:5
+    #1 0x555c36159949 in v9fs_complete_renameat /src/qemu/build-oss-fuzz/../hw/9pfs/9p.c:3397:11
+    #2 0x555c36148c9f in v9fs_renameat /src/qemu/build-oss-fuzz/../hw/9pfs/9p.c:3446:11
+    #3 0x555c3719eb5e in coroutine_trampoline /src/qemu/build-oss-fuzz/../util/coroutine-ucontext.c:177:9
+    #4 0x7f43a0e794df  (/out/lib/libc.so.6+0x5b4df) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+
+DEDUP_TOKEN: v9fs_co_renameat--v9fs_complete_renameat--v9fs_renameat
+[1m[32mAddress 0x7f43a0569c48 is located in stack of thread T0 at offset 72 in frame[1m[0m
+[1m[0m    #0 0x555c37169f8f in qemu_mutex_lock_impl /src/qemu/build-oss-fuzz/../util/qemu-thread-posix.c:84
+
+DEDUP_TOKEN: qemu_mutex_lock_impl
+  This frame has 2 object(s):
+    [32, 48) '_now.i.i.i11'
+    [64, 80) '_now.i.i.i'[1m[32m <== Memory access at offset 72 is inside this variable[1m[0m
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-use-after-return /src/qemu/build-oss-fuzz/../hw/9pfs/cofs.c:298:5 in v9fs_co_renameat
+Shadow bytes around the buggy address:
+  0x0fe8f40a5330: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe8f40a5340: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe8f40a5350: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe8f40a5360: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe8f40a5370: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+=>0x0fe8f40a5380: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m[[1m[35mf5[1m[0m][1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe8f40a5390: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe8f40a53a0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe8f40a53b0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe8f40a53c0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x0fe8f40a53d0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+Thread T4 created by T0 here:
+    #0 0x555c3605da1c in __interceptor_pthread_create /src/llvm-project/compiler-rt/lib/asan/asan_interceptors.cpp:208:3
+    #1 0x555c3716cefe in qemu_thread_create /src/qemu/build-oss-fuzz/../util/qemu-thread-posix.c:545:11
+    #2 0x555c371a0c3f in do_spawn_thread /src/qemu/build-oss-fuzz/../util/thread-pool.c:145:5
+    #3 0x555c371a0c3f in spawn_thread_bh_fn /src/qemu/build-oss-fuzz/../util/thread-pool.c:153:5
+    #4 0x555c37196889 in aio_bh_call /src/qemu/build-oss-fuzz/../util/async.c:151:5
+    #5 0x555c37196889 in aio_bh_poll /src/qemu/build-oss-fuzz/../util/async.c:179:13
+    #6 0x555c371638c5 in aio_poll /src/qemu/build-oss-fuzz/../util/aio-posix.c:721:17
+    #7 0x555c3613c321 in v9fs_reset /src/qemu/build-oss-fuzz/../hw/9pfs/9p.c:4341:9
+    #8 0x555c36a15e16 in virtio_9p_reset /src/qemu/build-oss-fuzz/../hw/9pfs/virtio-9p-device.c:117:5
+    #9 0x555c36af6bdc in virtio_reset /src/qemu/build-oss-fuzz/../hw/virtio/virtio.c:2126:9
+    #10 0x555c366950bb in virtio_bus_reset /src/qemu/build-oss-fuzz/../hw/virtio/virtio-bus.c:109:9
+    #11 0x555c366a215a in virtio_pci_reset /src/qemu/build-oss-fuzz/../hw/virtio/virtio-pci.c:2209:5
+    #12 0x555c366a215a in virtio_ioport_write /src/qemu/build-oss-fuzz/../hw/virtio/virtio-pci.c:438:13
+    #13 0x555c366a215a in virtio_pci_config_write /src/qemu/build-oss-fuzz/../hw/virtio/virtio-pci.c:576:9
+    #14 0x555c36ba429b in memory_region_write_accessor /src/qemu/build-oss-fuzz/../softmmu/memory.c:493:5
+    #15 0x555c36ba3d9c in access_with_adjusted_size /src/qemu/build-oss-fuzz/../softmmu/memory.c:555:18
+    #16 0x555c36ba3d9c in memory_region_dispatch_write /src/qemu/build-oss-fuzz/../softmmu/memory.c:1515:16
+    #17 0x555c36bcede5 in flatview_write_continue /src/qemu/build-oss-fuzz/../softmmu/physmem.c:2826:23
+    #18 0x555c36bc68dd in flatview_write /src/qemu/build-oss-fuzz/../softmmu/physmem.c:2868:12
+    #19 0x555c36bc6514 in address_space_write /src/qemu/build-oss-fuzz/../softmmu/physmem.c:2964:18
+    #20 0x555c36b9ce56 in cpu_outl /src/qemu/build-oss-fuzz/../softmmu/ioport.c:80:5
+    #21 0x555c36d66410 in __wrap_qtest_outl /src/qemu/build-oss-fuzz/../tests/qtest/fuzz/qtest_wrappers.c:100:9
+    #22 0x555c36d6d3c1 in op_out /src/qemu/build-oss-fuzz/../tests/qtest/fuzz/generic_fuzz.c:407:13
+    #23 0x555c36d6c47b in generic_fuzz /src/qemu/build-oss-fuzz/../tests/qtest/fuzz/generic_fuzz.c:666:13
+    #24 0x555c36d6531c in LLVMFuzzerTestOneInput /src/qemu/build-oss-fuzz/../tests/qtest/fuzz/fuzz.c:158:5
+    #25 0x555c35f83193 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #26 0x555c35f6e8f2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #27 0x555c35f7419c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #28 0x555c35f9d6d2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #29 0x7f43a0e42082 in __libc_start_main (/out/lib/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+
+DEDUP_TOKEN: __interceptor_pthread_create--qemu_thread_create--do_spawn_thread
+==6==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42523045

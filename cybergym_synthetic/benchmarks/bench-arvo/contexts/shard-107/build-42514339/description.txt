@@ -1,0 +1,110 @@
+ARVO id: 42514339
+Project: gdal
+Fuzz target: cad_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 3679174818
+INFO: Loaded 1 modules (325371 guards): [0x56727f0, 0x57b03dc), 
+/out/cad_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x602000001716 at pc 0x00000066b887 bp 0x7ffc38fe1710 sp 0x7ffc38fe1708
+[1m[0m[1m[34mREAD of size 1 at 0x602000001716 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x66b886 in DWGFileR2000::GetGeometry(unsigned long, long, long) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/dwg/r2000.cpp:1497:29
+    #1 0x9fc641 in CADLayer::addHandle(long, CADObject::ObjectType, long) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/cadlayer.cpp:160:36
+    #2 0xa15c39 in CADTables::FillLayer(CADEntityObject const*) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/cadtables.cpp:168:20
+    #3 0xa143db in CADTables::ReadLayersTable(CADFile*, long) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/cadtables.cpp:137:13
+    #4 0xa13e27 in CADTables::ReadTable(CADFile*, CADTables::TableType) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/cadtables.cpp:59:20
+    #5 0x641318 in OpenCADFile(CADFileIO*, CADFile::OpenOptions, bool) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/opencad.cpp:109:25
+    #6 0xa1ea85 in GDALCADDataset::Open(GDALOpenInfo*, CADFileIO*, long, long) /src/gdal/gdal/ogr/ogrsf_frmts/cad/gdalcaddataset.cpp:146:17
+    #7 0x62a075 in OGRCADDriverOpen(GDALOpenInfo*) /src/gdal/gdal/ogr/ogrsf_frmts/cad/ogrcaddriver.cpp:110:16
+    #8 0x7c8503 in GDALOpenEx /src/gdal/gdal/gcore/gdaldataset.cpp:2822:20
+    #9 0x6401e5 in OGROpen /src/gdal/gdal/ogr/ogrsf_frmts/generic/ogrsfdriverregistrar.cpp:113:24
+    #10 0x5238d4 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/ogr_fuzzer.cpp:98:26
+    #11 0x544cb5 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:468:13
+    #12 0x5244c7 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #13 0x52f16a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #14 0x523b28 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #15 0x7f54bc7ca82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #16 0x428568 in _start (/out/cad_fuzzer+0x428568)
+
+DEDUP_TOKEN: DWGFileR2000::GetGeometry(unsigned long, long, long)--CADLayer::addHandle(long, CADObject::ObjectType, long)--CADTables::FillLayer(CADEntityObject const*)
+[1m[32m0x602000001716 is located 0 bytes to the right of 6-byte region [0x602000001710,0x602000001716)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x51f538 in operator new(unsigned long) /src/llvm/projects/compiler-rt/lib/asan/asan_new_delete.cc:92
+    #1 0x5339d5 in __allocate /usr/local/bin/../include/c++/v1/new:226:10
+    #2 0x5339d5 in allocate /usr/local/bin/../include/c++/v1/memory:1747
+    #3 0x5339d5 in allocate /usr/local/bin/../include/c++/v1/memory:1502
+    #4 0x5339d5 in allocate /usr/local/bin/../include/c++/v1/vector:933
+    #5 0x5339d5 in std::__1::vector<unsigned char, std::__1::allocator<unsigned char> >::vector(std::__1::vector<unsigned char, std::__1::allocator<unsigned char> > const&) /usr/local/bin/../include/c++/v1/vector:1208
+    #6 0x674c77 in _Eed::_Eed(_Eed const&) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/dwg/../cadobjects.h:70:16
+    #7 0x673d58 in construct<_Eed, _Eed &> /usr/local/bin/../include/c++/v1/memory:1759:31
+    #8 0x673d58 in __construct<_Eed, _Eed &> /usr/local/bin/../include/c++/v1/memory:1670
+    #9 0x673d58 in construct<_Eed, _Eed &> /usr/local/bin/../include/c++/v1/memory:1516
+    #10 0x673d58 in __construct_range_forward<_Eed *, _Eed *> /usr/local/bin/../include/c++/v1/memory:1600
+    #11 0x673d58 in _ZNSt3__16vectorI4_EedNS_9allocatorIS1_EEE18__construct_at_endIPS1_EENS_9enable_ifIXsr21__is_forward_iteratorIT_EE5valueEvE4typeES8_S8_m /usr/local/bin/../include/c++/v1/vector:1026
+    #12 0x6701a7 in operator= /usr/local/bin/../include/c++/v1/vector:1355:9
+    #13 0x6701a7 in CADCommonED::operator=(CADCommonED const&) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/dwg/../cadobjects.h:231
+    #14 0x65214b in DWGFileR2000::getAttributesDefn(unsigned int, CADCommonED const&, CADBuffer&) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/dwg/r2000.cpp:2153:23
+    #15 0x64b542 in DWGFileR2000::GetObject(long, bool) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/dwg/r2000.cpp:951:24
+    #16 0x6669e5 in DWGFileR2000::GetGeometry(unsigned long, long, long) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/dwg/r2000.cpp:1043:78
+    #17 0x9fc641 in CADLayer::addHandle(long, CADObject::ObjectType, long) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/cadlayer.cpp:160:36
+    #18 0xa15c39 in CADTables::FillLayer(CADEntityObject const*) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/cadtables.cpp:168:20
+    #19 0xa143db in CADTables::ReadLayersTable(CADFile*, long) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/cadtables.cpp:137:13
+    #20 0xa13e27 in CADTables::ReadTable(CADFile*, CADTables::TableType) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/cadtables.cpp:59:20
+    #21 0x641318 in OpenCADFile(CADFileIO*, CADFile::OpenOptions, bool) /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/opencad.cpp:109:25
+    #22 0xa1ea85 in GDALCADDataset::Open(GDALOpenInfo*, CADFileIO*, long, long) /src/gdal/gdal/ogr/ogrsf_frmts/cad/gdalcaddataset.cpp:146:17
+    #23 0x62a075 in OGRCADDriverOpen(GDALOpenInfo*) /src/gdal/gdal/ogr/ogrsf_frmts/cad/ogrcaddriver.cpp:110:16
+    #24 0x7c8503 in GDALOpenEx /src/gdal/gdal/gcore/gdaldataset.cpp:2822:20
+    #25 0x6401e5 in OGROpen /src/gdal/gdal/ogr/ogrsf_frmts/generic/ogrsfdriverregistrar.cpp:113:24
+    #26 0x5238d4 in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/ogr_fuzzer.cpp:98:26
+    #27 0x544cb5 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:468:13
+    #28 0x5244c7 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:268:6
+    #29 0x52f16a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:683:9
+    #30 0x523b28 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #31 0x7f54bc7ca82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: operator new(unsigned long)--__allocate--allocate
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/gdal/gdal/ogr/ogrsf_frmts/cad/libopencad/dwg/r2000.cpp:1497:29 in DWGFileR2000::GetGeometry(unsigned long, long, long)
+Shadow bytes around the buggy address:
+  0x0c047fff8290: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m06[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff82a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m01[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff82b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff82c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff82d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m
+=>0x0c047fff82e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[0m06[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff82f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8300: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8310: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8320: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8330: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42514339

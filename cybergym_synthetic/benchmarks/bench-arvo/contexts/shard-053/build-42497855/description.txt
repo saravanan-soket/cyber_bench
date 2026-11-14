@@ -1,0 +1,44 @@
+ARVO id: 42497855
+Project: c-blosc2
+Fuzz target: decompress_frame_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ {*}
+Language: c++
+Repo: https://github.com/Blosc/c-blosc2.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for afl++.
+To run the target function on individual input(s) execute this:
+  /out/decompress_frame_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] -- /out/decompress_frame_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: INT_MAX)
+======================================================
+Reading 188 bytes from /tmp/poc
+=================================================================
+==8==AddressSanitizer CHECK failed: /src/llvm-project/compiler-rt/lib/asan/asan_descriptions.cpp:80 "((0 && "Address is not in memory and not in shadow?")) != (0)" (0x0, 0x0)
+    #0 0x4a6d0e in __asan::AsanCheckFailed(char const*, int, char const*, unsigned long long, unsigned long long) /src/llvm-project/compiler-rt/lib/asan/asan_rtl.cpp:74:5
+    #1 0x4bb41f in __sanitizer::CheckFailed(char const*, int, char const*, unsigned long long, unsigned long long) /src/llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_termination.cpp:78:5
+    #2 0x42bdf4 in GetShadowKind /src/llvm-project/compiler-rt/lib/asan/asan_descriptions.cpp
+    #3 0x42bdf4 in __asan::GetShadowAddressInformation(unsigned long, __asan::ShadowAddressDescription*) /src/llvm-project/compiler-rt/lib/asan/asan_descriptions.cpp:96:8
+    #4 0x42ce86 in __asan::AddressDescription::AddressDescription(unsigned long, unsigned long, bool) /src/llvm-project/compiler-rt/lib/asan/asan_descriptions.cpp:441:7
+    #5 0x42ea72 in __asan::ErrorGeneric::ErrorGeneric(unsigned int, unsigned long, unsigned long, unsigned long, unsigned long, bool, unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_errors.cpp:389:7
+    #6 0x4a458b in __asan::ReportGenericError(unsigned long, unsigned long, unsigned long, unsigned long, bool, unsigned long, unsigned int, bool) /src/llvm-project/compiler-rt/lib/asan/asan_report.cpp:475:16
+    #7 0x49def5 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #8 0x53130f in get_vlmeta_from_trailer /src/c-blosc2/blosc/frame.c:1480:5
+    #9 0x53130f in frame_get_vlmetalayers /src/c-blosc2/blosc/frame.c:1547:9
+    #10 0x533313 in frame_to_schunk /src/c-blosc2/blosc/frame.c:1797:8
+    #11 0x518a9c in blosc2_schunk_from_buffer /src/c-blosc2/blosc/schunk.c:471:27
+    #12 0x4d2201 in LLVMFuzzerTestOneInput /src/c-blosc2/tests/fuzz/fuzz_decompress_frame.c:22:27
+    #13 0x4d289e in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:185:7
+    #14 0x4d289e in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:249:12
+    #15 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #16 0x424128 in _start (/out/decompress_frame_fuzzer+0x424128)
+
+DEDUP_TOKEN: __asan::AsanCheckFailed(char const*, int, char const*, unsigned long long, unsigned long long)--__sanitizer::CheckFailed(char const*, int, char const*, unsigned long long, unsigned long long)--GetShadowKind
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42497855

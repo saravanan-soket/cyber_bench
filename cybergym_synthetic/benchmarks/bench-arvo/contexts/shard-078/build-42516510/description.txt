@@ -1,0 +1,112 @@
+ARVO id: 42516510
+Project: skia
+Fuzz target: api_svg_canvas
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4025852785
+INFO: Loaded 1 modules   (380397 inline 8-bit counters): 380397 [0x5296f50, 0x52f3d3d), 
+INFO: Loaded 1 PC tables (380397 PCs): 380397 [0x52f3d40,0x58c1c10), 
+/out/api_svg_canvas: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0xab2109 in SkRect::setBoundsCheck(SkPoint const*, int) /src/skia/out/Fuzz/../../src/core/SkRect.cpp:87:9
+    #1 0x9ff4e4 in ComputePtBounds /src/skia/out/Fuzz/../../include/private/SkPathRef.h:376:24
+    #2 0x9ff4e4 in computeBounds /src/skia/out/Fuzz/../../include/private/SkPathRef.h:386:21
+    #3 0x9ff4e4 in isFinite /src/skia/out/Fuzz/../../include/private/SkPathRef.h:208:19
+    #4 0x9ff4e4 in SkPath::isFinite() const /src/skia/out/Fuzz/../../src/core/SkPath.cpp:408:22
+    #5 0x9f0c32 in SkPaint::getFillPath(SkPath const&, SkPath*, SkRect const*, SkMatrix const&) const /src/skia/out/Fuzz/../../src/core/SkPaint.cpp:409:15
+    #6 0x9f06ff in SkPaint::getFillPath(SkPath const&, SkPath*, SkRect const*, float) const /src/skia/out/Fuzz/../../src/core/SkPaint.cpp:370:18
+    #7 0x1b4a421 in getFillPath /src/skia/out/Fuzz/../../include/core/SkPaint.h:411:22
+    #8 0x1b4a421 in SkSVGDevice::drawPath(SkPath const&, SkPaint const&, bool) /src/skia/out/Fuzz/../../src/svg/SkSVGDevice.cpp:939:31
+    #9 0x7aeaae in SkCanvas::onDrawPath(SkPath const&, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2199:28
+    #10 0x7a30b8 in SkCanvas::drawPath(SkPath const&, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1883:11
+    #11 0x529359 in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1252:25
+    #12 0x548007 in fuzz_SVGCanvas(Fuzz*) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1692:5
+    #13 0x55a631 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAPISVGCanvas.cpp:17:5
+    #14 0x471023 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #15 0x45ca42 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #16 0x4622ec in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #17 0x48a842 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7ffff7c55082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #19 0x452f9d in _start (/out/api_svg_canvas+0x452f9d)
+
+DEDUP_TOKEN: SkRect::setBoundsCheck(SkPoint const*, int)--ComputePtBounds--computeBounds
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0xa0692a in set /src/skia/out/Fuzz/../../include/core/SkPoint.h:198:12
+    #1 0xa0692a in SkPath::lineTo(float, float) /src/skia/out/Fuzz/../../src/core/SkPath.cpp:713:33
+    #2 0xec9284 in lineTo /src/skia/out/Fuzz/../../include/core/SkPath.h:601:22
+    #3 0xec9284 in SkCornerPathEffectImpl::onFilterPath(SkPath*, SkPath const&, SkStrokeRec*, SkRect const*, SkMatrix const&) const /src/skia/out/Fuzz/../../src/effects/SkCornerPathEffect.cpp:140:30
+    #4 0xa4d56e in SkPathEffect::filterPath(SkPath*, SkPath const&, SkStrokeRec*, SkRect const*, SkMatrix const&) const /src/skia/out/Fuzz/../../src/core/SkPathEffect.cpp:27:23
+    #5 0x9f0ad1 in SkPaint::getFillPath(SkPath const&, SkPath*, SkRect const*, SkMatrix const&) const /src/skia/out/Fuzz/../../src/core/SkPaint.cpp:393:37
+    #6 0x9f06ff in SkPaint::getFillPath(SkPath const&, SkPath*, SkRect const*, float) const /src/skia/out/Fuzz/../../src/core/SkPaint.cpp:370:18
+    #7 0x1b4a421 in getFillPath /src/skia/out/Fuzz/../../include/core/SkPaint.h:411:22
+    #8 0x1b4a421 in SkSVGDevice::drawPath(SkPath const&, SkPaint const&, bool) /src/skia/out/Fuzz/../../src/svg/SkSVGDevice.cpp:939:31
+    #9 0x7aeaae in SkCanvas::onDrawPath(SkPath const&, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2199:28
+    #10 0x7a30b8 in SkCanvas::drawPath(SkPath const&, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1883:11
+    #11 0x529359 in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1252:25
+    #12 0x548007 in fuzz_SVGCanvas(Fuzz*) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1692:5
+    #13 0x55a631 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAPISVGCanvas.cpp:17:5
+    #14 0x471023 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #15 0x45ca42 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #16 0x4622ec in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #17 0x48a842 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7ffff7c55082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+
+DEDUP_TOKEN: set--SkPath::lineTo(float, float)--lineTo
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x4ce6d4 in __msan_memcpy /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:1570:3
+    #1 0xa21a46 in SkPath::Iter::next(SkPoint*) /src/skia/out/Fuzz/../../src/core/SkPath.cpp:1865:13
+    #2 0xec80fe in SkCornerPathEffectImpl::onFilterPath(SkPath*, SkPath const&, SkStrokeRec*, SkRect const*, SkMatrix const&) const /src/skia/out/Fuzz/../../src/effects/SkCornerPathEffect.cpp:67:33
+    #3 0xa4d56e in SkPathEffect::filterPath(SkPath*, SkPath const&, SkStrokeRec*, SkRect const*, SkMatrix const&) const /src/skia/out/Fuzz/../../src/core/SkPathEffect.cpp:27:23
+    #4 0x9f0ad1 in SkPaint::getFillPath(SkPath const&, SkPath*, SkRect const*, SkMatrix const&) const /src/skia/out/Fuzz/../../src/core/SkPaint.cpp:393:37
+    #5 0x9f06ff in SkPaint::getFillPath(SkPath const&, SkPath*, SkRect const*, float) const /src/skia/out/Fuzz/../../src/core/SkPaint.cpp:370:18
+    #6 0x1b4a421 in getFillPath /src/skia/out/Fuzz/../../include/core/SkPaint.h:411:22
+    #7 0x1b4a421 in SkSVGDevice::drawPath(SkPath const&, SkPaint const&, bool) /src/skia/out/Fuzz/../../src/svg/SkSVGDevice.cpp:939:31
+    #8 0x7aeaae in SkCanvas::onDrawPath(SkPath const&, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:2199:28
+    #9 0x7a30b8 in SkCanvas::drawPath(SkPath const&, SkPaint const&) /src/skia/out/Fuzz/../../src/core/SkCanvas.cpp:1883:11
+    #10 0x529359 in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1252:25
+    #11 0x548007 in fuzz_SVGCanvas(Fuzz*) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1692:5
+    #12 0x55a631 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAPISVGCanvas.cpp:17:5
+    #13 0x471023 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #14 0x45ca42 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #15 0x4622ec in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #16 0x48a842 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7ffff7c55082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+
+DEDUP_TOKEN: __msan_memcpy--SkPath::Iter::next(SkPoint*)--SkCornerPathEffectImpl::onFilterPath(SkPath*, SkPath const&, SkStrokeRec*, SkRect const*, SkMatrix const&) const
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x4d4c3c in __interceptor_realloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:883:3
+    #1 0xfc5798 in sk_realloc_throw(void*, unsigned long) /src/skia/out/Fuzz/../../src/ports/SkMemory_malloc.cpp:68:35
+    #2 0xb8de22 in SkTDStorage::reserve(unsigned long, unsigned long) /src/skia/out/Fuzz/../../src/core/SkTDArray.cpp:94:40
+    #3 0xa528e0 in reserve /src/skia/out/Fuzz/../../include/private/SkTDArray.h:195:18
+    #4 0xa528e0 in incReserve /src/skia/out/Fuzz/../../include/private/SkPathRef.h:400:17
+    #5 0xa528e0 in SkPathRef::Editor::Editor(sk_sp<SkPathRef>*, int, int) /src/skia/out/Fuzz/../../src/core/SkPathRef.cpp:28:21
+    #6 0xa092fe in SkPath::cubicTo(float, float, float, float, float, float) /src/skia/out/Fuzz/../../src/core/SkPath.cpp:784:23
+    #7 0xa09c85 in SkPath::rCubicTo(float, float, float, float, float, float) /src/skia/out/Fuzz/../../src/core/SkPath.cpp:798:18
+    #8 0x5f4e64 in FuzzNicePath(Fuzz*, SkPath*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCommon.cpp:98:23
+    #9 0x52932c in fuzz_canvas(Fuzz*, SkCanvas*, int) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1251:17
+    #10 0x548007 in fuzz_SVGCanvas(Fuzz*) /src/skia/out/Fuzz/../../fuzz/FuzzCanvas.cpp:1692:5
+    #11 0x55a631 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz/../../fuzz/oss_fuzz/FuzzAPISVGCanvas.cpp:17:5
+    #12 0x471023 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #13 0x45ca42 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #14 0x4622ec in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #15 0x48a842 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7ffff7c55082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+
+DEDUP_TOKEN: __interceptor_realloc--sk_realloc_throw(void*, unsigned long)--SkTDStorage::reserve(unsigned long, unsigned long)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/skia/out/Fuzz/../../src/core/SkRect.cpp:87:9 in SkRect::setBoundsCheck(SkPoint const*, int)
+Unique heap origins: 215
+Stack depot allocated bytes: 9764880
+Unique origin histories: 53
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42516510

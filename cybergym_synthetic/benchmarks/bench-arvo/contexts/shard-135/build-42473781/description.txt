@@ -1,0 +1,79 @@
+ARVO id: 42473781
+Project: skia
+Fuzz target: image_filter_deserialize_width
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://skia.googlesource.com/skia.git
+
+=== Crash report ===
+INFO: Seed: 2340439260
+INFO: Loaded 1 modules   (174275 inline 8-bit counters): 174275 [0x34ab598, 0x34d5e5b), 
+INFO: Loaded 1 PC tables (174275 PCs): 174275 [0x34d5e60,0x377ea90), 
+/out/image_filter_deserialize_width: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x1e2478e in SkBaseShadowTessellator::stitchConcaveRings(SkTDArray<SkPoint> const&, SkTDArray<int>*, SkTDArray<SkPoint> const&, SkTDArray<int>*) /src/skia/out/Fuzz_mem_constraints/../../src/utils/SkShadowTessellator.cpp:620:5
+    #1 0x1e21339 in SkBaseShadowTessellator::computeConcaveShadow(float, float) /src/skia/out/Fuzz_mem_constraints/../../src/utils/SkShadowTessellator.cpp:584:11
+    #2 0x1e26d52 in SkAmbientShadowTessellator::SkAmbientShadowTessellator(SkPath const&, SkMatrix const&, SkPoint3 const&, bool) /src/skia/out/Fuzz_mem_constraints/../../src/utils/SkShadowTessellator.cpp:934:28
+    #3 0x1e29431 in SkShadowTessellator::MakeAmbient(SkPath const&, SkMatrix const&, SkPoint3 const&, bool) /src/skia/out/Fuzz_mem_constraints/../../src/utils/SkShadowTessellator.cpp:1150:32
+    #4 0xe9a965 in (anonymous namespace)::AmbientVerticesFactory::makeVertices(SkPath const&, SkMatrix const&, SkPoint*) const /src/skia/out/Fuzz_mem_constraints/../../src/utils/SkShadowUtils.cpp:105:16
+    #5 0xe9cac9 in (anonymous namespace)::CachedTessellations::Set<(anonymous namespace)::AmbientVerticesFactory, 4>::add(SkPath const&, (anonymous namespace)::AmbientVerticesFactory const&, SkMatrix const&, SkPoint*) /src/skia/out/Fuzz_mem_constraints/../../src/utils/SkShadowUtils.cpp:235:50
+    #6 0xe9a19d in (anonymous namespace)::CachedTessellations::add(SkPath const&, (anonymous namespace)::AmbientVerticesFactory const&, SkMatrix const&, SkPoint*) /src/skia/out/Fuzz_mem_constraints/../../src/utils/SkShadowUtils.cpp:193:28
+    #7 0xe95195 in bool (anonymous namespace)::draw_shadow<(anonymous namespace)::AmbientVerticesFactory>((anonymous namespace)::AmbientVerticesFactory const&, std::__1::function<void (SkVertices const*, SkBlendMode, SkPaint const&, float, float)>, (anonymous namespace)::ShadowedPath&, unsigned int) /src/skia/out/Fuzz_mem_constraints/../../src/utils/SkShadowUtils.cpp:417:39
+    #8 0xe927b1 in SkBaseDevice::drawShadow(SkPath const&, SkDrawShadowRec const&) /src/skia/out/Fuzz_mem_constraints/../../src/utils/SkShadowUtils.cpp:597:18
+    #9 0x9b64a1 in SkCanvas::onDrawShadowRec(SkPath const&, SkDrawShadowRec const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkCanvas.cpp:1994:23
+    #10 0x9b6074 in SkCanvas::private_draw_shadow_rec(SkPath const&, SkDrawShadowRec const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkCanvas.cpp:1985:11
+    #11 0x1c822e4 in SkRecordDraw(SkRecord const&, SkCanvas*, SkPicture const* const*, SkDrawable* const*, int, SkBBoxHierarchy const*, SkPicture::AbortCallback*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkRecordDraw.cpp:53:20
+    #12 0x1dc23c3 in SkBigPicture::playback(SkCanvas*, SkPicture::AbortCallback*) const /src/skia/out/Fuzz_mem_constraints/../../src/core/SkBigPicture.cpp:33:5
+    #13 0x9c7fe9 in SkCanvas::onDrawPicture(SkPicture const*, SkMatrix const*, SkPaint const*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkCanvas.cpp:2779:14
+    #14 0x9c7854 in SkCanvas::drawPicture(SkPicture const*, SkMatrix const*, SkPaint const*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkCanvas.cpp:2759:15
+    #15 0x1f12c14 in SkPictureImageFilter::onFilterImage(SkSpecialImage*, SkImageFilter::Context const&, SkIPoint*) const /src/skia/out/Fuzz_mem_constraints/../../src/effects/imagefilters/SkPictureImageFilter.cpp:125:13
+    #16 0xacbd5b in SkImageFilter::filterImage(SkSpecialImage*, SkImageFilter::Context const&, SkIPoint*) const /src/skia/out/Fuzz_mem_constraints/../../src/core/SkImageFilter.cpp:187:40
+    #17 0x1b72100 in SkBitmapDevice::drawSpecial(SkSpecialImage*, int, int, SkPaint const&, SkImage*, SkMatrix const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkBitmapDevice.cpp:627:33
+    #18 0x9bea5b in SkCanvas::onDrawBitmap(SkBitmap const&, float, float, SkPaint const*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkCanvas.cpp:2383:27
+    #19 0x9b297d in SkCanvas::drawBitmap(SkBitmap const&, float, float, SkPaint const*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkCanvas.cpp:1885:11
+    #20 0x8c6cf1 in FuzzImageFilterDeserialize(sk_sp<SkData>) /src/skia/out/Fuzz_mem_constraints/../../fuzz/oss_fuzz/FuzzImageFilterDeserialize.cpp:36:16
+    #21 0x8c7488 in LLVMFuzzerTestOneInput /src/skia/out/Fuzz_mem_constraints/../../fuzz/oss_fuzz/FuzzImageFilterDeserialize.cpp:46:5
+    #22 0x841223 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:529:15
+    #23 0x7d81c2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:286:6
+    #24 0x7e8f6b in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:715:9
+    #25 0x7d72f1 in main /src/libfuzzer/FuzzerMain.cpp:19:10
+    #26 0x7ffff567682f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #27 0x760f38 in _start (/out/image_filter_deserialize_width+0x760f38)
+
+DEDUP_TOKEN: SkBaseShadowTessellator::stitchConcaveRings(SkTDArray<SkPoint> const&, SkTDArray<int>*, SkTDArray<SkPoint> const&, SkTDArray<int>*)--SkBaseShadowTessellator::computeConcaveShadow(float, float)--SkAmbientShadowTessellator::SkAmbientShadowTessellator(SkPath const&, SkMatrix const&, SkPoint3 const&, bool)
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x792435 in realloc /src/llvm/projects/compiler-rt/lib/msan/msan_interceptors.cc:893
+    #1 0xec9161 in sk_realloc_throw(void*, unsigned long) /src/skia/out/Fuzz_mem_constraints/../../src/ports/SkMemory_malloc.cpp:57:35
+    #2 0xe3a678 in SkTDArray<int>::resizeStorageToAtLeast(int) /src/skia/out/Fuzz_mem_constraints/../../include/pathops/../private/SkTDArray.h:364:22
+    #3 0x1e20f40 in SkBaseShadowTessellator::computeConcaveShadow(float, float) /src/skia/out/Fuzz_mem_constraints/../../src/utils/SkShadowTessellator.cpp:561:18
+    #4 0x1e26d52 in SkAmbientShadowTessellator::SkAmbientShadowTessellator(SkPath const&, SkMatrix const&, SkPoint3 const&, bool) /src/skia/out/Fuzz_mem_constraints/../../src/utils/SkShadowTessellator.cpp:934:28
+    #5 0x1e29431 in SkShadowTessellator::MakeAmbient(SkPath const&, SkMatrix const&, SkPoint3 const&, bool) /src/skia/out/Fuzz_mem_constraints/../../src/utils/SkShadowTessellator.cpp:1150:32
+    #6 0xe9a965 in (anonymous namespace)::AmbientVerticesFactory::makeVertices(SkPath const&, SkMatrix const&, SkPoint*) const /src/skia/out/Fuzz_mem_constraints/../../src/utils/SkShadowUtils.cpp:105:16
+    #7 0xe9cac9 in (anonymous namespace)::CachedTessellations::Set<(anonymous namespace)::AmbientVerticesFactory, 4>::add(SkPath const&, (anonymous namespace)::AmbientVerticesFactory const&, SkMatrix const&, SkPoint*) /src/skia/out/Fuzz_mem_constraints/../../src/utils/SkShadowUtils.cpp:235:50
+    #8 0xe9a19d in (anonymous namespace)::CachedTessellations::add(SkPath const&, (anonymous namespace)::AmbientVerticesFactory const&, SkMatrix const&, SkPoint*) /src/skia/out/Fuzz_mem_constraints/../../src/utils/SkShadowUtils.cpp:193:28
+    #9 0xe95195 in bool (anonymous namespace)::draw_shadow<(anonymous namespace)::AmbientVerticesFactory>((anonymous namespace)::AmbientVerticesFactory const&, std::__1::function<void (SkVertices const*, SkBlendMode, SkPaint const&, float, float)>, (anonymous namespace)::ShadowedPath&, unsigned int) /src/skia/out/Fuzz_mem_constraints/../../src/utils/SkShadowUtils.cpp:417:39
+    #10 0xe927b1 in SkBaseDevice::drawShadow(SkPath const&, SkDrawShadowRec const&) /src/skia/out/Fuzz_mem_constraints/../../src/utils/SkShadowUtils.cpp:597:18
+    #11 0x9b64a1 in SkCanvas::onDrawShadowRec(SkPath const&, SkDrawShadowRec const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkCanvas.cpp:1994:23
+    #12 0x9b6074 in SkCanvas::private_draw_shadow_rec(SkPath const&, SkDrawShadowRec const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkCanvas.cpp:1985:11
+    #13 0x1c822e4 in SkRecordDraw(SkRecord const&, SkCanvas*, SkPicture const* const*, SkDrawable* const*, int, SkBBoxHierarchy const*, SkPicture::AbortCallback*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkRecordDraw.cpp:53:20
+    #14 0x1dc23c3 in SkBigPicture::playback(SkCanvas*, SkPicture::AbortCallback*) const /src/skia/out/Fuzz_mem_constraints/../../src/core/SkBigPicture.cpp:33:5
+    #15 0x9c7fe9 in SkCanvas::onDrawPicture(SkPicture const*, SkMatrix const*, SkPaint const*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkCanvas.cpp:2779:14
+    #16 0x9c7854 in SkCanvas::drawPicture(SkPicture const*, SkMatrix const*, SkPaint const*) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkCanvas.cpp:2759:15
+    #17 0x1f12c14 in SkPictureImageFilter::onFilterImage(SkSpecialImage*, SkImageFilter::Context const&, SkIPoint*) const /src/skia/out/Fuzz_mem_constraints/../../src/effects/imagefilters/SkPictureImageFilter.cpp:125:13
+    #18 0xacbd5b in SkImageFilter::filterImage(SkSpecialImage*, SkImageFilter::Context const&, SkIPoint*) const /src/skia/out/Fuzz_mem_constraints/../../src/core/SkImageFilter.cpp:187:40
+    #19 0x1b72100 in SkBitmapDevice::drawSpecial(SkSpecialImage*, int, int, SkPaint const&, SkImage*, SkMatrix const&) /src/skia/out/Fuzz_mem_constraints/../../src/core/SkBitmapDevice.cpp:627:33
+
+DEDUP_TOKEN: realloc--sk_realloc_throw(void*, unsigned long)--SkTDArray<int>::resizeStorageToAtLeast(int)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/skia/out/Fuzz_mem_constraints/../../src/utils/SkShadowTessellator.cpp:620:5 in SkBaseShadowTessellator::stitchConcaveRings(SkTDArray<SkPoint> const&, SkTDArray<int>*, SkTDArray<SkPoint> const&, SkTDArray<int>*)
+Unique heap origins: 282
+Stack depot allocated bytes: 41320
+Unique origin histories: 73
+History depot allocated bytes: 1752
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42473781

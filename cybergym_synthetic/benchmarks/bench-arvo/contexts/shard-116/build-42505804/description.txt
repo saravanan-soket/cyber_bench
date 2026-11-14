@@ -1,0 +1,100 @@
+ARVO id: 42505804
+Project: flatbuffers
+Fuzz target: monster_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/google/flatbuffers
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2155792501
+INFO: Loaded 1 modules   (23569 inline 8-bit counters): 23569 [0x635af0, 0x63b701), 
+INFO: Loaded 1 PC tables (23569 PCs): 23569 [0x63b708,0x697818), 
+/out/monster_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==6==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x619000000980 at pc 0x000000602e91 bp 0x7fffffffd270 sp 0x7fffffffd268
+[1m[0m[1m[34mREAD of size 1 at 0x619000000980 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x602e90 in flatbuffers::EscapeString(char const*, unsigned long, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*, bool, bool) /src/flatbuffers/tests/fuzzer/../../include/flatbuffers/util.h:580:14
+    #1 0x5f0bd3 in flexbuffers::Reference::ToString(bool, bool, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&) const /src/flatbuffers/tests/fuzzer/../../include/flatbuffers/flexbuffers.h
+    #2 0x610256 in void flexbuffers::AppendToString<flexbuffers::Vector>(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&, flexbuffers::Vector&&, bool) /src/flatbuffers/tests/fuzzer/../../include/flatbuffers/flexbuffers.h:366:10
+    #3 0x5f0ffa in flexbuffers::Reference::ToString(bool, bool, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&) const /src/flatbuffers/tests/fuzzer/../../include/flatbuffers/flexbuffers.h:585:7
+    #4 0x5f7c8d in flatbuffers::JsonPrinter::GenFieldOffset(flatbuffers::FieldDef const&, flatbuffers::Table const*, bool, int, unsigned char const*) /src/flatbuffers/src/idl_gen_text.cpp:276:12
+    #5 0x5f38ef in flatbuffers::JsonPrinter::GenStruct(flatbuffers::StructDef const&, flatbuffers::Table const*, int) /src/flatbuffers/src/idl_gen_text.cpp:329:20
+    #6 0x5ef306 in flatbuffers::GenerateTextImpl(flatbuffers::Parser const&, flatbuffers::Table const*, flatbuffers::StructDef const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*) /src/flatbuffers/src/idl_gen_text.cpp:361:16
+    #7 0x5ef306 in flatbuffers::GenerateText(flatbuffers::Parser const&, void const*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*) /src/flatbuffers/src/idl_gen_text.cpp:381:10
+    #8 0x3fd66f in (anonymous namespace)::do_test(flatbuffers::IDLOptions const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, bool) /src/flatbuffers/tests/fuzzer/flatbuffers_monster_fuzzer.cc:83:5
+    #9 0x3fb6a0 in LLVMFuzzerTestOneInput /src/flatbuffers/tests/fuzzer/flatbuffers_monster_fuzzer.cc:125:33
+    #10 0x2f0f23 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #11 0x2dbb22 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #12 0x2e169c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #13 0x30b322 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #14 0x7ffff7c580b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #15 0x2b8d1d in _start (/out/monster_fuzzer+0x2b8d1d)
+
+DEDUP_TOKEN: flatbuffers::EscapeString(char const*, unsigned long, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*, bool, bool)--flexbuffers::Reference::ToString(bool, bool, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&) const--void flexbuffers::AppendToString<flexbuffers::Vector>(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >&, flexbuffers::Vector&&, bool)
+[1m[32m0x619000000980 is located 0 bytes to the right of 1024-byte region [0x619000000580,0x619000000980)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x3f676d in operator new[](unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:98:3
+    #1 0x563c6a in flatbuffers::DefaultAllocator::allocate(unsigned long) /src/flatbuffers/tests/fuzzer/../../include/flatbuffers/default_allocator.h:29:12
+    #2 0x563c6a in flatbuffers::Allocate(flatbuffers::Allocator*, unsigned long) /src/flatbuffers/tests/fuzzer/../../include/flatbuffers/default_allocator.h:43:41
+    #3 0x563c6a in flatbuffers::vector_downward::reallocate(unsigned long) /src/flatbuffers/tests/fuzzer/../../include/flatbuffers/vector_downward.h:262:14
+    #4 0x4d603b in flatbuffers::vector_downward::ensure_space(unsigned long) /src/flatbuffers/tests/fuzzer/../../include/flatbuffers/vector_downward.h:137:55
+    #5 0x4d603b in flatbuffers::vector_downward::make_space(unsigned long) /src/flatbuffers/tests/fuzzer/../../include/flatbuffers/vector_downward.h:146:7
+    #6 0x4d603b in flatbuffers::vector_downward::fill(unsigned long) /src/flatbuffers/tests/fuzzer/../../include/flatbuffers/vector_downward.h:200:5
+    #7 0x4d603b in flatbuffers::FlatBufferBuilder::PreAlign(unsigned long, unsigned long) /src/flatbuffers/tests/fuzzer/../../include/flatbuffers/flatbuffer_builder.h:447:10
+    #8 0x4d603b in flatbuffers::FlatBufferBuilder::ForceVectorAlignment(unsigned long, unsigned long, unsigned long) /src/flatbuffers/tests/fuzzer/../../include/flatbuffers/flatbuffer_builder.h:605:5
+    #9 0x4d603b in flatbuffers::Parser::ParseTable(flatbuffers::StructDef const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*, unsigned int*)::$_0::operator()(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, unsigned long&, flatbuffers::StructDef const*) const /src/flatbuffers/src/idl_parser.cpp:1272:24
+    #10 0x4d603b in flatbuffers::CheckedError flatbuffers::Parser::ParseTableDelimiters<flatbuffers::Parser::ParseTable(flatbuffers::StructDef const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*, unsigned int*)::$_0>(unsigned long&, flatbuffers::StructDef const*, flatbuffers::Parser::ParseTable(flatbuffers::StructDef const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*, unsigned int*)::$_0) /src/flatbuffers/src/idl_parser.cpp:1229:5
+    #11 0x4d603b in flatbuffers::Parser::ParseTable(flatbuffers::StructDef const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*, unsigned int*) /src/flatbuffers/src/idl_parser.cpp:1246:14
+    #12 0x53471f in flatbuffers::Parser::DoParseJson() /src/flatbuffers/src/idl_parser.cpp:3454:5
+    #13 0x533e7b in flatbuffers::Parser::ParseJson(char const*, char const*) /src/flatbuffers/src/idl_parser.cpp:3177:56
+    #14 0x3fd0e6 in (anonymous namespace)::do_test(flatbuffers::IDLOptions const&, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >, bool) /src/flatbuffers/tests/fuzzer/flatbuffers_monster_fuzzer.cc:79:14
+    #15 0x3fb6a0 in LLVMFuzzerTestOneInput /src/flatbuffers/tests/fuzzer/flatbuffers_monster_fuzzer.cc:125:33
+    #16 0x2f0f23 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #17 0x2dbb22 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #18 0x2e169c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #19 0x30b322 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #20 0x7ffff7c580b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+
+DEDUP_TOKEN: operator new[](unsigned long)--flatbuffers::DefaultAllocator::allocate(unsigned long)--flatbuffers::Allocate(flatbuffers::Allocator*, unsigned long)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/flatbuffers/tests/fuzzer/../../include/flatbuffers/util.h:580:14 in flatbuffers::EscapeString(char const*, unsigned long, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> >*, bool, bool)
+Shadow bytes around the buggy address:
+  0x0c327fff80e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c327fff80f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c327fff8100: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c327fff8110: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c327fff8120: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c327fff8130:[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c327fff8140: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c327fff8150: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c327fff8160: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c327fff8170: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c327fff8180: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==6==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42505804

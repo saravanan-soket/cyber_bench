@@ -1,0 +1,66 @@
+ARVO id: 42516054
+Project: ghostpdl
+Fuzz target: gs_device_pdfwrite_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c++
+Repo: https://cgit.ghostscript.com/ghostpdl.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2301971595
+INFO: Loaded 3 modules   (222724 inline 8-bit counters): 13708 [0x7f180d0549e0, 0x7f180d057f6c), 959 [0x7f180d0b5a40, 0x7f180d0b5dff), 208057 [0x37df6d0, 0x3812389), 
+INFO: Loaded 3 PC tables (222724 PCs): 13708 [0x7f180d057f70,0x7f180d08d830), 959 [0x7f180d0b5e00,0x7f180d0b99f0), 208057 [0x2a53d10,0x2d808a0), 
+/out/gs_device_pdfwrite_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x7f180cdc084a bp 0x611000028328 sp 0x7ffe77c673b0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x7f180cdc084a in deflate (/lib/x86_64-linux-gnu/libz.so.1+0x584a)
+    #1 0x70a9c0 in s_zlibE_process /src/ghostpdl/./base/szlibe.c:69:14
+    #2 0x6be9c0 in swritebuf /src/ghostpdl/./base/stream.c:929:26
+    #3 0x6be9c0 in s_process_write_buf /src/ghostpdl/./base/stream.c:780:18
+    #4 0x6bf838 in s_filter_close /src/ghostpdl/./base/stream.c:363:22
+    #5 0x6bf9cb in sclose /src/ghostpdl/./base/stream.c:445:18
+    #6 0x6c6618 in s_close_filters /src/ghostpdl/./base/stream.c:1304:22
+    #7 0x8efa5a in stream_to_none /src/ghostpdl/./devices/vector/gdevpdfu.c:1178:9
+    #8 0x8e1fa4 in pdf_open_contents /src/ghostpdl/./devices/vector/gdevpdfu.c:1200:20
+    #9 0x8e1fa4 in pdf_close_contents /src/ghostpdl/./devices/vector/gdevpdfu.c:1224:12
+    #10 0x83b221 in pdf_close_page /src/ghostpdl/./devices/vector/gdevpdf.c:1047:5
+    #11 0x8259d5 in pdf_output_page /src/ghostpdl/./devices/vector/gdevpdf.c:1543:16
+    #12 0xa619ef in gs_output_page /src/ghostpdl/./base/gsdevice.c:207:17
+    #13 0xf60f92 in zoutputpage /src/ghostpdl/./psi/zdevice.c:493:12
+    #14 0xe91fac in interp /src/ghostpdl/./psi/interp.c:1351:28
+    #15 0xe91fac in gs_call_interp /src/ghostpdl/./psi/interp.c:522:12
+    #16 0xe91fac in gs_interpret /src/ghostpdl/./psi/interp.c:479:12
+    #17 0x567e0a in gs_main_interpret /src/ghostpdl/./psi/imain.c:257:12
+    #18 0x567e0a in gs_main_run_string_end /src/ghostpdl/./psi/imain.c:945:12
+    #19 0x567e0a in gs_main_run_string_with_length /src/ghostpdl/./psi/imain.c:889:12
+    #20 0x5632b2 in gs_main_run_string /src/ghostpdl/./psi/imain.c:870:12
+    #21 0x11d49f1 in run_string /src/ghostpdl/./psi/imainarg.c:1169:12
+    #22 0x11d09f9 in swproc /src/ghostpdl/./psi/imainarg.c:367:20
+    #23 0x11cd8de in gs_main_init_with_args01 /src/ghostpdl/./psi/imainarg.c:224:24
+    #24 0x11d4779 in gs_main_init_with_args /src/ghostpdl/./psi/imainarg.c:289:16
+    #25 0xe7da74 in psapi_init_with_args /src/ghostpdl/./psi/psapi.c:281:12
+    #26 0x55f70c in gsapi_init_with_args /src/ghostpdl/./psi/iapi.c:253:12
+    #27 0x55e7c2 in fuzz_gs_device(unsigned char const*, unsigned long, int, char const*, char const*) /src/gs_fuzzlib.h:130:8
+    #28 0x55ebc0 in LLVMFuzzerTestOneInput /src/gs_device_pdfwrite_fuzzer.cc:18:2
+    #29 0x4565c3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #30 0x442252 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #31 0x447a9c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #32 0x470692 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #33 0x7f180ca4e082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #34 0x420a7d in _start (/out/gs_device_pdfwrite_fuzzer+0x420a7d)
+
+DEDUP_TOKEN: deflate--s_zlibE_process--swritebuf
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib/x86_64-linux-gnu/libz.so.1+0x584a) in deflate
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42516054

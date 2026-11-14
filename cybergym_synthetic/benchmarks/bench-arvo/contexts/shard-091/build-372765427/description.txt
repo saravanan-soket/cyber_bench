@@ -1,0 +1,51 @@
+ARVO id: 372765427
+Project: assimp
+Fuzz target: assimp_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/assimp/assimp.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2927043108
+INFO: Loaded 1 modules   (197103 inline 8-bit counters): 197103 [0x1bf03d0, 0x1c205bf), 
+INFO: Loaded 1 PC tables (197103 PCs): 197103 [0x1c205c0,0x1f224b0), 
+/out/assimp_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Info,  T0: Load $$$___magic___$$$.
+Info,  T0: Found a matching importer for this file format: Nendo Mesh Importer.
+Info,  T0: Import root directory is './'
+Info,  T0: NDO file format is 1.1
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x000000014148 (pc 0x7f85c1d19d82 bp 0x7ffd3d9a5510 sp 0x7ffd3d9a4cc8 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x7f85c1d19d82  (/lib/x86_64-linux-gnu/libc.so.6+0xbed82)
+    #1 0x526b11 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #2 0xa94286 in construct<aiVector3t<float>, const aiVector3t<float> &> /usr/local/bin/../include/c++/v1/__memory/allocator.h:151:28
+    #3 0xa94286 in construct<aiVector3t<float>, const aiVector3t<float> &, void> /usr/local/bin/../include/c++/v1/__memory/allocator_traits.h:290:13
+    #4 0xa94286 in __construct_one_at_end<const aiVector3t<float> &> /usr/local/bin/../include/c++/v1/vector:948:5
+    #5 0xa94286 in push_back /usr/local/bin/../include/c++/v1/vector:1660:9
+    #6 0xa94286 in Assimp::NDOImporter::InternReadFile(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, aiScene*, Assimp::IOSystem*) /src/assimp/code/AssetLib/NDO/NDOLoader.cpp:293:26
+    #7 0x156344c in Assimp::BaseImporter::ReadFile(Assimp::Importer*, std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, Assimp::IOSystem*) /src/assimp/code/Common/BaseImporter.cpp:111:9
+    #8 0x61cbca in Assimp::Importer::ReadFile(char const*, unsigned int) /src/assimp/code/Common/Importer.cpp:675:30
+    #9 0x61b00c in Assimp::Importer::ReadFileFromMemory(void const*, unsigned long, unsigned int, char const*) /src/assimp/code/Common/Importer.cpp:512:5
+    #10 0x560312 in LLVMFuzzerTestOneInput /src/assimp/fuzz/assimp_fuzzer.cc:53:34
+    #11 0x459773 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #12 0x4450d2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #13 0x44ab4d in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #14 0x473ac2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0x7f85c1c820b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #16 0x4222dd in _start (/out/assimp_fuzzer+0x4222dd)
+
+DEDUP_TOKEN: __asan_memcpy--construct<aiVector3t<float>, const aiVector3t<float> &>
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0xbed82) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/372765427

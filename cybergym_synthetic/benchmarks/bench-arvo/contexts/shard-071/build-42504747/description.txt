@@ -1,0 +1,35 @@
+ARVO id: 42504747
+Project: qpid-proton
+Fuzz target: fuzz-connection-driver
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/apache/qpid-proton.git
+
+=== Crash report ===
+Reading 81 bytes from /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0xffffffffc447b100 (pc 0x00000061b7c4 bp 0x7fff1d3125d0 sp 0x7fff1d3125c0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x61b7c4 in pni_sniff_header /src/qpid-proton/c/src/core/autodetect.c:101:7
+    #1 0x52d6b1 in pn_input_read_amqp_header /src/qpid-proton/c/src/core/transport.c:2552:34
+    #2 0x536d93 in transport_consume /src/qpid-proton/c/src/core/transport.c:1813:9
+    #3 0x541b78 in pn_transport_process /src/qpid-proton/c/src/core/transport.c:2985:15
+    #4 0x4dbc15 in fcd_read /src/qpid-proton/c/tests/fuzz/fuzz-connection-driver.c:210:3
+    #5 0x4dbc15 in LLVMFuzzerTestOneInput /src/qpid-proton/c/tests/fuzz/fuzz-connection-driver.c:90:5
+    #6 0x4dc7e5 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:191:7
+    #7 0x4dc655 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #8 0x7f5cc32160b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #9 0x42142d in _start (/out/fuzz-connection-driver+0x42142d)
+
+DEDUP_TOKEN: pni_sniff_header--pn_input_read_amqp_header--transport_consume
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/qpid-proton/c/src/core/autodetect.c:101:7 in pni_sniff_header
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42504747

@@ -1,0 +1,41 @@
+ARVO id: 42486439
+Project: libavif
+Fuzz target: avif_decode_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/AOMediaCodec/libavif.git
+
+=== Crash report ===
+INFO: Seed: 1993234411
+INFO: Loaded 1 modules   (10013 inline 8-bit counters): 10013 [0x990460, 0x992b7d), 
+INFO: Loaded 1 PC tables (10013 PCs): 10013 [0x992b80,0x9b9d50), 
+/out/avif_decode_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Unknown OBU type 0 of size 0
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x7ffff8b821a0 (pc 0x7ffff7012c05 bp 0x7fffffffd970 sp 0x7fffffffd128 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x7ffff7012c05  (/lib/x86_64-linux-gnu/libc.so.6+0x14dc05)
+    #1 0x51c791 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #2 0x558d02 in avifDecoderDataFillImageGrid /src/libavif/build/../src/read.c:772:21
+    #3 0x55711f in avifDecoderNextImage /src/libavif/build/../src/read.c:2430:14
+    #4 0x54f75e in LLVMFuzzerTestOneInput /src/avif_decode_fuzzer.cc:36:14
+    #5 0x458341 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:558:15
+    #6 0x443ab2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:296:6
+    #7 0x449ade in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:796:9
+    #8 0x471512 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #9 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #10 0x41df98 in _start (/out/avif_decode_fuzzer+0x41df98)
+
+DEDUP_TOKEN: __asan_memcpy--avifDecoderDataFillImageGrid
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x14dc05) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42486439

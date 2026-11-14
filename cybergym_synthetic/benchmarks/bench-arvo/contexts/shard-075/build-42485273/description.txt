@@ -1,0 +1,72 @@
+ARVO id: 42485273
+Project: jbig2dec
+Fuzz target: jbig2_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: git://git.ghostscript.com/jbig2dec.git
+
+=== Crash report ===
+INFO: Seed: 3475497126
+INFO: Loaded 1 modules   (1821 inline 8-bit counters): 1821 [0x7f10b8, 0x7f17d5), 
+INFO: Loaded 1 PC tables (1821 PCs): 1821 [0x5a8a60,0x5afc30), 
+/out/jbig2_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x57e37b in jbig2_arith_decode /src/jbig2dec/jbig2_arith.c:264:23
+    #1 0x561701 in jbig2_decode_refinement_TPGRON /src/jbig2dec/jbig2_refinement.c:328:23
+    #2 0x564aab in jbig2_refinement_region /src/jbig2dec/jbig2_refinement.c:523:16
+    #3 0x52d470 in jbig2_parse_segment /src/jbig2dec/jbig2_segment.c:359:16
+    #4 0x528b0d in jbig2_data_in /src/jbig2dec/jbig2.c:389:20
+    #5 0x524e11 in LLVMFuzzerTestOneInput /src/jbig2_fuzzer.cc:107:7
+    #6 0x459ef1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #7 0x444a11 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #8 0x44a6ce in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #9 0x4745f2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #10 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #11 0x41de88 in _start (/out/jbig2_fuzzer+0x41de88)
+
+DEDUP_TOKEN: jbig2_arith_decode--jbig2_decode_refinement_TPGRON--jbig2_refinement_region
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x57acd8 in template_image_compose_opt /src/jbig2dec/jbig2_image.c
+    #1 0x579191 in jbig2_image_compose_opt_AND /src/jbig2dec/jbig2_image.c
+    #2 0x5789b7 in jbig2_image_compose /src/jbig2dec/jbig2_image.c:438:9
+    #3 0x531f7b in jbig2_page_add_result /src/jbig2dec/jbig2_page.c:299:12
+    #4 0x565416 in jbig2_refinement_region /src/jbig2dec/jbig2_refinement.c:536:20
+    #5 0x52d470 in jbig2_parse_segment /src/jbig2dec/jbig2_segment.c:359:16
+    #6 0x528b0d in jbig2_data_in /src/jbig2dec/jbig2.c:389:20
+    #7 0x524e11 in LLVMFuzzerTestOneInput /src/jbig2_fuzzer.cc:107:7
+    #8 0x459ef1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #9 0x444a11 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #10 0x44a6ce in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #11 0x4745f2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #12 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: template_image_compose_opt--jbig2_image_compose_opt_AND--jbig2_image_compose
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x4d546d in malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:925:3
+    #1 0x5252cf in jbig2_alloc(_Jbig2Allocator*, unsigned long) /src/jbig2_fuzzer.cc:38:9
+    #2 0x525cd5 in jbig2_alloc /src/jbig2dec/jbig2.c:68:12
+    #3 0x576835 in jbig2_image_new /src/jbig2dec/jbig2_image.c:63:19
+    #4 0x5646ed in jbig2_refinement_region /src/jbig2dec/jbig2_refinement.c:496:17
+    #5 0x52d470 in jbig2_parse_segment /src/jbig2dec/jbig2_segment.c:359:16
+    #6 0x528b0d in jbig2_data_in /src/jbig2dec/jbig2.c:389:20
+    #7 0x524e11 in LLVMFuzzerTestOneInput /src/jbig2_fuzzer.cc:107:7
+    #8 0x459ef1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:556:15
+    #9 0x444a11 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:292:6
+    #10 0x44a6ce in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:774:9
+    #11 0x4745f2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:19:10
+    #12 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: malloc--jbig2_alloc(_Jbig2Allocator*, unsigned long)--jbig2_alloc
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/jbig2dec/jbig2_arith.c:264:23 in jbig2_arith_decode
+Unique heap origins: 41
+Stack depot allocated bytes: 3536
+Unique origin histories: 16
+History depot allocated bytes: 384
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42485273

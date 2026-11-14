@@ -1,0 +1,74 @@
+ARVO id: 371659889
+Project: imagemagick
+Fuzz target: encoder_heic_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 4039885772
+INFO: Loaded 1 modules   (338664 inline 8-bit counters): 338664 [0x55a365a72848, 0x55a365ac5330), 
+INFO: Loaded 1 PC tables (338664 PCs): 338664 [0x55a365ac5330,0x55a365ff01b0), 
+/out/encoder_heic_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x55a363463cf9 in Decoder_VVC::get_coded_image_colorspace(heif_colorspace*, heif_chroma*) const /src/libheif/libheif/codecs/vvc_dec.cc:63:7
+    #1 0x55a363438fc6 in ImageItem::get_coded_image_colorspace(heif_colorspace*, heif_chroma*) const /src/libheif/libheif/image-items/image_item.cc:456:19
+    #2 0x55a36331bafd in HeifContext::has_alpha(unsigned int) const /src/libheif/libheif/context.cc:864:20
+    #3 0x55a3631f6462 in heif_image_handle_has_alpha_channel /src/libheif/libheif/api/libheif/heif.cc:1101:27
+    #4 0x55a362ecaaf3 in ReadHEICImageHandle /src/imagemagick/coders/heic.c:350:7
+    #5 0x55a362ec437b in ReadHEICImage /src/imagemagick/coders/heic.c:700:10
+    #6 0x55a3626c1a54 in ReadImage /src/imagemagick/MagickCore/constitute.c:736:15
+    #7 0x55a36261042f in BlobToImage /src/imagemagick/MagickCore/blob.c:520:9
+    #8 0x55a36243aa51 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4044:12
+    #9 0x55a3624105a2 in LLVMFuzzerTestOneInput /src/imagemagick/oss-fuzz/encoder_fuzzer.cc:84:11
+    #10 0x55a3622a82c0 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #11 0x55a3622928e5 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #12 0x55a36229837f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #13 0x55a3622c4272 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #14 0x7fd3fe3ab082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #15 0x55a36228aacd in _start (/out/encoder_heic_fuzzer+0xc0dacd)
+
+DEDUP_TOKEN: Decoder_VVC::get_coded_image_colorspace(heif_colorspace*, heif_chroma*) const--ImageItem::get_coded_image_colorspace(heif_colorspace*, heif_chroma*) const--HeifContext::has_alpha(unsigned int) const
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x55a36240ecfc in operator new(unsigned long) /src/llvm-project/compiler-rt/lib/msan/msan_new_delete.cpp:51:35
+    #1 0x55a36325ead3 in __libcpp_operator_new<unsigned long> /usr/local/bin/../include/c++/v1/new:271:10
+    #2 0x55a36325ead3 in __libcpp_allocate /usr/local/bin/../include/c++/v1/new:295:10
+    #3 0x55a36325ead3 in allocate /usr/local/bin/../include/c++/v1/__memory/allocator.h:125:32
+    #4 0x55a36325ead3 in allocate /usr/local/bin/../include/c++/v1/__memory/allocator_traits.h:269:16
+    #5 0x55a36325ead3 in __allocation_guard<std::__1::allocator<Box_vvcC> > /usr/local/bin/../include/c++/v1/__memory/allocation_guard.h:56:16
+    #6 0x55a36325ead3 in allocate_shared<Box_vvcC, std::__1::allocator<Box_vvcC>, void> /usr/local/bin/../include/c++/v1/__memory/shared_ptr.h:822:46
+    #7 0x55a36325ead3 in std::__1::shared_ptr<Box_vvcC> std::__1::make_shared[abi:ne180100]<Box_vvcC, void>() /usr/local/bin/../include/c++/v1/__memory/shared_ptr.h:831:10
+    #8 0x55a3632540ca in Box::read(BitstreamRange&, std::__1::shared_ptr<Box>*) /src/libheif/libheif/box.cc:532:13
+    #9 0x55a36326e53c in Box::read_children(BitstreamRange&, int) /src/libheif/libheif/box.cc:854:19
+    #10 0x55a3632937dc in Box_ipco::parse(BitstreamRange&) /src/libheif/libheif/box.cc:2293:10
+    #11 0x55a363256802 in Box::read(BitstreamRange&, std::__1::shared_ptr<Box>*) /src/libheif/libheif/box.cc:762:14
+    #12 0x55a36326e53c in Box::read_children(BitstreamRange&, int) /src/libheif/libheif/box.cc:854:19
+    #13 0x55a363291bbc in Box_iprp::parse(BitstreamRange&) /src/libheif/libheif/box.cc:2235:10
+    #14 0x55a363256802 in Box::read(BitstreamRange&, std::__1::shared_ptr<Box>*) /src/libheif/libheif/box.cc:762:14
+    #15 0x55a36326e53c in Box::read_children(BitstreamRange&, int) /src/libheif/libheif/box.cc:854:19
+    #16 0x55a363277495 in Box_meta::parse(BitstreamRange&) /src/libheif/libheif/box.cc:1128:10
+    #17 0x55a363256802 in Box::read(BitstreamRange&, std::__1::shared_ptr<Box>*) /src/libheif/libheif/box.cc:762:14
+    #18 0x55a36336d368 in FileLayout::read(std::__1::shared_ptr<StreamReader> const&) /src/libheif/libheif/file_layout.cc:141:13
+    #19 0x55a36333f23c in HeifFile::read(std::__1::shared_ptr<StreamReader> const&) /src/libheif/libheif/file.cc:130:24
+    #20 0x55a36333e27b in HeifFile::read_from_file(char const*) /src/libheif/libheif/file.cc:113:10
+    #21 0x55a3633161f7 in HeifContext::read_from_file(char const*) /src/libheif/libheif/context.cc:126:28
+    #22 0x55a3631e3a33 in heif_context_read_from_file /src/libheif/libheif/api/libheif/heif.cc:500:29
+    #23 0x55a362ec3f5d in ReadHEICImage /src/imagemagick/coders/heic.c:680:9
+    #24 0x55a3626c1a54 in ReadImage /src/imagemagick/MagickCore/constitute.c:736:15
+    #25 0x55a36261042f in BlobToImage /src/imagemagick/MagickCore/blob.c:520:9
+
+DEDUP_TOKEN: operator new(unsigned long)--__libcpp_operator_new<unsigned long>--__libcpp_allocate
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/libheif/libheif/codecs/vvc_dec.cc:63:7 in Decoder_VVC::get_coded_image_colorspace(heif_colorspace*, heif_chroma*) const
+Unique heap origins: 2146
+Stack depot allocated bytes: 9764880
+Unique origin histories: 94
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/371659889

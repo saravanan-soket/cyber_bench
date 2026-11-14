@@ -1,0 +1,52 @@
+ARVO id: 42500883
+Project: libvips
+Fuzz target: jpegsave_file_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/libvips/libvips
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2539625048
+INFO: Loaded 1 modules   (238153 inline 8-bit counters): 238153 [0x3f860f0, 0x3fc0339), 
+INFO: Loaded 1 PC tables (238153 PCs): 238153 [0x3fc0340,0x43627d0), 
+/out/jpegsave_file_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+
+(process:7): VIPS-[1;33mWARNING[0m **: [34m12:51:32.189[0m: unable to read data for "/tmp/vips-0-2148014651", file has been truncated
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x0008036d9458 (pc 0x00000056404b bp 0x7fffffffd2a0 sp 0x7fffffffd280 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x56404b in vips_image_guess_interpretation /src/libvips/libvips/iofuncs/header.c
+    #1 0x6a2187 in vips_colourspace_issupported /src/libvips/libvips/colour/colourspace.c:509:19
+    #2 0x77d02a in vips__foreign_convert_saveable /src/libvips/libvips/foreign/foreign.c:1440:3
+    #3 0x783ee5 in vips_foreign_save_build /src/libvips/libvips/foreign/foreign.c:1687:7
+    #4 0x55ba96 in vips_foreign_save_jpeg_build /src/libvips/libvips/foreign/jpegsave.c:127:6
+    #5 0x55c9c6 in vips_foreign_save_jpeg_buffer_build /src/libvips/libvips/foreign/jpegsave.c:396:6
+    #6 0x577953 in vips_object_build /src/libvips/libvips/iofuncs/object.c:367:6
+    #7 0x83d528 in vips_cache_operation_buildp /src/libvips/libvips/iofuncs/cache.c:910:7
+    #8 0x5855d7 in vips_call_required_optional /src/libvips/libvips/iofuncs/operation.c:880:6
+    #9 0x589139 in vips_call_by_name /src/libvips/libvips/iofuncs/operation.c:920:11
+    #10 0x589364 in vips_call_split /src/libvips/libvips/iofuncs/operation.c:1024:11
+    #11 0x55af30 in vips_jpegsave_buffer /src/libvips/libvips/foreign/jpegsave.c:713:11
+    #12 0x55a408 in test_one_file(char const*) /src/libvips/fuzz/jpegsave_file_fuzzer.cc:29:6
+    #13 0x55a216 in LLVMFuzzerTestOneInput /src/libvips/fuzz/jpegsave_file_fuzzer.cc:52:3
+    #14 0x45e1f3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) (/out/jpegsave_file_fuzzer+0x45e1f3)
+    #15 0x449962 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #16 0x44f62e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) (/out/jpegsave_file_fuzzer+0x44f62e)
+    #17 0x478f02 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7ffff7c560b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #19 0x424c0d in _start (/out/jpegsave_file_fuzzer+0x424c0d)
+
+DEDUP_TOKEN: vips_image_guess_interpretation--vips_colourspace_issupported--vips__foreign_convert_saveable
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/libvips/libvips/iofuncs/header.c in vips_image_guess_interpretation
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42500883

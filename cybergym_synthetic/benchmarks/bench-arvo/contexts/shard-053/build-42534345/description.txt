@@ -1,0 +1,45 @@
+ARVO id: 42534345
+Project: qt/qtqa
+Fuzz target: qtbase_gui_painting_qcolorspace_fromiccprofile
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: git://code.qt.io/qt/qtqa.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1909287162
+INFO: Loaded 1 modules   (424452 inline 8-bit counters): 424452 [0x328aa68, 0x32f246c), 
+INFO: Loaded 1 PC tables (424452 PCs): 424452 [0x32f2470,0x396c4b0), 
+/out/qtbase_gui_painting_qcolorspace_fromiccprofile: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x624f00002900 (pc 0x0000012257e0 bp 0x7ffd80f4feb0 sp 0x7ffd80f4fda0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x12257e0 in fromLinear /src/qt/qtbase/src/gui/painting/qcolortrclut_p.h:196:20
+    #1 0x12257e0 in QColorTransformPrivate::map(QColorVector) const /src/qt/qtbase/src/gui/painting/qcolortransform.cpp:1518:42
+    #2 0x12241a9 in QColorTransform::map(unsigned int) const /src/qt/qtbase/src/gui/painting/qcolortransform.cpp:183:12
+    #3 0x540026 in LLVMFuzzerTestOneInput /src/qt/qtbase/tests/libfuzzer/gui/painting/qcolorspace/fromiccprofile/main.cpp:31:24
+    #4 0x451543 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #5 0x451ea5 in fuzzer::Fuzzer::TryDetectingAMemoryLeak(unsigned char const*, unsigned long, bool) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:687:3
+    #6 0x43cfbe in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:329:8
+    #7 0x44281c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #8 0x46abd2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #9 0x7fc1cfa96082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 5792732f783158c66fb4f3756458ca24e46e827d)
+    #10 0x4334cd in _start (/out/qtbase_gui_painting_qcolorspace_fromiccprofile+0x4334cd)
+
+DEDUP_TOKEN: fromLinear--QColorTransformPrivate::map(QColorVector) const--QColorTransform::map(unsigned int) const
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/qt/qtbase/src/gui/painting/qcolortrclut_p.h:196:20 in fromLinear
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42534345

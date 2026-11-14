@@ -1,0 +1,95 @@
+ARVO id: 42523506
+Project: libheif
+Fuzz target: file-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/strukturag/libheif.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1053022120
+INFO: Loaded 1 modules   (137610 inline 8-bit counters): 137610 [0xa5c75e0, 0xa5e8f6a), 
+INFO: Loaded 1 PC tables (137610 PCs): 137610 [0xa5e8f6c,0xa6f5bbc), 
+/out/file-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0xe5403e80 at pc 0x08431111 bp 0xffaf20a8 sp 0xffaf20a0
+[1m[0m[1m[34mREAD of size 1 at 0xe5403e80 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x8431110 in parse_signed /src/libheif/libheif/region.cc:130:11
+    #1 0x8431110 in RegionGeometry_Polygon::parse(std::__1::vector<unsigned char, std::__1::allocator<unsigned char> > const&, int, unsigned int*) /src/libheif/libheif/region.cc:209:11
+    #2 0x842c458 in RegionItem::parse(std::__1::vector<unsigned char, std::__1::allocator<unsigned char> > const&) /src/libheif/libheif/region.cc:95:27
+    #3 0x8384ce1 in heif::HeifContext::interpret_heif_file() /src/libheif/libheif/heif_context.cc:959:20
+    #4 0x838aaa4 in heif::HeifContext::read_from_memory(void const*, unsigned int, bool) /src/libheif/libheif/heif_context.cc:447:10
+    #5 0x83331ee in heif_context_read_from_memory /src/libheif/libheif/heif.cc:447:29
+    #6 0x844e131 in LLVMFuzzerTestOneInput /src/libheif/libheif/file_fuzzer.cc:95:9
+    #7 0x811509e in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #8 0x80ffffe in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #9 0x8105c00 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #10 0x812f7e7 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0xea780ed4 in __libc_start_main (/lib32/libc.so.6+0x1aed4) (BuildId: 8c11d7b4ac6d685f0bba1cf2506a80f64d314582)
+    #12 0x80f7145 in _start (/out/file-fuzzer+0x80f7145)
+
+DEDUP_TOKEN: parse_signed--RegionGeometry_Polygon::parse(std::__1::vector<unsigned char, std::__1::allocator<unsigned char> > const&, int, unsigned int*)--RegionItem::parse(std::__1::vector<unsigned char, std::__1::allocator<unsigned char> > const&)
+[1m[32m0xe5403e80 is located 0 bytes to the right of 256-byte region [0xe5403d80,0xe5403e80)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x8251a99 in operator new(unsigned int) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:95:3
+    #1 0x825d63b in __libcpp_operator_new<unsigned int> /usr/local/bin/../include/c++/v1/new:245:10
+    #2 0x825d63b in __libcpp_allocate /usr/local/bin/../include/c++/v1/new:271:10
+    #3 0x825d63b in allocate /usr/local/bin/../include/c++/v1/__memory/allocator.h:105:38
+    #4 0x825d63b in allocate /usr/local/bin/../include/c++/v1/__memory/allocator_traits.h:262:20
+    #5 0x825d63b in __split_buffer /usr/local/bin/../include/c++/v1/__split_buffer:306:29
+    #6 0x825d63b in std::__1::vector<unsigned char, std::__1::allocator<unsigned char> >::__append(unsigned int) /usr/local/bin/../include/c++/v1/vector:1031:53
+    #7 0x8285f0c in resize /usr/local/bin/../include/c++/v1/vector:1902:15
+    #8 0x8285f0c in heif::Box_iloc::read_data(heif::Box_iloc::Item const&, std::__1::shared_ptr<heif::StreamReader> const&, std::__1::shared_ptr<heif::Box_idat> const&, std::__1::vector<unsigned char, std::__1::allocator<unsigned char> >*) const /src/libheif/libheif/box.cc:1170:13
+    #9 0x8300d98 in heif::HeifFile::get_compressed_image_data(unsigned int, std::__1::vector<unsigned char, std::__1::allocator<unsigned char> >*) const /src/libheif/libheif/heif_file.cc:722:27
+    #10 0x8384c02 in heif::HeifContext::interpret_heif_file() /src/libheif/libheif/heif_context.cc:955:32
+    #11 0x838aaa4 in heif::HeifContext::read_from_memory(void const*, unsigned int, bool) /src/libheif/libheif/heif_context.cc:447:10
+    #12 0x83331ee in heif_context_read_from_memory /src/libheif/libheif/heif.cc:447:29
+    #13 0x844e131 in LLVMFuzzerTestOneInput /src/libheif/libheif/file_fuzzer.cc:95:9
+    #14 0x811509e in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #15 0x80ffffe in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #16 0x8105c00 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #17 0x812f7e7 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0xea780ed4 in __libc_start_main (/lib32/libc.so.6+0x1aed4) (BuildId: 8c11d7b4ac6d685f0bba1cf2506a80f64d314582)
+
+DEDUP_TOKEN: operator new(unsigned int)--__libcpp_operator_new<unsigned int>--__libcpp_allocate
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/libheif/libheif/region.cc:130:11 in parse_signed
+Shadow bytes around the buggy address:
+  0x3ca80780: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3ca80790: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3ca807a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3ca807b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3ca807c0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x3ca807d0:[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3ca807e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x3ca807f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3ca80800: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3ca80810: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x3ca80820: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42523506

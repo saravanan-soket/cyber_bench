@@ -1,0 +1,46 @@
+ARVO id: 42515720
+Project: hunspell
+Fuzz target: affdicfuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/hunspell/hunspell.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3726069176
+INFO: Loaded 1 modules   (15817 inline 8-bit counters): 15817 [0x9e6dc8, 0x9eab91), 
+INFO: Loaded 1 PC tables (15817 PCs): 15817 [0x918438,0x9560c8), 
+/out/affdicfuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x70cda8 in void std::__1::__introsort<std::__1::__less<unsigned short, unsigned short>&, unsigned short*>(unsigned short*, unsigned short*, std::__1::__less<unsigned short, unsigned short>&, std::__1::iterator_traits<unsigned short*>::difference_type) /work/msan/include/c++/v1/__algorithm/sort.h:289:17
+    #1 0x6d6dc8 in sort<unsigned short *, std::__1::__less<unsigned short, unsigned short> > /usr/local/bin/../include/c++/v1/__algorithm/sort.h:542:5
+    #2 0x6d6dc8 in sort<unsigned short *> /usr/local/bin/../include/c++/v1/__algorithm/sort.h:551:5
+    #3 0x6d6dc8 in HashMgr::parse_aliasf(std::__1::basic_string<char, std::__1::char_traits<char>, std::__1::allocator<char> > const&, FileMgr*) /src/hunspell/src/hunspell/hashmgr.cxx:1092:13
+    #4 0x6baaa0 in HashMgr::load_config(char const*, char const*) /src/hunspell/src/hunspell/hashmgr.cxx:986:12
+    #5 0x6b82bb in HashMgr::HashMgr(char const*, char const*, char const*) /src/hunspell/src/hunspell/hashmgr.cxx:93:3
+    #6 0x53f9a7 in HunspellImpl::HunspellImpl(char const*, char const*, char const*) /src/hunspell/src/hunspell/hunspell.cxx:179:25
+    #7 0x58ab05 in Hunspell::Hunspell(char const*, char const*, char const*) /src/hunspell/src/hunspell/hunspell.cxx:2026:16
+    #8 0x537dd4 in LLVMFuzzerTestOneInput /src/hunspell/./src/tools/affdicfuzzer.cxx:63:14
+    #9 0x440443 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #10 0x42bba2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #11 0x43144c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #12 0x45a982 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7ffff7c55082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #14 0x421d6d in _start (/out/affdicfuzzer+0x421d6d)
+
+DEDUP_TOKEN: void std::__1::__introsort<std::__1::__less<unsigned short, unsigned short>&, unsigned short*>(unsigned short*, unsigned short*, std::__1::__less<unsigned short, unsigned short>&, std::__1::iterator_traits<unsigned short*>::difference_type)--sort<unsigned short *, std::__1::__less<unsigned short, unsigned short> >--sort<unsigned short *>
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /work/msan/include/c++/v1/__algorithm/sort.h:289:17 in void std::__1::__introsort<std::__1::__less<unsigned short, unsigned short>&, unsigned short*>(unsigned short*, unsigned short*, std::__1::__less<unsigned short, unsigned short>&, std::__1::iterator_traits<unsigned short*>::difference_type)
+  ORIGIN: invalid (0). Might be a bug in MemorySanitizer origin tracking.
+    This could still be a bug in your code, too!
+Unique heap origins: 41
+Stack depot allocated bytes: 9764880
+Unique origin histories: 10
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42515720

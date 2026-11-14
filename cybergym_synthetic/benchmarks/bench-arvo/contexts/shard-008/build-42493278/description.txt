@@ -1,0 +1,94 @@
+ARVO id: 42493278
+Project: wolfssl
+Fuzz target: cryptofuzz-openssl-api
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow WRITE 16
+Language: c++
+Repo: https://github.com/wolfssl/wolfssl
+
+=== Crash report ===
+INFO: found LLVMFuzzerCustomMutator (0x71f4e0). Disabling -len_control by default.
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2669666763
+INFO: Loaded 1 modules   (56788 inline 8-bit counters): 56788 [0x11e7230, 0x11f5004), 
+INFO: Loaded 1 PC tables (56788 PCs): 56788 [0x11f5008,0x12d2d48), 
+/out/cryptofuzz-openssl-api: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x602000001a38 at pc 0x00000052318a bp 0x7ffd8c443250 sp 0x7ffd8c442a18
+[1m[0m[1m[34mWRITE of size 16 at 0x602000001a38 thread T0[1m[0m
+SCARINESS: 45 (multi-byte-write-heap-buffer-overflow)
+    #0 0x523189 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #1 0x8533e7 in AES_GCM_encrypt_C /src/wolfssl-openssl-api/wolfcrypt/src/aes.c:6694:13
+    #2 0x853179 in wc_AesGcmEncrypt /src/wolfssl-openssl-api/wolfcrypt/src/aes.c:6842:16
+    #3 0x75fa0f in wolfSSL_EVP_CipherFinal /src/wolfssl-openssl-api/./wolfcrypt/src/evp.c:797:31
+    #4 0x73fefe in cryptofuzz::module::wolfCrypt_OpenSSL_detail::OpSymmetricEncrypt_EVP(cryptofuzz::operation::SymmetricEncrypt&, fuzzing::datasource::Datasource&) /src/cryptofuzz-openssl-api/modules/wolfcrypt-openssl/module.cpp:500:9
+    #5 0x7409d4 in cryptofuzz::module::wolfCrypt_OpenSSL::OpSymmetricEncrypt(cryptofuzz::operation::SymmetricEncrypt&) /src/cryptofuzz-openssl-api/modules/wolfcrypt-openssl/module.cpp:528:12
+    #6 0x573ed0 in cryptofuzz::ExecutorBase<cryptofuzz::component::Ciphertext, cryptofuzz::operation::SymmetricEncrypt>::callModule(std::__1::shared_ptr<cryptofuzz::Module>, cryptofuzz::operation::SymmetricEncrypt&) const /src/cryptofuzz-openssl-api/executor.cpp:220:20
+    #7 0x572b54 in cryptofuzz::ExecutorBase<cryptofuzz::component::Ciphertext, cryptofuzz::operation::SymmetricEncrypt>::Run(fuzzing::datasource::Datasource&, unsigned char const*, unsigned long) const /src/cryptofuzz-openssl-api/executor.cpp:1352:47
+    #8 0x557a2f in cryptofuzz::Driver::Run(unsigned char const*, unsigned long) const /src/cryptofuzz-openssl-api/driver.cpp:74:42
+    #9 0x6811bc in LLVMFuzzerTestOneInput /src/cryptofuzz-openssl-api/entry.cpp:323:13
+    #10 0x45b681 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #11 0x445412 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #12 0x44b755 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #13 0x475602 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #14 0x7f97de5f983f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #15 0x420328 in _start (/out/cryptofuzz-openssl-api+0x420328)
+
+DEDUP_TOKEN: __asan_memcpy--AES_GCM_encrypt_C--wc_AesGcmEncrypt
+[1m[32m0x602000001a38 is located 0 bytes to the right of 8-byte region [0x602000001a30,0x602000001a38)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x523d2d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x653f7e in cryptofuzz::util::malloc(unsigned long) /src/cryptofuzz-openssl-api/util.cpp:346:46
+    #2 0x73f1c8 in cryptofuzz::module::wolfCrypt_OpenSSL_detail::OpSymmetricEncrypt_EVP(cryptofuzz::operation::SymmetricEncrypt&, fuzzing::datasource::Datasource&) /src/cryptofuzz-openssl-api/modules/wolfcrypt-openssl/module.cpp:410:20
+    #3 0x7409d4 in cryptofuzz::module::wolfCrypt_OpenSSL::OpSymmetricEncrypt(cryptofuzz::operation::SymmetricEncrypt&) /src/cryptofuzz-openssl-api/modules/wolfcrypt-openssl/module.cpp:528:12
+    #4 0x573ed0 in cryptofuzz::ExecutorBase<cryptofuzz::component::Ciphertext, cryptofuzz::operation::SymmetricEncrypt>::callModule(std::__1::shared_ptr<cryptofuzz::Module>, cryptofuzz::operation::SymmetricEncrypt&) const /src/cryptofuzz-openssl-api/executor.cpp:220:20
+    #5 0x572b54 in cryptofuzz::ExecutorBase<cryptofuzz::component::Ciphertext, cryptofuzz::operation::SymmetricEncrypt>::Run(fuzzing::datasource::Datasource&, unsigned char const*, unsigned long) const /src/cryptofuzz-openssl-api/executor.cpp:1352:47
+    #6 0x557a2f in cryptofuzz::Driver::Run(unsigned char const*, unsigned long) const /src/cryptofuzz-openssl-api/driver.cpp:74:42
+    #7 0x6811bc in LLVMFuzzerTestOneInput /src/cryptofuzz-openssl-api/entry.cpp:323:13
+    #8 0x45b681 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #9 0x445412 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #10 0x44b755 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #11 0x475602 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f97de5f983f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: malloc--cryptofuzz::util::malloc(unsigned long)--cryptofuzz::module::wolfCrypt_OpenSSL_detail::OpSymmetricEncrypt_EVP(cryptofuzz::operation::SymmetricEncrypt&, fuzzing::datasource::Datasource&)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x0c047fff82f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8300: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8310: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8320: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8330: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+=>0x0c047fff8340: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8350: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8360: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c047fff8370: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8380: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8390: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42493278

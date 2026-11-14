@@ -1,0 +1,88 @@
+ARVO id: 42503094
+Project: wolfssl
+Fuzz target: cryptofuzz-disable-fastmath
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-buffer-overflow WRITE 8
+Language: c++
+Repo: https://github.com/wolfssl/wolfssl
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/cryptofuzz-disable-fastmath[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6060000184d8 at pc 0x0000009ba02a bp 0x7fffffffda50 sp 0x7fffffffda48
+[1m[0m[1m[34mWRITE of size 8 at 0x6060000184d8 thread T0[1m[0m
+SCARINESS: 42 (8-byte-write-heap-buffer-overflow)
+    #0 0x9ba029 in mp_mod_2d /src/wolfssl-disable-fastmath/wolfcrypt/src/integer.c:701:19
+    #1 0x9b8b77 in mp_div_2d /src/wolfssl-disable-fastmath/wolfcrypt/src/integer.c:464:16
+    #2 0x8b9e05 in cryptofuzz::module::wolfCrypt_bignum::RShift::Run(fuzzing::datasource::Datasource&, cryptofuzz::module::wolfCrypt_bignum::Bignum&, cryptofuzz::module::wolfCrypt_bignum::BignumCluster&) const /src/cryptofuzz-disable-fastmath/modules/wolfcrypt/bn_ops.cpp:458:13
+    #3 0x88aec2 in cryptofuzz::module::wolfCrypt::OpBignumCalc(cryptofuzz::operation::BignumCalc&) /src/cryptofuzz-disable-fastmath/modules/wolfcrypt/module.cpp:3375:5
+    #4 0x62f165 in cryptofuzz::ExecutorBignumCalc::callModule(std::__1::shared_ptr<cryptofuzz::Module>, cryptofuzz::operation::BignumCalc&) const /src/cryptofuzz-disable-fastmath/executor.cpp:861:20
+    #5 0x5c149e in cryptofuzz::ExecutorBase<cryptofuzz::Bignum, cryptofuzz::operation::BignumCalc>::Run(fuzzing::datasource::Datasource&, unsigned char const*, unsigned long) const /src/cryptofuzz-disable-fastmath/executor.cpp:1755:47
+    #6 0x522375 in cryptofuzz::Driver::Run(unsigned char const*, unsigned long) const /src/cryptofuzz-disable-fastmath/driver.cpp:205:36
+    #7 0x74e05e in LLVMFuzzerTestOneInput /src/cryptofuzz-disable-fastmath/entry.cpp:499:13
+    #8 0xeef78b in main (/out/cryptofuzz-disable-fastmath+0xeef78b)
+    #9 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #10 0x471c48 in _start (/out/cryptofuzz-disable-fastmath+0x471c48)
+
+DEDUP_TOKEN: mp_mod_2d--mp_div_2d--cryptofuzz::module::wolfCrypt_bignum::RShift::Run(fuzzing::datasource::Datasource&, cryptofuzz::module::wolfCrypt_bignum::Bignum&, cryptofuzz::module::wolfCrypt_bignum::BignumCluster&) const
+[1m[32m0x6060000184d8 is located 0 bytes to the right of 56-byte region [0x6060000184a0,0x6060000184d8)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4ec78d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x70ce43 in cryptofuzz::util::malloc(unsigned long) /src/cryptofuzz-disable-fastmath/util.cpp:454:46
+    #2 0x70ced5 in cryptofuzz::util::realloc(void*, unsigned long) /src/cryptofuzz-disable-fastmath/util.cpp:465:20
+    #3 0x863493 in cryptofuzz::module::wolfCrypt_detail::realloc(void*, unsigned long) /src/cryptofuzz-disable-fastmath/modules/wolfcrypt/module.cpp:295:16
+    #4 0x863b18 in cryptofuzz::module::wolfCrypt_custom_realloc(void*, unsigned long) /src/cryptofuzz-disable-fastmath/modules/wolfcrypt/module.cpp:312:9
+    #5 0x9d0fdf in wolfSSL_Realloc /src/wolfssl-disable-fastmath/wolfcrypt/src/memory.c:231:15
+    #6 0x9b97a9 in mp_grow /src/wolfssl-disable-fastmath/wolfcrypt/src/integer.c:420:30
+    #7 0x9b937b in mp_copy /src/wolfssl-disable-fastmath/wolfcrypt/src/integer.c:368:17
+    #8 0x9b9af1 in mp_mod_2d /src/wolfssl-disable-fastmath/wolfcrypt/src/integer.c:678:14
+    #9 0x9b8b77 in mp_div_2d /src/wolfssl-disable-fastmath/wolfcrypt/src/integer.c:464:16
+    #10 0x8b9e05 in cryptofuzz::module::wolfCrypt_bignum::RShift::Run(fuzzing::datasource::Datasource&, cryptofuzz::module::wolfCrypt_bignum::Bignum&, cryptofuzz::module::wolfCrypt_bignum::BignumCluster&) const /src/cryptofuzz-disable-fastmath/modules/wolfcrypt/bn_ops.cpp:458:13
+    #11 0x88aec2 in cryptofuzz::module::wolfCrypt::OpBignumCalc(cryptofuzz::operation::BignumCalc&) /src/cryptofuzz-disable-fastmath/modules/wolfcrypt/module.cpp:3375:5
+    #12 0x62f165 in cryptofuzz::ExecutorBignumCalc::callModule(std::__1::shared_ptr<cryptofuzz::Module>, cryptofuzz::operation::BignumCalc&) const /src/cryptofuzz-disable-fastmath/executor.cpp:861:20
+    #13 0x5c149e in cryptofuzz::ExecutorBase<cryptofuzz::Bignum, cryptofuzz::operation::BignumCalc>::Run(fuzzing::datasource::Datasource&, unsigned char const*, unsigned long) const /src/cryptofuzz-disable-fastmath/executor.cpp:1755:47
+    #14 0x522375 in cryptofuzz::Driver::Run(unsigned char const*, unsigned long) const /src/cryptofuzz-disable-fastmath/driver.cpp:205:36
+    #15 0x74e05e in LLVMFuzzerTestOneInput /src/cryptofuzz-disable-fastmath/entry.cpp:499:13
+    #16 0xeef78b in main (/out/cryptofuzz-disable-fastmath+0xeef78b)
+
+DEDUP_TOKEN: malloc--cryptofuzz::util::malloc(unsigned long)--cryptofuzz::util::realloc(void*, unsigned long)
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/wolfssl-disable-fastmath/wolfcrypt/src/integer.c:701:19 in mp_mod_2d
+Shadow bytes around the buggy address:
+  0x0c0c7fffb040: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c0c7fffb050: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+  0x0c0c7fffb060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0c7fffb070: [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c0c7fffb080: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+=>0x0c0c7fffb090: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0c7fffb0a0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0c7fffb0b0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0c7fffb0c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0c7fffb0d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c0c7fffb0e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42503094

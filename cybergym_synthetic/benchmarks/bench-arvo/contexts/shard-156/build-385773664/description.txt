@@ -1,0 +1,38 @@
+ARVO id: 385773664
+Project: wamr
+Fuzz target: wasm_mutator_fuzz_loader
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: Bad-cast
+Language: c
+Repo: https://github.com/bytecodealliance/wasm-micro-runtime
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2640521522
+INFO: Loaded 1 modules   (15556 inline 8-bit counters): 15556 [0x558bd2696780, 0x558bd269a444), 
+INFO: Loaded 1 PC tables (15556 PCs): 15556 [0x558bd269a448,0x558bd26d7088), 
+/out/wasm_mutator_fuzz_loader: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m/src/wamr/core/iwasm/interpreter/wasm_loader.c:5844:29:[1m[31m runtime error: [1m[0m[1mmember access within address 0x001fffffffe0 with insufficient space for an object of type 'WASMGlobal' (aka 'struct WASMGlobal')[1m[0m
+[1m0x001fffffffe0:[1m[30m note: [1m[0mpointer points here[1m[0m
+<memory cannot be printed>
+    #0 0x558bd25d8a5e in load_from_sections /src/wamr/core/iwasm/interpreter/wasm_loader.c:5844:29
+    #1 0x558bd25d98c2 in load /src/wamr/core/iwasm/interpreter/wasm_loader.c:6435:13
+    #2 0x558bd25d98c2 in wasm_loader_load /src/wamr/core/iwasm/interpreter/wasm_loader.c:6612:10
+    #3 0x558bd257a578 in wasm_runtime_load_ex /src/wamr/core/iwasm/common/wasm_runtime_common.c:1457:33
+    #4 0x558bd257a8d3 in wasm_runtime_load /src/wamr/core/iwasm/common/wasm_runtime_common.c:1510:12
+    #5 0x558bd2579202 in LLVMFuzzerTestOneInput /src/wamr/tests/fuzz/wasm-mutator-fuzz/wasm_mutator_fuzz.cc:34:9
+    #6 0x558bd24dbb20 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #7 0x558bd24c62b4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #8 0x558bd24cbd4a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #9 0x558bd24f8142 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7f35f16d6082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 5792732f783158c66fb4f3756458ca24e46e827d)
+    #11 0x558bd24bcd8d in _start (/out/wasm_mutator_fuzz_loader+0x9bd8d)
+
+DEDUP_TOKEN: load_from_sections--load--wasm_loader_load
+SUMMARY: UndefinedBehaviorSanitizer: undefined-behavior /src/wamr/core/iwasm/interpreter/wasm_loader.c:5844:29 in 
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/385773664

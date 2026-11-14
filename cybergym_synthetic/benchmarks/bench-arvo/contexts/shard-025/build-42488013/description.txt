@@ -1,0 +1,42 @@
+ARVO id: 42488013
+Project: c-blosc2
+Fuzz target: decompress_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/Blosc/c-blosc2.git
+
+=== Crash report ===
+INFO: Seed: 3917949720
+INFO: Loaded 1 modules   (43401 inline 8-bit counters): 43401 [0x8791540, 0x879bec9), 
+INFO: Loaded 1 PC tables (43401 PCs): 43401 [0x86f0e9c,0x8745ae4), 
+/out/decompress_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x05e02a85 (pc 0x0820bd27 bp 0xffffcd18 sp 0xffffcc80 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x820bd27 in sw32_ /src/c-blosc2/blosc/blosc-private.h:44:13
+    #1 0x820bd27 in blosc_d /src/c-blosc2/blosc/blosc2.c:1025:14
+    #2 0x8201fc2 in serial_blosc /src/c-blosc2/blosc/blosc2.c:1176:18
+    #3 0x8201fc2 in do_job /src/c-blosc2/blosc/blosc2.c:1335:15
+    #4 0x820877d in blosc_run_decompression_with_context /src/c-blosc2/blosc/blosc2.c:2130:15
+    #5 0x82094a8 in blosc2_decompress /src/c-blosc2/blosc/blosc2.c:2199:12
+    #6 0x81ab15d in LLVMFuzzerTestOneInput /src/c-blosc2/tests/fuzz/fuzz_decompress.c:33:5
+    #7 0x80a6db1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:595:15
+    #8 0x809213e in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned int) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #9 0x8097e2f in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned int)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:852:9
+    #10 0x80bfed7 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #11 0xf7d91646 in __libc_start_main (/lib32/libc.so.6+0x18646)
+    #12 0x806d128 in _start (/out/decompress_fuzzer+0x806d128)
+
+DEDUP_TOKEN: sw32_--blosc_d--serial_blosc
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/c-blosc2/blosc/blosc-private.h:44:13 in sw32_
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42488013

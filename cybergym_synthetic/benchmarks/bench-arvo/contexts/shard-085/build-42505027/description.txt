@@ -1,0 +1,69 @@
+ARVO id: 42505027
+Project: draco
+Fuzz target: draco_mesh_decoder_without_dequantization_fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Global-buffer-overflow READ 4
+Language: c++
+Repo: https://github.com/google/draco
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/draco_mesh_decoder_without_dequantization_fuzzer[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: global-buffer-overflow on address 0x00000075fa58 at pc 0x000000519f1d bp 0x7fffffffdab0 sp 0x7fffffffdaa8
+[1m[0m[1m[34mREAD of size 4 at 0x00000075fa58 thread T0[1m[0m
+SCARINESS: 17 (4-byte-read-global-buffer-overflow)
+    #0 0x519f1c in DecodeSymbol /src/draco/src/draco/compression/mesh/mesh_edgebreaker_traversal_valence_decoder.h:128:22
+    #1 0x519f1c in draco::MeshEdgebreakerDecoderImpl<draco::MeshEdgebreakerTraversalValenceDecoder>::DecodeConnectivity(int) /src/draco/src/draco/compression/mesh/mesh_edgebreaker_decoder_impl.cc:542:48
+    #2 0x50ebbc in draco::MeshEdgebreakerDecoderImpl<draco::MeshEdgebreakerTraversalValenceDecoder>::DecodeConnectivity() /src/draco/src/draco/compression/mesh/mesh_edgebreaker_decoder_impl.cc:435:38
+    #3 0x549c07 in draco::PointCloudDecoder::Decode(draco::DracoOptions<draco::GeometryAttribute::Type> const&, draco::DecoderBuffer*, draco::PointCloud*) /src/draco/src/draco/compression/point_cloud/point_cloud_decoder.cc:109:8
+    #4 0x4db652 in draco::MeshDecoder::Decode(draco::DracoOptions<draco::GeometryAttribute::Type> const&, draco::DecoderBuffer*, draco::Mesh*) /src/draco/src/draco/compression/mesh/mesh_decoder.cc:24:29
+    #5 0x4d72ce in draco::Decoder::DecodeBufferToGeometry(draco::DecoderBuffer*, draco::Mesh*) /src/draco/src/draco/compression/decode.cc:121:3
+    #6 0x4d7a9e in draco::Decoder::DecodeMeshFromBuffer(draco::DecoderBuffer*) /src/draco/src/draco/compression/decode.cc:86:3
+    #7 0x4d277d in LLVMFuzzerTestOneInput /src/draco/src/draco/tools/fuzz/draco_mesh_decoder_without_dequantization_fuzzer.cc:27:11
+    #8 0x4c8f6b in main (/out/draco_mesh_decoder_without_dequantization_fuzzer+0x4c8f6b)
+    #9 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #10 0x41e278 in _start (/out/draco_mesh_decoder_without_dequantization_fuzzer+0x41e278)
+
+DEDUP_TOKEN: DecodeSymbol--draco::MeshEdgebreakerDecoderImpl<draco::MeshEdgebreakerTraversalValenceDecoder>::DecodeConnectivity(int)--draco::MeshEdgebreakerDecoderImpl<draco::MeshEdgebreakerTraversalValenceDecoder>::DecodeConnectivity()
+[1m[32m0x00000075fa58 is located 40 bytes to the left of global variable 'draco::kInvalidAttributeValueIndex' defined in '/src/draco/src/draco/attributes/geometry_indices.h:38:38' (0x75fa80) of size 4
+[1m[0m[1m[32m0x00000075fa58 is located 4 bytes to the right of global variable 'draco::edge_breaker_symbol_to_topology_id' defined in '/src/draco/src/draco/compression/mesh/mesh_edgebreaker_shared.h:91:41' (0x75fa40) of size 20
+[1m[0mSUMMARY: AddressSanitizer: global-buffer-overflow /src/draco/src/draco/compression/mesh/mesh_edgebreaker_traversal_valence_decoder.h:128:22 in DecodeSymbol
+Shadow bytes around the buggy address:
+  0x0000800e3ef0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0000800e3f00: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0000800e3f10: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0000800e3f20: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0000800e3f30: [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0000800e3f40: [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m04[1m[0m[[1m[31mf9[1m[0m][1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x0000800e3f50: [1m[0m04[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[0m01[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m [1m[31mf9[1m[0m
+  0x0000800e3f60: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0000800e3f70: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0000800e3f80: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0000800e3f90: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42505027

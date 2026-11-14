@@ -1,0 +1,103 @@
+ARVO id: 42531653
+Project: upx
+Fuzz target: test_packed_file_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 4
+Language: c++
+Repo: https://github.com/upx/upx.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2025780218
+INFO: Loaded 1 modules   (39756 inline 8-bit counters): 39756 [0xd23b98, 0xd2d6e4), 
+INFO: Loaded 1 PC tables (39756 PCs): 39756 [0xba7f68,0xc43428), 
+/out/test_packed_file_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m[0m                       Ultimate Packer for eXecutables
+                          Copyright (C) 1996 - 2024
+UPX git-250c65+ Markus Oberhumer, Laszlo Molnar & John Reiser    Jan 4th 2024
+
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x616000001d9b at pc 0x0000008d4c30 bp 0x7ffe3350f470 sp 0x7ffe3350f468
+[1m[0m[1m[34mREAD of size 4 at 0x616000001d9b thread T0[1m[0m
+SCARINESS: 17 (4-byte-read-heap-buffer-overflow)
+    #0 0x8d4c2f in get_ne32<void, void> /src/upx/src/util/../bele.h:117:5
+    #1 0x8d4c2f in get_le32<void, void> /src/upx/src/util/../bele.h:220:59
+    #2 0x8d4c2f in N_BELE_RTP::LEPolicy::get32(void const*) const /src/upx/src/util/../bele_policy.h:172:48
+    #3 0x7d7c7d in get_te32<unsigned char, unsigned char> /src/upx/src/packer.h:277:22
+    #4 0x7d7c7d in PackUnix::find_overlay_offset(MemBuffer const&) /src/upx/src/p_unix.cpp:586:22
+    #5 0x7d7782 in PackUnix::canUnpack() /src/upx/src/p_unix.cpp:569:12
+    #6 0x849b60 in try_can_unpack(PackerBase*, void*) /src/upx/src/packmast.cpp:119:25
+    #7 0x8441da in PackMaster::visitAllPackers(upx::TriBool<int, false> (*)(PackerBase*, void*), InputFile*, Options const*, void*) /src/upx/src/packmast.cpp:211:5
+    #8 0x84a007 in getUnpacker /src/upx/src/packmast.cpp:247:22
+    #9 0x84a007 in PackMaster::test() /src/upx/src/packmast.cpp:271:14
+    #10 0x8d68ba in do_one_file(char const*, char*) /src/upx/src/work.cpp:335:12
+    #11 0x8d8248 in do_files(int, int, char**) /src/upx/src/work.cpp:421:13
+    #12 0x6b183e in upx_main(int, char**) /src/upx/src/main.cpp:1303:9
+    #13 0x577a7c in LLVMFuzzerTestOneInput /src/upx/fuzzers/test_packed_file_fuzzer.cpp:43:5
+    #14 0x449213 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #15 0x434972 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #16 0x43a21c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #17 0x463752 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #18 0x7f6b7e0f3082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: eebe5d5f4b608b8a53ec446b63981bba373ca0ca)
+    #19 0x42ab3d in _start (/out/test_packed_file_fuzzer+0x42ab3d)
+
+DEDUP_TOKEN: get_ne32<void, void>--get_le32<void, void>--N_BELE_RTP::LEPolicy::get32(void const*) const
+[1m[32m0x616000001d9b is located 2 bytes to the right of 537-byte region [0x616000001b80,0x616000001d99)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x53a3a6 in __interceptor_malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0x8b0e35 in MemBuffer::alloc(unsigned long long) /src/upx/src/util/membuffer.cpp:179:24
+    #2 0x7d7686 in PackUnix::canUnpack() /src/upx/src/p_unix.cpp:565:15
+    #3 0x849b60 in try_can_unpack(PackerBase*, void*) /src/upx/src/packmast.cpp:119:25
+    #4 0x8441da in PackMaster::visitAllPackers(upx::TriBool<int, false> (*)(PackerBase*, void*), InputFile*, Options const*, void*) /src/upx/src/packmast.cpp:211:5
+    #5 0x84a007 in getUnpacker /src/upx/src/packmast.cpp:247:22
+    #6 0x84a007 in PackMaster::test() /src/upx/src/packmast.cpp:271:14
+    #7 0x8d68ba in do_one_file(char const*, char*) /src/upx/src/work.cpp:335:12
+    #8 0x8d8248 in do_files(int, int, char**) /src/upx/src/work.cpp:421:13
+    #9 0x6b183e in upx_main(int, char**) /src/upx/src/main.cpp:1303:9
+    #10 0x577a7c in LLVMFuzzerTestOneInput /src/upx/fuzzers/test_packed_file_fuzzer.cpp:43:5
+    #11 0x449213 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #12 0x434972 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #13 0x43a21c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #14 0x463752 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0x7f6b7e0f3082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: eebe5d5f4b608b8a53ec446b63981bba373ca0ca)
+
+DEDUP_TOKEN: __interceptor_malloc--MemBuffer::alloc(unsigned long long)--PackUnix::canUnpack()
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/upx/src/util/../bele.h:117:5 in get_ne32<void, void>
+Shadow bytes around the buggy address:
+  0x0c2c7fff8360: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c2c7fff8370: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c2c7fff8380: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c2c7fff8390: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c2c7fff83a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c2c7fff83b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m01[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c2c7fff83c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c2c7fff83d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c2c7fff83e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c2c7fff83f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c2c7fff8400: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42531653

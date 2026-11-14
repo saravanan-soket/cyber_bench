@@ -1,0 +1,59 @@
+ARVO id: 369652657
+Project: libultrahdr
+Fuzz target: ultrahdr_enc_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/google/libultrahdr.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 983522315
+INFO: Loaded 1 modules   (22272 inline 8-bit counters): 22272 [0x5652540aad40, 0x5652540b0440), 
+INFO: Loaded 1 PC tables (22272 PCs): 22272 [0x5652540b0440,0x565254107440), 
+/out/ultrahdr_enc_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x565253b46c37 in ultrahdr::uhdr_gainmap_metadata_frac::encodeGainmapMetadata(ultrahdr::uhdr_gainmap_metadata_frac const*, std::__1::vector<unsigned char, std::__1::allocator<unsigned char>>&) /src/libultrahdr/lib/src/gainmapmetadata.cpp:80:66
+    #1 0x565253af9891 in ultrahdr::JpegR::appendGainMap(uhdr_compressed_image*, uhdr_compressed_image*, uhdr_mem_block*, void*, unsigned long, ultrahdr::uhdr_gainmap_metadata_ext*, uhdr_compressed_image*) /src/libultrahdr/lib/src/jpegr.cpp:1021:3
+    #2 0x565253afecc1 in ultrahdr::JpegR::encodeJPEGR(uhdr_compressed_image*, uhdr_compressed_image*, ultrahdr::uhdr_gainmap_metadata_ext*, uhdr_compressed_image*) /src/libultrahdr/lib/src/jpegr.cpp:410:5
+    #3 0x565253ab4fc3 in uhdr_encode /src/libultrahdr/lib/src/ultrahdr_api.cpp:1172:22
+    #4 0x565253a87961 in UltraHdrEncFuzzer::process() /src/libultrahdr/fuzzer/ultrahdr_enc_fuzzer.cpp:353:22
+    #5 0x565253a8d49c in LLVMFuzzerTestOneInput /src/libultrahdr/fuzzer/ultrahdr_enc_fuzzer.cpp:386:14
+    #6 0x56525397dd10 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #7 0x5652539684a4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #8 0x56525396df3a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #9 0x56525399a332 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7f1ad1d29082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #11 0x56525395ef7d in _start (/out/ultrahdr_enc_fuzzer+0xe4f7d)
+
+DEDUP_TOKEN: ultrahdr::uhdr_gainmap_metadata_frac::encodeGainmapMetadata(ultrahdr::uhdr_gainmap_metadata_frac const*, std::__1::vector<unsigned char, std::__1::allocator<unsigned char>>&)--ultrahdr::JpegR::appendGainMap(uhdr_compressed_image*, uhdr_compressed_image*, uhdr_mem_block*, void*, unsigned long, ultrahdr::uhdr_gainmap_metadata_ext*, uhdr_compressed_image*)--ultrahdr::JpegR::encodeJPEGR(uhdr_compressed_image*, uhdr_compressed_image*, ultrahdr::uhdr_gainmap_metadata_ext*, uhdr_compressed_image*)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x565253b4a43a in ultrahdr::uhdr_gainmap_metadata_frac::gainmapMetadataFloatToFraction(ultrahdr::uhdr_gainmap_metadata_ext const*, ultrahdr::uhdr_gainmap_metadata_frac*) /src/libultrahdr/lib/src/gainmapmetadata.cpp:319:43
+    #1 0x565253af97e0 in ultrahdr::JpegR::appendGainMap(uhdr_compressed_image*, uhdr_compressed_image*, uhdr_mem_block*, void*, unsigned long, ultrahdr::uhdr_gainmap_metadata_ext*, uhdr_compressed_image*) /src/libultrahdr/lib/src/jpegr.cpp:1018:3
+    #2 0x565253afecc1 in ultrahdr::JpegR::encodeJPEGR(uhdr_compressed_image*, uhdr_compressed_image*, ultrahdr::uhdr_gainmap_metadata_ext*, uhdr_compressed_image*) /src/libultrahdr/lib/src/jpegr.cpp:410:5
+    #3 0x565253ab4fc3 in uhdr_encode /src/libultrahdr/lib/src/ultrahdr_api.cpp:1172:22
+    #4 0x565253a87961 in UltraHdrEncFuzzer::process() /src/libultrahdr/fuzzer/ultrahdr_enc_fuzzer.cpp:353:22
+    #5 0x565253a8d49c in LLVMFuzzerTestOneInput /src/libultrahdr/fuzzer/ultrahdr_enc_fuzzer.cpp:386:14
+    #6 0x56525397dd10 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #7 0x5652539684a4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #8 0x56525396df3a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #9 0x56525399a332 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7f1ad1d29082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+
+DEDUP_TOKEN: ultrahdr::uhdr_gainmap_metadata_frac::gainmapMetadataFloatToFraction(ultrahdr::uhdr_gainmap_metadata_ext const*, ultrahdr::uhdr_gainmap_metadata_frac*)--ultrahdr::JpegR::appendGainMap(uhdr_compressed_image*, uhdr_compressed_image*, uhdr_mem_block*, void*, unsigned long, ultrahdr::uhdr_gainmap_metadata_ext*, uhdr_compressed_image*)--ultrahdr::JpegR::encodeJPEGR(uhdr_compressed_image*, uhdr_compressed_image*, ultrahdr::uhdr_gainmap_metadata_ext*, uhdr_compressed_image*)
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32miso_secondary_metadata[1m[35m' in the stack frame[1m[0m
+    #0 0x565253af976a in ultrahdr::JpegR::appendGainMap(uhdr_compressed_image*, uhdr_compressed_image*, uhdr_mem_block*, void*, unsigned long, ultrahdr::uhdr_gainmap_metadata_ext*, uhdr_compressed_image*) /src/libultrahdr/lib/src/jpegr.cpp:1016:3
+
+DEDUP_TOKEN: ultrahdr::JpegR::appendGainMap(uhdr_compressed_image*, uhdr_compressed_image*, uhdr_mem_block*, void*, unsigned long, ultrahdr::uhdr_gainmap_metadata_ext*, uhdr_compressed_image*)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/libultrahdr/lib/src/gainmapmetadata.cpp:80:66 in ultrahdr::uhdr_gainmap_metadata_frac::encodeGainmapMetadata(ultrahdr::uhdr_gainmap_metadata_frac const*, std::__1::vector<unsigned char, std::__1::allocator<unsigned char>>&)
+Unique heap origins: 1347
+Stack depot allocated bytes: 9764880
+Unique origin histories: 66
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/369652657

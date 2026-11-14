@@ -1,0 +1,95 @@
+ARVO id: 42488601
+Project: openh264
+Fuzz target: decoder_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/cisco/openh264.git
+
+=== Crash report ===
+INFO: Seed: 2494147780
+INFO: Loaded 1 modules   (10162 inline 8-bit counters): 10162 [0x9b1378, 0x9b3b2a), 
+INFO: Loaded 1 PC tables (10162 PCs): 10162 [0x9b3b30,0x9db650), 
+/out/decoder_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x6b9aba in DeblockChromaLt42_c(unsigned char*, int, int, int, int, signed char*) /src/openh264/codec/common/src/deblocking_common.cpp:197:20
+    #1 0x6ba1c0 in DeblockChromaLt4V2_c(unsigned char*, int, int, int, signed char*) /src/openh264/codec/common/src/deblocking_common.cpp:234:3
+    #2 0x5e689a in WelsDec::FilteringEdgeChromaH(WelsDec::tagDeblockingFilter*, unsigned char*, unsigned char*, int, unsigned char*) /src/openh264/codec/decoder/core/src/deblocking.cpp:775:9
+    #3 0x61d2c4 in WelsDec::DeblockingInterMb(WelsDec::TagDqLayer*, WelsDec::tagDeblockingFilter*, unsigned char (*) [4][4], int) /src/openh264/codec/decoder/core/src/deblocking.cpp:965:5
+    #4 0x5ecb69 in WelsDec::WelsDeblockingMb(WelsDec::TagDqLayer*, WelsDec::tagDeblockingFilter*, int) /src/openh264/codec/decoder/core/src/deblocking.cpp:1203:5
+    #5 0x61ddd7 in WelsDec::WelsDeblockingFilterSlice(WelsDec::TagWelsDecoderContext*, void (*)(WelsDec::TagDqLayer*, WelsDec::tagDeblockingFilter*, int)) /src/openh264/codec/decoder/core/src/deblocking.cpp:1257:7
+    #6 0x622034 in WelsDec::WelsTargetSliceConstruction(WelsDec::TagWelsDecoderContext*) /src/openh264/codec/decoder/core/src/decode_slice.cpp:170:5
+    #7 0x56a2c8 in WelsDec::WelsDecodeConstructSlice(WelsDec::TagWelsDecoderContext*, WelsDec::TagNalUnit*) /src/openh264/codec/decoder/core/src/decoder_core.cpp:311:19
+    #8 0x5648fa in WelsDec::DecodeCurrentAccessUnit(WelsDec::TagWelsDecoderContext*, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/core/src/decoder_core.cpp:2745:23
+    #9 0x561670 in WelsDec::ConstructAccessUnit(WelsDec::TagWelsDecoderContext*, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/core/src/decoder_core.cpp:2358:10
+    #10 0x540dff in WelsDecodeBs /src/openh264/codec/decoder/core/src/decoder.cpp:918:7
+    #11 0x52ec65 in WelsDec::CWelsDecoder::DecodeFrame2WithCtx(WelsDec::TagWelsDecoderContext*, unsigned char const*, int, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:794:3
+    #12 0x532c24 in WelsDec::CWelsDecoder::DecodeFrame2(unsigned char const*, int, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:913:10
+    #13 0x52b352 in WelsDec::CWelsDecoder::DecodeFrameNoDelay(unsigned char const*, int, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:712:11
+    #14 0x523a23 in LLVMFuzzerTestOneInput /src/decoder_fuzzer.cpp:75:15
+    #15 0x458621 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:595:15
+    #16 0x4436f2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #17 0x4497ae in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:852:9
+    #18 0x471792 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #19 0x7fdbbe09c83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #20 0x41e9c8 in _start (/out/decoder_fuzzer+0x41e9c8)
+
+DEDUP_TOKEN: DeblockChromaLt42_c(unsigned char*, int, int, int, int, signed char*)--DeblockChromaLt4V2_c(unsigned char*, int, int, int, signed char*)--WelsDec::FilteringEdgeChromaH(WelsDec::tagDeblockingFilter*, unsigned char*, unsigned char*, int, unsigned char*)
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x5b5c56 in (anonymous namespace)::McChromaWithFragMv_c(unsigned char const*, int, unsigned char*, int, short, short, int, int) /src/openh264/codec/common/src/mc.cpp:361:15
+    #1 0x5b4d4f in (anonymous namespace)::McChroma_c(unsigned char const*, int, unsigned char*, int, short, short, int, int) /src/openh264/codec/common/src/mc.cpp:378:5
+    #2 0x59b225 in WelsDec::BaseMC(WelsDec::TagWelsDecoderContext*, WelsDec::TagMCRefMember*, int const&, signed char const&, int, int, TagMcFunc*, int, int, short*) /src/openh264/codec/decoder/core/src/rec_mb.cpp:293:3
+    #3 0x59e223 in WelsDec::GetInterPred(unsigned char*, unsigned char*, unsigned char*, WelsDec::TagWelsDecoderContext*) /src/openh264/codec/decoder/core/src/rec_mb.cpp:512:5
+    #4 0x6255e4 in WelsDec::WelsMbInterPrediction(WelsDec::TagWelsDecoderContext*, WelsDec::TagDqLayer*) /src/openh264/codec/decoder/core/src/decode_slice.cpp:317:5
+    #5 0x6229b6 in WelsDec::WelsTargetMbConstruction(WelsDec::TagWelsDecoderContext*) /src/openh264/codec/decoder/core/src/decode_slice.cpp:346:14
+    #6 0x6216dc in WelsDec::WelsTargetSliceConstruction(WelsDec::TagWelsDecoderContext*) /src/openh264/codec/decoder/core/src/decode_slice.cpp:120:11
+    #7 0x56a2c8 in WelsDec::WelsDecodeConstructSlice(WelsDec::TagWelsDecoderContext*, WelsDec::TagNalUnit*) /src/openh264/codec/decoder/core/src/decoder_core.cpp:311:19
+    #8 0x5648fa in WelsDec::DecodeCurrentAccessUnit(WelsDec::TagWelsDecoderContext*, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/core/src/decoder_core.cpp:2745:23
+    #9 0x561670 in WelsDec::ConstructAccessUnit(WelsDec::TagWelsDecoderContext*, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/core/src/decoder_core.cpp:2358:10
+    #10 0x540dff in WelsDecodeBs /src/openh264/codec/decoder/core/src/decoder.cpp:918:7
+    #11 0x52ec65 in WelsDec::CWelsDecoder::DecodeFrame2WithCtx(WelsDec::TagWelsDecoderContext*, unsigned char const*, int, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:794:3
+    #12 0x532c24 in WelsDec::CWelsDecoder::DecodeFrame2(unsigned char const*, int, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:913:10
+    #13 0x52b352 in WelsDec::CWelsDecoder::DecodeFrameNoDelay(unsigned char const*, int, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:712:11
+    #14 0x523a23 in LLVMFuzzerTestOneInput /src/decoder_fuzzer.cpp:75:15
+    #15 0x458621 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:595:15
+    #16 0x4436f2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #17 0x4497ae in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:852:9
+    #18 0x471792 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #19 0x7fdbbe09c83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: (anonymous namespace)::McChromaWithFragMv_c(unsigned char const*, int, unsigned char*, int, short, short, int, int)--(anonymous namespace)::McChroma_c(unsigned char const*, int, unsigned char*, int, short, short, int, int)--WelsDec::BaseMC(WelsDec::TagWelsDecoderContext*, WelsDec::TagMCRefMember*, int const&, signed char const&, int, int, TagMcFunc*, int, int, short*)
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x4d18fd in malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:901:3
+    #1 0x5370d3 in WelsCommon::WelsMalloc(unsigned int, char const*, unsigned int) /src/openh264/codec/common/src/memory_align.cpp:72:30
+    #2 0x537468 in WelsCommon::CMemoryAlign::WelsMalloc(unsigned int, char const*) /src/openh264/codec/common/src/memory_align.cpp:129:20
+    #3 0x53730a in WelsCommon::CMemoryAlign::WelsMallocz(unsigned int, char const*) /src/openh264/codec/common/src/memory_align.cpp:118:20
+    #4 0x5957a4 in WelsDec::AllocPicture(WelsDec::TagWelsDecoderContext*, int, int) /src/openh264/codec/decoder/core/src/pic_queue.cpp:92:52
+    #5 0x53eefe in WelsDec::CreatePicBuff(WelsDec::TagWelsDecoderContext*, WelsDec::TagPicBuff**, int, int, int) /src/openh264/codec/decoder/core/src/decoder.cpp:89:21
+    #6 0x53c4b5 in WelsRequestMem /src/openh264/codec/decoder/core/src/decoder.cpp:523:12
+    #7 0x54374a in SyncPictureResolutionExt /src/openh264/codec/decoder/core/src/decoder.cpp:955:10
+    #8 0x560ee8 in WelsDec::AllocPicBuffOnNewSeqBegin(WelsDec::TagWelsDecoderContext*) /src/openh264/codec/decoder/core/src/decoder_core.cpp:2296:18
+    #9 0x5612d5 in WelsDec::InitConstructAccessUnit(WelsDec::TagWelsDecoderContext*, TagBufferInfo*) /src/openh264/codec/decoder/core/src/decoder_core.cpp:2323:12
+    #10 0x5614bc in WelsDec::ConstructAccessUnit(WelsDec::TagWelsDecoderContext*, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/core/src/decoder_core.cpp:2347:12
+    #11 0x540dff in WelsDecodeBs /src/openh264/codec/decoder/core/src/decoder.cpp:918:7
+    #12 0x52ec65 in WelsDec::CWelsDecoder::DecodeFrame2WithCtx(WelsDec::TagWelsDecoderContext*, unsigned char const*, int, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:794:3
+    #13 0x532c24 in WelsDec::CWelsDecoder::DecodeFrame2(unsigned char const*, int, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:913:10
+    #14 0x52b352 in WelsDec::CWelsDecoder::DecodeFrameNoDelay(unsigned char const*, int, unsigned char**, TagBufferInfo*) /src/openh264/codec/decoder/plus/src/welsDecoderExt.cpp:712:11
+    #15 0x523a23 in LLVMFuzzerTestOneInput /src/decoder_fuzzer.cpp:75:15
+    #16 0x458621 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:595:15
+    #17 0x4436f2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #18 0x4497ae in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:852:9
+    #19 0x471792 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+
+DEDUP_TOKEN: malloc--WelsCommon::WelsMalloc(unsigned int, char const*, unsigned int)--WelsCommon::CMemoryAlign::WelsMalloc(unsigned int, char const*)
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/openh264/codec/common/src/deblocking_common.cpp:197:20 in DeblockChromaLt42_c(unsigned char*, int, int, int, int, signed char*)
+Unique heap origins: 132
+Stack depot allocated bytes: 20472
+Unique origin histories: 9
+History depot allocated bytes: 216
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42488601

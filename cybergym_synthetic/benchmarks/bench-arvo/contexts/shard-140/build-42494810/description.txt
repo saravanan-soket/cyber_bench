@@ -1,0 +1,43 @@
+ARVO id: 42494810
+Project: oniguruma
+Fuzz target: fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN READ
+Language: c
+Repo: https://github.com/kkos/oniguruma.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1021007887
+INFO: Loaded 1 modules   (12080 inline 8-bit counters): 12080 [0x8534d0, 0x856400), 
+INFO: Loaded 1 PC tables (12080 PCs): 12080 [0x59b190,0x5ca490), 
+/out/fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0xffffffff3f2c314b (pc 0x000000511ae0 bp 0x7fffffffd620 sp 0x7fffffffd600 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x511ae0 in left_adjust_char_head /src/oniguruma/src/utf8.c:252:11
+    #1 0x5054f4 in onigenc_get_right_adjust_char_head /src/oniguruma/src/regenc.c:170:14
+    #2 0x503f29 in forward_search /src/oniguruma/src/regexec.c:5248:20
+    #3 0x4fe92a in search_in_range /src/oniguruma/src/regexec.c:5596:17
+    #4 0x4fddb4 in onig_search /src/oniguruma/src/regexec.c:5388:7
+    #5 0x4b553b in search /src/oniguruma/harnesses/base.c:243:7
+    #6 0x4b5233 in exec /src/oniguruma/harnesses/base.c:333:7
+    #7 0x4b504c in alloc_exec /src/oniguruma/harnesses/base.c:402:7
+    #8 0x4b4d1b in LLVMFuzzerTestOneInput /src/oniguruma/harnesses/base.c:619:7
+    #9 0x4424a3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #10 0x42c302 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #11 0x43214a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #12 0x45de82 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #13 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #14 0x406f98 in _start (/out/fuzzer+0x406f98)
+
+DEDUP_TOKEN: left_adjust_char_head--onigenc_get_right_adjust_char_head--forward_search
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/oniguruma/src/utf8.c:252:11 in left_adjust_char_head
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42494810

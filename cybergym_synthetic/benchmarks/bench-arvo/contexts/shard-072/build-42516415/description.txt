@@ -1,0 +1,42 @@
+ARVO id: 42516415
+Project: binutils-gdb
+Fuzz target: fuzz_objcopy
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c++
+Repo: git://sourceware.org/git/binutils-gdb.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/fuzz_objcopy[0m
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x0000012834c9 bp 0x7fffffffd910 sp 0x7fffffffd8f0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x12834c9 in htab_find_slot /src/binutils-gdb/libiberty/./hashtab.c:703:59
+    #1 0x548fb7 in _bfd_unlink_from_archive_parent /src/binutils-gdb/bfd/archive.c:2837:11
+    #2 0x548fb7 in _bfd_archive_close_and_cleanup /src/binutils-gdb/bfd/archive.c:2876:3
+    #3 0x56640e in bfd_close_all_done /src/binutils-gdb/bfd/opncls.c:844:9
+    #4 0x5662c8 in bfd_close /src/binutils-gdb/bfd/opncls.c:814:10
+    #5 0xfed37b in pdb_get_elt_at_index /src/binutils-gdb/bfd/pdb.c:368:3
+    #6 0xfecc8f in pdb_openr_next_archived_file /src/binutils-gdb/bfd/pdb.c
+    #7 0x53e8fc in bfd_openr_next_archived_file /src/binutils-gdb/bfd/archive.c:832:10
+    #8 0x4efe4b in copy_archive /src/binutils-gdb/binutils/./fuzz_objcopy.h:3573:18
+    #9 0x4efe4b in copy_file /src/binutils-gdb/binutils/./fuzz_objcopy.h:3868:7
+    #10 0x4ecab4 in copy_main /src/binutils-gdb/binutils/./fuzz_objcopy.h:5946:3
+    #11 0x4ee60f in LLVMFuzzerTestOneInput /src/binutils-gdb/binutils/fuzz_objcopy.c:132:3
+    #12 0x4dd58b in main (/out/fuzz_objcopy+0x4dd58b)
+    #13 0x7ffff7c56082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #14 0x41e79d in _start (/out/fuzz_objcopy+0x41e79d)
+
+DEDUP_TOKEN: htab_find_slot--_bfd_unlink_from_archive_parent--_bfd_archive_close_and_cleanup
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/binutils-gdb/libiberty/./hashtab.c:703:59 in htab_find_slot
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42516415

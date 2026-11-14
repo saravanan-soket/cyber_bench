@@ -1,0 +1,44 @@
+ARVO id: 42497787
+Project: imagemagick
+Fuzz target: ping_mvg_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1832246336
+INFO: Loaded 1 modules   (337006 inline 8-bit counters): 337006 [0x1f0bbd8, 0x1f5e046), 
+INFO: Loaded 1 PC tables (337006 PCs): 337006 [0x1f5e048,0x2482728), 
+/out/ping_mvg_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x7fe33c8fd010 (pc 0x00000093bec9 bp 0x7ffc820c0840 sp 0x7ffc820c0840 T7)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+    #0 0x93bec9 in TracePoint /src/imagemagick/MagickCore/draw.c:2438:30
+    #1 0x93cbcb in TraceEllipse /src/imagemagick/MagickCore/draw.c:6439:9
+    #2 0x932db1 in RenderMVGContent /src/imagemagick/MagickCore/draw.c:4239:17
+    #3 0x92dbd4 in DrawImage /src/imagemagick/MagickCore/draw.c:4476:10
+    #4 0xb5c92d in ReadMVGImage /src/imagemagick/coders/mvg.c:239:10
+    #5 0x90c3e1 in ReadImage /src/imagemagick/MagickCore/constitute.c:563:15
+    #6 0xa75d92 in ReadStream /src/imagemagick/MagickCore/stream.c:1081:9
+    #7 0x8cb687 in PingBlob /src/imagemagick/MagickCore/blob.c:3647:13
+    #8 0x7ebdaf in Magick::Image::ping(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:3860:12
+    #9 0x7a60e4 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/ping_fuzzer.cc:43:11
+    #10 0x713cf1 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #11 0x6fcd62 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #12 0x7030b6 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #13 0x72dd12 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #14 0x7fe33ec7e83f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #15 0x6d7908 in _start (/out/ping_mvg_fuzzer+0x6d7908)
+
+DEDUP_TOKEN: TracePoint--TraceEllipse--RenderMVGContent
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/imagemagick/MagickCore/draw.c:2438:30 in TracePoint
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42497787

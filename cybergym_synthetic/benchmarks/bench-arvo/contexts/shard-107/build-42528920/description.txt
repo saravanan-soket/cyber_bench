@@ -1,0 +1,47 @@
+ARVO id: 42528920
+Project: libxml2
+Fuzz target: xpath
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Memcpy-param-overlap
+Language: c++
+Repo: https://gitlab.gnome.org/GNOME/libxml2.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/xpath[0m
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x00023e84950e (pc 0x00000058b120 bp 0x7fff3c9f5dc0 sp 0x7fff3c9f5ca0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x58b120 in xmlDictFindEntry /src/libxml2/dict.c:527:16
+    #1 0x58b120 in xmlDictLookupInternal /src/libxml2/dict.c:692:20
+    #2 0x58a6b2 in xmlDictLookup /src/libxml2/dict.c:795:13
+    #3 0x628520 in xmlNewDocNode /src/libxml2/tree.c:2282:26
+    #4 0x628e83 in xmlNewDocRawNode /src/libxml2/tree.c:2352:11
+    #5 0x6296bb in xmlNewTextChild /src/libxml2/tree.c
+    #6 0x50dc7a in exsltDynMapFunction /src/libxslt/libexslt/dynamic.c:192:33
+    #7 0x70fd92 in xmlXPathCompOpEval /src/libxml2/xpath.c:12321:17
+    #8 0x70cef6 in xmlXPathCompOpEvalToBoolean /src/libxml2/xpath.c:12709:6
+    #9 0x7192b4 in xmlXPathNodeSetFilter /src/libxml2/xpath.c:10799:15
+    #10 0x70f042 in xmlXPathCompOpEval /src/libxml2/xpath.c:12466:21
+    #11 0x70e167 in xmlXPathCompOpEval /src/libxml2/xpath.c:12219:26
+    #12 0x70de69 in xmlXPathCompOpEval /src/libxml2/xpath.c:12473:26
+    #13 0x6fcbd7 in xmlXPathRunEval /src/libxml2/xpath.c:13053:2
+    #14 0x6fbd71 in xmlXPathCompiledEvalInternal /src/libxml2/xpath.c:13434:11
+    #15 0x6fba66 in xmlXPathCompiledEval /src/libxml2/xpath.c:13480:5
+    #16 0x4ddc30 in xsltFuzzXPath /src/libxslt/tests/fuzz/fuzz.c:207:16
+    #17 0x4dd0b1 in LLVMFuzzerTestOneInput /src/libxslt/tests/fuzz/xpath.c:17:34
+    #18 0x4e02db in main (/out/xpath+0x4e02db)
+    #19 0x7ffad7239082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #20 0x41e7fd in _start (/out/xpath+0x41e7fd)
+
+DEDUP_TOKEN: xmlDictFindEntry--xmlDictLookupInternal--xmlDictLookup
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/libxml2/dict.c:527:16 in xmlDictFindEntry
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42528920

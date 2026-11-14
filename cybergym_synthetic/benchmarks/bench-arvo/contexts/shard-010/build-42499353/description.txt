@@ -1,0 +1,126 @@
+ARVO id: 42499353
+Project: libvips
+Fuzz target: jpegsave_file_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ {*}
+Language: c++
+Repo: https://github.com/libvips/libvips
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 2014608496
+INFO: Loaded 1 modules   (248443 inline 8-bit counters): 248443 [0x41d8440, 0x4214ebb), 
+INFO: Loaded 1 PC tables (248443 PCs): 248443 [0x4214ec0,0x45df670), 
+/out/jpegsave_file_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x631000012e00 at pc 0x000002d4a870 bp 0x7ffff1ef74b0 sp 0x7ffff1ef74a8
+[1m[0m[1m[34mREAD of size 32 at 0x631000012e00 thread T2[1m[0m
+SCARINESS: 26 (multi-byte-read-heap-buffer-overflow)
+    #0 0x2d4a86f in Load<int> /src/libjxl/third_party/highway/hwy/ops/x86_256-inl.h:1327:7
+    #1 0x2d4a86f in jxl::N_AVX2::RgbFromSingle(unsigned long, int const*, float, jxl::Image3<float>*, unsigned long, unsigned long, jxl::Rect&) /src/libjxl/lib/jxl/dec_modular.cc:63:21
+    #2 0x2569861 in jxl::ThreadPool::SequentialRunnerStatic(void*, void*, int (*)(void*, unsigned long), void (*)(void*, unsigned int, unsigned long), unsigned int, unsigned int) /src/libjxl/lib/jxl/base/data_parallel.cc:18:5
+    #3 0x2d535a8 in Run<jxl::Status (unsigned long), (lambda at /src/libjxl/lib/jxl/dec_modular.cc:528:13)> /src/libjxl/lib/jxl/base/data_parallel.h:51:12
+    #4 0x2d535a8 in Run<(lambda at /src/libjxl/lib/jxl/dec_modular.cc:528:13)> /src/libjxl/lib/jxl/base/data_parallel.h:60:12
+    #5 0x2d535a8 in RunOnPool<jxl::ThreadPool::SkipInit, (lambda at /src/libjxl/lib/jxl/dec_modular.cc:528:13)> /src/libjxl/lib/jxl/base/data_parallel.h:115:24
+    #6 0x2d535a8 in jxl::ModularFrameDecoder::ModularImageToDecodedRect(jxl::Image&, jxl::PassesDecoderState*, jxl::ThreadPool*, jxl::ImageBundle*, jxl::Rect) /src/libjxl/lib/jxl/dec_modular.cc:526:9
+    #7 0x2d518b7 in jxl::ModularFrameDecoder::DecodeGroup(jxl::Rect const&, jxl::BitReader*, int, int, jxl::ModularStreamId const&, bool, jxl::PassesDecoderState*, jxl::ImageBundle*) /src/libjxl/lib/jxl/dec_modular.cc:309:7
+    #8 0x2c093da in jxl::FrameDecoder::ProcessACGroup(unsigned long, jxl::BitReader* restrict*, unsigned long, unsigned long, bool, bool) /src/libjxl/lib/jxl/dec_frame.cc:578:7
+    #9 0x2c12444 in operator() /src/libjxl/lib/jxl/dec_frame.cc:731:16
+    #10 0x2c12444 in jxl::ThreadPool::RunCallState<jxl::FrameDecoder::ProcessSections(jxl::FrameDecoder::SectionInfo const*, unsigned long, jxl::FrameDecoder::SectionStatus*)::$_1, jxl::FrameDecoder::ProcessSections(jxl::FrameDecoder::SectionInfo const*, unsigned long, jxl::FrameDecoder::SectionStatus*)::$_2>::CallDataFunc(void*, unsigned int, unsigned long) /src/libjxl/lib/jxl/base/data_parallel.h:88:14
+    #11 0x31a8a39 in RunRange /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:137:7
+    #12 0x31a8a39 in jpegxl::ThreadParallelRunner::ThreadFunc(jpegxl::ThreadParallelRunner*, int) /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:167:9
+    #13 0x31aaa73 in __invoke<void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int> /usr/local/bin/../include/c++/v1/type_traits:3679:1
+    #14 0x31aaa73 in __thread_execute<std::unique_ptr<std::__thread_struct>, void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int, 2, 3> /usr/local/bin/../include/c++/v1/thread:280:5
+    #15 0x31aaa73 in void* std::__1::__thread_proxy<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(jpegxl::ThreadParallelRunner*, int), jpegxl::ThreadParallelRunner*, unsigned int> >(void*) /usr/local/bin/../include/c++/v1/thread:291:5
+    #16 0x7ffff78b86b9 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x76b9)
+    #17 0x7ffff6fcc51c in clone (/lib/x86_64-linux-gnu/libc.so.6+0x10751c)
+
+DEDUP_TOKEN: Load<int>--jxl::N_AVX2::RgbFromSingle(unsigned long, int const*, float, jxl::Image3<float>*, unsigned long, unsigned long, jxl::Rect&)--jxl::ThreadPool::SequentialRunnerStatic(void*, void*, int (*)(void*, unsigned long), void (*)(void*, unsigned int, unsigned long), unsigned int, unsigned int)
+[1m[32m0x631000012e00 is located 0 bytes to the right of 75264-byte region [0x631000000800,0x631000012e00)
+[1m[0m[1m[35mallocated by thread T2 here:[1m[0m
+    #0 0x525fbd in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x2569416 in jxl::CacheAligned::Allocate(unsigned long, unsigned long) /src/libjxl/lib/jxl/base/cache_aligned.cc:85:21
+    #2 0x25d8b47 in Allocate /src/libjxl/lib/jxl/base/cache_aligned.h:43:12
+    #3 0x25d8b47 in AllocateArray /src/libjxl/lib/jxl/base/cache_aligned.h:61:29
+    #4 0x25d8b47 in jxl::PlaneBase::PlaneBase(unsigned long, unsigned long, unsigned long) /src/libjxl/lib/jxl/image.cc:93:14
+    #5 0x2d4f3e4 in Plane /src/libjxl/lib/jxl/image.h:147:9
+    #6 0x2d4f3e4 in Channel /src/libjxl/lib/jxl/modular/modular_image.h:40:9
+    #7 0x2d4f3e4 in jxl::ModularFrameDecoder::DecodeGroup(jxl::Rect const&, jxl::BitReader*, int, int, jxl::ModularStreamId const&, bool, jxl::PassesDecoderState*, jxl::ImageBundle*) /src/libjxl/lib/jxl/dec_modular.cc:275:13
+    #8 0x2c093da in jxl::FrameDecoder::ProcessACGroup(unsigned long, jxl::BitReader* restrict*, unsigned long, unsigned long, bool, bool) /src/libjxl/lib/jxl/dec_frame.cc:578:7
+    #9 0x2c12444 in operator() /src/libjxl/lib/jxl/dec_frame.cc:731:16
+    #10 0x2c12444 in jxl::ThreadPool::RunCallState<jxl::FrameDecoder::ProcessSections(jxl::FrameDecoder::SectionInfo const*, unsigned long, jxl::FrameDecoder::SectionStatus*)::$_1, jxl::FrameDecoder::ProcessSections(jxl::FrameDecoder::SectionInfo const*, unsigned long, jxl::FrameDecoder::SectionStatus*)::$_2>::CallDataFunc(void*, unsigned int, unsigned long) /src/libjxl/lib/jxl/base/data_parallel.h:88:14
+    #11 0x31a8a39 in RunRange /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:137:7
+    #12 0x31a8a39 in jpegxl::ThreadParallelRunner::ThreadFunc(jpegxl::ThreadParallelRunner*, int) /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:167:9
+    #13 0x31aaa73 in __invoke<void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int> /usr/local/bin/../include/c++/v1/type_traits:3679:1
+    #14 0x31aaa73 in __thread_execute<std::unique_ptr<std::__thread_struct>, void (*)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int, 2, 3> /usr/local/bin/../include/c++/v1/thread:280:5
+    #15 0x31aaa73 in void* std::__1::__thread_proxy<std::__1::tuple<std::__1::unique_ptr<std::__1::__thread_struct, std::__1::default_delete<std::__1::__thread_struct> >, void (*)(jpegxl::ThreadParallelRunner*, int), jpegxl::ThreadParallelRunner*, unsigned int> >(void*) /usr/local/bin/../include/c++/v1/thread:291:5
+    #16 0x7ffff78b86b9 in start_thread (/lib/x86_64-linux-gnu/libpthread.so.0+0x76b9)
+
+DEDUP_TOKEN: malloc--jxl::CacheAligned::Allocate(unsigned long, unsigned long)--Allocate
+Thread T2 created by T0 here:
+    #0 0x51030a in pthread_create /src/llvm-project/compiler-rt/lib/asan/asan_interceptors.cpp:214:3
+    #1 0x31aa1af in __libcpp_thread_create /usr/local/bin/../include/c++/v1/__threading_support:509:10
+    #2 0x31aa1af in thread<void (&)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int &, void> /usr/local/bin/../include/c++/v1/thread:307:16
+    #3 0x31aa1af in construct<std::thread, void (&)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int &> /usr/local/bin/../include/c++/v1/memory:886:28
+    #4 0x31aa1af in construct<std::thread, void (&)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int &, void> /usr/local/bin/../include/c++/v1/__memory/allocator_traits.h:288:13
+    #5 0x31aa1af in void std::__1::vector<std::__1::thread, std::__1::allocator<std::__1::thread> >::__construct_one_at_end<void (&)(jpegxl::ThreadParallelRunner*, int), jpegxl::ThreadParallelRunner*, unsigned int&>(void (&)(jpegxl::ThreadParallelRunner*, int), jpegxl::ThreadParallelRunner*&&, unsigned int&) /usr/local/bin/../include/c++/v1/vector:926:5
+    #6 0x31a9053 in emplace_back<void (&)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int &> /usr/local/bin/../include/c++/v1/vector:1684:9
+    #7 0x31a9053 in jpegxl::ThreadParallelRunner::ThreadParallelRunner(int) /src/libjxl/lib/threads/thread_parallel_runner_internal.cc:194:14
+    #8 0x31a78b8 in JxlThreadParallelRunnerCreate /src/libjxl/lib/threads/thread_parallel_runner.cc:81:19
+    #9 0x7914f7 in vips_foreign_load_jxl_build /src/libvips/libvips/foreign/jxlload.c:156:16
+    #10 0x7930d9 in vips_foreign_load_jxl_file_build /src/libvips/libvips/foreign/jxlload.c:722:6
+    #11 0x577593 in vips_object_build /src/libvips/libvips/iofuncs/object.c:367:6
+    #12 0x83a668 in vips_cache_operation_buildp /src/libvips/libvips/iofuncs/cache.c:910:7
+    #13 0x585257 in vips_call_required_optional /src/libvips/libvips/iofuncs/operation.c:880:6
+    #14 0x588e59 in vips_call_by_name /src/libvips/libvips/iofuncs/operation.c:920:11
+    #15 0x589220 in vips_call_split_option_string /src/libvips/libvips/iofuncs/operation.c:1039:11
+    #16 0x56ad15 in vips_image_new_from_file /src/libvips/libvips/iofuncs/image.c:1916:11
+    #17 0x559edb in test_one_file(char const*) /src/libvips/fuzz/jpegsave_file_fuzzer.cc:17:16
+    #18 0x559dd6 in LLVMFuzzerTestOneInput /src/libvips/fuzz/jpegsave_file_fuzzer.cc:52:3
+    #19 0x45d083 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #20 0x4487c2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #21 0x44e49e in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #22 0x477f82 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #23 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: pthread_create--__libcpp_thread_create--thread<void (&)(jpegxl::ThreadParallelRunner *, int), jpegxl::ThreadParallelRunner *, unsigned int &, void>
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/libjxl/third_party/highway/hwy/ops/x86_256-inl.h:1327:7 in Load<int>
+Shadow bytes around the buggy address:
+  0x0c627fffa570: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c627fffa580: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c627fffa590: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c627fffa5a0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c627fffa5b0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c627fffa5c0:[[1m[31mfa[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c627fffa5d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c627fffa5e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c627fffa5f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c627fffa600: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c627fffa610: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42499353

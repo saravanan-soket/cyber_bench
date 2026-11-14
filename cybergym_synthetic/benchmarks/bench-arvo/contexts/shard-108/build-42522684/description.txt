@@ -1,0 +1,76 @@
+ARVO id: 42522684
+Project: libdwarf
+Fuzz target: fuzz_srcfiles
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-double-free
+Language: c
+Repo: https://github.com/davea42/libdwarf-code
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1819161914
+INFO: Loaded 1 modules   (12027 inline 8-bit counters): 12027 [0x777280, 0x77a17b), 
+INFO: Loaded 1 PC tables (12027 PCs): 12027 [0x6d8250,0x707200), 
+/out/fuzz_srcfiles: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+
+libdwarf is unable to record error DW_DLE_LINE_OFFSET_WRONG_FORM(336) Corrupt dwarf No error argument or handler available
+
+libdwarf is unable to record error DW_DLE_LINE_OFFSET_BAD (120) No error argument or handler available
+
+libdwarf is unable to record error DW_DLE_LINE_OFFSET_BAD (120) No error argument or handler available
+
+libdwarf is unable to record error DW_DLE_LINE_NUMBER_HEADER_ERROR (235), a line number program header seems incomplete No error argument or handler available
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: attempting double-free on 0x61f000000080 in thread T0:
+[1m[0mSCARINESS: 42 (double-free)
+    #0 0x52ece2 in __interceptor_free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3
+    #1 0x5c5b28 in _dwarf_read_line_table_header /src/libdwarf/src/lib/libdwarf/dwarf_line_table_reader_common.h
+    #2 0x5c81b1 in _dwarf_internal_srclines /src/libdwarf/src/lib/libdwarf/dwarf_line.c:826:20
+    #3 0x5d0da5 in dwarf_srclines_b /src/libdwarf/src/lib/libdwarf/dwarf_line.c:1088:12
+    #4 0x56ab1d in exampled /src/libdwarf/fuzz/fuzz_srcfiles.c:123:10
+    #5 0x56a3b3 in LLVMFuzzerTestOneInput /src/libdwarf/fuzz/fuzz_srcfiles.c:78:11
+    #6 0x43ddf3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #7 0x429552 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #8 0x42edfc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #9 0x458332 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7f1ce8f06082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #11 0x41f71d in _start (/out/fuzz_srcfiles+0x41f71d)
+
+DEDUP_TOKEN: __interceptor_free--_dwarf_read_line_table_header--_dwarf_internal_srclines
+[1m[32m0x61f000000080 is located 0 bytes inside of 3376-byte region [0x61f000000080,0x61f000000db0)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x52ece2 in __interceptor_free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3
+    #1 0x5c5b06 in _dwarf_read_line_table_header /src/libdwarf/src/lib/libdwarf/dwarf_line_table_reader_common.h:990:21
+    #2 0x5c81b1 in _dwarf_internal_srclines /src/libdwarf/src/lib/libdwarf/dwarf_line.c:826:20
+    #3 0x5d0da5 in dwarf_srclines_b /src/libdwarf/src/lib/libdwarf/dwarf_line.c:1088:12
+    #4 0x56ab1d in exampled /src/libdwarf/fuzz/fuzz_srcfiles.c:123:10
+    #5 0x56a3b3 in LLVMFuzzerTestOneInput /src/libdwarf/fuzz/fuzz_srcfiles.c:78:11
+    #6 0x43ddf3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #7 0x429552 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #8 0x42edfc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #9 0x458332 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7f1ce8f06082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+
+DEDUP_TOKEN: __interceptor_free--_dwarf_read_line_table_header--_dwarf_internal_srclines
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x52ef86 in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:69:3
+    #1 0x5c4ce6 in _dwarf_read_line_table_header /src/libdwarf/src/lib/libdwarf/dwarf_line_table_reader_common.h:782:32
+    #2 0x5c81b1 in _dwarf_internal_srclines /src/libdwarf/src/lib/libdwarf/dwarf_line.c:826:20
+    #3 0x5d0da5 in dwarf_srclines_b /src/libdwarf/src/lib/libdwarf/dwarf_line.c:1088:12
+    #4 0x56ab1d in exampled /src/libdwarf/fuzz/fuzz_srcfiles.c:123:10
+    #5 0x56a3b3 in LLVMFuzzerTestOneInput /src/libdwarf/fuzz/fuzz_srcfiles.c:78:11
+    #6 0x43ddf3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #7 0x429552 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #8 0x42edfc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #9 0x458332 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7f1ce8f06082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+
+DEDUP_TOKEN: malloc--_dwarf_read_line_table_header--_dwarf_internal_srclines
+SUMMARY: AddressSanitizer: double-free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3 in __interceptor_free
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42522684

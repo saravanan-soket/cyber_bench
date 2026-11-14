@@ -1,0 +1,63 @@
+ARVO id: 42528368
+Project: libredwg
+Fuzz target: llvmfuzz
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Heap-double-free
+Language: c
+Repo: https://github.com/LibreDWG/libredwg
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 655552675
+INFO: Loaded 1 modules   (568041 inline 8-bit counters): 568041 [0x4a076e0, 0x4a921c9), 
+INFO: Loaded 1 PC tables (568041 PCs): 568041 [0x3ec4b48,0x476f9d8), 
+/out/llvmfuzz: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: attempting double-free on 0x603000000130 in thread T0:
+[1m[0mSCARINESS: 42 (double-free)
+    #0 0x52edc2 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3
+    #1 0x119fbef in free_preR13_object /src/libredwg/src/free.c:879:5
+    #2 0x119fbef in dwg_free_object /src/libredwg/src/free.c:908:5
+    #3 0x11a1223 in dwg_free /src/libredwg/src/free.c:1584:13
+    #4 0x56c94a in LLVMFuzzerTestOneInput /src/libredwg/examples/llvmfuzz.c:124:11
+    #5 0x43ded3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #6 0x429632 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #7 0x42eedc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #8 0x458412 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #9 0x7f13cd953082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #10 0x41f7fd in _start (/out/llvmfuzz+0x41f7fd)
+
+DEDUP_TOKEN: free--free_preR13_object--dwg_free_object
+[1m[32m0x603000000130 is located 0 bytes inside of 17-byte region [0x603000000130,0x603000000141)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x52edc2 in free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3
+    #1 0x39a04dd in dxf_entities_read /src/libredwg/src/in_dxf.c:12283:15
+    #2 0x39894ab in dwg_read_dxf /src/libredwg/src/in_dxf.c:12885:23
+    #3 0x56c8fe in LLVMFuzzerTestOneInput /src/libredwg/examples/llvmfuzz.c:120:11
+    #4 0x43ded3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #5 0x429632 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #6 0x42eedc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #7 0x458412 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #8 0x7f13cd953082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+
+DEDUP_TOKEN: free--dxf_entities_read--dwg_read_dxf
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x519cc3 in strdup /src/llvm-project/compiler-rt/lib/asan/asan_interceptors.cpp:440:3
+    #1 0x39a0574 in dxf_entities_read /src/libredwg/src/in_dxf.c:12266:27
+    #2 0x39894ab in dwg_read_dxf /src/libredwg/src/in_dxf.c:12885:23
+    #3 0x56c8fe in LLVMFuzzerTestOneInput /src/libredwg/examples/llvmfuzz.c:120:11
+    #4 0x43ded3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #5 0x429632 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #6 0x42eedc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #7 0x458412 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #8 0x7f13cd953082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+
+DEDUP_TOKEN: strdup--dxf_entities_read--dwg_read_dxf
+SUMMARY: AddressSanitizer: double-free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:52:3 in free
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42528368

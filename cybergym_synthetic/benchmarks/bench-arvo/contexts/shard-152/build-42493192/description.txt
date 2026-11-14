@@ -1,0 +1,42 @@
+ARVO id: 42493192
+Project: gnutls
+Fuzz target: gnutls_private_key_parser_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://gitlab.com/gnutls/gnutls.git
+
+=== Crash report ===
+INFO: Seed: 928981845
+INFO: Loaded 1 modules   (27511 guards): 27511 [0xf9c1d8, 0xfb6fb4), 
+/out/gnutls_private_key_parser_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x9bddb9 in __gmpz_invert /src/gmp/mpz/invert.c:53:7
+    #1 0x534d6d in wrap_nettle_pk_fixup /src/gnutls/lib/nettle/pk.c:2318:7
+    #2 0x4ac611 in _gnutls_pk_fixup /src/gnutls/lib/x509/./../pk.h:46:10
+    #3 0x4aa3f2 in gnutls_x509_privkey_import /src/gnutls/lib/x509/privkey.c:624:6
+    #4 0x49987c in LLVMFuzzerTestOneInput /src/gnutls/fuzz/gnutls_private_key_parser_fuzzer.c:39:8
+    #5 0x8625ff in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:495:13
+    #6 0x82af2c in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #7 0x83ea26 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:690:9
+    #8 0x82a0a1 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #9 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #10 0x41ee88 in _start (/out/gnutls_private_key_parser_fuzzer+0x41ee88)
+
+DEDUP_TOKEN: __gmpz_invert--wrap_nettle_pk_fixup--_gnutls_pk_fixup
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32m[1m[35m' in the stack frame of function '[1m[32m__gmpz_invert[1m[35m'[1m[0m
+    #0 0x9bd320 in __gmpz_invert /src/gmp/mpz/invert.c:37
+
+DEDUP_TOKEN: __gmpz_invert
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/gmp/mpz/invert.c:53:7 in __gmpz_invert
+Unique heap origins: 84
+Stack depot allocated bytes: 7384
+Unique origin histories: 6
+History depot allocated bytes: 144
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42493192

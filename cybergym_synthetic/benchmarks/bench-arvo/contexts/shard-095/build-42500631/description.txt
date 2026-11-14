@@ -1,0 +1,114 @@
+ARVO id: 42500631
+Project: imagemagick
+Fuzz target: ping_ttf_fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/ping_ttf_fuzzer[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x6020000020f6 at pc 0x00000162c7d9 bp 0x7ffee6376c90 sp 0x7ffee6376c88
+[1m[0m[1m[34mREAD of size 1 at 0x6020000020f6 thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0x162c7d8 in tt_skip_pdffont_random_tag /src/freetype2/src/truetype/ttobjs.c:159:10
+    #1 0x162bfbb in tt_check_trickyness_family /src/freetype2/src/truetype/ttobjs.c:235:24
+    #2 0x162a709 in tt_check_trickyness /src/freetype2/src/truetype/ttobjs.c:554:10
+    #3 0x15eb779 in tt_face_init /src/freetype2/src/truetype/ttobjs.c:719:10
+    #4 0x15dd481 in open_face /src/freetype2/src/base/ftobjs.c:1465:15
+    #5 0x15c38b2 in ft_open_face_internal /src/freetype2/src/base/ftobjs.c:2501:17
+    #6 0x15deae7 in open_face_from_buffer /src/freetype2/src/base/ftobjs.c:1686:13
+    #7 0x15e1395 in Mac_Read_sfnt_Resource /src/freetype2/src/base/ftobjs.c:2148:13
+    #8 0x15df7ed in IsMacResource /src/freetype2/src/base/ftobjs.c:2211:15
+    #9 0x15dde4f in load_mac_face /src/freetype2/src/base/ftobjs.c:2399:15
+    #10 0x15c30e6 in ft_open_face_internal /src/freetype2/src/base/ftobjs.c:2583:17
+    #11 0x15c47e7 in FT_Open_Face /src/freetype2/src/base/ftobjs.c:2428:12
+    #12 0x9066d2 in RenderFreetype /src/imagemagick/MagickCore/annotate.c:1421:13
+    #13 0x903f13 in RenderType /src/imagemagick/MagickCore/annotate.c:965:18
+    #14 0x9036ff in GetTypeMetrics /src/imagemagick/MagickCore/annotate.c:885:10
+    #15 0x9c341f in RenderMVGContent /src/imagemagick/MagickCore/draw.c:4356:17
+    #16 0x9bb05c in DrawImage /src/imagemagick/MagickCore/draw.c:4478:10
+    #17 0xda92da in ReadTTFImage /src/imagemagick/coders/ttf.c:289:10
+    #18 0x98641c in ReadImage /src/imagemagick/MagickCore/constitute.c:563:15
+    #19 0xb9946e in ReadStream /src/imagemagick/MagickCore/stream.c:1081:9
+    #20 0x9269b8 in PingBlob /src/imagemagick/MagickCore/blob.c:3646:13
+    #21 0x867b34 in Magick::Image::ping(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:3873:12
+    #22 0x83ee85 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/ping_fuzzer.cc:44:11
+    #23 0x84036b in main (/out/ping_ttf_fuzzer+0x84036b)
+    #24 0x7f178dd9083f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #25 0x791148 in _start (/out/ping_ttf_fuzzer+0x791148)
+
+DEDUP_TOKEN: tt_skip_pdffont_random_tag--tt_check_trickyness_family--tt_check_trickyness
+[1m[32m0x6020000020f6 is located 5 bytes to the right of 1-byte region [0x6020000020f0,0x6020000020f1)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x80bc0d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0x15b89fa in ft_alloc /src/freetype2/src/base/ftsystem.c:76:12
+    #2 0x15dbe5a in ft_mem_qrealloc /src/freetype2/src/base/ftutil.c:145:15
+    #3 0x15bd000 in ft_mem_realloc /src/freetype2/src/base/ftutil.c:101:13
+    #4 0x16ea584 in tt_name_ascii_from_utf16 /src/freetype2/src/sfnt/sfobjs.c:68:10
+    #5 0x16cc0a8 in tt_face_get_name /src/freetype2/src/sfnt/sfobjs.c:280:16
+    #6 0x16ba712 in sfnt_load_face /src/freetype2/src/sfnt/sfobjs.c:1019:9
+    #7 0x15eb744 in tt_face_init /src/freetype2/src/truetype/ttobjs.c:715:13
+    #8 0x15dd481 in open_face /src/freetype2/src/base/ftobjs.c:1465:15
+    #9 0x15c38b2 in ft_open_face_internal /src/freetype2/src/base/ftobjs.c:2501:17
+    #10 0x15deae7 in open_face_from_buffer /src/freetype2/src/base/ftobjs.c:1686:13
+    #11 0x15e1395 in Mac_Read_sfnt_Resource /src/freetype2/src/base/ftobjs.c:2148:13
+    #12 0x15df7ed in IsMacResource /src/freetype2/src/base/ftobjs.c:2211:15
+    #13 0x15dde4f in load_mac_face /src/freetype2/src/base/ftobjs.c:2399:15
+    #14 0x15c30e6 in ft_open_face_internal /src/freetype2/src/base/ftobjs.c:2583:17
+    #15 0x15c47e7 in FT_Open_Face /src/freetype2/src/base/ftobjs.c:2428:12
+    #16 0x9066d2 in RenderFreetype /src/imagemagick/MagickCore/annotate.c:1421:13
+    #17 0x903f13 in RenderType /src/imagemagick/MagickCore/annotate.c:965:18
+    #18 0x9036ff in GetTypeMetrics /src/imagemagick/MagickCore/annotate.c:885:10
+    #19 0x9c341f in RenderMVGContent /src/imagemagick/MagickCore/draw.c:4356:17
+    #20 0x9bb05c in DrawImage /src/imagemagick/MagickCore/draw.c:4478:10
+    #21 0xda92da in ReadTTFImage /src/imagemagick/coders/ttf.c:289:10
+    #22 0x98641c in ReadImage /src/imagemagick/MagickCore/constitute.c:563:15
+    #23 0xb9946e in ReadStream /src/imagemagick/MagickCore/stream.c:1081:9
+    #24 0x9269b8 in PingBlob /src/imagemagick/MagickCore/blob.c:3646:13
+    #25 0x867b34 in Magick::Image::ping(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:3873:12
+    #26 0x83ee85 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/ping_fuzzer.cc:44:11
+    #27 0x84036b in main (/out/ping_ttf_fuzzer+0x84036b)
+
+DEDUP_TOKEN: malloc--ft_alloc--ft_mem_qrealloc
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/freetype2/src/truetype/ttobjs.c:159:10 in tt_skip_pdffont_random_tag
+Shadow bytes around the buggy address:
+  0x0c047fff83c0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m01[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m06[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m02[1m[0m
+  0x0c047fff83d0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m01[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m02[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff83e0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff83f0: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+  0x0c047fff8400: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m
+=>0x0c047fff8410: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m01[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m[[1m[0m01[1m[0m][1m[31mfa[1m[0m
+  0x0c047fff8420: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m06[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8430: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8440: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8450: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c047fff8460: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42500631

@@ -1,0 +1,47 @@
+ARVO id: 42538161
+Project: binutils-gdb
+Fuzz target: fuzz_addr2line
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: git://sourceware.org/git/binutils-gdb.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3874793425
+INFO: Loaded 1 modules   (186911 inline 8-bit counters): 186911 [0x55aa688cce20, 0x55aa688fa83f), 
+INFO: Loaded 1 PC tables (186911 PCs): 186911 [0x55aa688fa840,0x55aa68bd4a30), 
+/out/fuzz_addr2line: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+BFD: warning: /tmp/libfuzzer.7 has a program header with invalid alignment
+BFD: warning: /tmp/libfuzzer.7 has a program header with invalid alignment
+BFD: /tmp/libfuzzer.7: string table [10] is corrupt
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x7f5e50f7dbff (pc 0x55aa67705615 bp 0x7ffcdeff0c00 sp 0x7ffcdeff0bc0 T0)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+SCARINESS: 30 (wild-addr-write)
+    #0 0x55aa67705615 in bfd_elf_get_str_section /src/binutils-gdb/bfd/elf.c:304:31
+    #1 0x55aa67705919 in bfd_elf_string_from_elf_section /src/binutils-gdb/bfd/elf.c:338:11
+    #2 0x55aa6770692e in bfd_elf_sym_name /src/binutils-gdb/bfd/elf.c:550:10
+    #3 0x55aa678182b7 in bfd_elf32_slurp_symbol_table /src/binutils-gdb/bfd/./elfcode.h:1358:25
+    #4 0x55aa6773f277 in _bfd_elf_canonicalize_symtab /src/binutils-gdb/bfd/elf.c:9127:19
+    #5 0x55aa6767d894 in slurp_symtab /src/binutils-gdb/binutils/./fuzz_addr2line.h
+    #6 0x55aa6767d894 in process_file /src/binutils-gdb/binutils/./fuzz_addr2line.h:480:3
+    #7 0x55aa6767ee95 in LLVMFuzzerTestOneInput /src/binutils-gdb/binutils/fuzz_addr2line.c:47:3
+    #8 0x55aa6752f620 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #9 0x55aa67519db4 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #10 0x55aa6751f84a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #11 0x55aa6754bc42 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f5e51595082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #13 0x55aa6751088d in _start (/out/fuzz_addr2line+0x7b188d)
+
+DEDUP_TOKEN: bfd_elf_get_str_section--bfd_elf_string_from_elf_section--bfd_elf_sym_name
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/binutils-gdb/bfd/elf.c:304:31 in bfd_elf_get_str_section
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42538161

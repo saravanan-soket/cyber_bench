@@ -1,0 +1,46 @@
+ARVO id: 42530193
+Project: vulkan-loader
+Fuzz target: instance_create_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c
+Repo: https://github.com/khronosgroup/Vulkan-Loader
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1048575920
+INFO: Loaded 1 modules   (9500 inline 8-bit counters): 9500 [0x72a663, 0x72cb7f), 
+INFO: Loaded 1 PC tables (9500 PCs): 9500 [0x72cb80,0x751d40), 
+/out/instance_create_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x01fe0c9e53ed (pc 0x0000004c3dc2 bp 0x7ffd4cbf0580 sp 0x7ffd4cbefcf8 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x4c3dc2 in AddressIsPoisoned /src/llvm-project/compiler-rt/lib/asan/asan_mapping.h:377:21
+    #1 0x4c3dc2 in __asan::QuickCheckForUnpoisonedRegion(unsigned long, unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.h:31:13
+    #2 0x4cf4bc in printf_common(void*, char const*, __va_list_tag*) /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors_format.inc:553:9
+    #3 0x4cf75c in __interceptor_vsnprintf /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:1665:1
+    #4 0x60e2c9 in loader_log /src/vulkan-loader/loader/log.c:97:15
+    #5 0x5e624d in loader_handle_load_library_error /src/vulkan-loader/loader/loader.c:195:5
+    #6 0x5e624d in loader_scanned_icd_add /src/vulkan-loader/loader/loader.c:1656:9
+    #7 0x5e7b0c in loader_icd_scan /src/vulkan-loader/loader/loader.c:3645:13
+    #8 0x570a91 in vkCreateInstance /src/vulkan-loader/loader/trampoline.c:652:11
+    #9 0x56cc7b in LLVMFuzzerTestOneInput /src/instance_create_fuzzer.c:105:18
+    #10 0x43de73 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #11 0x4295d2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #12 0x42ee7c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #13 0x4583b2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #14 0x7f6328266082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: e678fe54a5d2c2092f8e47eb0b33105e380f7340)
+    #15 0x41f79d in _start (/out/instance_create_fuzzer+0x41f79d)
+
+DEDUP_TOKEN: AddressIsPoisoned--__asan::QuickCheckForUnpoisonedRegion(unsigned long, unsigned long)--printf_common(void*, char const*, __va_list_tag*)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/llvm-project/compiler-rt/lib/asan/asan_mapping.h:377:21 in AddressIsPoisoned
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42530193

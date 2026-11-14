@@ -1,0 +1,42 @@
+ARVO id: 42525114
+Project: PcapPlusPlus
+Fuzz target: FuzzTarget
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/seladb/PcapPlusPlus
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1532271193
+INFO: Loaded 1 modules   (26806 inline 8-bit counters): 26806 [0xbf79e8, 0xbfe29e), 
+INFO: Loaded 1 PC tables (26806 PCs): 26806 [0xbfe2a0,0xc66e00), 
+/out/FuzzTarget: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address 0x701000010000 (pc 0x0000006f4640 bp 0x7ffe0e606a90 sp 0x7ffe0e6069f0 T7)
+[1m[0m==7==The signal is caused by a READ memory access.
+    #0 0x6f4640 in assign /src/PcapPlusPlus/Packet++/header/NflogLayer.h:117:12
+    #1 0x6f4640 in NflogTlv /src/PcapPlusPlus/Packet++/header/NflogLayer.h:98:4
+    #2 0x6f4640 in getFirstTLVRecord /src/PcapPlusPlus/Packet++/header/TLVData.h:263:18
+    #3 0x6f4640 in getTLVRecord /src/PcapPlusPlus/Packet++/header/TLVData.h:313:27
+    #4 0x6f4640 in getTlvByType /src/PcapPlusPlus/Packet++/src/NflogLayer.cpp:38:29
+    #5 0x6f4640 in pcpp::NflogLayer::parseNextLayer() /src/PcapPlusPlus/Packet++/src/NflogLayer.cpp:50:21
+    #6 0x5e3462 in pcpp::Packet::setRawPacket(pcpp::RawPacket*, bool, unsigned long, pcpp::OsiModelLayer) /src/PcapPlusPlus/Packet++/src/Packet.cpp:81:13
+    #7 0x56547c in LLVMFuzzerTestOneInput /src/PcapPlusPlus/Tests/Fuzzers/FuzzTarget.cpp:68:16
+    #8 0x46e353 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #9 0x459ab2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x45f35c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #11 0x488892 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f29fe047082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #13 0x44fc7d in _start (/out/FuzzTarget+0x44fc7d)
+
+DEDUP_TOKEN: assign--NflogTlv--getFirstTLVRecord
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV /src/PcapPlusPlus/Packet++/header/NflogLayer.h:117:12 in assign
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42525114

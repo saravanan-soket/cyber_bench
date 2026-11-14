@@ -1,0 +1,103 @@
+ARVO id: 42539004
+Project: imagemagick
+Fuzz target: encoder_heic_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-buffer-overflow READ 1
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/encoder_heic_fuzzer < INPUT_FILE
+or
+  /out/encoder_heic_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/encoder_heic_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 4939 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x62300000199c at pc 0x000000bc529f bp 0x7ffca34f1570 sp 0x7ffca34f1568
+[1m[0m[1m[34mREAD of size 1 at 0x62300000199c thread T0[1m[0m
+SCARINESS: 12 (1-byte-read-heap-buffer-overflow)
+    #0 0xbc529e in ref_pic_set::compute_derived_values() /src/libde265/libde265/refpic.cc:56:9
+    #1 0xbc6449 in read_short_term_ref_pic_set(error_queue*, seq_parameter_set const*, bitreader*, ref_pic_set*, int, std::__1::vector<ref_pic_set, std::__1::allocator<ref_pic_set> > const&, bool) /src/libde265/libde265/refpic.cc:312:12
+    #2 0xb639db in seq_parameter_set::read(error_queue*, bitreader*) /src/libde265/libde265/sps.cc:383:20
+    #3 0xb0179d in decoder_context::read_sps_NAL(bitreader&) /src/libde265/libde265/decctx.cc:552:21
+    #4 0xb079f6 in decoder_context::decode_NAL(NAL_unit*) /src/libde265/libde265/decctx.cc:1236:13
+    #5 0xb07e2c in decoder_context::decode(int*) /src/libde265/libde265/decctx.cc:1315:16
+    #6 0x9f6709 in decodeH265Image /src/imagemagick/coders/heic.c:928:11
+    #7 0x9f48b0 in ReadHEICImage /src/imagemagick/coders/heic.c:1171:9
+    #8 0x635e16 in ReadImage /src/imagemagick/MagickCore/constitute.c:500:13
+    #9 0x5d784f in BlobToImage /src/imagemagick/MagickCore/blob.c:469:13
+    #10 0x52faa4 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4015:12
+    #11 0x52629b in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:43:11
+    #12 0x52698f in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:279:5
+    #13 0x526f2f in main /src/libfuzzer/afl/afl_driver.cpp:316:12
+    #14 0x7f18c60ca82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #15 0x41dff8 in _start (/out/encoder_heic_fuzzer+0x41dff8)
+
+DEDUP_TOKEN: ref_pic_set::compute_derived_values()--read_short_term_ref_pic_set(error_queue*, seq_parameter_set const*, bitreader*, ref_pic_set*, int, std::__1::vector<ref_pic_set, std::__1::allocator<ref_pic_set> > const&, bool)--seq_parameter_set::read(error_queue*, bitreader*)
+[1m[32m0x62300000199c is located 0 bytes to the right of 6300-byte region [0x623000000100,0x62300000199c)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x521d58 in operator new(unsigned long) /src/llvm/projects/compiler-rt/lib/asan/asan_new_delete.cc:92
+    #1 0xb6a26b in __libcpp_allocate /usr/local/bin/../include/c++/v1/new:259:10
+    #2 0xb6a26b in allocate /usr/local/bin/../include/c++/v1/memory:1799
+    #3 0xb6a26b in allocate /usr/local/bin/../include/c++/v1/memory:1548
+    #4 0xb6a26b in std::__1::__split_buffer<ref_pic_set, std::__1::allocator<ref_pic_set>&>::__split_buffer(unsigned long, unsigned long, std::__1::allocator<ref_pic_set>&) /usr/local/bin/../include/c++/v1/__split_buffer:311
+    #5 0xb69e97 in std::__1::vector<ref_pic_set, std::__1::allocator<ref_pic_set> >::__append(unsigned long) /usr/local/bin/../include/c++/v1/vector:1047:53
+    #6 0xb63995 in seq_parameter_set::read(error_queue*, bitreader*) /src/libde265/libde265/sps.cc:379:16
+    #7 0xb0179d in decoder_context::read_sps_NAL(bitreader&) /src/libde265/libde265/decctx.cc:552:21
+    #8 0xb079f6 in decoder_context::decode_NAL(NAL_unit*) /src/libde265/libde265/decctx.cc:1236:13
+    #9 0xb07e2c in decoder_context::decode(int*) /src/libde265/libde265/decctx.cc:1315:16
+    #10 0x9f6709 in decodeH265Image /src/imagemagick/coders/heic.c:928:11
+    #11 0x9f48b0 in ReadHEICImage /src/imagemagick/coders/heic.c:1171:9
+    #12 0x635e16 in ReadImage /src/imagemagick/MagickCore/constitute.c:500:13
+    #13 0x5d784f in BlobToImage /src/imagemagick/MagickCore/blob.c:469:13
+    #14 0x52faa4 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4015:12
+    #15 0x52629b in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:43:11
+    #16 0x52698f in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:279:5
+    #17 0x526f2f in main /src/libfuzzer/afl/afl_driver.cpp:316:12
+    #18 0x7f18c60ca82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+
+DEDUP_TOKEN: operator new(unsigned long)--__libcpp_allocate--allocate
+SUMMARY: AddressSanitizer: heap-buffer-overflow /src/libde265/libde265/refpic.cc:56:9 in ref_pic_set::compute_derived_values()
+Shadow bytes around the buggy address:
+  0x0c467fff82e0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c467fff82f0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c467fff8300: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c467fff8310: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c467fff8320: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+=>0x0c467fff8330: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m04[1m[0m][1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c467fff8340: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c467fff8350: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c467fff8360: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c467fff8370: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c467fff8380: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42539004

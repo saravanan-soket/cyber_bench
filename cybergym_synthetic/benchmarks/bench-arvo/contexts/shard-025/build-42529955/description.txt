@@ -1,0 +1,38 @@
+ARVO id: 42529955
+Project: libheif
+Fuzz target: file_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/strukturag/libheif.git
+
+=== Crash report ===
+Reading 2029 bytes from /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x4a9aa54a7800 (pc 0x7f52a899cd58 bp 0x7ffeb81c90b0 sp 0x7ffeb81c8878 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x7f52a899cd58  (/lib/x86_64-linux-gnu/libc.so.6+0xbbd58) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #1 0x4a05f8 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #2 0x6156cd in HeifPixelImage::overlay(std::__1::shared_ptr<HeifPixelImage>&, int, int) /src/libheif/libheif/pixelimage.cc:834:9
+    #3 0x58b17c in HeifContext::decode_overlay_image(unsigned int, std::__1::shared_ptr<HeifPixelImage>&, std::__1::vector<unsigned char, std::__1::allocator<unsigned char> > const&, heif_decoding_options const&) const /src/libheif/libheif/context.cc:1976:16
+    #4 0x575201 in HeifContext::decode_image_planar(unsigned int, std::__1::shared_ptr<HeifPixelImage>&, heif_colorspace, heif_decoding_options const&, bool) const /src/libheif/libheif/context.cc:1333:13
+    #5 0x5715fe in HeifContext::decode_image_user(unsigned int, std::__1::shared_ptr<HeifPixelImage>&, heif_colorspace, heif_chroma, heif_decoding_options const&) const /src/libheif/libheif/context.cc:1154:15
+    #6 0x4f3a82 in heif_decode_image /src/libheif/libheif/heif.cc:1019:35
+    #7 0x4dfb7a in TestDecodeImage(heif_context*, heif_image_handle const*, unsigned long) /src/libheif/fuzzing/file_fuzzer.cc:62:9
+    #8 0x4df338 in LLVMFuzzerTestOneInput /src/libheif/fuzzing/file_fuzzer.cc:134:5
+    #9 0x4dee1a in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:234:7
+    #10 0x4debec in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:318:12
+    #11 0x7f52a8905082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #12 0x41ff9d in _start (/out/file_fuzzer+0x41ff9d)
+
+DEDUP_TOKEN: __asan_memcpy--HeifPixelImage::overlay(std::__1::shared_ptr<HeifPixelImage>&, int, int)
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0xbbd58) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42529955

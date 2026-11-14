@@ -1,0 +1,41 @@
+ARVO id: 42510351
+Project: gdal
+Fuzz target: gdal_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: ubsan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+INFO: Seed: 3925875056
+INFO: Loaded 1 modules   (533752 inline 8-bit counters): 533752 [0x543b430, 0x54bd928), 
+INFO: Loaded 1 PC tables (533752 PCs): 533752 [0x54bd928,0x5ce28a8), 
+/out/gdal_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+Warning: use meta data at your own risk.
+Supported master table versions: (1,2,3,4,5) yours is 32... Supported local table version supported (0,1) yours is 32...
+UndefinedBehaviorSanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: UndefinedBehaviorSanitizer: SEGV on unknown address 0x000038074988 (pc 0x0000008fd560 bp 0x7ffeb461c930 sp 0x7ffeb461c900 T7)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+    #0 0x8fd55f in extpdstemplate /src/gdal/gdal/frmts/grib/degrib/g2clib/pdstemplates.c:608:30
+    #1 0x1448e27 in g2_unpack4 /src/gdal/gdal/frmts/grib/degrib/g2clib/g2_unpack4.c:136:16
+    #2 0x55d2a4 in GRIBRasterBand::FindPDSTemplate() /src/gdal/gdal/frmts/grib/gribdataset.cpp:358:23
+    #3 0x563992 in GRIBDataset::Open(GDALOpenInfo*) /src/gdal/gdal/frmts/grib/gribdataset.cpp:996:27
+    #4 0xbade90 in GDALOpenEx /src/gdal/gdal/gcore/gdaldataset.cpp:2825:20
+    #5 0x43a17d in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/gdal_fuzzer.cpp:114:24
+    #6 0x44708c in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:512:13
+    #7 0x43af0c in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:273:6
+    #8 0x43ee27 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:692:9
+    #9 0x43ac18 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #10 0x7f0fd2f1482f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #11 0x412e98 in _start (/out/gdal_fuzzer+0x412e98)
+
+DEDUP_TOKEN: extpdstemplate--g2_unpack4--GRIBRasterBand::FindPDSTemplate()
+UndefinedBehaviorSanitizer can not provide additional info.
+SUMMARY: UndefinedBehaviorSanitizer: SEGV /src/gdal/gdal/frmts/grib/degrib/g2clib/pdstemplates.c:608:30 in extpdstemplate
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42510351

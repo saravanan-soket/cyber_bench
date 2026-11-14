@@ -1,0 +1,61 @@
+ARVO id: 42508915
+Project: binutils-gdb
+Fuzz target: fuzz_as
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: git://sourceware.org/git/binutils-gdb.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1377164920
+INFO: Loaded 1 modules   (184340 inline 8-bit counters): 184340 [0x244ec17, 0x247bc2b), 
+INFO: Loaded 1 PC tables (184340 PCs): 184340 [0x206cbc8,0x233cd08), 
+/out/fuzz_as: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+/tmp/libfuzzer-7.s: Assembler messages:
+/tmp/libfuzzer-7.s: Warning: end of file not at end of a line; newline inserted
+/tmp/libfuzzer-7.s:1: Error: bad or irreducible absolute expression
+[1m[31m[1m[31mUninitialized bytes in [1m[32m__interceptor_strncasecmp[1m[31m at offset 0 inside [0x71400000057d, 1)[1m[0m
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x593132 in buffer_and_nest /src/binutils-gdb/gas/macro.c:188:10
+    #1 0x5c92fd in do_repeat /src/binutils-gdb/gas/read.c:3128:8
+    #2 0x5c9097 in s_rept /src/binutils-gdb/gas/read.c:3109:3
+    #3 0x5afebc in read_a_source_file /src/binutils-gdb/gas/read.c:1202:9
+    #4 0x52de37 in perform_an_assembly_pass /src/binutils-gdb/gas/./fuzz_as.h:1239:4
+    #5 0x52e3f0 in LLVMFuzzerTestOneInput /src/fuzz_as.c:55:3
+    #6 0x456ac3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #7 0x442372 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #8 0x447e25 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #9 0x470b22 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #10 0x7f093345e0b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #11 0x41f60d in _start (/out/fuzz_as+0x41f60d)
+
+DEDUP_TOKEN: buffer_and_nest--do_repeat--s_rept
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x4d4a92 in __interceptor_realloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:881:3
+    #1 0x1e1283a in xrealloc /src/binutils-gdb/libiberty/./xmalloc.c:179:14
+    #2 0x5e5d4d in sb_check /src/binutils-gdb/gas/sb.c:148:18
+    #3 0x5e5d4d in sb_add_buffer /src/binutils-gdb/gas/sb.c:185:3
+    #4 0x5c3023 in get_line_sb /src/binutils-gdb/gas/read.c:2725:3
+    #5 0x5c3023 in get_non_macro_line_sb /src/binutils-gdb/gas/read.c:2739:10
+    #6 0x593cd7 in buffer_and_nest /src/binutils-gdb/gas/macro.c:241:14
+    #7 0x5c92fd in do_repeat /src/binutils-gdb/gas/read.c:3128:8
+    #8 0x5c9097 in s_rept /src/binutils-gdb/gas/read.c:3109:3
+    #9 0x5afebc in read_a_source_file /src/binutils-gdb/gas/read.c:1202:9
+    #10 0x52de37 in perform_an_assembly_pass /src/binutils-gdb/gas/./fuzz_as.h:1239:4
+    #11 0x52e3f0 in LLVMFuzzerTestOneInput /src/fuzz_as.c:55:3
+    #12 0x456ac3 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #13 0x442372 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #14 0x447e25 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #15 0x470b22 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #16 0x7f093345e0b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+
+DEDUP_TOKEN: __interceptor_realloc--xrealloc--sb_check
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/binutils-gdb/gas/macro.c:188:10 in buffer_and_nest
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42508915

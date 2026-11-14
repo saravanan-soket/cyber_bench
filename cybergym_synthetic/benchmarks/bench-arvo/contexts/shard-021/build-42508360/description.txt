@@ -1,0 +1,94 @@
+ARVO id: 42508360
+Project: libarchive
+Fuzz target: libarchive_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Heap-use-after-free READ 4
+Language: c++
+Repo: https://github.com/libarchive/libarchive.git
+
+=== Crash report ===
+Reading 1423 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: heap-use-after-free on address 0x6080000000e0 at pc 0x000000576ab8 bp 0x7fffffffdcf0 sp 0x7fffffffdce8
+[1m[0m[1m[34mREAD of size 4 at 0x6080000000e0 thread T0[1m[0m
+SCARINESS: 45 (4-byte-read-heap-use-after-free)
+    #0 0x576ab7 in run_filters /src/libarchive/libarchive/archive_read_support_format_rar.c:3334:30
+    #1 0x576ab7 in read_data_compressed /src/libarchive/libarchive/archive_read_support_format_rar.c:2082:12
+    #2 0x576ab7 in archive_read_format_rar_read_data /src/libarchive/libarchive/archive_read_support_format_rar.c:1126:11
+    #3 0x4e84f9 in _archive_read_data_block /src/libarchive/libarchive/archive_read.c:987:9
+    #4 0x4dfb6c in archive_read_data /src/libarchive/libarchive/archive_read.c:841:8
+    #5 0x4d83d6 in LLVMFuzzerTestOneInput /src/libarchive_fuzzer.cc:55:17
+    #6 0x4dad35 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:191:7
+    #7 0x4daba5 in main /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c
+    #8 0x7ffff78f90b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #9 0x41f9ed in _start (/out/libarchive_fuzzer+0x41f9ed)
+
+DEDUP_TOKEN: run_filters--read_data_compressed--archive_read_format_rar_read_data
+[1m[32m0x6080000000e0 is located 64 bytes inside of 88-byte region [0x6080000000a0,0x6080000000f8)
+[1m[0m[1m[35mfreed by thread T0 here:[1m[0m
+    #0 0x49ea82 in __interceptor_free /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:111:3
+    #1 0x5847af in delete_filter /src/libarchive/libarchive/archive_read_support_format_rar.c:3430:5
+    #2 0x5847af in parse_filter /src/libarchive/libarchive/archive_read_support_format_rar.c:3187:7
+    #3 0x5847af in read_filter /src/libarchive/libarchive/archive_read_support_format_rar.c:3537:8
+    #4 0x5847af in expand /src/libarchive/libarchive/archive_read_support_format_rar.c:2920:12
+    #5 0x571705 in run_filters /src/libarchive/libarchive/archive_read_support_format_rar.c:3333:17
+    #6 0x571705 in read_data_compressed /src/libarchive/libarchive/archive_read_support_format_rar.c:2082:12
+    #7 0x571705 in archive_read_format_rar_read_data /src/libarchive/libarchive/archive_read_support_format_rar.c:1126:11
+    #8 0x4e84f9 in _archive_read_data_block /src/libarchive/libarchive/archive_read.c:987:9
+    #9 0x4dfb6c in archive_read_data /src/libarchive/libarchive/archive_read.c:841:8
+    #10 0x4d83d6 in LLVMFuzzerTestOneInput /src/libarchive_fuzzer.cc:55:17
+    #11 0x4dad35 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:191:7
+
+DEDUP_TOKEN: __interceptor_free--delete_filter--parse_filter
+[1m[35mpreviously allocated by thread T0 here:[1m[0m
+    #0 0x49ee72 in __interceptor_calloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:138:3
+    #1 0x586aa8 in create_filter /src/libarchive/libarchive/archive_read_support_format_rar.c:3302:12
+    #2 0x586aa8 in parse_filter /src/libarchive/libarchive/archive_read_support_format_rar.c:3275:12
+    #3 0x586aa8 in read_filter /src/libarchive/libarchive/archive_read_support_format_rar.c:3537:8
+    #4 0x586aa8 in expand /src/libarchive/libarchive/archive_read_support_format_rar.c:2920:12
+    #5 0x572509 in read_data_compressed /src/libarchive/libarchive/archive_read_support_format_rar.c:2182:24
+    #6 0x572509 in archive_read_format_rar_read_data /src/libarchive/libarchive/archive_read_support_format_rar.c:1126:11
+    #7 0x4e84f9 in _archive_read_data_block /src/libarchive/libarchive/archive_read.c:987:9
+    #8 0x4dfb6c in archive_read_data /src/libarchive/libarchive/archive_read.c:841:8
+    #9 0x4d83d6 in LLVMFuzzerTestOneInput /src/libarchive_fuzzer.cc:55:17
+    #10 0x4dad35 in ExecuteFilesOnyByOne /src/aflplusplus/utils/aflpp_driver/aflpp_driver.c:191:7
+
+DEDUP_TOKEN: __interceptor_calloc--create_filter--parse_filter
+SUMMARY: AddressSanitizer: heap-use-after-free /src/libarchive/libarchive/archive_read_support_format_rar.c:3334:30 in run_filters
+Shadow bytes around the buggy address:
+  0x0c107fff7fc0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c107fff7fd0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c107fff7fe0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c107fff7ff0: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x0c107fff8000: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m02[1m[0m
+=>0x0c107fff8010: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m[[1m[35mfd[1m[0m][1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c107fff8020: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[35mfd[1m[0m [1m[31mfa[1m[0m
+  0x0c107fff8030: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c107fff8040: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c107fff8050: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+  0x0c107fff8060: [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m [1m[31mfa[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42508360

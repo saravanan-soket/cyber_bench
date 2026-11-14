@@ -1,0 +1,65 @@
+ARVO id: 42487713
+Project: arrow
+Fuzz target: parquet-arrow-fuzz
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Negative-size-param
+Language: c++
+Repo: https://github.com/apache/arrow.git
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/parquet-arrow-fuzz < INPUT_FILE
+or
+  /out/parquet-arrow-fuzz INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/parquet-arrow-fuzz [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 1484 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: negative-size-param: (size=-26)
+[1m[0mSCARINESS: 10 (negative-size-param)
+    #0 0x657ca4 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #1 0x7dfd85 in parquet::SerializedPageReader::DecompressPage(int, int, unsigned char const*) /src/arrow/cpp/src/parquet/column_reader.cc:459:5
+    #2 0x7d799a in parquet::SerializedPageReader::NextPage() /src/arrow/cpp/src/parquet/column_reader.cc:379:21
+    #3 0x85d41d in parquet::ColumnReaderImplBase<parquet::PhysicalType<(parquet::Type::type)7> >::ReadNewPage() /src/arrow/cpp/src/parquet/column_reader.cc:563:31
+    #4 0x8d615d in HasNextInternal /src/arrow/cpp/src/parquet/column_reader.cc:543:12
+    #5 0x8d615d in parquet::internal::TypedRecordReader<parquet::PhysicalType<(parquet::Type::type)7> >::ReadRecords(long) /src/arrow/cpp/src/parquet/column_reader.cc:1105:18
+    #6 0x6b20cd in parquet::arrow::(anonymous namespace)::LeafReader::LoadBatch(long) /src/arrow/cpp/src/parquet/arrow/reader.cc:444:46
+    #7 0x6b1014 in parquet::arrow::ColumnReaderImpl::NextBatch(long, std::__1::shared_ptr<arrow::ChunkedArray>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:103:5
+    #8 0x6d77c6 in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadColumn(int, std::__1::vector<int, std::__1::allocator<int> > const&, parquet::arrow::ColumnReader*, std::__1::shared_ptr<arrow::ChunkedArray>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:268:20
+    #9 0x6a2a22 in operator() /src/arrow/cpp/src/parquet/arrow/reader.cc:923:12
+    #10 0x6a2a22 in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadRowGroups(std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::shared_ptr<arrow::Table>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:940:7
+    #11 0x69f8ae in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadRowGroup(int, std::__1::vector<int, std::__1::allocator<int> > const&, std::__1::shared_ptr<arrow::Table>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:298:12
+    #12 0x69ffe5 in parquet::arrow::(anonymous namespace)::FileReaderImpl::ReadRowGroup(int, std::__1::shared_ptr<arrow::Table>*) /src/arrow/cpp/src/parquet/arrow/reader.cc:302:12
+    #13 0x6922a4 in parquet::arrow::internal::FuzzReader(std::__1::unique_ptr<parquet::arrow::FileReader, std::__1::default_delete<parquet::arrow::FileReader> >) /src/arrow/cpp/src/parquet/arrow/reader.cc:1035:37
+    #14 0x693dbb in parquet::arrow::internal::FuzzReader(unsigned char const*, long) /src/arrow/cpp/src/parquet/arrow/reader.cc:1052:10
+    #15 0x68cca9 in LLVMFuzzerTestOneInput /src/arrow/cpp/src/parquet/arrow/fuzz.cc:22:17
+    #16 0x68b33e in ExecuteFilesOnyByOne /src/libfuzzer/afl/afl_driver.cpp:217:5
+    #17 0x68b33e in main /src/libfuzzer/afl/afl_driver.cpp:254:12
+    #18 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #19 0x5dd448 in _start (/out/parquet-arrow-fuzz+0x5dd448)
+
+DEDUP_TOKEN: __asan_memcpy--parquet::SerializedPageReader::DecompressPage(int, int, unsigned char const*)--parquet::SerializedPageReader::NextPage()
+[1m[32m0x61b00000013e is located 190 bytes inside of 1484-byte region [0x61b000000080,0x61b00000064c)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x68862d in operator new(unsigned long) /src/llvm-project/compiler-rt/lib/asan/asan_new_delete.cpp:99:3
+    #1 0x68b2d7 in __libcpp_allocate /usr/local/bin/../include/c++/v1/new:253:10
+    #2 0x68b2d7 in allocate /usr/local/bin/../include/c++/v1/memory:1789:34
+    #3 0x68b2d7 in allocate /usr/local/bin/../include/c++/v1/memory:1525:21
+    #4 0x68b2d7 in __vallocate /usr/local/bin/../include/c++/v1/vector:996:37
+    #5 0x68b2d7 in vector /usr/local/bin/../include/c++/v1/vector:1129:9
+    #6 0x68b2d7 in ExecuteFilesOnyByOne /src/libfuzzer/afl/afl_driver.cpp:214:23
+    #7 0x68b2d7 in main /src/libfuzzer/afl/afl_driver.cpp:254:12
+    #8 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+
+DEDUP_TOKEN: operator new(unsigned long)--__libcpp_allocate--allocate
+SUMMARY: AddressSanitizer: negative-size-param /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3 in __asan_memcpy
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42487713

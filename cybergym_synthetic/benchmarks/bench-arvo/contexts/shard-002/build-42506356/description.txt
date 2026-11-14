@@ -1,0 +1,48 @@
+ARVO id: 42506356
+Project: selinux
+Fuzz target: binpolicy-fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c
+Repo: https://github.com/SELinuxProject/selinux
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 160066739
+INFO: Loaded 1 modules   (10453 inline 8-bit counters): 10453 [0x6b94a0, 0x6bbd75), 
+INFO: Loaded 1 PC tables (10453 PCs): 10453 [0x6bbd78,0x6e4ac8), 
+/out/binpolicy-fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address (pc 0x7ffff7dbb6a7 bp 0x7fffffffd7f0 sp 0x7fffffffcfa8 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+==7==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x7ffff7dbb6a7  (/lib/x86_64-linux-gnu/libc.so.6+0x18b6a7)
+    #1 0x4b9ac8 in strlen /src/llvm-project/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc
+    #2 0x5c32e0 in symhash /src/selinux/libsepol/src/symtab.c:26:9
+    #3 0x617fd6 in hashtab_search /src/selinux/libsepol/src/hashtab.c:188:11
+    #4 0x5f32aa in mls_semantic_level_expand /src/selinux/libsepol/src/expand.c:933:31
+    #5 0x5f3c02 in mls_semantic_range_expand /src/selinux/libsepol/src/expand.c:972:6
+    #6 0x58a5aa in policydb_user_cache /src/selinux/libsepol/src/policydb.c:966:7
+    #7 0x6184d5 in hashtab_map /src/selinux/libsepol/src/hashtab.c:236:10
+    #8 0x58b530 in policydb_index_others /src/selinux/libsepol/src/policydb.c:1274:6
+    #9 0x591aea in policydb_read /src/selinux/libsepol/src/policydb.c:4496:6
+    #10 0x55e989 in LLVMFuzzerTestOneInput /src/selinux/libsepol/fuzz/binpolicy-fuzzer.c:35:6
+    #11 0x456c33 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) cxa_noexception.cpp
+    #12 0x442482 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #13 0x447ffc in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) cxa_noexception.cpp
+    #14 0x471032 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #15 0x7ffff7c570b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #16 0x41f67d in _start (/out/binpolicy-fuzzer+0x41f67d)
+
+DEDUP_TOKEN: strlen--symhash
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x18b6a7) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42506356

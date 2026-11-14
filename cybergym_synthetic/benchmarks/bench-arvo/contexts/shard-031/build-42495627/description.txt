@@ -1,0 +1,44 @@
+ARVO id: 42495627
+Project: wasm3
+Fuzz target: fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: asan
+Crash type: Segv on unknown address
+Language: c
+Repo: https://github.com/wasm3/wasm3
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 3693787154
+INFO: Loaded 1 modules   (3033 inline 8-bit counters): 3033 [0x823ee0, 0x824ab9), 
+INFO: Loaded 1 PC tables (3033 PCs): 3033 [0x5c9668,0x5d53f8), 
+/out/fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x10007fff8020 (pc 0x000000558592 bp 0x7fffffffd748 sp 0x7fffffffd728 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x558592 in ForEachModule /src/wasm3/source/m3_env.c:201:35
+    #1 0x558592 in Runtime_Release /src/wasm3/source/m3_env.c:240:5
+    #2 0x558937 in m3_FreeRuntime /src/wasm3/source/m3_env.c:258:9
+    #3 0x565a92 in Parse_InitExpr /src/wasm3/source/m3_parse.c:282:14
+    #4 0x565a92 in ParseSection_Data /src/wasm3/source/m3_parse.c:390:1
+    #5 0x567786 in ParseModuleSection /src/wasm3/source/m3_parse.c:539:18
+    #6 0x567786 in m3_ParseModule /src/wasm3/source/m3_parse.c:591:1
+    #7 0x556e7d in LLVMFuzzerTestOneInput /src/wasm3/platforms/app_fuzz/fuzzer.c:30:22
+    #8 0x459c63 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #9 0x443aa2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #10 0x44990a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #11 0x475682 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #13 0x41e738 in _start (/out/fuzzer+0x41e738)
+
+DEDUP_TOKEN: ForEachModule--Runtime_Release--m3_FreeRuntime
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/wasm3/source/m3_env.c:201:35 in ForEachModule
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42495627

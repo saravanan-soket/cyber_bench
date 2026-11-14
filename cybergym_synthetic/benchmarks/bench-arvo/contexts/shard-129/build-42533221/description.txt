@@ -1,0 +1,44 @@
+ARVO id: 42533221
+Project: gdal
+Fuzz target: avce00_fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://github.com/OSGeo/gdal
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/avce00_fuzzer < INPUT_FILE
+or
+  /out/avce00_fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/avce00_fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 269 bytes from /tmp/poc
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x000200000000 (pc 0x0000004c4bc1 bp 0x7fffd07c6250 sp 0x7fffd07c59b0 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x4c4bc0 in strncasecmp /src/llvm/projects/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:504
+    #1 0x6c9dfe in OGRSpatialReference::importFromESRI(char**) /src/gdal/gdal/ogr/ogr_srs_esri.cpp:725:9
+    #2 0x9967d2 in OGRAVCE00DataSource::GetSpatialRef() /src/gdal/gdal/ogr/ogrsf_frmts/avc/ogravce00datasource.cpp:233:24
+    #3 0x5e1932 in OGR_L_GetSpatialRef /src/gdal/gdal/ogr/ogrsf_frmts/generic/ogrlayer.cpp:1054:58
+    #4 0x52bdff in LLVMFuzzerTestOneInput /src/gdal/gdal/./fuzzers/ogr_fuzzer.cpp:108:13
+    #5 0x52c27f in ExecuteFilesOnyByOne(int, char**) /src/libfuzzer/afl/afl_driver.cpp:279:5
+    #6 0x52c81f in main /src/libfuzzer/afl/afl_driver.cpp:316:12
+    #7 0x7f679f5bb82f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #8 0x4279e8 in _start (/out/avce00_fuzzer+0x4279e8)
+
+DEDUP_TOKEN: strncasecmp--OGRSpatialReference::importFromESRI(char**)--OGRAVCE00DataSource::GetSpatialRef()
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV /src/llvm/projects/compiler-rt/lib/asan/../sanitizer_common/sanitizer_common_interceptors.inc:504 in strncasecmp
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42533221

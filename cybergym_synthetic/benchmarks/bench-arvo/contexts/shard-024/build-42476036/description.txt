@@ -1,0 +1,95 @@
+ARVO id: 42476036
+Project: openthread
+Fuzz target: ncp-uart-received-fuzzer
+Fuzz engine: afl
+Sanitizer: asan
+Crash type: Stack-buffer-overflow READ {*}
+Language: c++
+Repo: https://github.com/openthread/openthread
+
+=== Crash report ===
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/ncp-uart-received-fuzzer < INPUT_FILE
+or
+  /out/ncp-uart-received-fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/ncp-uart-received-fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 102 bytes from /tmp/poc
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffff7f3cf32 at pc 0x000000494f5a bp 0x7fffffffd9a0 sp 0x7fffffffd168
+[1m[0m[1m[34mREAD of size 118 at 0x7ffff7f3cf32 thread T0[1m[0m
+SCARINESS: 41 (multi-byte-read-stack-buffer-overflow)
+    #0 0x494f59 in __asan_memcpy /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cc:22:3
+    #1 0x508529 in ot::Message::Write(unsigned short, unsigned short, void const*) /src/openthread/src/core/common/message.cpp:595:9
+    #2 0x50837a in ot::Message::Append(void const*, unsigned short) /src/openthread/src/core/common/message.cpp:390:20
+    #3 0x54bd60 in ot::AddressResolver::SendAddressQueryResponse(ot::ThreadTargetTlv const&, ot::ThreadMeshLocalEidTlv const&, ot::ThreadLastTransactionTimeTlv const*, ot::Ip6::Address const&) /src/openthread/src/core/thread/address_resolver.cpp:647:5
+    #4 0x54b90e in ot::AddressResolver::HandleAddressQuery(ot::Coap::Message&, ot::Ip6::MessageInfo const&) /src/openthread/src/core/thread/address_resolver.cpp:605:9
+    #5 0x5a27e1 in ot::Coap::CoapBase::ProcessReceivedRequest(ot::Coap::Message&, ot::Ip6::MessageInfo const&) /src/openthread/src/core/coap/coap.cpp:635:23
+    #6 0x50618f in otUdpForwardReceive /src/openthread/src/core/api/udp_api.cpp:125:30
+    #7 0x4ea005 in otError ot::Ncp::NcpBase::HandlePropertySet<(spinel_prop_key_t)5412>() /src/openthread/src/ncp/ncp_base_mtd.cpp:3460:5
+    #8 0x4ccea4 in ot::Ncp::NcpBase::HandleCommandPropertySet(unsigned char, spinel_prop_key_t) /src/openthread/src/ncp/ncp_base.cpp:952:31
+    #9 0x4cc553 in ot::Ncp::NcpBase::CommandHandler_PROP_VALUE_update(unsigned char, unsigned int) /src/openthread/src/ncp/ncp_base.cpp:1194:17
+    #10 0x4cab68 in ot::Ncp::NcpBase::HandleCommand(unsigned char) /src/openthread/src/ncp/ncp_base.cpp:857:17
+    #11 0x4ca685 in ot::Ncp::NcpBase::HandleReceive(unsigned char const*, unsigned short) /src/openthread/src/ncp/ncp_base.cpp:341:13
+    #12 0x4c8566 in ot::Ncp::NcpUart::HandleFrame(otError) /src/openthread/src/ncp/ncp_uart.cpp:267:18
+    #13 0x4c98ac in ot::Hdlc::Decoder::Decode(unsigned char const*, unsigned short) /src/openthread/src/ncp/hdlc.cpp:256:21
+    #14 0x4c71f0 in LLVMFuzzerTestOneInput /src/openthread/tests/fuzz/ncp_uart_received.cpp:70:5
+    #15 0x61f74a in ExecuteFilesOnyByOne /src/libfuzzer/afl/afl_driver.cpp:216:5
+    #16 0x61f74a in main /src/libfuzzer/afl/afl_driver.cpp:253
+    #17 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #18 0x41db88 in _start (/out/ncp-uart-received-fuzzer+0x41db88)
+
+DEDUP_TOKEN: __asan_memcpy--ot::Message::Write(unsigned short, unsigned short, void const*)--ot::Message::Append(void const*, unsigned short)
+[1m[32mAddress 0x7ffff7f3cf32 is located in stack of thread T0 at offset 50 in frame[1m[0m
+[1m[0m    #0 0x54b6af in ot::AddressResolver::HandleAddressQuery(ot::Coap::Message&, ot::Ip6::MessageInfo const&) /src/openthread/src/core/thread/address_resolver.cpp:585
+
+DEDUP_TOKEN: ot::AddressResolver::HandleAddressQuery(ot::Coap::Message&, ot::Ip6::MessageInfo const&)
+  This frame has 4 object(s):
+    [32, 50) 'targetTlv' (line 586)
+    [96, 106) 'mlIidTlv' (line 587)[1m[32m <== Memory access at offset 50 partially underflows this variable[1m[0m
+    [128, 134) 'lastTransactionTimeTlv' (line 588)[1m[32m <== Memory access at offset 50 partially underflows this variable[1m[0m
+    [160, 184) 'iter' (line 609)[1m[32m <== Memory access at offset 50 partially underflows this variable[1m[0m
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow /src/llvm/projects/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cc:22:3 in __asan_memcpy
+Shadow bytes around the buggy address:
+  0x10007efdf990: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x10007efdf9a0: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m
+  0x10007efdf9b0: [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efdf9c0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+  0x10007efdf9d0: [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m [1m[35mf5[1m[0m
+=>0x10007efdf9e0: [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[31mf1[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m[[1m[0m02[1m[0m][1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[0m00[1m[0m [1m[0m02[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m
+  0x10007efdf9f0: [1m[0m06[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[31mf2[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[35mf8[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[31mf3[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efdfa00: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efdfa10: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efdfa20: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+  0x10007efdfa30: [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m [1m[0m00[1m[0m
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           [1m[0m00[1m[0m
+  Partially addressable: [1m[0m01[1m[0m [1m[0m02[1m[0m [1m[0m03[1m[0m [1m[0m04[1m[0m [1m[0m05[1m[0m [1m[0m06[1m[0m [1m[0m07[1m[0m 
+  Heap left redzone:       [1m[31mfa[1m[0m
+  Freed heap region:       [1m[35mfd[1m[0m
+  Stack left redzone:      [1m[31mf1[1m[0m
+  Stack mid redzone:       [1m[31mf2[1m[0m
+  Stack right redzone:     [1m[31mf3[1m[0m
+  Stack after return:      [1m[35mf5[1m[0m
+  Stack use after scope:   [1m[35mf8[1m[0m
+  Global redzone:          [1m[31mf9[1m[0m
+  Global init order:       [1m[36mf6[1m[0m
+  Poisoned by user:        [1m[34mf7[1m[0m
+  Container overflow:      [1m[34mfc[1m[0m
+  Array cookie:            [1m[31mac[1m[0m
+  Intra object redzone:    [1m[33mbb[1m[0m
+  ASan internal:           [1m[33mfe[1m[0m
+  Left alloca redzone:     [1m[34mca[1m[0m
+  Right alloca redzone:    [1m[34mcb[1m[0m
+  Shadow gap:              [1m[0mcc[1m[0m
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42476036

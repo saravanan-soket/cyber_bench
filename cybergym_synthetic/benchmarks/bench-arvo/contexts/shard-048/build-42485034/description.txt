@@ -1,0 +1,73 @@
+ARVO id: 42485034
+Project: php-src
+Fuzz target: php-fuzz-parser
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: Memcpy-param-overlap
+Language: c++
+Repo: https://github.com/php/php-src.git
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/php-fuzz-parser[0m
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: memcpy-param-overlap: memory ranges [0x62b000007218,0x62b00000d4e8) and [0x62b000007350, 0x62b00000d620) overlap
+[1m[0mSCARINESS: 10 (memcpy-param-overlap)
+    #0 0x4bc184 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #1 0xafa894 in zend_string_init /src/php-src/Zend/zend_string.h:165:2
+    #2 0xafa894 in zend_lex_tstring /src/php-src/Zend/zend_language_scanner.l:317:2
+    #3 0xaef1f1 in zendparse /src/php-src/Zend/zend_language_parser.y:299:4
+    #4 0xafbe44 in zend_compile /src/php-src/Zend/zend_language_scanner.l:604:7
+    #5 0xafbb1a in compile_file /src/php-src/Zend/zend_language_scanner.l:659:14
+    #6 0xef1951 in fuzzer_do_request /src/php-src/sapi/fuzzer/fuzzer-sapi.c:194:29
+    #7 0xef2086 in fuzzer_do_request_from_buffer /src/php-src/sapi/fuzzer/fuzzer-sapi.c:238:9
+    #8 0xef1481 in LLVMFuzzerTestOneInput /src/php-src/sapi/fuzzer/fuzzer-parser.c:40:2
+    #9 0xf87edd in main (/out/php-fuzz-parser+0xf87edd)
+    #10 0x7ffff6ac782f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #11 0x444b38 in _start (/out/php-fuzz-parser+0x444b38)
+
+DEDUP_TOKEN: __asan_memcpy--zend_string_init--zend_lex_tstring
+[1m[32m0x62b000007218 is located 24 bytes inside of 25328-byte region [0x62b000007200,0x62b00000d4f0)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4bce1d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0xb4aa2d in __zend_malloc /src/php-src/Zend/zend_alloc.c:2992:14
+    #2 0xb3ec0d in tracked_malloc /src/php-src/Zend/zend_alloc.c:2714:14
+    #3 0xb41b11 in _malloc_custom /src/php-src/Zend/zend_alloc.c:2417:10
+    #4 0xb480cd in _emalloc /src/php-src/Zend/zend_alloc.c:2536:10
+    #5 0xafa80e in zend_string_alloc /src/php-src/Zend/zend_string.h:141:36
+    #6 0xafa80e in zend_string_init /src/php-src/Zend/zend_string.h:163:21
+    #7 0xafa80e in zend_lex_tstring /src/php-src/Zend/zend_language_scanner.l:317:2
+    #8 0xaef1f1 in zendparse /src/php-src/Zend/zend_language_parser.y:299:4
+    #9 0xafbe44 in zend_compile /src/php-src/Zend/zend_language_scanner.l:604:7
+    #10 0xafbb1a in compile_file /src/php-src/Zend/zend_language_scanner.l:659:14
+    #11 0xef1951 in fuzzer_do_request /src/php-src/sapi/fuzzer/fuzzer-sapi.c:194:29
+    #12 0xef2086 in fuzzer_do_request_from_buffer /src/php-src/sapi/fuzzer/fuzzer-sapi.c:238:9
+    #13 0xef1481 in LLVMFuzzerTestOneInput /src/php-src/sapi/fuzzer/fuzzer-parser.c:40:2
+    #14 0xf87edd in main (/out/php-fuzz-parser+0xf87edd)
+
+DEDUP_TOKEN: malloc--__zend_malloc--tracked_malloc
+[1m[32m0x62b00000d4f0 is located 0 bytes to the right of 25328-byte region [0x62b000007200,0x62b00000d4f0)
+[1m[0m[1m[35mallocated by thread T0 here:[1m[0m
+    #0 0x4bce1d in malloc /src/llvm-project/compiler-rt/lib/asan/asan_malloc_linux.cpp:145:3
+    #1 0xb4aa2d in __zend_malloc /src/php-src/Zend/zend_alloc.c:2992:14
+    #2 0xb3ec0d in tracked_malloc /src/php-src/Zend/zend_alloc.c:2714:14
+    #3 0xb41b11 in _malloc_custom /src/php-src/Zend/zend_alloc.c:2417:10
+    #4 0xb480cd in _emalloc /src/php-src/Zend/zend_alloc.c:2536:10
+    #5 0xafa80e in zend_string_alloc /src/php-src/Zend/zend_string.h:141:36
+    #6 0xafa80e in zend_string_init /src/php-src/Zend/zend_string.h:163:21
+    #7 0xafa80e in zend_lex_tstring /src/php-src/Zend/zend_language_scanner.l:317:2
+    #8 0xaef1f1 in zendparse /src/php-src/Zend/zend_language_parser.y:299:4
+    #9 0xafbe44 in zend_compile /src/php-src/Zend/zend_language_scanner.l:604:7
+    #10 0xafbb1a in compile_file /src/php-src/Zend/zend_language_scanner.l:659:14
+    #11 0xef1951 in fuzzer_do_request /src/php-src/sapi/fuzzer/fuzzer-sapi.c:194:29
+    #12 0xef2086 in fuzzer_do_request_from_buffer /src/php-src/sapi/fuzzer/fuzzer-sapi.c:238:9
+    #13 0xef1481 in LLVMFuzzerTestOneInput /src/php-src/sapi/fuzzer/fuzzer-parser.c:40:2
+    #14 0xf87edd in main (/out/php-fuzz-parser+0xf87edd)
+
+DEDUP_TOKEN: malloc--__zend_malloc--tracked_malloc
+SUMMARY: AddressSanitizer: memcpy-param-overlap /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3 in __asan_memcpy
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42485034

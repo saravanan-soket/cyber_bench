@@ -1,0 +1,95 @@
+ARVO id: 42524944
+Project: binutils-gdb
+Fuzz target: fuzz_readelf
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: git://sourceware.org/git/binutils-gdb.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 912412654
+INFO: Loaded 1 modules   (201100 inline 8-bit counters): 201100 [0x26b8388, 0x26e9514), 
+INFO: Loaded 1 PC tables (201100 PCs): 201100 [0x227c5e8,0x258dea8), 
+/out/fuzz_readelf: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+ELF Header:
+  Magic:   7f 45 4c 46 20 20 20 20 20 20 20 20 07 00 00 00 
+  Class:                             <unknown: 20>
+  Data:                              <unknown: 20>
+  Version:                           32 <unknown>
+  OS/ABI:                            <unknown: 20>
+  ABI Version:                       32
+  Type:                              REL (Relocatable file)
+  Machine:                           LoongArch
+  Version:                           0xffff2020
+  Entry point address:               0x20
+  Start of program headers:          32 (bytes into file)
+  Start of section headers:          8 (bytes into file)
+  Flags:                             0x20202020, OBJ-v0
+  Size of this header:               8224 (bytes)
+  Size of program headers:           8224 (bytes)
+  Number of program headers:         8224
+  Size of section headers:           40 (bytes)
+  Number of section headers:         10
+  Section header string table index: 8224 <corrupt: out of range>
+
+Section Headers:
+  [Nr] Name              Type            Addr     Off    Size   ES Flg Lk Inf Al
+  [ 0] <no-strings>      NOTE            ffff2020 000020 000020 282020 Wxo  8 538976288 538976288
+  [ 1] <no-strings>      REL             20202020 000000 000200 08 Sxop  2   0 538976288
+  [ 2] <no-strings>      SYMTAB          20202020 20202020 20202020 10 Sxop 538976288 538976288 538976288
+  [ 3] <no-strings>      20202020: <unkn 20202020 20202020 20202020 20202020 Sxop 538976288 538976288 538976288
+  [ 4] <no-strings>      LOUSER+0x7f2020 20202020 20202020 20202020 20202020 Sxop 538976288 538976364 538976288
+  [ 5] <no-strings>      LOUSER+0x7fffff 20ffffff 20202020 20202020 20202020 WAXxMSILOGTCxxxxxxxxop 538976511 538976288 538976288
+  [ 6] <no-strings>      20202020: <unkn 20202020 20202020 20202020 20202020 Sxop 539033376 538976288 538976288
+  [ 7] <no-strings>      20202020: <unkn 20202020 20202020 202020ff 20ff2020 Sxop 538976288 538976288 538976288
+  [ 8] <no-strings>      20202020: <unkn 20202020 20202020 20202020 20202020 SOGTCxxxxop 538976511 538976288 538976288
+  [ 9] <no-strings>      20202020: <unkn 20202020 20202020 20202020 20202020 Sxop 538976288 538976288 538976511
+Key to Flags:
+  W (write), A (alloc), X (execute), M (merge), S (strings), I (info),
+  L (link order), O (extra OS processing required), G (group), T (TLS),
+  C (compressed), x (unknown), o (OS specific), E (exclude),
+  p (processor specific)
+
+There are no section groups in this file.
+
+There is no dynamic section in this file.
+
+Relocation section 538968074 at offset 0 contains 64 entries:
+
+There are no relocations in this file.
+
+The decoding of unwind sections for machine type LoongArch is not currently supported.
+
+Symbol table '<no-strings>' contains 33686018 entries:
+   Num:    Value  Size Type    Bind   Vis      Ndx Name
+
+No version information found in this file.
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address 0x703020202080 (pc 0x00000054e1d2 bp 0x7ffe7bfb6150 sp 0x7ffe7bfb6070 T7)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+    #0 0x54e1d2 in target_specific_reloc_handling /src/binutils-gdb/binutils/./readelf.h:14044:14
+    #1 0x5411b7 in apply_relocations /src/binutils-gdb/binutils/./readelf.h:15143:8
+    #2 0x5ecf78 in process_notes_at /src/binutils-gdb/binutils/./readelf.h:21937:10
+    #3 0x5a5541 in process_note_sections /src/binutils-gdb/binutils/./readelf.h:22216:10
+    #4 0x5a5541 in process_notes /src/binutils-gdb/binutils/./readelf.h:22249:12
+    #5 0x5591e9 in process_object /src/binutils-gdb/binutils/./readelf.h:22713:9
+    #6 0x53dce4 in process_file /src/binutils-gdb/binutils/./readelf.h:23092:13
+    #7 0x53e8f2 in LLVMFuzzerTestOneInput /src/binutils-gdb/binutils/fuzz_readelf.c:117:3
+    #8 0x43dd83 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:611:15
+    #9 0x4294e2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:324:6
+    #10 0x42ed8c in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:860:9
+    #11 0x4582c2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #12 0x7f46f1e06082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 1878e6b475720c7c51969e69ab2d276fae6d1dee)
+    #13 0x41f6ad in _start (/out/fuzz_readelf+0x41f6ad)
+
+DEDUP_TOKEN: target_specific_reloc_handling--apply_relocations--process_notes_at
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV /src/binutils-gdb/binutils/./readelf.h:14044:14 in target_specific_reloc_handling
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42524944

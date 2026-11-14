@@ -1,0 +1,79 @@
+ARVO id: 42496261
+Project: imagemagick
+Fuzz target: encoder_ttf_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: https://github.com/imagemagick/imagemagick
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1504949380
+INFO: Loaded 1 modules   (191505 inline 8-bit counters): 191505 [0x2880bd0, 0x28af7e1), 
+INFO: Loaded 1 PC tables (191505 PCs): 191505 [0x28af7e8,0x2b9b8f8), 
+/out/encoder_ttf_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+[1m[31m[1m[31mUninitialized bytes in [1m[32m__interceptor_strcmp[1m[31m at offset 0 inside [0x7050000002e2, 1)[1m[0m
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x22bdab0 in ps_check_extra_glyph_name /src/freetype2/src/psnames/psmodule.c:276:12
+    #1 0x22bbcd1 in ps_unicodes_init /src/freetype2/src/psnames/psmodule.c:348:11
+    #2 0x20ca554 in cff_cmap_unicode_init /src/freetype2/src/cff/cffcmap.c:166:12
+    #3 0x1ff8bff in FT_CMap_New /src/freetype2/src/base/ftobjs.c:3737:17
+    #4 0x20cf0b3 in cff_face_init /src/freetype2/src/cff/cffobjs.c:1083:17
+    #5 0x201973f in open_face /src/freetype2/src/base/ftobjs.c:1457:15
+    #6 0x1fee3d9 in ft_open_face_internal /src/freetype2/src/base/ftobjs.c:2529:19
+    #7 0x201bec3 in open_face_from_buffer /src/freetype2/src/base/ftobjs.c:1678:13
+    #8 0x201a66d in open_face_PS_from_sfnt_stream /src/freetype2/src/base/ftobjs.c:1831:13
+    #9 0x201f9f8 in Mac_Read_sfnt_Resource /src/freetype2/src/base/ftobjs.c:2118:13
+    #10 0x201d2f0 in IsMacResource /src/freetype2/src/base/ftobjs.c:2203:15
+    #11 0x201a918 in load_mac_face /src/freetype2/src/base/ftobjs.c:2391:15
+    #12 0x1fedb43 in ft_open_face_internal /src/freetype2/src/base/ftobjs.c:2575:17
+    #13 0x1feffbc in FT_Open_Face /src/freetype2/src/base/ftobjs.c:2420:12
+    #14 0x96e66f in RenderFreetype /src/imagemagick/MagickCore/annotate.c:1421:13
+    #15 0x96a52e in RenderType /src/imagemagick/MagickCore/annotate.c:965:18
+    #16 0x968df0 in GetTypeMetrics /src/imagemagick/MagickCore/annotate.c:885:10
+    #17 0xae305e in RenderMVGContent /src/imagemagick/MagickCore/draw.c:4355:17
+    #18 0xacf973 in DrawImage /src/imagemagick/MagickCore/draw.c:4477:10
+    #19 0x12d93f3 in ReadTTFImage /src/imagemagick/coders/ttf.c:289:10
+    #20 0xa6adee in ReadImage /src/imagemagick/MagickCore/constitute.c:563:15
+    #21 0x994bbf in BlobToImage /src/imagemagick/MagickCore/blob.c:475:13
+    #22 0x7236f2 in Magick::Image::read(Magick::Blob const&) /src/imagemagick/Magick++/lib/Image.cpp:4028:12
+    #23 0x6f7490 in LLVMFuzzerTestOneInput /src/imagemagick/Magick++/fuzz/encoder_fuzzer.cc:50:11
+    #24 0x5b0003 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:599:15
+    #25 0x5991c2 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:323:6
+    #26 0x59f00a in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:856:9
+    #27 0x5cb942 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #28 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #29 0x573ea8 in _start (/out/encoder_ttf_fuzzer+0x573ea8)
+
+DEDUP_TOKEN: ps_check_extra_glyph_name--ps_unicodes_init--cff_cmap_unicode_init
+  [1m[35mUninitialized value was created by a heap allocation[1m[0m
+    #0 0x62c30d in malloc /src/llvm-project/compiler-rt/lib/msan/msan_interceptors.cpp:901:3
+    #1 0x1fd9da0 in ft_alloc /src/freetype2/builds/unix/ftsystem.c:113:12
+    #2 0x2012018 in ft_mem_qalloc /src/freetype2/src/base/ftutil.c:75:15
+    #3 0x20eef7e in cff_index_get_pointers /src/freetype2/src/cff/cffload.c:431:22
+    #4 0x20eb4ea in cff_font_load /src/freetype2/src/cff/cffload.c:2322:12
+    #5 0x20cba93 in cff_face_init /src/freetype2/src/cff/cffobjs.c:625:15
+    #6 0x201973f in open_face /src/freetype2/src/base/ftobjs.c:1457:15
+    #7 0x1fee3d9 in ft_open_face_internal /src/freetype2/src/base/ftobjs.c:2529:19
+    #8 0x201bec3 in open_face_from_buffer /src/freetype2/src/base/ftobjs.c:1678:13
+    #9 0x201a66d in open_face_PS_from_sfnt_stream /src/freetype2/src/base/ftobjs.c:1831:13
+    #10 0x201f9f8 in Mac_Read_sfnt_Resource /src/freetype2/src/base/ftobjs.c:2118:13
+    #11 0x201d2f0 in IsMacResource /src/freetype2/src/base/ftobjs.c:2203:15
+    #12 0x201a918 in load_mac_face /src/freetype2/src/base/ftobjs.c:2391:15
+    #13 0x1fedb43 in ft_open_face_internal /src/freetype2/src/base/ftobjs.c:2575:17
+    #14 0x1feffbc in FT_Open_Face /src/freetype2/src/base/ftobjs.c:2420:12
+    #15 0x96e66f in RenderFreetype /src/imagemagick/MagickCore/annotate.c:1421:13
+    #16 0x96a52e in RenderType /src/imagemagick/MagickCore/annotate.c:965:18
+    #17 0x968df0 in GetTypeMetrics /src/imagemagick/MagickCore/annotate.c:885:10
+    #18 0xae305e in RenderMVGContent /src/imagemagick/MagickCore/draw.c:4355:17
+    #19 0xacf973 in DrawImage /src/imagemagick/MagickCore/draw.c:4477:10
+
+DEDUP_TOKEN: malloc--ft_alloc--ft_mem_qalloc
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/freetype2/src/psnames/psmodule.c:276:12 in ps_check_extra_glyph_name
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42496261

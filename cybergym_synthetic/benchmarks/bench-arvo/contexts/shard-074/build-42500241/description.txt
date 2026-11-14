@@ -1,0 +1,52 @@
+ARVO id: 42500241
+Project: libwebp
+Fuzz target: jpegsave_file_fuzzer
+Fuzz engine: honggfuzz
+Sanitizer: asan
+Crash type: UNKNOWN READ
+Language: c++
+Repo: https://chromium.googlesource.com/webm/libwebp
+
+=== Crash report ===
+[1mAccepting input from '/tmp/poc'[0m
+[1mUsage for fuzzing: honggfuzz -P [flags] -- /out/jpegsave_file_fuzzer[0m
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+[1m[31m==7==ERROR: AddressSanitizer: SEGV on unknown address 0x61c10000080b (pc 0x7ffff7012d84 bp 0x7fffffffd460 sp 0x7fffffffcc18 T0)
+[1m[0m==7==The signal is caused by a READ memory access.
+SCARINESS: 20 (wild-addr-read)
+    #0 0x7ffff7012d84  (/lib/x86_64-linux-gnu/libc.so.6+0x14dd84)
+    #1 0x49cad1 in __asan_memcpy /src/llvm-project/compiler-rt/lib/asan/asan_interceptors_memintrinsics.cpp:22:3
+    #2 0x914e56 in exif_mnote_data_apple_load /src/libexif/libexif/apple/exif-mnote-data-apple.c:126:9
+    #3 0x9118bc in exif_mnote_data_load /src/libexif/libexif/exif-mnote-data.c:84:2
+    #4 0x8fe07c in interpret_maker_note /src/libexif/libexif/exif-data.c:835:3
+    #5 0x8fc979 in exif_data_load_data /src/libexif/libexif/exif-data.c:1010:2
+    #6 0x6ef331 in vips_exif_load_data_without_fix /src/libvips/libvips/foreign/exif.c:179:2
+    #7 0x6ef0b1 in vips__exif_parse /src/libvips/libvips/foreign/exif.c:488:13
+    #8 0x4dc07a in vips_image_set /src/libvips/libvips/iofuncs/header.c:1115:7
+    #9 0x4dd420 in vips_image_set_blob /src/libvips/libvips/iofuncs/header.c:1532:2
+    #10 0x7000d9 in vips_foreign_load_heif_set_header /src/libvips/libvips/foreign/heifload.c:513:3
+    #11 0x6ff030 in vips_foreign_load_heif_header /src/libvips/libvips/foreign/heifload.c:769:6
+    #12 0x6fb828 in vips_foreign_load_build /src/libvips/libvips/foreign/foreign.c:1085:3
+    #13 0x6fe4dd in vips_foreign_load_heif_build /src/libvips/libvips/foreign/heifload.c:251:6
+    #14 0x701de1 in vips_foreign_load_heif_file_build /src/libvips/libvips/foreign/heifload.c:1103:6
+    #15 0x4ed479 in vips_object_build /src/libvips/libvips/iofuncs/object.c:367:6
+    #16 0x7b4481 in vips_cache_operation_buildp /src/libvips/libvips/iofuncs/cache.c:910:7
+    #17 0x4fafa4 in vips_call_required_optional /src/libvips/libvips/iofuncs/operation.c:880:6
+    #18 0x4fecba in vips_call_by_name /src/libvips/libvips/iofuncs/operation.c:920:11
+    #19 0x4ff081 in vips_call_split_option_string /src/libvips/libvips/iofuncs/operation.c:1039:11
+    #20 0x4e0cbc in vips_image_new_from_file /src/libvips/libvips/iofuncs/image.c:1916:11
+    #21 0x4d07dd in test_one_file(char const*) /src/libvips/fuzz/jpegsave_file_fuzzer.cc:17:16
+    #22 0x4d06de in LLVMFuzzerTestOneInput /src/libvips/fuzz/jpegsave_file_fuzzer.cc:52:3
+    #23 0x3359f3b in main (/out/jpegsave_file_fuzzer+0x3359f3b)
+    #24 0x7ffff6ee583f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2083f)
+    #25 0x422b68 in _start (/out/jpegsave_file_fuzzer+0x422b68)
+
+DEDUP_TOKEN: __asan_memcpy--exif_mnote_data_apple_load
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/lib/x86_64-linux-gnu/libc.so.6+0x14dd84) 
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42500241

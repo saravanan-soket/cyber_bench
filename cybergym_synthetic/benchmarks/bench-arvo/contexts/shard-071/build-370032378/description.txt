@@ -1,0 +1,92 @@
+ARVO id: 370032378
+Project: mupdf
+Fuzz target: pdf_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: Use-of-uninitialized-value
+Language: c++
+Repo: git://git.ghostscript.com/mupdf.git
+
+=== Crash report ===
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 1871065717
+INFO: Loaded 1 modules   (165133 inline 8-bit counters): 165133 [0x55a2f2ceca20, 0x55a2f2d14f2d), 
+INFO: Loaded 1 PC tables (165133 PCs): 165133 [0x55a2f2d14f30,0x55a2f2f9a000), 
+/out/pdf_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+format error: cannot recognize version marker
+warning: trying to repair broken xref
+warning: repairing PDF document
+format error: non-page object in page tree
+warning: Page tree load failed. Falling back to slow lookup
+warning: invalid character in hex string
+warning: ... repeated 6 times...
+warning: ignoring CMap range (15728752-15728752) that is outside of the codespace
+library error: zlib error: invalid distance too far back
+warning: read error; treating as end of file
+library error: FT_New_Memory_Face(AAAAAA+SourceHanSansTC-Regular): unknown file format
+warning: ignored error when loading embedded font; attempting to load system font
+warning: expected name after CMapName in cmap
+warning: invalid character in hex string
+warning: ... repeated 7 times...
+warning: expected string
+warning: invalid character in hex string
+syntax error: unknown keyword: 'I'
+[1m[31m==7==WARNING: MemorySanitizer: use-of-uninitialized-value
+[1m[0m    #0 0x55a2efe75d3b in pdf_show_char /src/mupdf/source/pdf/pdf-op-run.c:1207:2
+    #1 0x55a2efe75d3b in show_string /src/mupdf/source/pdf/pdf-op-run.c:1295:4
+    #2 0x55a2efd3c897 in pdf_process_keyword /src/mupdf/source/pdf/pdf-interpret.c
+    #3 0x55a2efd37262 in pdf_process_stream /src/mupdf/source/pdf/pdf-interpret.c:1028:6
+    #4 0x55a2efd36534 in pdf_process_raw_contents /src/mupdf/source/pdf/pdf-interpret.c:1137:3
+    #5 0x55a2efd38593 in pdf_process_contents /src/mupdf/source/pdf/pdf-interpret.c:1159:3
+    #6 0x55a2efdea54d in pdf_run_page_contents_with_usage_imp /src/mupdf/source/pdf/pdf-run.c:199:3
+    #7 0x55a2efde9463 in pdf_run_page_contents_with_usage /src/mupdf/source/pdf/pdf-run.c:236:3
+    #8 0x55a2ef8a0a47 in fz_run_page_contents /src/mupdf/source/fitz/document.c:986:4
+    #9 0x55a2ef8a10a8 in fz_run_page /src/mupdf/source/fitz/document.c:1036:2
+    #10 0x55a2efa5d7f8 in fz_new_pixmap_from_page_with_separations /src/mupdf/source/fitz/util.c:226:3
+    #11 0x55a2efa5db19 in fz_new_pixmap_from_page_number_with_separations /src/mupdf/source/fitz/util.c:256:9
+    #12 0x55a2ef882bbd in LLVMFuzzerTestOneInput /src/pdf_fuzzer.cc:146:13
+    #13 0x55a2ef77f590 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #14 0x55a2ef769d24 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #15 0x55a2ef76f7ba in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #16 0x55a2ef79bbb2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7fc84639a082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+    #18 0x55a2ef7607fd in _start (/out/pdf_fuzzer+0x45a7fd)
+
+DEDUP_TOKEN: pdf_show_char--show_string--pdf_process_keyword
+  [1m[35mUninitialized value was stored to memory at[1m[0m
+    #0 0x55a2efe75d34 in pdf_show_char /src/mupdf/source/pdf/pdf-op-run.c:1207:60
+    #1 0x55a2efe75d34 in show_string /src/mupdf/source/pdf/pdf-op-run.c:1295:4
+    #2 0x55a2efd3c897 in pdf_process_keyword /src/mupdf/source/pdf/pdf-interpret.c
+    #3 0x55a2efd37262 in pdf_process_stream /src/mupdf/source/pdf/pdf-interpret.c:1028:6
+    #4 0x55a2efd36534 in pdf_process_raw_contents /src/mupdf/source/pdf/pdf-interpret.c:1137:3
+    #5 0x55a2efd38593 in pdf_process_contents /src/mupdf/source/pdf/pdf-interpret.c:1159:3
+    #6 0x55a2efdea54d in pdf_run_page_contents_with_usage_imp /src/mupdf/source/pdf/pdf-run.c:199:3
+    #7 0x55a2efde9463 in pdf_run_page_contents_with_usage /src/mupdf/source/pdf/pdf-run.c:236:3
+    #8 0x55a2ef8a0a47 in fz_run_page_contents /src/mupdf/source/fitz/document.c:986:4
+    #9 0x55a2ef8a10a8 in fz_run_page /src/mupdf/source/fitz/document.c:1036:2
+    #10 0x55a2efa5d7f8 in fz_new_pixmap_from_page_with_separations /src/mupdf/source/fitz/util.c:226:3
+    #11 0x55a2efa5db19 in fz_new_pixmap_from_page_number_with_separations /src/mupdf/source/fitz/util.c:256:9
+    #12 0x55a2ef882bbd in LLVMFuzzerTestOneInput /src/pdf_fuzzer.cc:146:13
+    #13 0x55a2ef77f590 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerLoop.cpp:614:13
+    #14 0x55a2ef769d24 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:327:6
+    #15 0x55a2ef76f7ba in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerDriver.cpp:862:9
+    #16 0x55a2ef79bbb2 in main /src/llvm-project/compiler-rt/lib/fuzzer/FuzzerMain.cpp:20:10
+    #17 0x7fc84639a082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082) (BuildId: 0702430aef5fa3dda43986563e9ffcc47efbd75e)
+
+DEDUP_TOKEN: pdf_show_char--show_string--pdf_process_keyword
+[1m[35m  [1m[35mUninitialized value was created by an allocation of '[1m[32madv.i[1m[35m' in the stack frame[1m[0m
+    #0 0x55a2efe74932 in pdf_show_char /src/mupdf/source/pdf/pdf-op-run.c:1145:2
+    #1 0x55a2efe74932 in show_string /src/mupdf/source/pdf/pdf-op-run.c:1295:4
+
+DEDUP_TOKEN: pdf_show_char--show_string
+SUMMARY: MemorySanitizer: use-of-uninitialized-value /src/mupdf/source/pdf/pdf-op-run.c:1207:2 in pdf_show_char
+Unique heap origins: 410
+Stack depot allocated bytes: 9764880
+Unique origin histories: 100
+History depot allocated bytes: 196608
+Exiting
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/370032378

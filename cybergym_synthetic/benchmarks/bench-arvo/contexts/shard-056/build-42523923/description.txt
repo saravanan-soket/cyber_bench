@@ -1,0 +1,41 @@
+ARVO id: 42523923
+Project: mupdf
+Fuzz target: pdf_fuzzer
+Fuzz engine: libfuzzer
+Sanitizer: msan
+Crash type: UNKNOWN WRITE
+Language: c++
+Repo: git://git.ghostscript.com/mupdf.git
+
+=== Crash report ===
+INFO: Seed: 2530441277
+INFO: Loaded 1 modules   (66570 inline 8-bit counters): 66570 [0x38b82d8, 0x38c86e2), 
+INFO: Loaded 1 PC tables (66570 PCs): 66570 [0x3480da0,0x3584e40), 
+/out/pdf_fuzzer: Running 1 inputs 1 time(s) each.
+Running: /tmp/poc
+warning: unknown PDF version: 0.0
+MemorySanitizer:DEADLYSIGNAL
+[1m[31m==7==ERROR: MemorySanitizer: SEGV on unknown address 0x7173ffffffe0 (pc 0x0000007b52a9 bp 0x7fffffffc4f0 sp 0x7fffffffc380 T7)
+[1m[0m==7==The signal is caused by a WRITE memory access.
+    #0 0x7b52a8 in pdf_read_new_xref /src/mupdf/source/pdf/pdf-xref.c:1035:14
+    #1 0x7b0dd7 in read_xref_section /src/mupdf/source/pdf/pdf-xref.c:1089:13
+    #2 0x7b040a in pdf_read_xref_sections /src/mupdf/source/pdf/pdf-xref.c:1157:10
+    #3 0x7a8e9e in pdf_load_xref /src/mupdf/source/pdf/pdf-xref.c:1213:2
+    #4 0x7a465a in pdf_init_document /src/mupdf/source/pdf/pdf-xref.c:1351:4
+    #5 0x7a1f73 in pdf_open_document_with_stream /src/mupdf/source/pdf/pdf-xref.c:2246:3
+    #6 0x49e691 in LLVMFuzzerTestOneInput /src/mupdf/source/fuzz/pdf_fuzzer.cc:31:24
+    #7 0x4e5556 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) /src/libfuzzer/FuzzerLoop.cpp:515:13
+    #8 0x49f9e1 in fuzzer::RunOneTest(fuzzer::Fuzzer*, char const*, unsigned long) /src/libfuzzer/FuzzerDriver.cpp:280:6
+    #9 0x4b3c36 in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) /src/libfuzzer/FuzzerDriver.cpp:703:9
+    #10 0x49eb21 in main /src/libfuzzer/FuzzerMain.cpp:20:10
+    #11 0x7ffff6ee582f in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2082f)
+    #12 0x41ffd8 in _start (/out/pdf_fuzzer+0x41ffd8)
+
+DEDUP_TOKEN: pdf_read_new_xref--read_xref_section--pdf_read_xref_sections
+MemorySanitizer can not provide additional info.
+SUMMARY: MemorySanitizer: SEGV /src/mupdf/source/pdf/pdf-xref.c:1035:14 in pdf_read_new_xref
+==7==ABORTING
+
+
+=== Full report ===
+https://issues.oss-fuzz.com/issues/42523923
