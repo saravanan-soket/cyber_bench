@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata: {name: server-data-extract, namespace: eka-bench}
+spec:
+  restartPolicy: Never
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - {key: kubernetes.io/hostname, operator: NotIn, values: [soketlab-worker002, soketlab-worker018]}
+  containers:
+  - name: x
+    image: debian:bookworm
+    resources: {requests: {cpu: "8", memory: 16Gi}, limits: {cpu: "16", memory: 32Gi}}
+    command: ["bash","-lc"]
+    args:
+    - |
+      set -e
+      apt-get update -qq && apt-get install -y -qq p7zip-full >/dev/null
+      cd /projects/data/datasets/code_data/cyber_bench/run/data
+      mkdir -p cybergym-server-data
+      echo "extracting..."; time 7z x -y -bsp0 -bso0 cybergym-server-data.7z -ocybergym-server-data
+      echo "EXTRACT DONE"; du -sh cybergym-server-data; ls cybergym-server-data | head
+    volumeMounts: [{name: p, mountPath: /projects/data}]
+  volumes: [{name: p, hostPath: {path: /projects/data, type: Directory}}]

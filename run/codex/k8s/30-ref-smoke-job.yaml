@@ -1,0 +1,123 @@
+apiVersion: batch/v1
+kind: Job
+metadata: {name: codex-ref-smoke, namespace: eka-bench}
+spec:
+  completions: 3
+  parallelism: 3
+  completionMode: Indexed
+  backoffLimit: 6
+  backoffLimitPerIndex: 1
+  template:
+    metadata: {labels: {app: codex-ref-smoke}}
+    spec:
+      restartPolicy: Never
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - {key: kubernetes.io/hostname, operator: NotIn, values: [soketlab-worker002, soketlab-worker018]}
+      containers:
+      - name: dind
+        image: docker:27-dind
+        securityContext: {privileged: true}
+        env: [{name: DOCKER_TLS_CERTDIR, value: ""}]
+        args: ["--host=unix:///dockersock/docker.sock"]
+        resources: {requests: {cpu: "3", memory: 8Gi}, limits: {cpu: "6", memory: 16Gi}}
+        volumeMounts:
+        - {name: projects, mountPath: /projects/data}
+        - {name: dockersock, mountPath: /dockersock}
+        - {name: dockerstore, mountPath: /var/lib/docker}
+      - name: agent
+        image: python:3.12-bookworm
+        env:
+        - {name: DOCKER_HOST,     value: "unix:///dockersock/docker.sock"}
+        - {name: OPENAI_API_KEY,  value: "EMPTY"}
+        - {name: LLM_BASE_URL,    value: "http://172.17.98.19:8000/v1"}
+        - {name: CYBERGYM_SERVER, value: "http://10.150.63.39:8666"}
+        resources: {requests: {cpu: "2", memory: 4Gi}, limits: {cpu: "4", memory: 8Gi}}
+        volumeMounts:
+        - {name: projects, mountPath: /projects/data}
+        - {name: dockersock, mountPath: /dockersock}
+        command: ["bash","-lc"]
+        args:
+        - |
+          set -u
+          ROOT=/projects/data/datasets/code_data/cyber_bench
+          IDX="${JOB_COMPLETION_INDEX}"
+          case "$IDX" in
+            0) TASK=arvo:1065 ;;
+            1) TASK=arvo:24993 ;;
+            2) TASK=arvo:11382 ;;
+            *) echo "bad idx $IDX"; exit 1;;
+          esac
+          TASK_SAFE=$(echo "$TASK" | tr ':' '_')
+          OUT="$ROOT/run/codex/ref_smoke/$TASK_SAFE"
+          mkdir -p "$OUT/logs" "$OUT/tmp"
+          LOG="$OUT/run.log"
+          exec > >(tee -a "$LOG") 2>&1
+          echo "shard=$IDX task=$TASK start=$(date -u +%FT%TZ)"
+
+          # Minimal deps
+          apt-get update -qq && apt-get install -y -qq docker.io curl ca-certificates git >/dev/null
+
+          # Wait for DinD
+          for i in $(seq 1 60); do docker info >/dev/null 2>&1 && break; sleep 2; done
+          docker info | head -3
+
+          # Load the prebuilt cybergym/codex image
+          if ! docker image inspect cybergym/codex:latest >/dev/null 2>&1; then
+            echo "loading image..."
+            docker load -i "$ROOT/run/codex/artifacts/cybergym-codex.tar"
+          fi
+          docker images cybergym/codex
+
+          # Reuse the cybergym Python venv; add docker-py + simple-parsing
+          source "$ROOT/cybergym/.venv/bin/activate"
+          pip install -q docker simple-parsing || true
+          python -c "import cybergym, docker, simple_parsing; print('deps ok')"
+
+          # Patch run.py to pass LLM_BASE_URL from env through to the inner container
+          REF="$ROOT/cybergym-agent-examples/codex"
+          WORK_REF="/tmp/codex-ref"
+          cp -r "$REF" "$WORK_REF"
+          python - <<'PY'
+          import re, pathlib
+          p = pathlib.Path("/tmp/codex-ref/run.py")
+          s = p.read_text()
+          # Insert llm_base_url pass-through right after llm_api_key line in the run_codex(...) call
+          needle = 'llm_api_key=os.getenv("OPENAI_API_KEY"),'
+          if needle in s and 'llm_base_url=os.getenv("LLM_BASE_URL")' not in s:
+              s = s.replace(needle, needle + '\n        llm_base_url=os.getenv("LLM_BASE_URL"),')
+              s = s.replace('envs["LLM_BASE_URL"] = llm_base_url',
+                            'envs["LLM_BASE_URL"] = llm_base_url\n        envs["OPENAI_BASE_URL"] = llm_base_url')
+              s = s.replace('detach=True,', 'detach=True,\n            network_mode="host",')
+              s = s.replace('"codex", "--full-auto", "--quiet",',
+                            '"codex", "--full-auto", "--quiet", "--disableResponseStorage",')
+              p.write_text(s)
+              print("patched run.py")
+          else:
+              print("no patch needed")
+          PY
+
+          # Run the official Codex ref agent
+          cd "$WORK_REF"
+          echo "=== running official codex ref agent ==="
+          timeout 3900 python run.py \
+            --model eka-sft7-w3000 \
+            --log_dir "$OUT/logs" \
+            --tmp_dir "$OUT/tmp" \
+            --task_id "$TASK" \
+            --data_dir "$ROOT/run/data/cybergym_data/data" \
+            --max_iter 100 \
+            --server "$CYBERGYM_SERVER" \
+            --difficulty level1 \
+            --timeout 3600 \
+            --remove_tmp false \
+            || echo "run.py exit=$?"
+          echo "done $(date -u +%FT%TZ)"
+          exit 0
+      volumes:
+      - {name: projects,    hostPath: {path: /projects/data, type: Directory}}
+      - {name: dockersock,  emptyDir: {}}
+      - {name: dockerstore, emptyDir: {}}

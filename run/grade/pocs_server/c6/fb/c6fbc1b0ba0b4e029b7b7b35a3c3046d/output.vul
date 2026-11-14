@@ -1,0 +1,79 @@
+======================= INFO =========================
+This binary is built for AFL-fuzz.
+To run the target function on individual input(s) execute this:
+  /out/secilc-fuzzer < INPUT_FILE
+or
+  /out/secilc-fuzzer INPUT_FILE1 [INPUT_FILE2 ... ]
+To fuzz with afl-fuzz execute this:
+  afl-fuzz [afl-flags] /out/secilc-fuzzer [-N]
+afl-fuzz will run N iterations before re-spawning the process (default: 1000)
+======================================================
+Reading 46 bytes from /tmp/poc
+Invalid syntax
+=================================================================
+==9==ERROR: AddressSanitizer: stack-use-after-return on address 0x7ffff500dc60 at pc 0x000000542581 bp 0x7fffffffddd0 sp 0x7fffffffddc8
+READ of size 8 at 0x7ffff500dc60 thread T0
+SCARINESS: 61 (8-byte-read-stack-use-after-return)
+    #0 0x542580 in cil_list_destroy /src/selinux/libsepol/src/../cil/src/cil_list.c:62:40
+    #1 0x542430 in cil_list_destroy /src/selinux/libsepol/src/../cil/src/cil_list.c:68:4
+    #2 0x520be3 in cil_destroy_validatetrans /src/selinux/libsepol/src/../cil/src/cil_build_ast.c:4041:2
+    #3 0x4e448f in cil_destroy_data /src/selinux/libsepol/src/../cil/src/cil.c:837:3
+    #4 0x57c384 in cil_tree_node_destroy /src/selinux/libsepol/src/../cil/src/cil_tree.c
+    #5 0x57c157 in cil_tree_children_destroy /src/selinux/libsepol/src/../cil/src/cil_tree.c
+    #6 0x5778dd in __cil_resolve_ast_last_child_helper /src/selinux/libsepol/src/../cil/src/cil_resolve_ast.c:3855:4
+    #7 0x57c876 in cil_tree_walk /src/selinux/libsepol/src/../cil/src/cil_tree.c:322:8
+    #8 0x57c5c2 in cil_tree_walk_core /src/selinux/libsepol/src/../cil/src/cil_tree.c:284:9
+    #9 0x57c80b in cil_tree_walk /src/selinux/libsepol/src/../cil/src/cil_tree.c:316:7
+    #10 0x57c5c2 in cil_tree_walk_core /src/selinux/libsepol/src/../cil/src/cil_tree.c:284:9
+    #11 0x57c80b in cil_tree_walk /src/selinux/libsepol/src/../cil/src/cil_tree.c:316:7
+    #12 0x577cad in cil_resolve_ast /src/selinux/libsepol/src/../cil/src/cil_resolve_ast.c:3926:8
+    #13 0x4e3834 in cil_compile /src/selinux/libsepol/src/../cil/src/cil.c:550:7
+    #14 0x4cdec0 in LLVMFuzzerTestOneInput /src/secilc-fuzzer.c:59:6
+    #15 0x4cc38e in ExecuteFilesOnyByOne /src/libfuzzer/afl/afl_driver.cpp:207:5
+    #16 0x4cc38e in main /src/libfuzzer/afl/afl_driver.cpp:244:12
+    #17 0x7ffff7c58082 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24082)
+    #18 0x41e478 in _start (/out/secilc-fuzzer+0x41e478)
+
+DEDUP_TOKEN: cil_list_destroy--cil_list_destroy--cil_destroy_validatetrans
+Address 0x7ffff500dc60 is located in stack of thread T0 at offset 32 in frame
+    #0 0x52f49f in __cil_fill_constraint_leaf_expr /src/selinux/libsepol/src/../cil/src/cil_build_ast.c:2665
+
+DEDUP_TOKEN: __cil_fill_constraint_leaf_expr
+  This frame has 1 object(s):
+    [32, 40) 'sub_list' (line 2715) <== Memory access at offset 32 is inside this variable
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-use-after-return /src/selinux/libsepol/src/../cil/src/cil_list.c:62:40 in cil_list_destroy
+Shadow bytes around the buggy address:
+  0x10007e9f9b30: f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5
+  0x10007e9f9b40: f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5
+  0x10007e9f9b50: f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5
+  0x10007e9f9b60: f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5
+  0x10007e9f9b70: f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5
+=>0x10007e9f9b80: f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5[f5]f5 f5 f5
+  0x10007e9f9b90: f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5
+  0x10007e9f9ba0: f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5
+  0x10007e9f9bb0: f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5
+  0x10007e9f9bc0: f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5
+  0x10007e9f9bd0: f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5 f5
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+  Shadow gap:              cc
+==9==ABORTING

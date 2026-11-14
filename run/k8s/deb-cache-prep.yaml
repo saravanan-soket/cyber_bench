@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: deb-cache-prep
+  namespace: eka-bench
+spec:
+  restartPolicy: Never
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: NotIn
+            values: [soketlab-worker002, soketlab-worker018]
+  containers:
+  - name: prep
+    image: python:3.12-bookworm
+    resources:
+      requests: {cpu: "2", memory: 4Gi}
+      limits: {cpu: "4", memory: 8Gi}
+    env:
+    - name: LITELLM_API_KEY
+      valueFrom:
+        secretKeyRef: {name: litellm-proxy-key, key: LITELLM_API_KEY}
+    command: ["bash", "-lc"]
+    args:
+    - |
+      set -e
+      export DEBIAN_FRONTEND=noninteractive
+      apt-get update -qq
+      mkdir -p /debs/partial
+      apt-get install -y -qq -d -o Dir::Cache::archives=/debs --no-install-recommends \
+        clang llvm libclang-rt-14-dev cmake gdb valgrind ninja-build pkg-config autoconf automake libtool libtool-bin
+      rm -rf /debs/partial /debs/lock
+      echo "Downloaded $(ls /debs/*.deb | wc -l) deb files ($(du -sh /debs | awk '{print $1}'))"
+      dpkg -i /debs/*.deb || dpkg --configure -a
+      echo "=== Verify tools ==="
+      which gcc g++ clang clang++ cmake make ninja gdb valgrind pkg-config autoconf automake libtoolize libtool
+      echo 'int main(){int *p=new int[2]; p[5]=1; return 0;}' > /tmp/t.cpp
+      clang++ -fsanitize=address,undefined -g /tmp/t.cpp -o /tmp/t_clang
+      (/tmp/t_clang || true) 2>&1 | head -n 5
+      g++ -fsanitize=address,undefined -g /tmp/t.cpp -o /tmp/t_gcc
+      (/tmp/t_gcc || true) 2>&1 | head -n 5
+      valgrind --version
+      gdb --version | head -n 1
+      echo "=== Verify isolation ==="
+      mkdir -p /var/cybergym/secret_test && chmod 700 /var/cybergym
+      su -s /bin/bash nobody -c "ls /var/cybergym 2>&1 || true"
+      echo "=== Test tool_choice=required on LiteLLM ==="
+      python3 - <<'PY'
+      import os, json
+      from urllib import request as urlrequest
+      body = {
+          "model": "glm5.3-defense",
+          "messages": [{"role": "user", "content": "Call submit_poc with content_text='test' and explanation='test'."}],
+          "tools": [{"type": "function", "function": {"name": "submit_poc", "description": "Submit PoC", "parameters": {"type": "object", "properties": {"content_text": {"type": "string"}, "explanation": {"type": "string"}}}}}],
+          "tool_choice": "required",
+          "max_tokens": 500
+      }
+      req = urlrequest.Request(
+          "http://litellm-defensive-proxy.exploitbench.svc.cluster.local:4000/v1/chat/completions",
+          data=json.dumps(body).encode(),
+          headers={"Content-Type": "application/json", "Authorization": f"Bearer {os.environ['LITELLM_API_KEY']}"}
+      )
+      with urlrequest.urlopen(req, timeout=60) as r:
+          resp = json.load(r)
+      print("LiteLLM tool_choice=required OK:", resp["choices"][0]["message"].get("tool_calls"))
+      PY
+    volumeMounts:
+    - name: projects
+      mountPath: /debs
+      subPath: datasets/code_data/cyber_bench/run/data/deb_cache
+  volumes:
+  - name: projects
+    hostPath:
+      path: /projects/data
+      type: Directory

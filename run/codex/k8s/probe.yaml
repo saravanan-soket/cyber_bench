@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Pod
+metadata: {name: codex-eka-probe, namespace: eka-bench}
+spec:
+  restartPolicy: Never
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - {key: kubernetes.io/hostname, operator: NotIn, values: [soketlab-worker002, soketlab-worker018]}
+  containers:
+  - name: c
+    image: node:22-bookworm
+    resources: {requests: {cpu: "2", memory: 4Gi}, limits: {cpu: "4", memory: 8Gi}}
+    command: ["bash","-lc"]
+    args:
+    - |
+      set -e
+      echo "== install public codex =="
+      npm install -g @openai/codex@0.118.0 >/dev/null 2>&1 && echo "codex installed: $(codex --version 2>&1 | head -1)"
+      mkdir -p $HOME/.codex
+      cat > $HOME/.codex/auth.json <<JSON
+      {"OPENAI_API_KEY": "EMPTY"}
+      JSON
+      cat > $HOME/.codex/config.toml <<TOML
+      openai_base_url = "http://172.17.98.19:8000/v1"
+      web_search = "disabled"
+      model_provider = "openai_http"
+
+      [model_providers.openai_http]
+      name = "OpenAI HTTP"
+      base_url = "http://172.17.98.19:8000/v1"
+      supports_websockets = false
+      TOML
+      echo "== config =="; cat $HOME/.codex/config.toml
+      mkdir -p /workspace && cd /workspace && echo "hello world" > testfile.txt
+      echo "== run codex exec against Eka (trivial task) =="
+      export OPENAI_API_KEY=EMPTY
+      timeout 300 codex exec --model eka-sft7-w3000 --json --dangerously-bypass-approvals-and-sandbox --skip-git-repo-check -- "List the files in the current directory using ls, then tell me what testfile.txt contains." 2>&1 | tail -40
+      echo "CODEX_EXIT=$?"
+    volumeMounts: []

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata: {name: eka-debug, namespace: eka-bench}
+spec:
+  restartPolicy: Never
+  containers:
+  - name: d
+    image: python:3.12-bookworm
+    resources: {requests: {cpu: "2", memory: 4Gi}, limits: {cpu: "2", memory: 4Gi}}
+    env: [{name: SHARD_COUNT, value: "500"}, {name: JOB_COMPLETION_INDEX, value: "0"}]
+    command: ["bash","-lc"]
+    args:
+    - |
+      set -x
+      python3 /projects/data/datasets/code_data/cyber_bench/run/agent_runner.py --tasks-dir /projects/data/datasets/code_data/cyber_bench/run/tasks_all         --trace-dir /projects/data/datasets/code_data/cyber_bench/run/traces_full --poc-dir /projects/data/datasets/code_data/cyber_bench/run/pocs_full         --base-url http://172.17.98.19:8000/v1 --model eka-sft7-w3000         --concurrency 1 --max-turns 6 2>&1 | tee /projects/data/datasets/code_data/cyber_bench/run/logs/debug_pod.log
+      echo "EXIT=${PIPESTATUS[0]}" | tee -a /projects/data/datasets/code_data/cyber_bench/run/logs/debug_pod.log
+    volumeMounts: [{name: projects, mountPath: /projects/data}]
+  volumes: [{name: projects, hostPath: {path: /projects/data, type: Directory}}]

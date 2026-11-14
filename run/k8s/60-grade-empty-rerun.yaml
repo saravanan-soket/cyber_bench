@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata: {name: grade-empty-rerun, namespace: eka-bench}
+spec:
+  restartPolicy: Never
+  containers:
+  - name: grader
+    image: python:3.12-bookworm
+    resources: {requests: {cpu: "1", memory: 2Gi}, limits: {cpu: "2", memory: 4Gi}}
+    env:
+    - {name: SERVER, value: "http://cybergym-server.eka-bench.svc.cluster.local:8666"}
+    - {name: DBPATH, value: "/projects/data/datasets/code_data/cyber_bench/run/grade/poc_empty_rerun.db"}
+    command: ["bash","-lc"]
+    args:
+    - |
+      pip install --quiet httpx sqlalchemy pydantic
+      pip install --quiet -e /projects/data/datasets/code_data/cyber_bench/cybergym
+      python3 /projects/data/datasets/code_data/cyber_bench/run/grade_client_empty_rerun.py
+    volumeMounts:
+    - {name: projects, mountPath: /projects/data}
+  volumes:
+  - {name: projects, hostPath: {path: /projects/data, type: Directory}}
