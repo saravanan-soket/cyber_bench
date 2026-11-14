@@ -1,0 +1,502 @@
+# OSWorld Responses API Agent
+
+The OSWorld agent runs complete desktop-computer tasks through NeMo Gym. The
+agent and benchmark stay in the Gym process; only the OSWorld desktop
+container/VM lifecycle moves into Gym Docker Sandbox. Each `/run` request
+creates an OSWorld `DesktopEnv`, sends observations to the configured model,
+parses and executes actions, invokes OSWorld's inline evaluator, and returns
+the trajectory and reward in Gym's Responses API shape.
+
+This directory owns the reusable runtime. Dataset preparation, benchmark
+configuration, model-specific overlays, serving recipes, and the full user
+guide live in the [OSWorld benchmark](../../benchmarks/osworld/README.md).
+
+The OSWorld agent and its vLLM transport use a managed Python interpreter at
+the repository's declared Python floor. This matters when Gym is loaded from
+a newer checkout inside an older accepted container: the parent CLI may keep
+running there, while each isolated server venv is resolved with the compatible
+managed interpreter. For offline runs, pre-seed uv's Python install directory
+and export `UV_PYTHON_INSTALL_DIR` before `gym env prefetch`.
+If the parent Ray cluster is still on a different 3.13 patch, the operator must
+either upgrade the whole cluster or explicitly set
+`RAY_DEFAULT_PYTHON_VERSION_MATCH_LEVEL=minor`; Ray otherwise requires an
+exact patch match. The relaxed mode is only valid within one Python minor and
+must be covered by a real server-registration smoke, not assumed from a
+successful resolver.
+
+## Request and response contract
+
+The rollout collector sends the complete upstream task under
+`verifier_metadata.osworld_task`. The runtime passes that task to
+`DesktopEnv.reset(task_config=...)` without translating its setup or evaluator
+semantics. `responses_create_params` supplies per-rollout sampling overrides.
+
+A completed response includes:
+
+- Gym `reward`, using `binary` (default), `raw`, or the opt-in `signed_v1`
+  mapping described below;
+- `runtime_eligible` plus `runtime_admission_reason` and policy identity;
+  `mask_sample` remains the backward-compatible inverse carrier for
+  infrastructure, timeout, and evaluator failures;
+- `horizon_reached` and `evaluation_completed`, so an evaluated `max_steps`
+  outcome is not confused with corrupt runtime data;
+- `verifier_metadata.osworld_score`, `osworld_steps`, completion/error state,
+  termination reason, model identity, artifact directory, and proxy provenance;
+- a schema-v2 `trajectory_contract` and one semantic `(state, action, reward,
+  next_state, done)` transition per environment step;
+- `trajectory_model_calls`, preserving each materialized prompt, sampled
+  action, reward/done linkage, parser outcome, and any available token/logprob
+  evidence. Screenshot bytes live once in `media_assets`; prompts reference
+  them by ordered `media_id`.
+
+### Semantic trajectory and exact model-call evidence
+
+Trajectory collection is automatic; it is not a training mode. Every runner,
+including closed model APIs that do not expose tokens, returns the semantic
+contract. `trajectory_contract.capabilities` says which stronger evidence is
+available.
+
+For endpoints that return `prompt_token_ids`, `generation_token_ids`, and
+`generation_log_probs`, Gym additionally emits `context_compaction_contract`
+exact authority. Each materialized model call is independent, so successive
+prompts may rewrite any earlier token or media position. Parser retries are
+also separate model calls and are not collapsed into the environment step.
+NeMo-RL can therefore reconstruct prefix-contiguous physical traces while one
+logical rollout retains one reward and advantage.
+
+When training-token capture owns the token arrays, the agent may not receive
+exact token evidence itself. In that case, `response.output` preserves one
+assistant message per **accepted** model call, including the original thinking
+text. A successful retry is included; parser-rejected attempts are not accepted
+history. Complete `trajectory_model_calls` evidence still preserves every
+attempt, its raw completion, acceptance flag, and parse error. Calls without a
+response or with empty served content
+(such as a local context-overflow refusal) provide no usable returned-content
+witness and are skipped; the capture ledger independently records what ran.
+An empty accepted history stays empty instead of falling back
+to synthesized step text. `terminal_response_id` identifies the last observed
+non-empty served response by its Chat completion ID. This lets the
+trainer join returned history to capture records without matching against
+parser-normalized actions. Capture-disabled responses and the existing exact
+per-call token-evidence path keep their previous behavior; that compatibility
+path still exports all exact calls, including parser retries.
+
+With NeMo-RL capture selection, `returned_history` selects the accepted output;
+`all_captured` explicitly opts into training captured rejected attempts too,
+subject to the trainer's completion and evidence checks. Neither capture nor
+the presence of a call in diagnostic evidence alone makes it accepted history.
+The scored terminal and selected ancestry must still be valid: if the last
+served call was rejected, its ID is not reassigned to an earlier accepted call.
+`returned_history` rejects that selection because the terminal is absent from
+accepted output. If a rejected terminal lacks that ID, response construction
+fails rather than permitting fallback to an earlier call. Likewise, if retry
+feedback makes an accepted call depend on
+a rejected captured parent, the trainer must reject the non-closed selection,
+not silently add that parent to the loss. Use an explicit compatible selection
+policy for these cases. This agent does not rewrite prompts or fabricate new
+capture roots to work around selection validation. Gym's runtime admission,
+evaluator score, and reward remain independent of this training selection.
+
+Training manifests should supply a model-independent caller-owned identity:
+
+```json
+{
+  "trajectory_identity": {
+    "schema_version": 1,
+    "group_id": "chrome-task-001",
+    "task_id": "task-001",
+    "rollout_index": 0,
+    "attempt_index": 0
+  }
+}
+```
+
+The trace-aware NeMo-RL launcher derives and stamps `rollout_id` inside that
+object and binds a runtime generation contract before training dispatch.
+Standalone benchmarks derive a stable identity automatically and still emit
+the same semantic contract. A trainer must fail closed unless the identity is
+caller-owned, exact evidence is complete, runtime admission is valid, and its
+own tokenizer/template/processor contract passes. Gym exposes the first two
+admission layers independently: `trajectory_contract.runtime_admission`
+classifies VM/evaluator trust, while `exact_trace_admission` reports evidence
+facts and leaves the final loss/token decision to the training consumer. The
+legacy `training_eligibility` and `eligible` fields remain compatibility views.
+The `context_compaction_contract` wire name is retained for compatibility with
+the existing NeMo-RL physical-trace reconstructor; it is evidence capability,
+not a Gym training switch.
+
+At `max_steps`, the runner executes the last valid action first, evaluates the
+resulting VM state, preserves score/reward, records
+`termination_reason=max_steps` and `horizon_reached=true`, and then applies
+runtime admission. Both reward-zero and reward-one horizons remain
+runtime-eligible when evaluation completed. The model adapter never fabricates
+`FAIL` and never decides `mask_sample`; it reports parse and transport facts.
+
+OSWorld continues to evaluate inside `env.evaluate()`. The environment backend
+is selectable between OSWorld's provider directly and Gym Sandbox. In the
+Sandbox path, OSWorld still owns `DesktopEnv`, setup, controllers, actions,
+and evaluators; Gym Sandbox owns only the VM container lifecycle, dynamic
+service endpoints, status, and cleanup.
+
+### Generated-task evaluators and reward modes
+
+Generated tasks can carry a `taskgen_plugins` block with schema
+`taskgen-plugins/1`: getter/metric names, Python source under
+`modules.getters` and `modules.metrics`, and a SHA-256 digest of those modules.
+`taskgen_plugins.register_task_plugins()` validates the block and registers
+the declared functions before `DesktopEnv.reset()` resolves them. It refuses
+to replace built-in OSWorld functions or reuse a name with a different digest
+within one task. Registrations last only for that task: `run_osworld_task()`
+clears them after closing the environment in its `finally` block, including
+partial registration, reset, rollout, evaluator, and environment-close failures.
+Cleanup removes only the exact callable objects installed by the loader,
+including aliases/partials, never built-ins or later replacements. Reused Ray
+workers therefore do not carry evaluator functions into the next task; different
+tasks may use the same name for different implementations or share a getter
+with different metrics. Tasks without this block are unchanged. The remote Resources
+Server path rejects these plugins because it cannot register their functions
+in the evaluator process.
+
+Plugin source executes as Python in the agent's evaluator process. Only use
+trusted task datasets; the digest checks content consistency, not authorship
+or sandbox isolation. This mechanism does not rewrite canonical OSWorld task
+setup or evaluator definitions.
+
+`reward_mode` maps the evaluator score and the agent's terminal action:
+
+| Mode | Reward |
+| --- | --- |
+| `binary` (default) | 1 when the evaluator score reaches 1.0; otherwise 0 |
+| `raw` | The evaluator score, including partial credit |
+| `signed_v1` (opt-in) | 1 on evaluator success; -1 for `DONE` without success; otherwise 0 |
+
+An infeasible task whose evaluator awards success for `FAIL` still earns 1.
+Infrastructure admission remains separate from reward mapping. `signed_v1`
+does not penalize reaching the step limit without `DONE`, so it can encourage
+continuing to the horizon; it is not a new benchmark default. Aggregate metrics
+continue to use the evaluator's raw score and binary success, independently
+of the selected training reward mapping.
+
+## Runtime components
+
+| File | Responsibility |
+| --- | --- |
+| `app.py` | Gym server, request validation, model transport, Ray dispatch, response and aggregate metrics |
+| `client.py` | `DesktopEnv` lifecycle, cache staging, action execution, evaluation, logging, and artifacts |
+| `rollout_outcome.py` | Termination classification and runtime admission; never changes actions, score, or reward |
+| `runner_registry.py` | Runner names, upstream class paths, and default observation/action contracts |
+| `adapter_agents.py` | Gym-owned model scaffolds, including `NemotronV3NanoOmniAgent` |
+| `trajectory.py` | Model-independent semantic trajectory identity, transitions, and evidence capabilities |
+| `exact_trace.py` | Optional exact model-call/token/media evidence for trace-aware trainers |
+| `action_parser.py` | Gym pyautogui/control-action parsing and validation |
+| `proxy.py` | Explicit proxy-task configuration validation and non-secret provenance |
+| `runtime_dependencies.py` | Version/import readiness check and explicit-install remediation for excluded packages |
+| `taskgen_plugins.py` | Validate, register, and clear task-scoped trusted evaluator functions without replacing OSWorld built-ins |
+| `reward_modes.py` | Map evaluator score and terminal action to the configured training reward |
+| `sandbox_desktop_env.py` | Scoped `DesktopEnv` compatibility wiring for the Gym Sandbox backend |
+| `sandbox_provider.py` | OSWorld provider contract backed by Gym Sandbox lifecycle and endpoints |
+
+### Shared Gym foundations
+
+The following foundations are already merged into Gym `main`:
+
+| Change | Contract used here |
+| --- | --- |
+| [#3591](https://github.com/NVIDIA-NeMo/Gym/pull/3591) | Isolated component runtimes, setup configuration, and rollout identity |
+| [#4128](https://github.com/NVIDIA-NeMo/Gym/pull/4128) | Shared training-token capture, lineage, and external-staging contracts |
+| [#4822](https://github.com/NVIDIA-NeMo/Gym/pull/4822) | Docker-create reconciliation and E2B service endpoints/worker transport |
+
+The taskgen, reward-mode, and served-history changes in
+[#4896](https://github.com/NVIDIA-NeMo/Gym/pull/4896) use these merged
+foundations; no additional stacked PR is needed for that scope.
+[#3368](https://github.com/NVIDIA-NeMo/Gym/pull/3368) is the separate optional
+simple-agent compaction migration, not OSWorld's `history_policy` implementation.
+[#4823](https://github.com/NVIDIA-NeMo/Gym/pull/4823) separately fixes shared
+HTTP-client shutdown and wildcard-host dialing. Neither change is bundled
+into #4896 or a prerequisite for merging its OSWorld-only changes. Workloads
+that need those separate capabilities should track their PRs explicitly.
+
+### OSWorld source dependency
+
+This agent intentionally installs the immutable
+[`JeffPengCoder/OSWorld`](https://github.com/JeffPengCoder/OSWorld) fork at
+commit `f32ab2b74e3ea66e6a8eb0d87876a12ce93904d5`, as declared in
+[`pyproject.toml`](pyproject.toml). That revision starts from upstream
+OSWorld `83e85344` and includes the `nv-gym` provider overlay, proxy-runtime
+repair, logging hardening, VLC gateway-auth fallback, the per-environment
+provider contract, opt-in setup/evaluator return-code semantics, and the
+restricted-guest Chrome ownership fix without rewriting canonical OSWorld task
+configs. Gym supplies orchestration and the
+worker control plane; OSWorld remains independent of Gym.
+
+The fork declares NumPy/OpenCV requirements by Python version: Python 3.12
+retains NumPy 1.26/OpenCV 4.8, while Python 3.13 uses NumPy 2.1+ and
+NumPy-2-compatible OpenCV 4.10.0.84+. Gym's role-local ranges further select
+the supported runtime. No NumPy override is needed to bypass OSWorld metadata;
+both this agent and the resources server consume the same source revision.
+
+The dependency is consumed as a commit-addressed source archive so uv does not
+initialize optional OSWorld submodules. Gym does not mutate the installed
+checkout at runtime, and the adapter does not monkeypatch OSWorld setup
+semantics. Update the fork URL or commit only together with contract tests and
+a real OSWorld rollout. Do not rewrite task setup to
+compensate for adapter behavior; task-corpus changes require their own dataset
+authority and evaluation review.
+
+## Supported runners
+
+`runner_name` selects the model-facing scaffold:
+
+| Runner | Ownership and contract |
+| --- | --- |
+| `gym_pyautogui` | Gym prompt and Python/pyautogui actions |
+| `prompt_agent` and `prompt_agent_*` | Upstream OSWorld `PromptAgent` observation/action variants |
+| `pointer_agent` | Upstream PointerAgent planner/executor/verifier loop |
+| `m3_agent` | Upstream MiniMax M3 scaffold and protocol |
+| `nemotron_v3_nano_omni_agent` | Gym-owned Nemotron 3 Nano Omni scaffold and parser |
+| `qwen3_omni_agent` | Upstream Qwen3VL scaffold through Gym model transport |
+
+The benchmark directory contains the model- and runner-specific YAML overlays.
+Those examples do not change the generic runtime defaults in this directory.
+
+### Nemotron response contract
+
+The adapter-owned Nemotron parser requires an explicit `## Code` section, so
+it never executes an unrelated code block from prose. `## Thought`,
+`## Action`, and `## Code` values may begin on the heading line or the next
+line, and Code may be fenced or unfenced. Thought and Action are descriptive
+metadata; an explicit, syntactically valid Code section remains executable even
+when an Action description is absent. Python is syntax-checked before OSWorld
+executes it, and terminal actions require an explicit `success` or `failure`
+status.
+
+The current model response must contain Code, but maintained conversation
+history deliberately retains only Thought and Action. Thinking-mode assistant
+history preserves the model's `<think>...</think>` wrapper. Omitting previously
+executed Code matches the validated Nano Omni prompt contract and avoids sending
+the same executable payload twice; this behavior is part of the standard
+`NemotronV3NanoOmniAgent`, not a run-local subclass or import overlay.
+
+When adding or upgrading a model, capture representative lossless responses
+and add focused parser regressions for heading placement, fenced and unfenced
+Code, literal newline escaping, reasoning/content separation, tool calls, and
+terminal status syntax. Supported formats should remain explicit rather than
+recovering executable code from arbitrary prose.
+
+### Model protocol and history policy
+
+The Nemotron adapter keeps two independently selectable identities:
+
+- `model_protocol_id` selects prompts, message templates, and response parser;
+- `history_policy` selects which completed turns remain live screenshots and
+  which are folded into text.
+
+Fixed three-image evaluation is explicit:
+
+```yaml
+model_protocol_id: nano-omni-v3-osworld-v1
+history_policy:
+  name: fixed
+  params: {keep_images: 3}
+```
+
+The append-stable 3-10-3 training window is a hysteresis policy:
+
+```yaml
+history_policy:
+  name: hysteresis
+  params: {low_water: 3, high_water: 10}
+```
+
+An opt-in sink window keeps the earliest screenshots alongside the recent
+window; intervening turns remain text in chronological order:
+
+```yaml
+history_policy:
+  name: sink_window
+  params: {sink: 1, low_water: 4, high_water: 4}
+```
+
+Here the four live images include one sink image and three recent images.
+Equal watermarks produce a sliding window. Setting `low_water: 3` and
+`high_water: 10` instead accumulates up to ten images and compacts back to
+three, including the sink. The low watermark must exceed `sink` to leave
+room for the current observation. Existing fixed/hysteresis policy identities
+and normal-path prompt rendering remain unchanged; selecting a sink is an
+intentional recipe change, not a default or a guaranteed score improvement.
+
+`snapshot_image_intervals` records the selected half-open turn intervals.
+For non-contiguous plans, consumers must use these intervals or per-turn
+decisions, not the legacy scalar `image_window_start` accessor. The telemetry
+field `snapshot_window_start` describes the trailing interval.
+
+On a context-length rejection, the adapter can shrink the recent-image window
+within its existing retry budget, preserving the sink and current observation.
+It stops when no smaller valid image set exists. Each actual shrink is recorded
+in `prompt_shrink_events`, including on recovered steps; this recovery can
+change outcomes relative to the previous unchanged-request retries. Normal
+parse failures do not trigger shrinking, and model deadlines propagate to the
+runner without parser retries. The adapter reports specific failure kinds and
+the terminal attempt's completion fact; runner/runtime admission still owns
+masking, and the evaluator still owns reward.
+
+`agent_contract_parity_mode: strict` is the default. It resolves the training
+and evaluation profiles at startup and refuses to start if their model
+protocol, history policy, or other Gym-owned adapter options differ. To run an
+intentional train/eval comparison, set the mode to `declared` and use
+`history_policy_by_rollout_purpose`; each response then records the selected
+`agent_contract_id`, `history_policy_id`, and `model_protocol_id`.
+
+```yaml
+agent_contract_parity_mode: declared
+history_policy_by_rollout_purpose:
+  training: {name: hysteresis, params: {low_water: 3, high_water: 10}}
+  evaluation: {name: fixed, params: {keep_images: 3}}
+```
+
+Legacy `max_trajectory_length` and `agent_kwargs.max_live_images` settings are
+accepted and normalized to the same identities. The legacy
+`agent_kwargs.max_image_history_length` / `max_live_images` fields cannot be
+mixed with an explicit `history_policy`; once the explicit form is present,
+the top-level `max_trajectory_length` remains only a compatibility field for
+other runners. Runtime exact-trace logic still measures the actual token/media
+prefix. A policy's structural append expectation never overrides that measured
+evidence.
+
+### PromptAgent variants
+
+The registered upstream PromptAgent variants are:
+
+- `prompt_agent_screenshot_pyautogui`
+- `prompt_agent_computer_13`
+- `prompt_agent_a11y_tree_pyautogui`
+- `prompt_agent_a11y_tree_computer_13`
+- `prompt_agent_screenshot_a11y_tree_pyautogui`
+- `prompt_agent_screenshot_a11y_tree_computer_13`
+- `prompt_agent_som_pyautogui`
+
+Runners that need accessibility data enable it when constructing `DesktopEnv`.
+Reasoning wrapped in `<think>` or `<thinking>` is removed before actions are
+executed.
+
+## Configuration
+
+The base configuration is
+[`configs/osworld_agent.yaml`](configs/osworld_agent.yaml). Important fields
+are grouped below.
+
+Gym's `skip_venv_if_present: true` explicitly reuses an existing role venv;
+it does not refresh dependencies when source manifests change. After a required
+dependency change, update that role environment explicitly or run setup with
+`skip_venv_if_present: false`. Setup retains the role's `.python-version` and
+uv resolver policy, serializes installers, and records its dependency identity
+only after installation succeeds. Ordinary source edits do not require setup.
+
+Environment and execution:
+
+- `provider_name`, `container_image`, `headless`, `screen_width`, and
+  `screen_height` configure `DesktopEnv`.
+- `sandbox_provider` selects a named Gym Sandbox provider configuration;
+  `sandbox_spec` supplies the provider-neutral image/resources/entrypoint, and
+  `sandbox_vm_path` selects the read-only OSWorld qcow2 base.
+  `sandbox_provider_overrides` applies an OSWorld-only recursive delta to the
+  selected provider after named configuration resolution. For example, the
+  default OpenSandbox delta bounds VM admission retries without shortening the
+  shared provider budget used by other Gym workloads.
+- `sandbox_require_kvm`, `sandbox_ready_timeout_s`, and
+  `sandbox_ready_poll_s` control the OSWorld Sandbox startup gate.
+- `concurrency` limits simultaneous `/run` requests.
+- `max_steps`, `sleep_after_execution`, `step_timeout`, and `task_timeout`
+  bound rollout work. `task_timeout` is the end-to-end Ray attempt deadline,
+  covering sandbox creation, environment setup, agent steps, and evaluation;
+  it is also checked cooperatively between child steps and applied to Pointer
+  model requests. `task_cancel_grace_s` bounds sandbox cleanup before the
+  parent force-cancels a worker that remains stuck.
+- `cache_dir` is OSWorld's mutable per-run cache; `setup_cache_dir` points to
+  the read-only cache populated by benchmark preparation.
+
+Runner and model behavior:
+
+- `runner_name`, `action_space`, and `observation_type` select a registered
+  runner contract.
+- `env_class_path` and `agent_class_path` allow explicit compatible classes.
+- `agent_kwargs` supplies runner-specific constructor options.
+- `max_tokens`, `temperature`, and `top_p` provide server defaults; request
+  values can override sampling parameters.
+
+Evaluation and operations:
+
+- `reward_mode` is `binary`, `raw`, or opt-in `signed_v1`; aggregate metrics always report both
+  binary success and raw OSWorld reward rates over the measured, unmasked
+  subset, following Gym's shared aggregation policy. Normal evaluated failures
+  with reward zero stay in that subset. Report `coverage/measured_rollouts`,
+  `coverage/masked_rollouts`, and task coverage alongside scores when samples
+  are masked; the old `osworld/masked_rollout_count` is replaced by these shared
+  counters. An entirely masked run reports coverage without inventing a score.
+- `evaluator_disable_gpu` prevents evaluator helpers from reserving rollout
+  GPU memory.
+- `enable_proxy` and `proxy_config_file` apply only to tasks explicitly marked
+  `proxy: true`. `allow_direct_proxy_tasks` preserves the benchmark's direct
+  fallback by default on local and Gym Sandbox backends; strict training or
+  deployment profiles can set it to `false` to mask those tasks instead.
+- `asset_input_jsonl` lets server startup idempotently fill missing prepared
+  assets before accepting work.
+
+See the benchmark guide for complete field semantics, logging controls, model
+recipes, VM requirements, and troubleshooting.
+
+## Running the benchmark
+
+The current Gym CLI commands are:
+
+```bash
+cd benchmarks/osworld
+python3 prepare.py \
+  --execution-backend gym_sandbox \
+  --vm-path /absolute/path/to/Ubuntu.qcow2
+
+# Explicitly opt in to packages excluded from Gym's shipped environments.
+# prepare.py prints these commands with the exact configured venv path.
+gym env prefetch
+bash ../../responses_api_agents/osworld_agent/install_optional_runtime_deps.sh \
+  ../../responses_api_agents/osworld_agent/.venv
+
+# Terminal 1: start configured servers.
+gym env start
+
+# Terminal 2: collect against those running servers.
+gym eval run --no-serve
+```
+
+The installer targets only the managed OSWorld agent venv. It does not modify
+the system Python, Gym's root venv, the model server, or the OSWorld VM. The
+installer synchronizes `runtime/uv.lock` with `uv sync --locked --inexact`,
+which preserves the base agent environment while adding the explicitly opted-in
+packages. The runtime project binds both Torch wheels to the CPU index. Commit
+both runtime manifest and lock when changing these optional packages.
+
+Choose a model-specific agent composition during preparation. For example:
+
+```bash
+python3 prepare.py \
+  --profile pointer \
+  --execution-backend gym_sandbox \
+  --vm-path /absolute/path/to/Ubuntu.qcow2 \
+  --policy-base-url https://ANTHROPIC_COMPATIBLE_HOST/v1 \
+  --policy-model-name SERVED_OPUS_4_7_MODEL
+```
+
+The Docker backend mounts that base as read-only `/System.qcow2`. Reset means
+destroying the Sandbox container and recreating it from the base, matching
+OSWorld's Docker-provider behavior. Live RAM/device-state snapshots are not
+implemented; callers that require them must select a virtualization provider
+with an explicit live-snapshot API.
+
+For data selection, host setup, advanced launchers, model-specific examples,
+and expected outputs, use the [benchmark README](../../benchmarks/osworld/README.md).
+
+## Licensing
+
+- Gym adapter code: Apache 2.0.
+- OSWorld code and task data retain their upstream licenses. See the benchmark
+  README and pinned dependency metadata for details.
