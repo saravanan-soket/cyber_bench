@@ -73,14 +73,27 @@ collects the `audit/` directory back. From there the normal
 ```
 cyber_bench/
 ├── README.md                  (this file)
-├── cybergym/                  benchmark 1: tasks + server + mask_map.json
-├── sec_bench_pro/             benchmark 2: harness + prompts + projects
+├── cybergym/
+│   └── examples/agents/
+│       ├── cybench/           upstream
+│       ├── enigma/            upstream
+│       ├── codex/             upstream
+│       ├── openhands/         upstream
+│       ├── claude/            NEW: Claude Code driver
+│       └── opencode/          NEW: OpenCode driver
+├── sec_bench_pro/
 │   └── harness/
-│       ├── eval_loop.py       NEW: drive SEC-bench instances with loop
-│       └── configs/loop/      NEW: example configs (v8, sm, linux)
+│       ├── eval_claude.py     upstream
+│       ├── eval_codex.py      upstream
+│       ├── eval_opencode.py   upstream
+│       ├── eval_loop.py       Soket AI loop
+│       ├── eval_cybench.py    NEW: Cybench driver
+│       ├── eval_enigma.py     NEW: EnIGMA driver
+│       ├── eval_openhands.py  NEW: OpenHands driver
+│       └── configs/           per-agent example configs
 └── loop_runners/
     ├── README.md
-    └── cybergym_loop.py       NEW: drive CyberGym tasks with loop
+    └── cybergym_loop.py       drive CyberGym tasks with loop
 ```
 
 The old Eka ReAct runners (`run/agent_runner.py`, `sec_bench_pro_run/*`) and
