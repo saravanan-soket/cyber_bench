@@ -7,7 +7,7 @@ harness:
 | Directory | What it is | Loop driver |
 | --- | --- | --- |
 | `cybergym/` | [CyberGym](https://arxiv.org/abs/2506.02548): 1,507 real-world OSS-Fuzz vulnerability tasks. Agents produce a PoC, the CyberGym server grades it. | [`loop_runners/cybergym_loop.py`](loop_runners/cybergym_loop.py) |
-| `sec_bench_pro/` | [SEC-bench Pro](https://sec-bench.github.io/): 344 verified cases across Chromium V8, SpiderMonkey, and the Linux kernel. Agents run inside a benchmark container and drop artifacts into `./audit/`. | [`sec_bench_pro/harness/eval_loop.py`](sec_bench_pro/harness/eval_loop.py) |
+| `sec_bench_pro/` | [SEC-bench Pro](https://sec-bench.github.io/): 207 verified cases across Chromium V8 (103) and SpiderMonkey (104); the upstream Linux kernel cases are not included. Agents run inside a benchmark container and drop artifacts into `./audit/`. | [`sec_bench_pro/harness/eval_loop.py`](sec_bench_pro/harness/eval_loop.py) |
 
 The `loop` binary is the single agent for both benchmarks. Each task becomes
 one `loop --print` invocation, with loop driving its own shell, file, and MCP

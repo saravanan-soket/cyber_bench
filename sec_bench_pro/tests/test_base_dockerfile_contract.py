@@ -11,7 +11,6 @@ DOCKERFILES = {
     "v8": ROOT / "base" / "v8" / "Dockerfile",
     "v8-latest": ROOT / "base" / "v8" / "Dockerfile.latest",
     "sm": ROOT / "base" / "sm" / "Dockerfile",
-    "linux": ROOT / "base" / "linux" / "Dockerfile",
 }
 
 COMMON_TOOLS = {
@@ -188,7 +187,6 @@ class BaseDockerfileContractTests(unittest.TestCase):
             "v8": 'git -C "$SRC/v8" fetch',
             "v8-latest": "ninja -j\"$jobs\" -C out/x64.release d8",
             "sm": "./mach bootstrap --application-choice=js",
-            "linux": "uv pip install --system /opt/secb-mcps/linux",
         }
         for name, source in self.sources.items():
             self.assertLess(

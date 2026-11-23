@@ -7,9 +7,9 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 usage() {
     cat <<'EOF'
-Usage: build_base_images.sh [options] [v8] [sm] [linux]
+Usage: build_base_images.sh [options] [v8] [sm]
 
-Build the selected canonical base images. All three are built when no target
+Build the selected canonical base images. Both are built when no target
 is provided. AGENT_CACHE_BUST may be set to an explicit shared cache key.
 
 Options:
@@ -60,12 +60,12 @@ while (( $# > 0 )); do
 done
 
 if (( ${#targets[@]} == 0 )); then
-    targets=(v8 sm linux)
+    targets=(v8 sm)
 fi
 
 for target in "${targets[@]}"; do
     case "$target" in
-        v8|sm|linux) ;;
+        v8|sm) ;;
         *)
             echo "Error: unknown target: $target" >&2
             usage >&2
@@ -127,11 +127,6 @@ for target in "${targets[@]}"; do
         sm)
             docker build -t hwiwonlee/sm.base:latest \
                 "${docker_options[@]}" "${build_args[@]}" "$REPO_ROOT/base/sm"
-            ;;
-        linux)
-            docker build -t hwiwonlee/linux.base:latest \
-                -f "$REPO_ROOT/base/linux/Dockerfile" \
-                "${docker_options[@]}" "${build_args[@]}" "$REPO_ROOT"
             ;;
     esac
 done

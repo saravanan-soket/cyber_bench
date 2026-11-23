@@ -104,12 +104,11 @@ class BaseBuildRoutineTests(unittest.TestCase):
                 "https://downloads.claude.ai/claude-code-releases/latest",
             },
         )
-        self.assertEqual(len(docker_calls), 3)
+        self.assertEqual(len(docker_calls), 2)
 
         expected_tags = (
             "hwiwonlee/v8.base:latest",
             "hwiwonlee/sm.base:latest",
-            "hwiwonlee/linux.base:latest",
         )
         for call, tag in zip(docker_calls, expected_tags, strict=True):
             self.assertTrue(call.startswith(f"build -t {tag} "), call)
@@ -120,19 +119,17 @@ class BaseBuildRoutineTests(unittest.TestCase):
 
         self.assertTrue(docker_calls[0].endswith(str(ROOT / "base" / "v8")))
         self.assertTrue(docker_calls[1].endswith(str(ROOT / "base" / "sm")))
-        self.assertIn(f"-f {ROOT / 'base' / 'linux' / 'Dockerfile'}", docker_calls[2])
-        self.assertTrue(docker_calls[2].endswith(str(ROOT)))
 
     def test_selected_targets_preserve_requested_order(self) -> None:
-        result, docker_calls, _ = self._run("linux", "sm")
+        result, docker_calls, _ = self._run("sm", "v8")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual(len(docker_calls), 2)
-        self.assertIn("hwiwonlee/linux.base:latest", docker_calls[0])
-        self.assertIn("hwiwonlee/sm.base:latest", docker_calls[1])
+        self.assertIn("hwiwonlee/sm.base:latest", docker_calls[0])
+        self.assertIn("hwiwonlee/v8.base:latest", docker_calls[1])
 
     def test_platform_and_no_cache_are_forwarded_to_docker(self) -> None:
         result, docker_calls, _ = self._run(
-            "linux", "--platform", "linux/amd64", "--no-cache"
+            "sm", "--platform", "linux/amd64", "--no-cache"
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual(len(docker_calls), 1)

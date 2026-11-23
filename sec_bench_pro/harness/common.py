@@ -776,6 +776,11 @@ def load_config(config_path: Path) -> dict:
         raise ValueError(f"Invalid mode '{mode}'. Only '{SOURCE_FILES_MODE}' is supported.")
     cfg["mode"] = SOURCE_FILES_MODE
 
+    if is_linux_project(cfg.get("project")):
+        raise ValueError(
+            "Linux kernel cases were removed from this repo; only 'v8' and 'sm' are supported."
+        )
+
     tracking = cfg.get("tracking", "beads")
     if tracking not in ("beads", "acov", "none"):
         raise ValueError(f"Invalid tracking '{tracking}'. Must be 'beads', 'acov', or 'none'.")

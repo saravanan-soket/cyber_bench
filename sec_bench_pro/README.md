@@ -21,12 +21,11 @@
 
 SEC-bench Pro is a repository for building advanced software security benchmarks from real-world bug reports, proof-of-concept inputs, and reproducible execution environments. The goal is to make difficult security cases easier to study, validate, and reuse for benchmarking research, triage workflows, and automated analysis systems.
 
-The benchmark currently includes 344 verified cases across Chromium V8, Mozilla SpiderMonkey, and the Linux kernel. Each case packages `meta.json`, reproduction assets, Docker build files, validation logs, and fixed-image checks where applicable.
+This copy keeps the 207 verified JavaScript-engine cases: 103 Chromium V8 and 104 Mozilla SpiderMonkey. The upstream benchmark's 137 Linux kernel cases were removed from this repo. Each case packages `meta.json`, reproduction assets, Docker build files, validation logs, and fixed-image checks where applicable.
 
 ## News
 
 - [2026-06]: 🔥 SEC-bench Pro was used in the full [GPT-5.5-Cyber](https://openai.com/index/daybreak-securing-the-world/) and [GPT-5.6](https://deploymentsafety.openai.com/gpt-5-6-preview/sec-bench-pro) evaluation.
-- [2026-06]: The Linux leaderboard is now live ([link](https://sec-bench.github.io/linux)).
 - [2026-05]: The SpiderMonkey leaderboard is now live ([link](https://sec-bench.github.io/firefox)).
 - [2026-05]: SEC-bench Pro launched with the V8 leaderboard ([link](https://sec-bench.github.io/v8)).
 
@@ -39,18 +38,6 @@ Prerequisites:
 - `uv`
 - Agent credentials for the config you run. Codex configs use `OPENAI_API_KEY` or `~/.codex/auth.json` with `copy_host_auth = true`; Claude and OpenCode configs use the provider credentials declared in their TOML files.
 
-Linux evaluations additionally require an x86-64 Linux host whose Docker daemon
-can expose a readable and writable `/dev/kvm` to a privileged container. This
-includes enabling nested virtualization when evaluating from a cloud VM.
-The benchmark does not support QEMU TCG as an equivalent grading mode: it
-changes execution time and scheduling, and can invalidate time-sensitive PoCs.
-Check the actual container environment before starting an evaluation:
-
-```sh
-docker run --rm --privileged hwiwonlee/linux.x86_64:CVE-2022-0185 \
-  bash -lc 'test -r /dev/kvm && test -w /dev/kvm && echo KVM-ready'
-```
-
 Install Python dependencies from the repo root:
 
 ```sh
@@ -62,7 +49,6 @@ Run an example Codex eval for a target project:
 ```sh
 uv run harness/eval_codex.py harness/configs/codex/v8/config.example.toml
 uv run harness/eval_codex.py harness/configs/codex/sm/config.example.toml
-uv run harness/eval_codex.py harness/configs/codex/linux/config.example.toml
 ```
 
 Run Claude or OpenCode with the matching config tree:
@@ -82,23 +68,10 @@ To evaluate a small target set, edit the TOML config before running:
 instances = ["472139305"]        # explicit case ids
 # instances = "__verified__"     # all verified cases in images_dir
 outdir = "output/v8/codex/my-run"
-images_dir = "../projects/v8"    # use ../projects/sm or ../projects/linux for other targets
+images_dir = "../projects/v8"    # use ../projects/sm for SpiderMonkey
 ```
 
 Relative `outdir` values are resolved under `harness/`, so the example above writes to `harness/output/v8/codex/my-run/<timestamp>/<instance_id>/`. See `harness/README.md` for all config fields, provider options, and artifact details.
-
-### Linux MCP Sandbox
-
-Linux agent runs expose the KVM/QEMU harness through the vendored
-`mcps/linux` package (`secb-linux-vm-mcp`). Agents write `audit/poc.c` and use
-the trusted MCP tools `secb_build`, `secb_repro`, and `secb_validate`; the MCP
-server runs outside the agent command sandbox so QEMU gets native KVM while the
-agent shell remains network-restricted.
-
-All Linux leaves now declare `meta.json.privilege`: `user` PoCs run as uid
-1000, and `root` PoCs run as init-namespace uid 0. The Linux prompts and MCP
-validator use this field so the stated attacker model matches the actual guest
-execution.
 
 The example configs harden network access per agent: Codex uses
 `workspace-write` with `network_access = false` and `web_search = "disabled"`,
@@ -107,26 +80,14 @@ calls through a network-namespace shell wrapper.
 
 ## Grade Results
 
-`harness/grade.py` uses staged execution judging plus scoped source review for V8/SpiderMonkey, while Linux retains its combined vulnerable/fixed/latest judge. Point `--target-dir` at one timestamped run or a parent directory containing timestamped runs:
+`harness/grade.py` uses staged execution judging plus scoped source review for V8/SpiderMonkey. Point `--target-dir` at one timestamped run or a parent directory containing timestamped runs:
 
 ```sh
 uv run harness/grade.py --project v8 --target-dir harness/output/v8/codex/example/gpt-5.5 --benchmark-dir projects/v8 --pull-missing
 uv run harness/grade.py --project sm --target-dir harness/output/sm/codex/example/gpt-5.5 --benchmark-dir projects/sm --pull-missing
-uv run harness/grade.py --project linux --target-dir harness/output/linux/codex/example/gpt-5.5 --benchmark-dir projects/linux --pull-missing
 ```
 
-Summary CSVs are written to `<timestamp_dir>/summary` unless `--out-dir` is set. Linux latest validation uses per-CVE images from `hwiwonlee/linux.x86_64.latest:<instance_id>`; build local copies with:
-
-```sh
-python projects/linux/build_images.py --mode latest -j 4
-```
-
-The default latest snapshot is pinned to Linux commit
-`d2c9a99135da931377240942d44f3dea104cedb8`. For cases whose target subsystem
-or required interface is unavailable at that commit, `meta.json` can pin a
-post-fix compatible snapshot in `latest_validation.linux_ref`. That
-per-instance ref takes precedence; `--linux-ref` is the fallback for all other
-cases.
+Summary CSVs are written to `<timestamp_dir>/summary` unless `--out-dir` is set.
 
 SpiderMonkey fixed images use `hwiwonlee/sm.x86_64.fixed:<issue_id>`. To build
 a local replacement for a tag, run:
@@ -144,7 +105,6 @@ Each project has a host-side oracle for checking the packaged PoC against its vu
 ```sh
 projects/v8/crash_check.sh 472139305
 projects/sm/crash_check.sh 1880719
-projects/linux/crash_check.sh CVE-2022-0185
 ```
 
 V8 and SpiderMonkey also accept a custom PoC path:
@@ -159,7 +119,6 @@ Check that a fixed image mitigates the same case:
 ```sh
 python projects/v8/patch_check.py 472139305
 python projects/sm/patch_check.py 1880719
-python projects/linux/patch_check.py CVE-2022-0185
 ```
 
 The crash oracles read image names, binaries, and command-line options from each case's `meta.json`. `output.txt` is retained as validation context, not as the scoring oracle.
@@ -169,44 +128,31 @@ The crash oracles read image names, binaries, and command-line options from each
 ```text
 base/
   chromium/    Base image definitions for Chromium-related targets
-  linux/       Base/latest image definitions for Linux kernel benchmark cases
   sm/          Base/latest image definitions for SpiderMonkey benchmark cases
   v8/          Base image definitions for V8 benchmark cases
 harness/
   eval_codex.py
   eval_claude.py
   eval_opencode.py
+  eval_loop.py
+  eval_openhands.py
+  eval_cybench.py
+  eval_enigma.py
   common.py
   grade.py
   judge.py
   source_review.py
-  configs/claude/
+  configs/<agent>/   claude, codex, opencode, loop, openhands, cybench, enigma
     v8/
     sm/
-    linux/
-  configs/codex/
-    v8/
-    sm/
-    linux/
-  configs/opencode/
-    v8/
-    sm/
-    linux/
 prompts/
   baseline/
   judge/
-mcps/
-  linux/       Vendored secb Linux VM MCP server
 projects/
   v8/
     <issue_id>/  103 Chromium V8 benchmark cases
   sm/
     <issue_id>/  104 Mozilla SpiderMonkey benchmark cases
-  linux/
-    CVE-*/       137 Linux kernel benchmark cases
-    build_images.py  Build orchestrator for base/vuln/fixed/latest images
-    crash_check.sh   Host-side vuln image crash oracle
-    patch_check.py   Host-side fixed image mitigation oracle
 ```
 
 ## License

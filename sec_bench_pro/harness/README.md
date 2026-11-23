@@ -1,5 +1,11 @@
 # SEC-bench Pro Harness
 
+> **Note:** this repo keeps only the V8 and SpiderMonkey cases. The Linux kernel
+> cases, configs, prompts and the `mcps/linux` server were removed, and configs
+> with `project = "linux"` are rejected. Linux sections below describe upstream
+> behaviour only; the matching code paths in `common.py` and `grade.py` are
+> left dormant.
+
 End-to-end evaluation pipeline for SEC-bench Pro:
 
 1. **Drive an agent** (Claude Code, Codex, or OpenCode) inside per-instance
