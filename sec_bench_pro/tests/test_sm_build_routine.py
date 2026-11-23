@@ -336,7 +336,7 @@ class SpiderMonkeyBuildRoutineTests(unittest.TestCase):
 
     def test_all_fixed_leaves_depend_on_the_probed_canonical_base(self) -> None:
         dockerfiles = sorted((ROOT / "projects" / "sm").glob("*/Dockerfile.fixed"))
-        self.assertEqual(len(dockerfiles), 104)
+        self.assertEqual(len(dockerfiles), 80)
         for dockerfile in dockerfiles:
             first_from = next(
                 line for line in dockerfile.read_text(encoding="utf-8").splitlines()

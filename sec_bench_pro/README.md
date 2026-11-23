@@ -21,7 +21,7 @@
 
 SEC-bench Pro is a repository for building advanced software security benchmarks from real-world bug reports, proof-of-concept inputs, and reproducible execution environments. The goal is to make difficult security cases easier to study, validate, and reuse for benchmarking research, triage workflows, and automated analysis systems.
 
-This copy keeps the 207 verified JavaScript-engine cases: 103 Chromium V8 and 104 Mozilla SpiderMonkey. The upstream benchmark's 137 Linux kernel cases were removed from this repo. Each case packages `meta.json`, reproduction assets, Docker build files, validation logs, and fixed-image checks where applicable.
+This copy keeps exactly the 183 cases on the official [Overall leaderboard](https://sec-bench.github.io/): 103 Chromium V8 and 80 Mozilla SpiderMonkey. The upstream Linux kernel cases and the 24 SpiderMonkey cases outside the official set were removed from this repo. Each case packages `meta.json`, reproduction assets, Docker build files, validation logs, and fixed-image checks where applicable.
 
 ## News
 
@@ -93,9 +93,9 @@ SpiderMonkey fixed images use `hwiwonlee/sm.x86_64.fixed:<issue_id>`. To build
 a local replacement for a tag, run:
 
 ```sh
-projects/sm/build_fixed_images.sh 1675905
+projects/sm/build_fixed_images.sh 1880719
 # Or use a different repository and pass it to the grader with --fixed-repo.
-projects/sm/build_fixed_images.sh --image-repo myorg/sm.x86_64.fixed 1675905
+projects/sm/build_fixed_images.sh --image-repo myorg/sm.x86_64.fixed 1880719
 ```
 
 ## Reproduce Ground Truth
@@ -152,7 +152,7 @@ projects/
   v8/
     <issue_id>/  103 Chromium V8 benchmark cases
   sm/
-    <issue_id>/  104 Mozilla SpiderMonkey benchmark cases
+    <issue_id>/  80 Mozilla SpiderMonkey benchmark cases
 ```
 
 ## License
