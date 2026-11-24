@@ -79,17 +79,21 @@ cyber_bench/
 │       ├── enigma/            upstream
 │       ├── codex/             upstream
 │       ├── openhands/         upstream
-│       ├── claude/            NEW: Claude Code driver
-│       └── opencode/          NEW: OpenCode driver
+│       ├── claude/            Claude Code driver
+│       ├── opencode/          OpenCode driver
+│       ├── pi/                pi (Earendil) driver + Dockerfile
+│       └── deepseek/          DeepSeek Harness (dsh) driver + Dockerfile
 ├── sec_bench_pro/
 │   └── harness/
 │       ├── eval_claude.py     upstream
 │       ├── eval_codex.py      upstream
 │       ├── eval_opencode.py   upstream
 │       ├── eval_loop.py       Soket AI loop
-│       ├── eval_cybench.py    NEW: Cybench driver
-│       ├── eval_enigma.py     NEW: EnIGMA driver
-│       ├── eval_openhands.py  NEW: OpenHands driver
+│       ├── eval_cybench.py    Cybench driver
+│       ├── eval_enigma.py     EnIGMA driver
+│       ├── eval_openhands.py  OpenHands driver
+│       ├── eval_pi.py         pi (Earendil) driver
+│       ├── eval_deepseek.py   DeepSeek Harness (dsh) driver
 │       └── configs/           per-agent example configs
 └── loop_runners/
     ├── README.md

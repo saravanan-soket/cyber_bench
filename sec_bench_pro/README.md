@@ -58,6 +58,14 @@ uv run harness/eval_claude.py harness/configs/claude/v8/config.example.toml
 uv run harness/eval_opencode.py harness/configs/opencode/v8/config.example.toml
 ```
 
+Run pi (Earendil) or DeepSeek Harness (`dsh`). Both install their pinned CLI into
+the instance container with npm, and DeepSeek Harness runs with web search disabled:
+
+```sh
+uv run harness/eval_pi.py harness/configs/pi/v8/config.example.toml
+uv run harness/eval_deepseek.py harness/configs/deepseek/v8/config.example.toml
+```
+
 Each `harness/configs/<agent>/<project>/` directory contains one
 `config.example.toml`. Copy or edit that file to select another model,
 provider, output directory, or instance set.
@@ -138,11 +146,13 @@ harness/
   eval_openhands.py
   eval_cybench.py
   eval_enigma.py
+  eval_pi.py
+  eval_deepseek.py
   common.py
   grade.py
   judge.py
   source_review.py
-  configs/<agent>/   claude, codex, opencode, loop, openhands, cybench, enigma
+  configs/<agent>/   claude, codex, opencode, loop, openhands, cybench, enigma, pi, deepseek
     v8/
     sm/
 prompts/
